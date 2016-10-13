@@ -12,7 +12,7 @@ services:
     depends_on:
       - tap
     volumes:
-      - /Users/jenkinsd/Projects/Sandbox/opencadc/caom2ui/search/build/libs:/usr/local/tomcat/webapps
+      - /usr/local/tomcat/webapps
   tap:
     image: opencadc/tap
     ports:
@@ -30,8 +30,8 @@ services:
       - POSTGRES_PASSWORD=astr0query
       - PGDATA=/var/lib/postgresql/data/tap
     volumes:
-      - /Users/jenkinsd/devdata/postgresql/data/tap:/var/lib/postgresql/data/tap
-      - /Users/jenkinsd/devdata/postgresql/tabledata:/var/run/postgresql
+      - /var/lib/postgresql/data/tap
+      - /var/run/postgresql
 
 # Create the network 'archive' for which this system will run within.
 networks:
