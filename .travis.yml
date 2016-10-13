@@ -1,0 +1,6 @@
+language: java
+jdk:
+  - openjdk7
+  - oraclejdk8
+script: for mod in search; do cd $mod; gradle --info build javadoc install || break -1; cd ..; done
+
