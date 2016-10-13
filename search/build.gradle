@@ -58,6 +58,9 @@ group = 'ca.nrc.cadc'
 
 version = '1000'
 
+// Modify this to your liking!
+def docker_image_name = 'opencadc/search'
+
 war {
     archiveName = project.name + '##' + project.version + '.war'
 }
@@ -83,7 +86,7 @@ task copyWAR(type: Copy, dependsOn: war) {
 }
 
 task dockerize(type: Exec, dependsOn: [initDockerize, copyWAR]) {
-    commandLine 'docker', 'build', '-t', 'opencadc/search', '-f', './docker/Dockerfile', './docker/'
+    commandLine 'docker', 'build', '-t', docker_image_name, '-f', './docker/Dockerfile', './docker/'
 }
 
 sourceSets {
