@@ -1,0 +1,39 @@
+version: '2'
+services:
+  ui:
+    image: opencadc/search
+    ports:
+      - '8080:8080'
+      - '5555:5555'
+    networks:
+      - 'caom2'
+    environment:
+      - 'CATALINA_OPTS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5555 -Djava.security.egd=file:/dev/./urandom -Djsse.enableSNIExtension=false -Dcadc.search.theme=base -Dcadc.search.showObsCoreTab=true -Dcadc.search.maxRowLimit=30000 -Dcadc.search.tapServiceID=ivo://cadc.nrc.ca/tap -Dca.nrc.cadc.reg.client.RegistryClient.host=tap:8080'
+    depends_on:
+      - tap
+    volumes:
+      - /Users/jenkinsd/Projects/Sandbox/opencadc/caom2ui/search/build/libs:/usr/local/tomcat/webapps
+  tap:
+    image: opencadc/tap
+    ports:
+      - '9080:8080'
+    networks:
+      - 'caom2'
+    depends_on:
+      - tappg
+  tappg:
+    image: opencadc/tap_postgres
+    networks:
+      - 'caom2'
+    environment:
+      - POSTGRES_USER=tap
+      - POSTGRES_PASSWORD=astr0query
+      - PGDATA=/var/lib/postgresql/data/tap
+    volumes:
+      - /Users/jenkinsd/devdata/postgresql/data/tap:/var/lib/postgresql/data/tap
+      - /Users/jenkinsd/devdata/postgresql/tabledata:/var/run/postgresql
+
+# Create the network 'archive' for which this system will run within.
+networks:
+  caom2:
+    driver: 'bridge'
