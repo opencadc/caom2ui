@@ -47,11 +47,12 @@ Ideally, the database (`tappg`) should have mounted volumes to move state out of
     - POSTGRES_PASSWORD=astr0query
     - PGDATA=/var/lib/postgresql/data/tap
     volumes:
-    - /var/lib/postgresql/data/tap:/var/lib/postgresql/data
+    - /var/lib/postgresql/data:/var/lib/postgresql/data
     - /var/run/postgresql/tap:/var/run/postgresql
 ...
 ```
 
-Where the `/var/lib/postgresql/data/tap` and `/var/run/postgresql/tap` directories are on the host, and are mounted as their mapped volumes (i.e. after the colon).
+Where the `/var/lib/postgresql/data` and `/var/run/postgresql/tap` directories are on the host, and are mounted as their mapped volumes (i.e. after the colon).
+Notice that the `PGDATA` variable is set to `/var/lib/postgresql/data/tap`, so the `tap` directory will need to be created in the host's `/var/lib/postgresql/data` directory.
 
 Not mounting the volumes from the host will keep all of the `postgresql` data in the container, which is volatile.
