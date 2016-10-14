@@ -30,7 +30,7 @@ services:
       - POSTGRES_PASSWORD=astr0query
       - PGDATA=/var/lib/postgresql/data/tap
     volumes:
-      - /var/lib/postgresql/data/tap
+      - /var/lib/postgresql/data
       - /var/run/postgresql
 
 # Create the network 'archive' for which this system will run within.

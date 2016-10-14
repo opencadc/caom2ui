@@ -33,3 +33,25 @@ To then construct a Docker image that can be run anywhere, modify the `build.gra
 To have a constructed docker image ready to run.  As of this writing, this image is based off the `tomcat:8.5-alpine` image.
 
 The provided [`docker-compose`](docker-compose.yml) file will construct a fully working system using the pre-built images in [OpenCADC](https://hub.docker.com/r/opencadc/).
+
+Ideally, the database (`tappg`) should have mounted volumes to move state out of the container:
+
+```YAML
+...
+    tappg:
+    image: opencadc/tap_postgres
+    networks:
+    - 'caom2'
+    environment:
+    - POSTGRES_USER=tap
+    - POSTGRES_PASSWORD=astr0query
+    - PGDATA=/var/lib/postgresql/data/tap
+    volumes:
+    - /var/lib/postgresql/data/tap:/var/lib/postgresql/data
+    - /var/run/postgresql/tap:/var/run/postgresql
+...
+```
+
+Where the `/var/lib/postgresql/data/tap` and `/var/run/postgresql/tap` directories are on the host, and are mounted as their mapped volumes (i.e. after the colon).
+
+Not mounting the volumes from the host will keep all of the `postgresql` data in the container, which is volatile.
