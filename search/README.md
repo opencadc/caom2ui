@@ -54,5 +54,6 @@ Ideally, the database (`tappg`) should have mounted volumes to move state out of
 
 Where the `/var/lib/postgresql/data` and `/var/run/postgresql/tap` directories are on the host, and are mounted as their mapped volumes (i.e. after the colon).
 Notice that the `PGDATA` variable is set to `/var/lib/postgresql/data/tap`, so the `tap` directory will need to be created in the host's `/var/lib/postgresql/data` directory.
+See the [Docker PostgreSQL](https://hub.docker.com/_/postgres) documentation.
 
 Not mounting the volumes from the host will keep all of the `postgresql` data in the container, which is volatile.
