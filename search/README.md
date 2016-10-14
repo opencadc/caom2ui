@@ -28,9 +28,10 @@ Where `<YOUR HOST>` is the location of a running TAP web service.
 Alternatively, this can be built into a Docker image and run as a container anywhere.
 
 To then construct a Docker image that can be run anywhere, modify the `build.gradle` file's variable `docker_image_name` to your liking, then run
+
 `gradle dockerize`
 
-To have a constructed docker image ready to run.  As of this writing, this image is based off the `tomcat:8.5-alpine` image.
+To have a constructed docker image ready to run (run `docker images` to see if it's listed).  As of this writing, the web application images are based off the `tomcat:8.5-alpine` image.
 
 The provided [`docker-compose`](docker-compose.yml) file will construct a fully working system using the pre-built images in [OpenCADC](https://hub.docker.com/r/opencadc/).
 
