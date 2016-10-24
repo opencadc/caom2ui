@@ -39,6 +39,7 @@ import java.util.List;
 
 import ca.nrc.cadc.AbstractUnitTest;
 import ca.nrc.cadc.caom2.types.*;
+import ca.nrc.cadc.date.DateUtil;
 import ca.nrc.cadc.search.parser.Operand;
 import ca.nrc.cadc.search.parser.Range;
 
@@ -267,7 +268,7 @@ public class ADQLImplTest extends AbstractUnitTest<ADQLImpl>
     @Test
     public void toSQLTimestampSearch() throws Exception
     {
-        final Calendar calendar = Calendar.getInstance();
+        final Calendar calendar = Calendar.getInstance(DateUtil.UTC);
         calendar.set(1977, Calendar.NOVEMBER, 25, 3, 21, 0);
         calendar.set(Calendar.MILLISECOND, 0);
 
@@ -288,28 +289,27 @@ public class ADQLImplTest extends AbstractUnitTest<ADQLImpl>
 
         assertEquals("Query string is wrong for timestamp.",
                      "Plane.dataRelease IS NOT NULL "
-                     + "AND Plane.dataRelease >= '1977-11-25 11:21:00.000' "
-                     + "AND Plane.dataRelease <= '1977-12-25 11:21:00.000'",
+                     + "AND Plane.dataRelease >= '1977-11-25 03:21:00.000' "
+                     + "AND Plane.dataRelease <= '1977-12-25 03:21:00.000'",
                      queryString);
 
         final String queryString2 =
                 getTestSubject().toSQL(timestampSearchTemplate, false);
 
         assertEquals("Query string is wrong for timestamp.",
-                     "Plane.dataRelease >= '1977-11-25 11:21:00.000' "
-                     + "AND Plane.dataRelease <= '1977-12-25 11:21:00.000'",
+                     "Plane.dataRelease >= '1977-11-25 03:21:00.000' "
+                     + "AND Plane.dataRelease <= '1977-12-25 03:21:00.000'",
                      queryString2);
 
         // Test 2
         final SearchTemplate timestampSearchTemplate2 =
-                new TimestampSearch("Plane.dataRelease", lowerDate,
-                                    null);
+                new TimestampSearch("Plane.dataRelease", lowerDate, null);
 
         final String queryString3 =
                 getTestSubject().toSQL(timestampSearchTemplate2, false);
 
         assertEquals("Query string is wrong for timestamp.",
-                     "Plane.dataRelease >= '1977-11-25 11:21:00.000'",
+                     "Plane.dataRelease >= '1977-11-25 03:21:00.000'",
                      queryString3);
     }
 
@@ -318,13 +318,13 @@ public class ADQLImplTest extends AbstractUnitTest<ADQLImpl>
     {
         setTestSubject(new ADQLImpl("caom2", null, null, null, null));
 
-        final Range<Double> raRange = new Range<Double>("110..115", null, 110d, 115d,
+        final Range<Double> raRange = new Range<>("110..115", null, 110d, 115d,
                                                         Operand.RANGE);
-        final Range<Double> decRange = new Range<Double>("-10..25", null, -10d, 25d,
+        final Range<Double> decRange = new Range<>("-10..25", null, -10d, 25d,
                                                          Operand.RANGE);
 
         final RangeSearch rangeSearch1 =
-                new RangeSearch<Double>(null, raRange, decRange);
+                new RangeSearch<>(null, raRange, decRange);
         try
         {
             getTestSubject().toSQL(rangeSearch1, null, false);
@@ -335,7 +335,7 @@ public class ADQLImplTest extends AbstractUnitTest<ADQLImpl>
         }
 
         final RangeSearch rangeSearch2 =
-                new RangeSearch<Double>("TESTSS", raRange, decRange);
+                new RangeSearch<>("TESTSS", raRange, decRange);
         try
         {
             getTestSubject().toSQL(rangeSearch2, null, false);
@@ -345,7 +345,7 @@ public class ADQLImplTest extends AbstractUnitTest<ADQLImpl>
         {
         }
 
-        final RangeSearch rangeSearch3 = new RangeSearch<Double>("Plane.position.bounds",
+        final RangeSearch rangeSearch3 = new RangeSearch<>("Plane.position.bounds",
                                                                  raRange, decRange);
         final String sql = getTestSubject().toSQL(rangeSearch3, null, false);
         assertEquals("RangeSearch SQL doesn't match.",
@@ -390,7 +390,7 @@ public class ADQLImplTest extends AbstractUnitTest<ADQLImpl>
         setTestSubject(new ADQLImpl("caom2", "search_upload,param:targetList",
                                     "ALL", "target_name", "position_bounds"));
 
-        final Calendar calendar = Calendar.getInstance();
+        final Calendar calendar = Calendar.getInstance(DateUtil.UTC);
         calendar.set(1977, Calendar.NOVEMBER, 25, 3, 21, 0);
         calendar.set(Calendar.MILLISECOND, 0);
 
@@ -406,15 +406,14 @@ public class ADQLImplTest extends AbstractUnitTest<ADQLImpl>
         final SearchTemplate numberTemplate =
                 new NumericSearch("Plane.energy.resolvingPower", 5000, null);
 
-        final List<SearchTemplate> templateList =
-                new ArrayList<SearchTemplate>(2);
+        final List<SearchTemplate> templateList = new ArrayList<>(2);
         templateList.add(timestampSearchTemplate);
         templateList.add(numberTemplate);
 
         final String whereClause = getTestSubject().getWhere(templateList);
 
         assertEquals("Wrong where clause.",
-                     " ( Plane.dataRelease >= '1977-11-25 11:21:00.000' AND Plane.dataRelease <= '1977-12-25 11:21:00.000' "
+                     " ( Plane.dataRelease >= '1977-11-25 03:21:00.000' AND Plane.dataRelease <= '1977-12-25 03:21:00.000' "
                      + "AND  Plane.energy_resolvingPower >= 5000 ) ",
                      whereClause);
     }
