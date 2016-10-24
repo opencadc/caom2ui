@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Context>
+
+  <WatchedResource>WEB-INF/web.xml</WatchedResource>
+
+    <!-- development server -->
+    <ResourceLink name="jdbc/uws-9"
+                  global="jdbc/postgresql-uws-9"
+                  type="javax.sql.DataSource" />
+
+    <!-- production servers -->
+    <ResourceLink name="jdbc/uws-201"
+                  global="jdbc/postgresql-uws-201"
+                  type="javax.sql.DataSource" />
+
+    <ResourceLink name="jdbc/uws-202"
+                  global="jdbc/postgresql-uws-202"
+                  type="javax.sql.DataSource" />
+
+  <ResourceLink name="jdbc/uws"
+                global="jdbc/postgresql-uws"
+                type="javax.sql.DataSource" />
+
+</Context>

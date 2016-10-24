@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+         version="3.0">
+
+  <display-name>caom2_web</display-name>
+
+  <filter>
+    <filter-name>AccessControlFilter</filter-name>
+    <filter-class>ca.nrc.cadc.auth.AccessControlFilter</filter-class>
+
+    <init-param>
+      <param-name>alwaysAugmentWithCredentials</param-name>
+      <param-value>true</param-value>
+    </init-param>
+
+    <init-param>
+      <param-name>allowAnonymous</param-name>
+      <param-value>true</param-value>
+    </init-param>
+  </filter>
+
+  <filter-mapping>
+    <filter-name>AccessControlFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+
+  <servlet>
+    <servlet-name>logControl</servlet-name>
+    <servlet-class>ca.nrc.cadc.log.LogControlServlet</servlet-class>
+    <init-param>
+      <param-name>logLevel</param-name>
+      <param-value>info</param-value>
+    </init-param>
+    <init-param>
+      <param-name>logLevelPackages</param-name>
+      <param-value>
+        ca.nrc.cadc.log
+        ca.nrc.cadc.caom2
+      </param-value>
+    </init-param>
+    <init-param>
+        <param-name>logAccessGroup</param-name>
+        <param-value>CADC</param-value>
+    </init-param>
+    <init-param>
+        <param-name>groupAuthorizer</param-name>
+        <param-value>ca.nrc.cadc.auth.CADCGroupAuthorizer</param-value>
+    </init-param>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+
+  <servlet>
+    <servlet-name>obsview</servlet-name>
+    <servlet-class>ca.nrc.cadc.caom2.ui.ObservationViewServlet</servlet-class>
+    <load-on-startup>2</load-on-startup>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>logControl</servlet-name>
+    <url-pattern>/logControl</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>obsview</servlet-name>
+    <url-pattern>/view/*</url-pattern>
+  </servlet-mapping>
+
+    <!-- Define the public security role -->
+    <security-role>
+        <description>Public security role</description>
+        <role-name>public</role-name>
+    </security-role>
+	
+    <!-- Define a security constraint for 'auth' -->
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>auth</web-resource-name>
+            <description/>
+            <url-pattern>/logControl/*</url-pattern>
+            <http-method>GET</http-method>
+            <http-method>POST</http-method>
+            <http-method>HEAD</http-method>
+            <http-method>PUT</http-method>
+            <http-method>OPTIONS</http-method>
+            <http-method>TRACE</http-method>
+            <http-method>DELETE</http-method>
+        </web-resource-collection>
+        <auth-constraint>
+            <description>force authentication for all requests</description>
+            <role-name>public</role-name>
+        </auth-constraint>
+    </security-constraint>
+    
+    <login-config>
+        <auth-method>BASIC</auth-method>
+        <realm-name>Canadian Astronomy Data Centre</realm-name>
+    </login-config>
+
+</web-app>

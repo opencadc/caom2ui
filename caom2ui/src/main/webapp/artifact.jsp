@@ -1,0 +1,69 @@
+<%@ taglib uri="WEB-INF/c.tld" prefix="c" %>
+
+<%--
+This JSP page renders a CAOM Artifact in an HTML table.
+
+It should be included with 
+
+request.setAttribute("artifact", a);
+<c:import url="artifact.jsp">
+--%>
+
+<%@ page import="ca.nrc.cadc.caom2.Part" %>
+<%@ page import="ca.nrc.cadc.caom2.ui.SS" %>
+
+<jsp:useBean id="artifact" scope="request" type="ca.nrc.cadc.caom2.Artifact"/>
+<jsp:useBean id="indent" scope="request" type="java.lang.Integer"/>
+
+
+<div style="margin-left: <%= indent.intValue() %>em">
+
+  <h2>Artifact</h2>
+
+  <table class="content">
+    <tr>
+      <td>artifactID</td>
+      <td><%= artifact.getID() %> aka <%= artifact.getID()
+          .getLeastSignificantBits() %>
+      </td>
+    </tr>
+    <tr>
+      <td>lastModified</td>
+      <td><%= SS.toString(artifact.getLastModified()) %>
+      </td>
+    </tr>
+    <tr>
+      <td>uri</td>
+      <td><%= artifact.getURI() %>
+      </td>
+    </tr>
+    <tr>
+        <td>productType</td><td><%= SS.toString(artifact.getProductType()) %></td>
+    </tr>
+    <tr>
+        <td>releaseType</td><td><%= SS.toString(artifact.getReleaseType()) %></td>
+    </tr>
+    </tr>
+    <tr>
+      <td>contentType</td>
+      <td><%= artifact.contentType %>
+      </td>
+    </tr>
+    <tr>
+      <td>contentLength</td>
+      <td><%= artifact.contentLength %>
+      </td>
+    </tr>
+
+  </table>
+
+  <%
+    for (final Part part : artifact.getParts())
+    {
+      request.setAttribute("part", part);
+  %>
+  <c:import url="part.jsp"/>
+  <%
+    }
+  %>
+</div>
