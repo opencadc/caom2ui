@@ -36,6 +36,7 @@ package ca.nrc.cadc.caom2;
 import java.util.Calendar;
 import java.util.Date;
 
+import ca.nrc.cadc.date.DateUtil;
 import org.junit.Test;
 
 import ca.nrc.cadc.AbstractUnitTest;
@@ -50,7 +51,7 @@ public class TimestampSearchTest
     @Test
     public void constructorBadDates() throws Exception
     {
-        final Calendar calendar = Calendar.getInstance();
+        final Calendar calendar = Calendar.getInstance(DateUtil.UTC);
         calendar.set(1977, Calendar.NOVEMBER, 25, 3, 12, 0);
         calendar.set(Calendar.MILLISECOND, 0);
 
@@ -62,15 +63,14 @@ public class TimestampSearchTest
 
         try
         {
-            setTestSubject(new TimestampSearch("NAME", lowerValue,
-                                                           upperValue));
+            setTestSubject(new TimestampSearch("NAME", lowerValue, upperValue));
             fail("Should throw IllegalArgumentException");
         }
         catch (IllegalArgumentException e)
         {
             assertEquals("Wrong message.",
-                         "Lower date (1977-11-25 11:22:00.000) is after Upper "
-                         + "date (1977-11-25 11:12:00.000).",
+                         "Lower date (1977-11-25 03:22:00.000) is after Upper "
+                         + "date (1977-11-25 03:12:00.000).",
                          e.getMessage());
         }
     }

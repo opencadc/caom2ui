@@ -38,6 +38,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.*;
 
 import ca.nrc.cadc.AbstractUnitTest;
+import ca.nrc.cadc.date.DateUtil;
 import ca.nrc.cadc.net.TransientException;
 import ca.nrc.cadc.uws.*;
 import ca.nrc.cadc.uws.server.JobUpdater;
@@ -62,7 +63,7 @@ public class AdvancedRunnerTest extends AbstractUnitTest<AdvancedRunner>
     @Test
     public void runOK() throws Throwable
     {
-        final Calendar cal = Calendar.getInstance();
+        final Calendar cal = Calendar.getInstance(DateUtil.UTC);
         cal.set(1977, Calendar.NOVEMBER, 25, 3, 21, 0);
         cal.set(Calendar.MILLISECOND, 0);
 
@@ -113,7 +114,7 @@ public class AdvancedRunnerTest extends AbstractUnitTest<AdvancedRunner>
     @Test
     public void runInternalServerError() throws Throwable
     {
-        final Calendar cal = Calendar.getInstance();
+        final Calendar cal = Calendar.getInstance(DateUtil.UTC);
         cal.set(1977, Calendar.NOVEMBER, 25, 3, 21, 0);
         cal.set(Calendar.MILLISECOND, 0);
 

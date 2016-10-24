@@ -36,6 +36,7 @@ package ca.nrc.cadc.search;
 
 import ca.nrc.cadc.AbstractUnitTest;
 
+import ca.nrc.cadc.date.DateUtil;
 import org.apache.log4j.Level;
 import org.json.JSONObject;
 import org.json.JSONWriter;
@@ -61,9 +62,9 @@ public class UnitConversionServletTest
 {
     private static final String TIME_PRESET_UTYPE = "Plane.time.bounds_PRESET";
 
-    StringWriter stringWriter = new StringWriter();
-    JSONWriter jsonWriter = new JSONWriter(stringWriter);
-    Map<String, String[]> parameters = new HashMap<>();
+    private StringWriter stringWriter = new StringWriter();
+    private JSONWriter jsonWriter = new JSONWriter(stringWriter);
+    private Map<String, String[]> parameters = new HashMap<>();
 
     private final FormErrors formErrors = new FormErrors();
 
@@ -100,7 +101,7 @@ public class UnitConversionServletTest
     {
         setTestSubject(new UnitConversionServlet());
 
-        final Calendar cal = Calendar.getInstance();
+        final Calendar cal = Calendar.getInstance(DateUtil.UTC);
         cal.set(1977, Calendar.NOVEMBER, 25, 3, 12, 0);
         cal.set(Calendar.MILLISECOND, 0);
 
@@ -109,7 +110,7 @@ public class UnitConversionServletTest
                                             TIME_PRESET_UTYPE, cal.getTime()));
 
         assertEquals("Wrong JSON Timestamp.",
-                     "[\" (43471.466667..43472.466667 MJD)\"]",
+                     "[\" (43471.133333..43472.133333 MJD)\"]",
                      stringWriter.toString());
     }
 
@@ -425,6 +426,7 @@ public class UnitConversionServletTest
         catch (Exception ignore)
         {
         }
+
         stringWriter = new StringWriter();
         jsonWriter = new JSONWriter(stringWriter);
         parameters = new HashMap<>();

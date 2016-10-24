@@ -94,7 +94,7 @@ public class TimestampFormConstraintTest
     @Test
     public void isValidCalendarEntry() throws Exception
     {
-        final Calendar calendar = Calendar.getInstance();
+        final Calendar calendar = Calendar.getInstance(DateUtil.UTC);
         calendar.set(1977, Calendar.NOVEMBER, 25, 3, 21, 0);
         calendar.set(Calendar.MILLISECOND, 0);
 
@@ -117,7 +117,7 @@ public class TimestampFormConstraintTest
     @Test
     public void isValidCalendarRangeEntry() throws Exception
     {
-        final Calendar calendar = Calendar.getInstance();
+        final Calendar calendar = Calendar.getInstance(DateUtil.UTC);
         calendar.set(1977, Calendar.NOVEMBER, 25, 3, 21, 0);
 
         final java.util.Date lowerDate = calendar.getTime();
@@ -152,7 +152,7 @@ public class TimestampFormConstraintTest
     @Test
     public void isValidMJDEntry() throws Exception
     {
-        final Calendar calendar = Calendar.getInstance();
+        final Calendar calendar = Calendar.getInstance(DateUtil.UTC);
         calendar.set(1977, Calendar.NOVEMBER, 25, 3, 21, 0);
         calendar.set(Calendar.MILLISECOND, 0);
 
@@ -175,7 +175,7 @@ public class TimestampFormConstraintTest
     @Test
     public void isValidMJDCalendarMixedEntry() throws Exception
     {
-        final Calendar calendar = Calendar.getInstance();
+        final Calendar calendar = Calendar.getInstance(DateUtil.UTC);
         calendar.set(1977, Calendar.NOVEMBER, 25, 3, 21, 0);
         calendar.set(Calendar.MILLISECOND, 0);
 
@@ -223,7 +223,7 @@ public class TimestampFormConstraintTest
     @Test
     public void buildSearch() throws Exception
     {
-        final Calendar calendar = Calendar.getInstance();
+        final Calendar calendar = Calendar.getInstance(DateUtil.UTC);
         calendar.set(1977, Calendar.NOVEMBER, 25, 3, 21, 0);
         calendar.set(Calendar.MILLISECOND, 0);
 

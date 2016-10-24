@@ -39,11 +39,10 @@
 
 package ca.nrc.cadc.search.parser;
 
+import ca.nrc.cadc.date.DateUtil;
 import ca.nrc.cadc.util.Log4jInit;
-import java.util.TimeZone;
 import ca.nrc.cadc.search.parser.exception.DateParserException;
 import java.util.Calendar;
-import org.junit.BeforeClass;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 
@@ -62,33 +61,6 @@ public class DateParserTest
                            org.apache.log4j.Level.INFO);
     }
 
-    public static final TimeZone UTC = TimeZone.getTimeZone("UTC");
-
-    public static Calendar dateCal;
-    public static Calendar dateTimeCal;
-
-
-    @BeforeClass
-    public static void before()
-    {
-        dateCal = Calendar.getInstance();
-        dateCal.clear();
-        dateCal.setTimeZone(UTC);
-        dateCal.set(Calendar.YEAR, 1910);
-        dateCal.set(Calendar.MONTH, 1);
-        dateCal.set(Calendar.DAY_OF_MONTH, 11);
-
-        dateTimeCal = Calendar.getInstance();
-        dateTimeCal.clear();
-        dateTimeCal.setTimeZone(UTC);
-        dateTimeCal.set(Calendar.YEAR, 1910);
-        dateTimeCal.set(Calendar.MONTH, 1);
-        dateTimeCal.set(Calendar.DAY_OF_MONTH, 11);
-        dateTimeCal.set(Calendar.HOUR_OF_DAY, 21);
-        dateTimeCal.set(Calendar.MINUTE, 45);
-        dateTimeCal.set(Calendar.SECOND, 30);
-        dateTimeCal.set(Calendar.MILLISECOND, 125);
-    }
 
     @Test
     public void nullString()
@@ -114,10 +86,9 @@ public class DateParserTest
         LOGGER.debug("parseYear()...");
 
         final String query = "2010";
-        final Calendar startCal = Calendar.getInstance();
+        final Calendar startCal = Calendar.getInstance(DateUtil.UTC);
 
         startCal.clear();
-        startCal.setTimeZone(UTC);
         startCal.set(Calendar.YEAR, 2010);
 
         final DateParser parser = new DateParser(query);
@@ -174,9 +145,8 @@ public class DateParserTest
         LOGGER.debug("parseYearMonth()...");
 
         final String query = "2010-09";
-        Calendar startCal = Calendar.getInstance();
+        Calendar startCal = Calendar.getInstance(DateUtil.UTC);
         startCal.clear();
-        startCal.setTimeZone(UTC);
         startCal.set(Calendar.YEAR, 2010);
         startCal.set(Calendar.MONTH, 8); // zero based month
 
@@ -233,10 +203,9 @@ public class DateParserTest
         LOGGER.debug("parseYearMonthDay()...");
 
         final String query = "2010-09-22";
-        final Calendar cal = Calendar.getInstance();
+        final Calendar cal = Calendar.getInstance(DateUtil.UTC);
 
         cal.clear();
-        cal.setTimeZone(UTC);
         cal.set(Calendar.YEAR, 2010);
         cal.set(Calendar.MONTH, 8);
         cal.set(Calendar.DAY_OF_MONTH, 22);
@@ -296,10 +265,9 @@ public class DateParserTest
         LOGGER.debug("parseDateTimeIsoSepT()...");
 
         final String query = "2010-09-22T05:15:05.015";
-        final Calendar cal = Calendar.getInstance();
+        final Calendar cal = Calendar.getInstance(DateUtil.UTC);
 
         cal.clear();
-        cal.setTimeZone(UTC);
         cal.set(Calendar.YEAR, 2010);
         cal.set(Calendar.MONTH, 8);
         cal.set(Calendar.DAY_OF_MONTH, 22);
@@ -320,10 +288,10 @@ public class DateParserTest
         LOGGER.debug("parseDateTimeIsoSepSpace()...");
 
         final String query = "2010-09-22 05:15:05.015";
-        final Calendar cal = Calendar.getInstance();
+        final Calendar cal = Calendar.getInstance(DateUtil.UTC);
 
         cal.clear();
-        cal.setTimeZone(UTC);
+        
         cal.set(Calendar.YEAR, 2010);
         cal.set(Calendar.MONTH, 8);
         cal.set(Calendar.DAY_OF_MONTH, 22);
@@ -344,10 +312,10 @@ public class DateParserTest
         LOGGER.debug("parseDateHourIsoSepT()...");
 
         final String query = "2010-09-22T05";
-        final Calendar cal = Calendar.getInstance();
+        final Calendar cal = Calendar.getInstance(DateUtil.UTC);
 
         cal.clear();
-        cal.setTimeZone(UTC);
+        
         cal.set(Calendar.YEAR, 2010);
         cal.set(Calendar.MONTH, 8);
         cal.set(Calendar.DAY_OF_MONTH, 22);
@@ -365,10 +333,10 @@ public class DateParserTest
         LOGGER.debug("parseDateHourIsoSepSpace()...");
 
         final String query = "2010-09-22 05";
-        final Calendar cal = Calendar.getInstance();
+        final Calendar cal = Calendar.getInstance(DateUtil.UTC);
 
         cal.clear();
-        cal.setTimeZone(UTC);
+        
         cal.set(Calendar.YEAR, 2010);
         cal.set(Calendar.MONTH, 8);
         cal.set(Calendar.DAY_OF_MONTH, 22);
@@ -386,10 +354,10 @@ public class DateParserTest
         LOGGER.debug("parseJD()...");
 
         final String query = "2455461.5";
-        final Calendar cal = Calendar.getInstance();
+        final Calendar cal = Calendar.getInstance(DateUtil.UTC);
 
         cal.clear();
-        cal.setTimeZone(UTC);
+        
         cal.set(Calendar.YEAR, 2010);
         cal.set(Calendar.MONTH, 8);
         cal.set(Calendar.DAY_OF_MONTH, 22);
@@ -448,10 +416,10 @@ public class DateParserTest
         LOGGER.debug("parseMJD()...");
 
         final String query = "55461";
-        final Calendar cal = Calendar.getInstance();
+        final Calendar cal = Calendar.getInstance(DateUtil.UTC);
 
         cal.clear();
-        cal.setTimeZone(UTC);
+        
         cal.set(Calendar.YEAR, 2010);
         cal.set(Calendar.MONTH, 8);
         cal.set(Calendar.DAY_OF_MONTH, 22);

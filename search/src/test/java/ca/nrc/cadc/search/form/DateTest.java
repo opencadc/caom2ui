@@ -95,7 +95,7 @@ public class DateTest extends AbstractNumericFormConstraintTest<Date>
     @Before
     public void before()
     {
-        startDateCal = Calendar.getInstance();
+        startDateCal = Calendar.getInstance(DateUtil.UTC);
         startDateCal.clear();
         startDateCal.setTimeZone(UTC);
         startDateCal.set(Calendar.YEAR, 1977);
@@ -106,7 +106,7 @@ public class DateTest extends AbstractNumericFormConstraintTest<Date>
         startDateCal.set(Calendar.SECOND, 0);
         startDateCal.set(Calendar.MILLISECOND, 0);
 
-        endDateCal = Calendar.getInstance();
+        endDateCal = Calendar.getInstance(DateUtil.UTC);
         endDateCal.clear();
         endDateCal.setTimeZone(UTC);
         endDateCal.set(Calendar.YEAR, 2007);
@@ -117,7 +117,7 @@ public class DateTest extends AbstractNumericFormConstraintTest<Date>
         endDateCal.set(Calendar.SECOND, 0);
         endDateCal.set(Calendar.MILLISECOND, 0);
 
-        startDateTimeCal = Calendar.getInstance();
+        startDateTimeCal = Calendar.getInstance(DateUtil.UTC);
         startDateTimeCal.clear();
         startDateTimeCal.setTimeZone(UTC);
         startDateTimeCal.set(Calendar.YEAR, 1977);
@@ -128,7 +128,7 @@ public class DateTest extends AbstractNumericFormConstraintTest<Date>
         startDateTimeCal.set(Calendar.SECOND, 12);
         startDateTimeCal.set(Calendar.MILLISECOND, 125);
 
-        endDateTimeCal = Calendar.getInstance();
+        endDateTimeCal = Calendar.getInstance(DateUtil.UTC);
         endDateTimeCal.clear();
         endDateTimeCal.setTimeZone(UTC);
         endDateTimeCal.set(Calendar.YEAR, 2007);
@@ -168,7 +168,7 @@ public class DateTest extends AbstractNumericFormConstraintTest<Date>
         final List<Parameter> parameters = new ArrayList<>();
         parameters.add(new Parameter(TIME_UTYPE + Date.VALUE, query));
 
-        final Calendar endCal = Calendar.getInstance();
+        final Calendar endCal = Calendar.getInstance(DateUtil.UTC);
         endCal.clear();
         endCal.setTimeZone(UTC);
         endCal.set(Calendar.YEAR, 2007);
@@ -204,7 +204,7 @@ public class DateTest extends AbstractNumericFormConstraintTest<Date>
         final List<Parameter> parameters = new ArrayList<>();
         parameters.add(new Parameter(TIME_UTYPE + Date.VALUE, queryOne));
 
-        final Calendar endCal = Calendar.getInstance();
+        final Calendar endCal = Calendar.getInstance(DateUtil.UTC);
         endCal.clear();
         endCal.setTimeZone(UTC);
         endCal.set(Calendar.YEAR, 2007);
@@ -266,7 +266,7 @@ public class DateTest extends AbstractNumericFormConstraintTest<Date>
         final List<Parameter> parameters = new ArrayList<>();
         parameters.add(new Parameter(TIME_UTYPE + Date.VALUE, queryOne));
 
-        final Calendar startCal = Calendar.getInstance();
+        final Calendar startCal = Calendar.getInstance(DateUtil.UTC);
         startCal.clear();
         startCal.setTimeZone(UTC);
         startCal.set(Calendar.YEAR, 1977);
@@ -509,7 +509,7 @@ public class DateTest extends AbstractNumericFormConstraintTest<Date>
 
         replay(mockJob);
 
-        final Calendar startDateYearCal = Calendar.getInstance();
+        final Calendar startDateYearCal = Calendar.getInstance(DateUtil.UTC);
         startDateYearCal.clear();
         startDateYearCal.setTimeZone(UTC);
         startDateYearCal.set(Calendar.YEAR, 1977);
@@ -549,7 +549,7 @@ public class DateTest extends AbstractNumericFormConstraintTest<Date>
 
         replay(mockJob);
 
-        final Calendar startDateMonthCal = Calendar.getInstance();
+        final Calendar startDateMonthCal = Calendar.getInstance(DateUtil.UTC);
         startDateMonthCal.clear();
         startDateMonthCal.setTimeZone(UTC);
         startDateMonthCal.set(Calendar.YEAR, 1977);
@@ -756,7 +756,7 @@ public class DateTest extends AbstractNumericFormConstraintTest<Date>
     @Test
     public void searchJDAndDate() throws Exception
     {
-        final Calendar endCal = Calendar.getInstance();
+        final Calendar endCal = Calendar.getInstance(DateUtil.UTC);
         final String query = START_JD_STRING + ".." + END_DATE_STRING;
 
         endCal.clear();
@@ -856,7 +856,7 @@ public class DateTest extends AbstractNumericFormConstraintTest<Date>
     public void searchMJDAndDate() throws Exception
     {
         final String query = START_MJD_STRING + ".." + END_DATE_STRING;
-        final Calendar endCal = Calendar.getInstance();
+        final Calendar endCal = Calendar.getInstance(DateUtil.UTC);
 
         endCal.clear();
         endCal.setTimeZone(UTC);
@@ -949,7 +949,7 @@ public class DateTest extends AbstractNumericFormConstraintTest<Date>
         verifyDateTest(START_MJD_STRING + ".." + END_MJD_STRING);
     }
 
-    void verifyDateTest(final String query)
+    private void verifyDateTest(final String query)
     {
         final Job mockJob = createMock(Job.class);
         final List<Parameter> parameters = new ArrayList<>();
@@ -997,7 +997,7 @@ public class DateTest extends AbstractNumericFormConstraintTest<Date>
     @Test
     public void calculatePast24HourValue() throws Exception
     {
-        final Calendar cal = Calendar.getInstance();
+        final Calendar cal = Calendar.getInstance(DateUtil.UTC);
         cal.set(1977, Calendar.NOVEMBER, 25, 3, 12, 0);
         cal.set(Calendar.MILLISECOND, 0);
 
@@ -1005,14 +1005,14 @@ public class DateTest extends AbstractNumericFormConstraintTest<Date>
                                 TIME_PRESET_UTYPE, cal.getTime()));
 
         assertEquals("Wrong date string calculated",
-                     "1977-11-24 11:12:00.000..1977-11-25 11:12:00.000",
+                     "1977-11-24 03:12:00.000..1977-11-25 03:12:00.000",
                      getTestSubject().calculateValue(DatePreset.PAST_24_HOURS));
     }
 
     @Test
     public void calculatePastWeekValue() throws Exception
     {
-        final Calendar cal = Calendar.getInstance();
+        final Calendar cal = Calendar.getInstance(DateUtil.UTC);
         cal.set(1977, Calendar.NOVEMBER, 25, 3, 12, 0);
         cal.set(Calendar.MILLISECOND, 0);
 
@@ -1020,11 +1020,11 @@ public class DateTest extends AbstractNumericFormConstraintTest<Date>
                                 TIME_PRESET_UTYPE, cal.getTime()));
 
         assertEquals("Wrong date string calculated",
-                     "1977-11-18 11:12:00.000..1977-11-25 11:12:00.000",
+                     "1977-11-18 03:12:00.000..1977-11-25 03:12:00.000",
                      getTestSubject().calculateValue(DatePreset.PAST_WEEK));
 
         // Verify roll-over
-        final Calendar cal2 = Calendar.getInstance();
+        final Calendar cal2 = Calendar.getInstance(DateUtil.UTC);
         cal2.set(1977, Calendar.NOVEMBER, 4, 3, 12, 0);
         cal2.set(Calendar.MILLISECOND, 0);
 
@@ -1032,14 +1032,14 @@ public class DateTest extends AbstractNumericFormConstraintTest<Date>
                                 TIME_PRESET_UTYPE, cal2.getTime()));
 
         assertEquals("Wrong date string calculated",
-                     "1977-10-28 11:12:00.000..1977-11-04 11:12:00.000",
+                     "1977-10-28 03:12:00.000..1977-11-04 03:12:00.000",
                      getTestSubject().calculateValue(DatePreset.PAST_WEEK));
     }
 
     @Test
     public void calculatePastMonthValue() throws Exception
     {
-        final Calendar cal = Calendar.getInstance();
+        final Calendar cal = Calendar.getInstance(DateUtil.UTC);
         cal.set(1977, Calendar.NOVEMBER, 25, 3, 12, 0);
         cal.set(Calendar.MILLISECOND, 0);
 
@@ -1047,7 +1047,7 @@ public class DateTest extends AbstractNumericFormConstraintTest<Date>
                                 TIME_PRESET_UTYPE, cal.getTime()));
 
         assertEquals("Wrong date string calculated",
-                     "1977-10-25 11:12:00.000..1977-11-25 11:12:00.000",
+                     "1977-10-25 03:12:00.000..1977-11-25 03:12:00.000",
                      getTestSubject().calculateValue(DatePreset.PAST_MONTH));
     }
 
@@ -1146,7 +1146,7 @@ public class DateTest extends AbstractNumericFormConstraintTest<Date>
                                  final Double expectedLower,
                                  final Double expectedUpper)
     {
-        final Calendar cal = Calendar.getInstance();
+        final Calendar cal = Calendar.getInstance(DateUtil.UTC);
         cal.set(1977, Calendar.NOVEMBER, 25, 3, 12, 0);
         cal.set(Calendar.MILLISECOND, 0);
 
