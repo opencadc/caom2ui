@@ -51,8 +51,8 @@ public class Templates
     private static Logger log = Logger.getLogger(Templates.class);
     private static final int QUERY_LIMIT = 20000;
 
-    public List<FormError> errorList;
-    public List<SearchTemplate> searchTemplates;
+    private final List<FormError> errorList = new ArrayList<>();
+    private final List<SearchTemplate> searchTemplates = new ArrayList<>();
 
 
     /**
@@ -61,20 +61,17 @@ public class Templates
      * thrown creating the template are stored in a Map with the
      * Form attribute as the Map key and the exception message as
      * the Map value.
-     * <p/>
+     * <p>
      * If a ScalarTemplate is not created for an Enumerated Form
      * with a Collection attribute, then a ScalarTemplate is created
      * using the default Collections in the List cadcList.
-     * <p/>
+     * </p>
      * It is expected that the forms in the list have been validated.
      *
      * @param formConstraints List of forms.
      */
     public Templates(final List<SearchableFormConstraint> formConstraints)
     {
-        errorList = new ArrayList<>();
-        searchTemplates = new ArrayList<>();
-
         for (final SearchableFormConstraint formConstraint : formConstraints)
         {
             final SearchTemplate template =
@@ -161,14 +158,11 @@ public class Templates
 
         Templates templates = (Templates) o;
 
-        if (errorList != null ? !errorList.equals(templates.errorList) :
-            templates.errorList != null)
-        {
-            return false;
-        }
-        return searchTemplates != null ?
-               searchTemplates.equals(templates.searchTemplates) :
-               templates.searchTemplates == null;
+        return errorList != null ? errorList.equals(templates.errorList) :
+               templates.errorList == null && (searchTemplates != null ?
+                                               searchTemplates
+                                                       .equals(templates.searchTemplates) :
+                                               templates.searchTemplates == null);
 
     }
 

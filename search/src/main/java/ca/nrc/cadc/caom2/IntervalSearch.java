@@ -52,8 +52,8 @@ public class IntervalSearch extends AbstractTemplate
     /**
      * Creates an interval inclusion template. An interval matches this template
      * if it includes the specified value.
-     * </p><p>
-     * <code>i.lower <= value and value <= i.upper</code>
+     * <p>
+     * <code>i.lower &le; value and value &le; i.upper</code>
      * </p>
      * @param name      This search's name.
      * @param value     The Double value to treat as a range value.
@@ -67,8 +67,8 @@ public class IntervalSearch extends AbstractTemplate
     /**
      * Creates an interval intersection template. An interval matches this
      * template if it overlaps the specified bounds.
-     * </p><p>
-     * <code>i.lower <= upper and lower <= i.upper</code>
+     * <p>
+     * <code>i.lower &le; upper and lower &le; i.upper</code>
      * </p>
      * @param name      This search's name.
      * @param lower     The lower value of the range (inclusive).
@@ -85,7 +85,7 @@ public class IntervalSearch extends AbstractTemplate
      * template if it overlaps the specified bounds.
      *
      * <p>
-     * <code>i.lower <= upper and lower <= i.upper</code>
+     * <code>i.lower &le; upper and lower &le; i.upper</code>
      * </p>
      *
      * @param name      This search's name.

@@ -40,15 +40,15 @@ import ca.nrc.cadc.util.StringUtil;
 
 /**
  * ra [sep] dec [sep] [radius[unit]] [sep] [coordsys]
- * <p/>
+ * <p></p>
  * Class takes a String target value and attempts to parse
  * the target into R.A., Dec., and radius values. If it is
  * unable to parse the target into coordinates, it passes
  * the target to a name resolver to retrieve the coordinates.
- * <p/>
+ * <p></p>
  * If the name is simply an Object Name rather than a name that can be parsed,
  * then attempt all resolution, then give up.
- * <p/>
+ * <p></p>
  * 1 token is resolved to coordinates.
  * 2 tokens are a RA and DEC.
  * 3 tokens are a RA, DEC, and radius or coordinate system.
@@ -66,7 +66,7 @@ public class TargetParser
 {
     private static final Logger log = Logger.getLogger(TargetParser.class);
 
-    public static final String DEGREE_SYMBOL =
+    private static final String DEGREE_SYMBOL =
             Character.toString((char) 0x00b0);
     private static final String RA_DEC_SEPARATORS =
             "'\"dhmsDHMS:" + DEGREE_SYMBOL;
@@ -121,6 +121,12 @@ public class TargetParser
                                                   "$2");
     }
 
+    /**
+     * Check if query is asking for degrees.
+     *
+     * @param query     The query to check.
+     * @return      True if degrees, false otherwise.
+     */
     public boolean isQueryInDegrees(final String query)
     {
         boolean raIsDegrees = true;

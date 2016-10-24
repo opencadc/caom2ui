@@ -48,7 +48,7 @@ public class TimestampSearch extends AbstractTemplate
 
     /**
      * Create a TimestampSearchTemplate. The default is for the ends to be
-     * closed (include the specfied values).
+     * closed (include the specified values).
      *
      * @param name          The name of this search template.
      * @param lower         The lower end of the range.
@@ -65,8 +65,8 @@ public class TimestampSearch extends AbstractTemplate
      * @param name          The name of this search template.
      * @param lower         The lower end of the range.
      * @param upper         The upper end of the range.
-     * @param closedLower   Whether to treat the lower end as >= lower.
-     * @param closedUpper   Whether to treat the upper end as <= upper.
+     * @param closedLower   Whether to treat the lower end as &ge; lower.
+     * @param closedUpper   Whether to treat the upper end as &le; upper.
      */
     public TimestampSearch(final String name, final Date lower,
                            final Date upper,

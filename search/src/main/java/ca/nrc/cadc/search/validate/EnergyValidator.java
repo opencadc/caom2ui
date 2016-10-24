@@ -103,7 +103,7 @@ public class EnergyValidator extends NumberValidator
                         }
                         else
                         {
-                            return energyUnitConverter.toMeters(
+                            return energyUnitConverter.toMetres(
                                     value.doubleValue(), unit);
                         }
                     }

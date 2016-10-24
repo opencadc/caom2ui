@@ -28,6 +28,7 @@
 
 package ca.nrc.cadc.search.nameresolver;
 
+import ca.nrc.cadc.astro.ConversionUtil;
 import ca.nrc.cadc.search.nameresolver.exception.ClientException;
 import ca.nrc.cadc.search.nameresolver.exception.TargetNotFoundException;
 import ca.nrc.cadc.search.nameresolver.exception.WebServiceException;
@@ -40,22 +41,21 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 
-import ca.nrc.cadc.astro.CoordUtil;
 import ca.nrc.cadc.util.StringUtil;
 
 
 /**
  * Client Class to query the Name Resolver servlet using an HTTP GET request. The Name Resolver servlet
  * attempts to resolve a target name to RA and DEC coordinates in degrees.
- * <p/>
+ * <p></p>
  * Four methods are provided to resolve a target name. Each method takes the target name,
  * then optionally either a service argument, or cached argument , or both.
- * <p/>
+ * <p></p>
  * By default Name Resolver concurrently queries NED at CalTech, Simbad at CDS, and VizieR at CDS and CADC,
  * returning the first positive result. The service argument can specify any combination of NED, SIMBAD,
  * or VIZIER, comma delimited if more than one is specified, no spaces allowed. The service argument
  * is not case sensitive.
- * <p/>
+ * <p></p>
  * The cached argument is true to return results from the Name Resolver cache (the default), or false
  * to force the Name Resolver to query the services for the target without checking it's cached results.
  *
@@ -63,7 +63,7 @@ import ca.nrc.cadc.util.StringUtil;
  */
 public class NameResolver
 {
-    public static final int NAME_RESOLVER_HTTP_ERROR_CODE = 425;
+    private static final int NAME_RESOLVER_HTTP_ERROR_CODE = 425;
 
     private static final String REQUEST_URL =
             "http://localhost/NameResolver/find?format=ascii&target=";
@@ -81,12 +81,19 @@ public class NameResolver
     private static final String TIME = "time(ms)=";
     private static final String[] SERVICES = new String[]{"NED", "SIMBAD",
                                                           "VIZIER", "ALL"};
+    private final ConversionUtil conversionUtil;
 
     /**
      * Constructs a new CADCResolver initialized with the default services and cached values.
      */
     public NameResolver()
     {
+        this(new ConversionUtil());
+    }
+
+    public NameResolver(final ConversionUtil conversionUtil)
+    {
+        this.conversionUtil = conversionUtil;
     }
 
     /**
@@ -252,7 +259,7 @@ public class NameResolver
                 {
                     if (RA.length() < result.length())
                     {
-                        data.ra = CoordUtil.raToDegrees(
+                        data.ra = conversionUtil.raToDegrees(
                                 result.substring(RA.length()));
                     }
                     else
@@ -264,7 +271,7 @@ public class NameResolver
                 {
                     if (DEC.length() < result.length())
                     {
-                        data.dec = CoordUtil.decToDegrees(
+                        data.dec = conversionUtil.decToDegrees(
                                 result.substring(DEC.length()));
                     }
                     else

@@ -29,9 +29,9 @@
 package ca.nrc.cadc.search.validate;
 
 
+import ca.nrc.cadc.astro.ConversionUtil;
 import ca.nrc.cadc.util.StringUtil;
 import ca.nrc.cadc.astro.AngleUnitConverter;
-import ca.nrc.cadc.astro.CoordUtil;
 import java.awt.geom.Point2D;
 import jsky.coords.wcscon;
 
@@ -47,10 +47,21 @@ public class ShapeValidator
     /**
      * Allowed coordinate systems.
      */
-    private static final String ICRS = "ICRS";
     private static final String GAL = "Galactic II";
     private static final String B1950 = "B1950";
 
+    private final ConversionUtil conversionUtil;
+
+
+    public ShapeValidator()
+    {
+        this(new ConversionUtil());
+    }
+
+    public ShapeValidator(final ConversionUtil conversionUtil)
+    {
+        this.conversionUtil = conversionUtil;
+    }
 
     /**
      * Validates the value and returns a Double of the value
@@ -75,7 +86,7 @@ public class ShapeValidator
 
         try
         {
-            ra = CoordUtil.raToDegrees(raForm);
+            ra = conversionUtil.raToDegrees(raForm);
         }
         catch (IllegalArgumentException e)
         {
@@ -85,7 +96,7 @@ public class ShapeValidator
 
         try
         {
-            dec = CoordUtil.decToDegrees(decForm);
+            dec = conversionUtil.decToDegrees(decForm);
         }
         catch (IllegalArgumentException e)
         {
@@ -95,17 +106,14 @@ public class ShapeValidator
 
         final Point2D.Double point = new Point2D.Double(ra, dec);
 
-        if (coordsys.equals(GAL))
+        switch (coordsys)
         {
-            return wcscon.gal2fk5(point);
-        }
-        else if (coordsys.equals(B1950))
-        {
-            return wcscon.fk425(point);
-        }
-        else
-        {
-            return point;
+            case GAL:
+                return wcscon.gal2fk5(point);
+            case B1950:
+                return wcscon.fk425(point);
+            default:
+                return point;
         }
     }
     
@@ -125,7 +133,7 @@ public class ShapeValidator
     {
         try
         {
-            return CoordUtil.decToDegrees(value);
+            return conversionUtil.decToDegrees(value);
         }
         catch (IllegalArgumentException e)
         {
@@ -165,8 +173,7 @@ public class ShapeValidator
         }
     }
     
-    private static Double validate(final String value)
-            throws ValidationException
+    private Double validate(final String value) throws ValidationException
     {
         if (!StringUtil.hasLength(value))
         {

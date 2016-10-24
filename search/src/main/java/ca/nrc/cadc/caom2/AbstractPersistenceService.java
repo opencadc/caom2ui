@@ -300,7 +300,7 @@ public abstract class AbstractPersistenceService implements PersistenceService
 
     /**
      * Convert the SearchTemplate to SQL.
-     * <p/>
+     * <p></p>
      * TODO - TECHNICAL DEBT: The long if statement should be refactored.  The
      * TODO - SQL is a View on the model (SearchTemplate), and should be
      * TODO - treated as such.

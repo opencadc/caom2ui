@@ -45,10 +45,9 @@ import ca.nrc.cadc.util.StringUtil;
 
 /**
  * Spact-time Coordinate representation of a cutout.
- * <p/>
- * See:
+ * <p></p>
  * http://www.ivoa.net/Documents/latest/STC-S.html
- * <p/>
+ * <p></p>
  * For documentation details.
  */
 public class STCCutoutImpl implements Cutout
