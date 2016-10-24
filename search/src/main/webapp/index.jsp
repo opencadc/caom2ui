@@ -42,7 +42,7 @@
                            defaultMaxRowLimit);
   final boolean showObsCoreTab =
       configuration.getBoolean("org.opencadc.search.obs-core", true);
-  final String theme = configuration.getString("cadc.search.theme", null);
+  final String theme = configuration.getString("org.opencadc.search.theme", null);
 
   if (theme != null)
   {
