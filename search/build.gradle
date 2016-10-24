@@ -35,7 +35,6 @@ dependencies {
     compile 'org.opencadc:caom2:2.+'
     compile 'org.opencadc:cadc-registry:1.+'
     compile 'org.opencadc:cadc-vosi:1.+'
-    compile 'ca.nrc.cadc:ws-util:1.+'
     compile 'ca.nrc.cadc:tap-util:1.+'
     compile 'org.apache.solr:solr-solrj:6.+'
     compile 'org.apache.commons:commons-configuration2:2.+'
