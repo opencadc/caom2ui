@@ -11,11 +11,6 @@ repositories {
     maven {
         url = 'http://java.freehep.org/maven2'
     }
-
-    // Used for web-test browser testing.
-    maven {
-        url = 'http://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/m2repo'
-    }
 }
 
 dependencies {
@@ -36,23 +31,20 @@ dependencies {
     compile 'org.opencadc:cadc-registry:1.+'
     compile 'org.opencadc:cadc-vosi:1.+'
     compile 'ca.nrc.cadc:ws-util:1.+'
-    compile 'ca.nrc.cadc:tap-util:1.+'
-    compile 'org.apache.solr:solr-solrj:6.+'
-    compile 'org.apache.commons:commons-configuration2:2.+'
-    compile 'javax.websocket:javax.websocket-api:1.+'
+    compile 'org.apache.httpcomponents:httpclient:4.+'
 
     providedCompile 'javax.servlet:javax.servlet-api:3.1.+'
     providedCompile 'javax.servlet:javax.servlet-api:3.0.+'
     runtime 'jstl:jstl:1.+'
 
     testCompile 'junit:junit:4.+'
-    testCompile 'org.skyscreamer:jsonassert:1.+'
+
     testCompile 'org.easymock:easymock:3.+'
 }
 
 ext {
     // Change this value to test other locations, such as Production or RC.
-    intTest_web_app_url = 'http://jenkinsd.cadc.dao.nrc.ca/en/search/'
+    intTest_web_app_url = 'http://jenkinsd.cadc.dao.nrc.ca/caom2ui/'
 }
 
 sourceCompatibility = '1.7'
@@ -62,7 +54,7 @@ group = 'ca.nrc.cadc'
 version = '1000'
 
 // Modify this to your liking!
-def docker_image_name = 'opencadc/search'
+def docker_image_name = 'opencadc/caom2ui'
 
 war {
     archiveName = project.name + '##' + project.version + '.war'
