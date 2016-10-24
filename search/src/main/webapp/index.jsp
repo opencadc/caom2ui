@@ -6,6 +6,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <%
+  final Configuration configuration = new SystemConfiguration();
   final String defaultTheme = "gcwu-fegc";
 
   // Conservative default.
@@ -14,29 +15,33 @@
   final String requestHeaderLang = (contentLanguage == null)
                                    ? "en" : contentLanguage;
 
-  final String maintenanceWarningURL = "http://jenkinsd.cadc.dao.nrc.ca/" + requestHeaderLang
+  final String staticWebHost =
+      configuration.getString("org.opencadc.search.static-web-host",
+                              "beta.cadc-ccda.hia-iha.nrc-cnrc.gc.ca");
+  final String maintenanceWarningURL = "http://" + staticWebHost + "/" + requestHeaderLang
                                        + "/future_maintenance.html";
-  String headerURL = "http://jenkinsd.cadc.dao.nrc.ca/" + requestHeaderLang
+  String headerURL = "http://" + staticWebHost + "/" + requestHeaderLang
                            + "/_page_header.html?LAST_MOD=$LastChangedDate$";
-  String footerURL = "http://jenkinsd.cadc.dao.nrc.ca/" + requestHeaderLang
+  String footerURL = "http://" + staticWebHost + "/" + requestHeaderLang
                      + "/_page_footer.html";
-  final String bannerURL = "http://jenkinsd.cadc.dao.nrc.ca/" + requestHeaderLang
+  final String bannerURL = "http://" + staticWebHost + "/" + requestHeaderLang
                            + "/_"
                            + (requestHeaderLang.equals("fr") ? "ccda" : "cadc")
                            + "_banner.html";
-  final String siteMenuURL = "http://jenkinsd.cadc.dao.nrc.ca/" + requestHeaderLang + "/_"
-                             + (requestHeaderLang
-                                    .equals("fr") ? "ccda" : "cadc")
+  final String siteMenuURL = "http://" + staticWebHost + "/"
+                             + requestHeaderLang + "/_"
+                             + (requestHeaderLang.equals("fr") ? "ccda"
+                                                               : "cadc")
                              + "_site_menu.html";
   final String downloadLink = "/" + requestHeaderLang + "/"
                               + (requestHeaderLang.equals("fr")
                                  ? "telecharger" : "download");
 
-  final Configuration configuration = new SystemConfiguration();
   final int maxRowLimit =
-      configuration.getInt("cadc.search.maxRowLimit", defaultMaxRowLimit);
+      configuration.getInt("org.opencadc.search.max-row-count",
+                           defaultMaxRowLimit);
   final boolean showObsCoreTab =
-      configuration.getBoolean("cadc.search.showObsCoreTab", true);
+      configuration.getBoolean("org.opencadc.search.obs-core", true);
   final String theme = configuration.getString("cadc.search.theme", null);
 
   if (theme != null)
@@ -514,7 +519,7 @@
             <fmt:message key="NO_OBSERVATIONS_SELECTED_MESSAGE" bundle="${langBundle}"/>
         </span>
         <span class="grid-header-icon-span">
-          <img class="margin-bottom-none margin-left-none margin-right-none align-middle grid-header-icon" src="http://jenkinsd.cadc.dao.nrc.ca/cadcVOTV/images/transparent-20.png"/>
+          <img class="margin-bottom-none margin-left-none margin-right-none align-middle grid-header-icon" src="http://<%= staticWebHost %>/cadcVOTV/images/transparent-20.png"/>
         </span>
         <span>
           <button type="submit" id="downloadFormSubmit" form="downloadForm" class="button button-accent">
@@ -593,7 +598,7 @@
 
 <div class="wb-invisible">
   <div id="queryOverlay" data-role="popup">
-    <img src="http://jenkinsd.cadc.dao.nrc.ca/_search/images/queryoverlay.gif" alt=""/>
+    <img src="http://<%= staticWebHost %>/_search/images/queryoverlay.gif" alt=""/>
     <br/>
               <span id="overlay_status">
                 <fmt:message key="EXECUTING_QUERY_LABEL"
@@ -611,104 +616,104 @@
 <%-- To find pixel lengths of strings. --%>
 <div id="lengthFinder"></div>
 
-<script type="text/javascript">
-  $(function ()
-    {
-      // Load in the CADC VOTV related CSS
-      $("head")
-          .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"http://jenkinsd.cadc.dao.nrc.ca/cadcVOTV/css/aladin.min.css\" />")
-          .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"http://jenkinsd.cadc.dao.nrc.ca/cadcVOTV/css/jquery-ui-1.11.4.min.css?version=@version@\" />")
-          .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"http://jenkinsd.cadc.dao.nrc.ca/_search/css/tooltipster.css?version=@version@\" />")
-          .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"http://jenkinsd.cadc.dao.nrc.ca/_search/css/advanced_search.css?version=@version@\" />")
-          .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"http://jenkinsd.cadc.dao.nrc.ca/cadcVOTV/css/slick.grid-frozen.css?version=@version@\" />")
-          .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"http://jenkinsd.cadc.dao.nrc.ca/cadcVOTV/css/slick.pager.css?version=@version@\" />")
-          .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"http://jenkinsd.cadc.dao.nrc.ca/cadcVOTV/css/cadc.columnpicker.dialog.css?version=@version@\"/>")
-          .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"http://jenkinsd.cadc.dao.nrc.ca/cadcVOTV/css/cadc.votv.css?version=@version@\" />")
-          .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"http://jenkinsd.cadc.dao.nrc.ca/cadcVOTV/css/slick-default-theme.css?version=@version@\" />");
-    });
-</script>
+  <script type="text/javascript">
+    $(function ()
+      {
+        // Load in the CADC VOTV related CSS
+        $("head")
+            .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"http://<%= staticWebHost %>/cadcVOTV/css/aladin.min.css\" />")
+            .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"http://<%= staticWebHost %>/cadcVOTV/css/jquery-ui-1.11.4.min.css?version=@version@\" />")
+            .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"http://<%= staticWebHost %>/_search/css/tooltipster.css?version=@version@\" />")
+            .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"http://<%= staticWebHost %>/_search/css/advanced_search.css?version=@version@\" />")
+            .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"http://<%= staticWebHost %>/cadcVOTV/css/slick.grid-frozen.css?version=@version@\" />")
+            .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"http://<%= staticWebHost %>/cadcVOTV/css/slick.pager.css?version=@version@\" />")
+            .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"http://<%= staticWebHost %>/cadcVOTV/css/cadc.columnpicker.dialog.css?version=@version@\"/>")
+            .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"http://<%= staticWebHost %>/cadcVOTV/css/cadc.votv.css?version=@version@\" />")
+            .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"http://<%= staticWebHost %>/cadcVOTV/css/slick-default-theme.css?version=@version@\" />");
+      });
+  </script>
 
-<script type="text/javascript"
-        src="http://jenkinsd.cadc.dao.nrc.ca/cadcVOTV/javascript/jquery.event.drag-2.2.min.js?version=@version@"></script>
-<script type="text/javascript"
-        src="http://jenkinsd.cadc.dao.nrc.ca/_search/js/jquery.form.js?version=@version@"></script>
-<script type="text/javascript" charset="utf-8"
-        src="http://jenkinsd.cadc.dao.nrc.ca/cadcVOTV/javascript/aladin.js?version=@version@"></script>
-<script type="text/javascript"
-        src="http://jenkinsd.cadc.dao.nrc.ca/wet/javascript/polyfills/detailssummary-min.js?version=@version@"></script>
-<script type="text/javascript"
-        src="http://jenkinsd.cadc.dao.nrc.ca/cadcVOTV/javascript/jquery-ui-1.11.4.min.js?version=@version@"></script>
-
-<!-- Moment for date parsing and formatting -->
-<script type="text/javascript"
-        src="http://jenkinsd.cadc.dao.nrc.ca/_search/js/moment.min.js?version=@version@"></script>
-<script type="text/javascript"
-        src="http://jenkinsd.cadc.dao.nrc.ca/_search/js/json.human.js?version=@version@"></script>
-<script type="text/javascript"
-        src="http://jenkinsd.cadc.dao.nrc.ca/cadcVOTV/javascript/wgxpath.install.js?version=@version@"></script>
-<script type="text/javascript"
-        src="http://jenkinsd.cadc.dao.nrc.ca/_search/js/jquery.tooltipster.custom.min.js?version=@version@"></script>
-<script type="text/javascript"
-        src="http://jenkinsd.cadc.dao.nrc.ca/cadcVOTV/javascript/jquery.csv-0.71.min.js"></script>
-<script type="text/javascript"
-        src="http://jenkinsd.cadc.dao.nrc.ca/cadcVOTV/javascript/slick.core.js?version=@version@"></script>
-<script type="text/javascript"
-        src="http://jenkinsd.cadc.dao.nrc.ca/cadcVOTV/javascript/cadc.rowselectionmodel.js?version=@version@"></script>
-<script type="text/javascript"
-        src="http://jenkinsd.cadc.dao.nrc.ca/cadcVOTV/javascript/cadc.checkboxselectcolumn.js?version=@version@"></script>
-<script type="text/javascript"
-        src="http://jenkinsd.cadc.dao.nrc.ca/cadcVOTV/javascript/slick.grid-frozen.js?version=@version@"></script>
-<script type="text/javascript"
-        src="http://jenkinsd.cadc.dao.nrc.ca/cadcVOTV/javascript/slick.dataview.js?version=@version@"></script>
-<script type="text/javascript"
-        src="http://jenkinsd.cadc.dao.nrc.ca/cadcVOTV/javascript/slick.pager.js?version=@version@"></script>
-<script type="text/javascript"
-        src="http://jenkinsd.cadc.dao.nrc.ca/cadcVOTV/javascript/cadc.columnpicker.dialog.js?version=@version@"></script>
-<script type="text/javascript"
-        src="http://jenkinsd.cadc.dao.nrc.ca/cadcVOTV/javascript/cadc.plugin.unitselection.js?version=@version@"></script>
-<script type="text/javascript"
-        src="http://jenkinsd.cadc.dao.nrc.ca/cadcVOTV/javascript/cadc.plugin.filter_suggest.js?version=@version@"></script>
-<script type="text/javascript"
-        src="http://jenkinsd.cadc.dao.nrc.ca/cadcVOTV/javascript/cadc.votable.js?version=@version@"></script>
-<script type="text/javascript"
-        src="http://jenkinsd.cadc.dao.nrc.ca/cadcVOTV/javascript/cadc.votable-reader.js?version=@version@"></script>
-<script type="text/javascript"
-        src="http://jenkinsd.cadc.dao.nrc.ca/cadcVOTV/javascript/cadc.votv.js?version=@version@"></script>
-<script type="text/javascript"
-        src="http://jenkinsd.cadc.dao.nrc.ca/cadcVOTV/javascript/cadc.votv.comparer.js?version=@version@"></script>
-<script type="text/javascript" 
-        src="http://jenkinsd.cadc.dao.nrc.ca/cadcJS/javascript/cadc.uri.js?version=@version@"></script>
-<script type="text/javascript"
-        src="http://jenkinsd.cadc.dao.nrc.ca/cadcVOTV/javascript/cadc.resultstate.js?version=@version@"></script>
-<script type="text/javascript"
-        src="http://jenkinsd.cadc.dao.nrc.ca/cadcVOTV/javascript/cadc.plugin.footprint-viewer.js?version=@version@"></script>
-<script type="text/javascript"
-        src="http://jenkinsd.cadc.dao.nrc.ca/_search/js/validator.js?version=@version@"></script>
-<script type="text/javascript"
-        src="http://jenkinsd.cadc.dao.nrc.ca/_search/js/cadc.search.uws.js?version=@version@"></script>
-<script type="text/javascript"
-        src="http://jenkinsd.cadc.dao.nrc.ca/cadcJS/javascript/cadc.util.js?version=@version@"></script>
-<script type="text/javascript"
-        src="http://jenkinsd.cadc.dao.nrc.ca/_search/js/cadc.search.format.js?version=@version@"></script>
-<script type="text/javascript"
-        src="http://jenkinsd.cadc.dao.nrc.ca/_search/js/cadc.search.unitconversion.js?version=@version@"></script>
   <script type="text/javascript"
-          src="http://jenkinsd.cadc.dao.nrc.ca/_search/js/cadc.search.columnbundles.js?version=@version@"></script>
-<script type="text/javascript"
-        src="http://jenkinsd.cadc.dao.nrc.ca/_search/js/cadc.search.columns.js?version=@version@"></script>
-<script type="text/javascript"
-        src="http://jenkinsd.cadc.dao.nrc.ca/_search/js/cadc.search.core.js?version=@version@"></script>
-<script type="text/javascript"
-        src="http://jenkinsd.cadc.dao.nrc.ca/_search/js/cadc.search.form.js?version=@version@"></script>
-<script type="text/javascript"
-        src="http://jenkinsd.cadc.dao.nrc.ca/_search/js/cadc.search.preview.js?version=@version@"></script>
-<script type="text/javascript"
-        src="http://jenkinsd.cadc.dao.nrc.ca/_search/js/cadc.search.app.js?version=@version@"></script>
-<script type="text/javascript"
-        src="http://jenkinsd.cadc.dao.nrc.ca/_search/js/cadc.search.tooltipcreator.js?version=@version@"></script>
+          src="http://<%= staticWebHost %>/cadcVOTV/javascript/jquery.event.drag-2.2.min.js?version=@version@"></script>
+  <script type="text/javascript"
+          src="http://<%= staticWebHost %>/_search/js/jquery.form.js?version=@version@"></script>
+  <script type="text/javascript" charset="utf-8"
+          src="http://<%= staticWebHost %>/cadcVOTV/javascript/aladin.js?version=@version@"></script>
+  <script type="text/javascript"
+          src="http://<%= staticWebHost %>/wet/javascript/polyfills/detailssummary-min.js?version=@version@"></script>
+  <script type="text/javascript"
+          src="http://<%= staticWebHost %>/cadcVOTV/javascript/jquery-ui-1.11.4.min.js?version=@version@"></script>
 
-<script type="text/javascript"
-        src="http://jenkinsd.cadc.dao.nrc.ca/_search/js/hierarchy.js?version=@version@"></script>
+  <!-- Moment for date parsing and formatting -->
+  <script type="text/javascript"
+          src="http://<%= staticWebHost %>/_search/js/moment.min.js?version=@version@"></script>
+  <script type="text/javascript"
+          src="http://<%= staticWebHost %>/_search/js/json.human.js?version=@version@"></script>
+  <script type="text/javascript"
+          src="http://<%= staticWebHost %>/cadcVOTV/javascript/wgxpath.install.js?version=@version@"></script>
+  <script type="text/javascript"
+          src="http://<%= staticWebHost %>/_search/js/jquery.tooltipster.custom.min.js?version=@version@"></script>
+  <script type="text/javascript"
+          src="http://<%= staticWebHost %>/cadcVOTV/javascript/jquery.csv-0.71.min.js"></script>
+  <script type="text/javascript"
+          src="http://<%= staticWebHost %>/cadcVOTV/javascript/slick.core.js?version=@version@"></script>
+  <script type="text/javascript"
+          src="http://<%= staticWebHost %>/cadcVOTV/javascript/cadc.rowselectionmodel.js?version=@version@"></script>
+  <script type="text/javascript"
+          src="http://<%= staticWebHost %>/cadcVOTV/javascript/cadc.checkboxselectcolumn.js?version=@version@"></script>
+  <script type="text/javascript"
+          src="http://<%= staticWebHost %>/cadcVOTV/javascript/slick.grid-frozen.js?version=@version@"></script>
+  <script type="text/javascript"
+          src="http://<%= staticWebHost %>/cadcVOTV/javascript/slick.dataview.js?version=@version@"></script>
+  <script type="text/javascript"
+          src="http://<%= staticWebHost %>/cadcVOTV/javascript/slick.pager.js?version=@version@"></script>
+  <script type="text/javascript"
+          src="http://<%= staticWebHost %>/cadcVOTV/javascript/cadc.columnpicker.dialog.js?version=@version@"></script>
+  <script type="text/javascript"
+          src="http://<%= staticWebHost %>/cadcVOTV/javascript/cadc.plugin.unitselection.js?version=@version@"></script>
+  <script type="text/javascript"
+          src="http://<%= staticWebHost %>/cadcVOTV/javascript/cadc.plugin.filter_suggest.js?version=@version@"></script>
+  <script type="text/javascript"
+          src="http://<%= staticWebHost %>/cadcVOTV/javascript/cadc.votable.js?version=@version@"></script>
+  <script type="text/javascript"
+          src="http://<%= staticWebHost %>/cadcVOTV/javascript/cadc.votable-reader.js?version=@version@"></script>
+  <script type="text/javascript"
+          src="http://<%= staticWebHost %>/cadcVOTV/javascript/cadc.votv.js?version=@version@"></script>
+  <script type="text/javascript"
+          src="http://<%= staticWebHost %>/cadcVOTV/javascript/cadc.votv.comparer.js?version=@version@"></script>
+  <script type="text/javascript"
+          src="http://<%= staticWebHost %>/cadcJS/javascript/cadc.uri.js?version=@version@"></script>
+  <script type="text/javascript"
+          src="http://<%= staticWebHost %>/cadcVOTV/javascript/cadc.resultstate.js?version=@version@"></script>
+  <script type="text/javascript"
+          src="http://<%= staticWebHost %>/cadcVOTV/javascript/cadc.plugin.footprint-viewer.js?version=@version@"></script>
+  <script type="text/javascript"
+          src="http://<%= staticWebHost %>/_search/js/validator.js?version=@version@"></script>
+  <script type="text/javascript"
+          src="http://<%= staticWebHost %>/_search/js/cadc.search.uws.js?version=@version@"></script>
+  <script type="text/javascript"
+          src="http://<%= staticWebHost %>/cadcJS/javascript/cadc.util.js?version=@version@"></script>
+  <script type="text/javascript"
+          src="http://<%= staticWebHost %>/_search/js/cadc.search.format.js?version=@version@"></script>
+  <script type="text/javascript"
+          src="http://<%= staticWebHost %>/_search/js/cadc.search.unitconversion.js?version=@version@"></script>
+  <script type="text/javascript"
+          src="http://<%= staticWebHost %>/_search/js/cadc.search.columnbundles.js?version=@version@"></script>
+  <script type="text/javascript"
+          src="http://<%= staticWebHost %>/_search/js/cadc.search.columns.js?version=@version@"></script>
+  <script type="text/javascript"
+          src="http://<%= staticWebHost %>/_search/js/cadc.search.core.js?version=@version@"></script>
+  <script type="text/javascript"
+          src="http://<%= staticWebHost %>/_search/js/cadc.search.form.js?version=@version@"></script>
+  <script type="text/javascript"
+          src="http://<%= staticWebHost %>/_search/js/cadc.search.preview.js?version=@version@"></script>
+  <script type="text/javascript"
+          src="http://<%= staticWebHost %>/_search/js/cadc.search.app.js?version=@version@"></script>
+  <script type="text/javascript"
+          src="http://<%= staticWebHost %>/_search/js/cadc.search.tooltipcreator.js?version=@version@"></script>
+
+  <script type="text/javascript"
+          src="http://<%= staticWebHost %>/_search/js/hierarchy.js?version=@version@"></script>
 
 <script type="text/javascript">
   $(document).ready(function ()

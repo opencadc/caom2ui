@@ -51,7 +51,7 @@ dependencies {
 
 ext {
     // Change this value to test other locations, such as Production or RC.
-    intTest_web_app_url = 'http://jenkinsd.cadc.dao.nrc.ca/en/search/'
+    intTest_web_app_url = 'http://localhost:8080/search/'
 }
 
 //sourceCompatibility = '1.7'
