@@ -8,11 +8,16 @@ services:
     networks:
       - 'caom2'
     environment:
-      - 'CATALINA_OPTS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5555 -Djava.security.egd=file:/dev/./urandom -Djsse.enableSNIExtension=false -Dcadc.search.theme=base -Dcadc.search.showObsCoreTab=true -Dcadc.search.maxRowLimit=30000 -Dcadc.search.tapServiceID=ivo://cadc.nrc.ca/tap -Dca.nrc.cadc.reg.client.RegistryClient.host=tap:8080'
+      - 'CATALINA_OPTS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5555 -Djava.security.egd=file:/dev/./urandom -Djsse.enableSNIExtension=false -Dorg.opencadc.search=base -Dcadc.search.obs-core=true -Dorg.opencadc.search.max-row-count=30000 -Dorg.opencadc.search.tap-service-id=ivo://cadc.nrc.ca/tap -Dca.nrc.cadc.reg.client.RegistryClient.host=tap:8080'
     depends_on:
       - tap
+      - caom2ui
     volumes:
-      - /usr/local/tomcat/webapps
+      - /usr/local/search/webapps:/usr/local/tomcat/webapps
+  caom2ui:
+    image: opencadc/caom2ui
+    networks:
+      - 'caom2'
   tap:
     image: opencadc/tap
     ports:
