@@ -15,7 +15,7 @@ The current status uses an external server to supply static resources at CADC.  
 technologies ([Web Experience Toolkit](http://wet-boew.github.io/wet-boew-legacy/v3.1/index.html)), that are no longer supported.
 Efforts are underway to replace them with a much better (and modern) user experience.
 
-See the [index.jsp](src/main/webapps/index.jsp) for properties to set, although it is very recommended to leave
+See the [index.jsp](src/main/webapp/index.jsp) for properties to set, although it is very recommended to leave
 them as their defaults.
 
 ### Running
