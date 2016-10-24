@@ -11,17 +11,24 @@ Simply run
 
 To have a constructed WAR file in the `build/libs` directory that can be run in a Java Servlet Container.
 
+The current status uses an external server to supply static resources at CADC.  It relies on
+technologies ([Web Experience Toolkit](http://wet-boew.github.io/wet-boew-legacy/v3.1/index.html)), that are no longer supported.
+Efforts are underway to replace them with a much better (and modern) user experience.
+
+See the [index.jsp](src/main/webapps/index.jsp) for properties to set, although it is very recommended to leave
+them as their defaults.
+
 ### Running
 
 #### Running in a Servlet Container
 Simply drop the WAR into a Java Servlet Container, then point a browser to:
 http://localhost:8080/search/
 
-To bring up the form.  By default, this will connect to the [CADC TAP service](http://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/tap), but can be configured with the `cadc.search.tapServiceID` system property like so:
+To bring up the form.  By default, this will connect to the [CADC TAP service](http://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/tap), but can be configured with the `org.opencadc.search.tap-service-id` system property like so:
 
-`-Dca.nrc.cadc.reg.client.RegistryClient.host=<YOUR HOST>`
+`-Dca.nrc.cadc.reg.client.RegistryClient.host=<YOUR HOST> -Dorg.opencadc.search.tap-service-id=ivo://<YOUR DOMAIN>/tap-service`
 
-Where `<YOUR HOST>` is the location of a running TAP web service.
+Where `<YOUR HOST>` is the location of a running TAP web service, and the service id is made up of your Oragnization's service URI policy.
 
 #### Running with Docker
 

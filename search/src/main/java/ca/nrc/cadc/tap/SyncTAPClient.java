@@ -37,7 +37,7 @@ package ca.nrc.cadc.tap;
 
 public interface SyncTAPClient
 {
-    String TAP_SERVICE_URI_PROPERTY_KEY = "cadc.search.tapServiceID";
+    String TAP_SERVICE_URI_PROPERTY_KEY = "org.opencadc.search.tap-service-id";
     String DEFAULT_TAP_SERVICE_URI_VALUE = "ivo://cadc.nrc.ca/tap";
 
     /**
