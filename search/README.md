@@ -22,7 +22,7 @@ them as their defaults.
 
 #### Running in a Servlet Container
 Simply drop the WAR into a Java Servlet Container, then point a browser to:
-http://localhost:8080/search/
+[http://localhost:8080/search/](http://localhost:8080/search/)
 
 To bring up the form.  By default, this will connect to the [CADC TAP service](http://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/tap), but can be configured with the `org.opencadc.search.tap-service-id` system property like so:
 
