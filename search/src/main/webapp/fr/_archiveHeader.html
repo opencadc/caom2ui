@@ -1,0 +1,107 @@
+<!--#include virtual="/fr/_page_header.html?LAST_MOD=$LAST_MOD"-->
+<!--#if expr="(${archive} = gemini)"-->
+<!--#set var="archivetitle" value="Archives scientifiques Gemini"-->
+<!--#elif expr="(${archive} = tcfh)"-->
+<!--#set var="archivetitle" value="Archives scientifiques TCFH"-->
+<!--#elif expr="(${archive} = tjcm)"-->
+<!--#set var="archivetitle" value="Archives scientifiques TJCM"-->
+<!--#elif expr="(${archive} = rencontres)"-->
+<!--#set var="archivetitle" value="Rencontres internationales en astronomie"-->
+<!--#elif expr="(${archive} = ofa)"-->
+<!--#set var="archivetitle" value="L'archive des données de l’OFA et les outils pour la préparation des observations" -->
+<!--#endif-->
+<!--#config errmsg="" -->
+<body>
+  <!--#if expr="${loginoutTarget}"-->
+    <script type="text/javascript">
+      LOGINOUT_TARGET = "<!--#echo var="loginoutTarget" -->";
+    </script>
+  <!--#endif-->
+  <!--#if expr="${archivetitle}"-->
+    <div id="wb-body-sec">
+  <!--#else-->
+    <div id="wb-body">
+  <!--#endif-->
+      <div id="wb-skip">
+        <ul id="wb-tphp">
+          <li id="wb-skip1"><a href="#wb-cont">Sauter au contenu principal</a></li>
+          <li id="wb-skip2"><a href="#wb-nav">Sauter au menu secondaire</a></li>
+          <!--#if expr="${archivetitle}"-->
+            <li id="wb-skip3"><a href="#wb-leftnav">Sauter au menu de navigation</a></li>
+          <!--#endif-->
+        </ul>
+      </div>
+
+      <div id="wb-head">
+        <div id="wb-head-in">
+          <header>
+            <!-- HeaderStart -->
+
+            <!--#include virtual="/fr/_ccda_banner.html"-->
+
+            <nav role="navigation">
+              <span lang="en" class="lang-link-target"><!--#echo encoding="none" var="langMirror"--></span>
+
+              <!--#include virtual="/fr/_ccda_site_menu.html"-->
+
+              <div id="gcwu-bc">
+                <h2>Fil d'Ariane</h2>
+                <div id="gcwu-bc-in">
+                  <ol>
+                    <li><a href="/fr/">Accueil CCDA</a></li>
+                    <!--#if expr="${archivetitle} && ${pagetitle}" -->
+                      <li><a href="/fr/<!--#echo var='archive'-->/index.html"><!--#echo encoding="none" var="archivetitle"--></a></li>
+                      <!--#if expr="${crumbtrail}"-->
+                        <!--#echo encoding="none" var="crumbtrail"-->
+                      <!--#endif-->
+                      <li><!--#echo encoding="none" var="pagetitle" --> </li>
+                    <!--#elif expr="${archivetitle}"-->
+                      <li><!--#echo encoding="none" var="archivetitle"--></li>
+                    <!--#elif expr="${pagetitle}"-->
+                      <li><!--#echo encoding="none" var="pagetitle"--></li>
+                    <!--#endif-->
+                  </ol>
+                </div>
+              </div>
+
+            </nav>
+            <!-- HeaderEnd -->
+          </header>
+        </div>
+      </div>
+      <!-- endnoindex -->
+
+      <div id="wb-core">
+        <div id="wb-core-in">
+          <!-- Re-insert the pound to activate this SSI. -->
+          <!-- include virtual="/fr/future_maintenance.html"-->
+          <div id="wb-main" role="main">
+            <div id="wb-main-in">
+              <!-- MainContentStart -->
+
+              <!--#if expr="${archivetitle}"-->
+                <!--#if expr="!${no_logo}"-->
+                  <img id="logo" src="/en/resources/images/<!--#echo var='archive'-->/logo_100.png" width="100"
+                       height="100" alt="" class="float-left margin-right-large" />
+                <!--#endif-->
+                <h1 class="margin-top-large page_content_title">
+                  <!--#echo encoding="none" var="archivetitle"-->
+                </h1>
+                <div class="span-6">
+              <!--#elif expr="${full-width}"-->
+                <div class="width-100">
+              <!--#else-->
+                <div class="span-8">
+              <!--#endif-->
+
+              <!--#if expr="${archivetitle} && ${pagetitle}"-->
+                <h1 id="wb-cont" class="wb-invisible"><!--#echo encoding="none" var="archivetitle"--> <!--#echo encoding="none" var="pagetitle" --></h1>
+                <h2 class="align-center"><!--#echo encoding="none" var="pagetitle"--></h2>
+              <!--#elif expr="${archivetitle}"-->
+                <h1 id="wb-cont" class="wb-invisible"><!--#echo encoding="none" var="archivetitle"--></h1>
+              <!--#elif expr="${pagetitle}"-->
+                <h1 id="wb-cont" class="wb-invisible"><!--#echo encoding="none" var="pagetitle"--></h1>
+                <h2 class="align-center"><!--#echo encoding="none" var="pagetitle"--></h2>
+              <!--#else-->
+                  <h1 id="wb-cont" class="wb-invisible">Principal</h1>
+              <!--#endif-->

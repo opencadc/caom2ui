@@ -59,7 +59,6 @@ public class SyncTAPClientImpl implements SyncTAPClient
 
     private final URL tapServiceURL;
     private final OutputStream outputStream;
-    private final Job job;
     private final boolean followToResults;
 
 
@@ -67,24 +66,25 @@ public class SyncTAPClientImpl implements SyncTAPClient
      * Complete constructor.
      * @param outputStream     The stream for the results of the client call.
      * @param tapServiceURL     The TAP service URL.
-     * @param job               The job to execute.
      * @param followToResults   Whether to follow redirects to the end result.
      */
     public SyncTAPClientImpl(final OutputStream outputStream,
-                             final URL tapServiceURL, final Job job,
+                             final URL tapServiceURL,
                              final boolean followToResults)
     {
         this.outputStream = outputStream;
         this.tapServiceURL = tapServiceURL;
-        this.job = job;
         this.followToResults = followToResults;
     }
 
 
     /**
      * Execute this client's Job.
+     *
+     * @param job The Job to execute.
      */
-    public void execute()
+    @Override
+    public void execute(final Job job)
     {
         try
         {
@@ -95,7 +95,7 @@ public class SyncTAPClientImpl implements SyncTAPClient
             }
 
             // POST PHASE=RUN to execute on server
-            postJob(tapServiceURL);
+            postJob(tapServiceURL, job);
         }
         catch (Exception e)
         {
@@ -119,7 +119,7 @@ public class SyncTAPClientImpl implements SyncTAPClient
      *
      * @return      Map of Parameter name -> value.
      */
-    private Map<String, Object> getQueryPayload()
+    private Map<String, Object> getQueryPayload(final Job job)
     {
         final Map<String, Object> payload = new HashMap<>();
 
@@ -145,13 +145,14 @@ public class SyncTAPClientImpl implements SyncTAPClient
      * Make a POST request to the TAP Service to the given URL with the given
      * parameters.
      *
+     * @param job           The job to send.
      * @param url           The URL to POST to.
      * @throws IOException  For any IO errors.
      */
-    private void postJob(final URL url) throws IOException
+    private void postJob(final URL url, final Job job) throws IOException
     {
         // POST the parameters to the tapServer.
-        final HttpPost httpPost = getPoster(url);
+        final HttpPost httpPost = getPoster(url, job);
         httpPost.run();
 
         if (!followToResults)
@@ -171,17 +172,17 @@ public class SyncTAPClientImpl implements SyncTAPClient
         }
     }
 
-    private HttpPost getPoster(final URL url) throws IOException
+    private HttpPost getPoster(final URL url, final Job job) throws IOException
     {
         final HttpPost poster;
 
         if (followToResults)
         {
-            poster = new HttpPost(url, getQueryPayload(), getOutputStream());
+            poster = new HttpPost(url, getQueryPayload(job), getOutputStream());
         }
         else
         {
-            poster = new HttpPost(url, getQueryPayload(), false);
+            poster = new HttpPost(url, getQueryPayload(job), false);
         }
 
         return poster;

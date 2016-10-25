@@ -252,8 +252,9 @@ public class TAPSearcherImpl implements Searcher
 
             jsonWriter.key("results_url").value(tapResultsURL.toExternalForm());
             jsonWriter.key("job_url").value(
-                    resultsURLValue.substring(0,
-                                              resultsURLValue.indexOf("/run")));
+                    new URL(resultsURLValue.substring(0,
+                                              resultsURLValue.indexOf("/run")))
+                            .toExternalForm());
             jsonWriter.key("run_id").value(job.getID());
 
             writeFormValueUnits(jsonWriter, formData);
@@ -436,8 +437,7 @@ public class TAPSearcherImpl implements Searcher
                                              Standards.TAP_SYNC_11,
                                              AuthMethod.ANON);
 
-        return new SyncTAPClientImpl(outputStream, tapServiceURL, tapJob,
-                                     false);
+        return new SyncTAPClientImpl(outputStream, tapServiceURL, false);
     }
 
     private Job createTAPJob(final Job baseJob, final Templates templates)
@@ -515,14 +515,14 @@ public class TAPSearcherImpl implements Searcher
                     @Override
                     public Void run()
                     {
-                        tapClient.execute();
+                        tapClient.execute(tapJob);
                         return null;
                     }
                 });
             }
             else
             {
-                tapClient.execute();
+                tapClient.execute(tapJob);
             }
         }
         finally

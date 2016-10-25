@@ -1,0 +1,94 @@
+ul.slick-columnpicker
+{
+  list-style-type: none;
+  margin: 0;
+  border: 1px solid #718BB7;
+  background: #f0f0f0;
+  padding: 6px;
+  -moz-box-shadow: 2px 2px 2px silver;
+  -webkit-box-shadow: 2px 2px 2px silver;
+  min-width: 600px;
+  cursor: default;
+}
+
+.slick-columnpicker li
+{
+  margin: 0;
+  padding: 0;
+  background: none;
+  border: 0.1em solid #336699;
+  height: auto;
+  width: 100%;
+}
+
+.slick-columnpicker input
+{
+  vertical-align: middle;
+  margin: 4px;
+}
+
+a.slick-columnpicker-panel-link-label
+{
+  cursor: pointer;
+  color: rgb(36, 71, 248);
+  text-decoration: underline;
+  margin-left: 10px;
+}
+
+a.slick-columnpicker-panel-link-label:hover
+{
+  cursor: pointer;
+  color: rgb(36, 71, 248);
+  text-decoration: underline;
+  margin-left: 10px;
+}
+
+div.slick-column-picker-label-text
+{
+  display: table-cell;
+  width: 170px;
+  vertical-align: middle;
+  border-right: 1px solid #718BB7;
+}
+
+div.slick-column-picker-unit-label-text
+{
+  display: table-cell;
+  width: 25px;
+  padding-left: 5px;
+  vertical-align: middle;
+  border-right: 1px solid #718BB7;
+}
+
+div.slick-column-picker-description-label-text
+{
+  display: table-cell;
+  padding-left: 5px;
+  /*word-wrap: break-word;*/
+  /*word-break: normal;*/
+}
+
+div.slick-column-picker-tooltip-button-holder
+{
+  margin-top: 20px;
+  margin-left: -3px;
+}
+
+.slick-columnpicker li a
+{
+  display: block;
+  padding: 4px;
+  font-weight: bold;
+}
+
+.slick-columnpicker li a:hover
+{
+  background: white;
+}
+
+.slick-column-picker-tooltip-threshold-line
+{
+  color: #f00;
+  background-color: #f00;
+  height: 5px;
+}

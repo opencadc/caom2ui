@@ -69,12 +69,15 @@
 package ca.nrc.cadc.tap;
 
 import ca.nrc.cadc.auth.AuthMethod;
+import ca.nrc.cadc.net.HttpDownload;
 import ca.nrc.cadc.reg.Standards;
 import ca.nrc.cadc.reg.client.RegistryClient;
 import ca.nrc.cadc.search.util.ParameterUtil;
 import ca.nrc.cadc.tap.impl.SyncTAPClientImpl;
+import ca.nrc.cadc.util.StringUtil;
 import ca.nrc.cadc.uws.ExecutionPhase;
 import ca.nrc.cadc.uws.Job;
+import ca.nrc.cadc.uws.web.JobCreator;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.SystemConfiguration;
 
@@ -231,22 +234,40 @@ public class TAPServlet extends HttpServlet
             throws IOException
     {
         final OutputStream outputStream = resp.getOutputStream();
+        final String sourceURL = req.getParameter("tap_url");
 
-        final SyncTAPClient syncTAPClient =
-                new SyncTAPClientImpl(outputStream,
-                                      lookupServiceURL(registryClient),
-                                      createJob(req), true);
+        if (StringUtil.hasText(sourceURL))
+        {
+            resp.setContentType("text/csv");
 
-        execute(syncTAPClient);
+            final HttpDownload httpDownload =
+                    new HttpDownload(new URL(sourceURL),
+                                     resp.getOutputStream());
+            httpDownload.setFollowRedirects(true);
+            httpDownload.run();
+
+            resp.setContentLengthLong(httpDownload.getContentLength());
+        }
+        else
+        {
+            final Job job = createJob(req);
+
+            final SyncTAPClient syncTAPClient =
+                    new SyncTAPClientImpl(outputStream,
+                                          lookupServiceURL(registryClient), true);
+
+            execute(syncTAPClient, job);
+        }
     }
 
     /**
      * Used for testers to override.
      * @param syncTAPClient
+     * @param job
      */
-    void execute(final SyncTAPClient syncTAPClient)
+    void execute(final SyncTAPClient syncTAPClient, final Job job)
     {
-        syncTAPClient.execute();
+        syncTAPClient.execute(job);
     }
 
     private URL lookupServiceURL(final RegistryClient registryClient)
