@@ -85,6 +85,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import ca.nrc.cadc.uws.Job;
 import org.apache.commons.configuration2.Configuration;
 
 import org.junit.Test;
@@ -109,7 +110,7 @@ public class TAPServletTest extends AbstractUnitTest<TAPServlet>
              * @param syncTAPClient     The sync client.
              */
             @Override
-            void execute(final SyncTAPClient syncTAPClient)
+            void execute(final SyncTAPClient syncTAPClient, final Job j)
             {
                 executeRan[0] = true;
             }
@@ -144,6 +145,8 @@ public class TAPServletTest extends AbstractUnitTest<TAPServlet>
                 .andReturn(new URL("http://www.site.com/example/tap"));
         expect(mockRequest.getParameterMap()).andReturn(requestParameters)
                 .once();
+
+        expect(mockRequest.getParameter("tap_url")).andReturn(null).once();
 
         replay(mockRequest, mockResponse, mockRegistryClient,
                mockConfiguration);

@@ -18,22 +18,19 @@
   final String staticWebHost =
       configuration.getString("org.opencadc.search.static-web-host",
                               "beta.cadc-ccda.hia-iha.nrc-cnrc.gc.ca");
-  final String maintenanceWarningURL = "http://" + staticWebHost + "/" + requestHeaderLang
+  final String maintenanceWarningURL = requestHeaderLang
                                        + "/future_maintenance.html";
-  String headerURL = "http://" + staticWebHost + "/" + requestHeaderLang
-                           + "/_page_header.html?LAST_MOD=$LastChangedDate$";
-  String footerURL = "http://" + staticWebHost + "/" + requestHeaderLang
-                     + "/_page_footer.html";
-  final String bannerURL = "http://" + staticWebHost + "/" + requestHeaderLang
-                           + "/_"
-                           + (requestHeaderLang.equals("fr") ? "ccda" : "cadc")
+  String headerURL = requestHeaderLang
+                     + "/_page_header.html?LAST_MOD=$LastChangedDate$";
+  String footerURL = requestHeaderLang + "/_page_footer.html";
+  final String bannerURL = requestHeaderLang
+                           + "/_" + (requestHeaderLang.equals("fr") ? "ccda" : "cadc")
                            + "_banner.html";
-  final String siteMenuURL = "http://" + staticWebHost + "/"
-                             + requestHeaderLang + "/_"
+  final String siteMenuURL = requestHeaderLang + "/_"
                              + (requestHeaderLang.equals("fr") ? "ccda"
                                                                : "cadc")
                              + "_site_menu.html";
-  final String downloadLink = "/" + requestHeaderLang + "/"
+  final String downloadLink = requestHeaderLang + "/"
                               + (requestHeaderLang.equals("fr")
                                  ? "telecharger" : "download");
 
@@ -437,10 +434,6 @@
                 url="number.jsp?utype=Char.SpectralAxis.Resolution.ResolPower.refval&tipSide=left"/>
             <c:import
                 url="number.jsp?utype=Char.SpectralAxis.numBins&tipSide=left"/>
-            <%--<c:import--%>
-                <%--url="number.jsp?utype=Char.SpectralAxis.Coverage.Bounds.Limits.LoLimit&tipSide=left"/>--%>
-            <%--<c:import--%>
-                <%--url="number.jsp?utype=Char.SpectralAxis.Coverage.Bounds.Limits.HiLimit&tipSide=left"/>--%>
             <c:import
                 url="boolean.jsp?name=Char.SpectralAxis.DOWNLOADCUTOUT&tipSide=left"/>
 
@@ -519,7 +512,7 @@
             <fmt:message key="NO_OBSERVATIONS_SELECTED_MESSAGE" bundle="${langBundle}"/>
         </span>
         <span class="grid-header-icon-span">
-          <img class="margin-bottom-none margin-left-none margin-right-none align-middle grid-header-icon" src="http://<%= staticWebHost %>/cadcVOTV/images/transparent-20.png"/>
+          <img class="margin-bottom-none margin-left-none margin-right-none align-middle grid-header-icon" src="cadcVOTV/images/transparent-20.png"/>
         </span>
         <span>
           <button type="submit" id="downloadFormSubmit" form="downloadForm" class="button button-accent">
@@ -598,7 +591,7 @@
 
 <div class="wb-invisible">
   <div id="queryOverlay" data-role="popup">
-    <img src="http://<%= staticWebHost %>/_search/images/queryoverlay.gif" alt=""/>
+    <img src="images/queryoverlay.gif" alt=""/>
     <br/>
               <span id="overlay_status">
                 <fmt:message key="EXECUTING_QUERY_LABEL"
@@ -621,99 +614,99 @@
       {
         // Load in the CADC VOTV related CSS
         $("head")
-            .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"http://<%= staticWebHost %>/cadcVOTV/css/aladin.min.css\" />")
-            .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"http://<%= staticWebHost %>/cadcVOTV/css/jquery-ui-1.11.4.min.css?version=@version@\" />")
-            .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"http://<%= staticWebHost %>/_search/css/tooltipster.css?version=@version@\" />")
-            .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"http://<%= staticWebHost %>/_search/css/advanced_search.css?version=@version@\" />")
-            .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"http://<%= staticWebHost %>/cadcVOTV/css/slick.grid-frozen.css?version=@version@\" />")
-            .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"http://<%= staticWebHost %>/cadcVOTV/css/slick.pager.css?version=@version@\" />")
-            .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"http://<%= staticWebHost %>/cadcVOTV/css/cadc.columnpicker.dialog.css?version=@version@\"/>")
-            .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"http://<%= staticWebHost %>/cadcVOTV/css/cadc.votv.css?version=@version@\" />")
-            .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"http://<%= staticWebHost %>/cadcVOTV/css/slick-default-theme.css?version=@version@\" />");
+            .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"cadcVOTV/css/aladin.min.css\" />")
+            .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"cadcVOTV/css/jquery-ui-1.11.4.min.css?version=@version@\" />")
+            .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"css/tooltipster.css?version=@version@\" />")
+            .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"css/advanced_search.css?version=@version@\" />")
+            .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"cadcVOTV/css/slick.grid-frozen.css?version=@version@\" />")
+            .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"cadcVOTV/css/slick.pager.css?version=@version@\" />")
+            .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"cadcVOTV/css/cadc.columnpicker.dialog.css?version=@version@\"/>")
+            .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"cadcVOTV/css/cadc.votv.css?version=@version@\" />")
+            .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"cadcVOTV/css/slick-default-theme.css?version=@version@\" />");
       });
   </script>
 
   <script type="text/javascript"
-          src="http://<%= staticWebHost %>/cadcVOTV/javascript/jquery.event.drag-2.2.min.js?version=@version@"></script>
+          src="cadcVOTV/javascript/jquery.event.drag-2.2.min.js?version=@version@"></script>
   <script type="text/javascript"
-          src="http://<%= staticWebHost %>/_search/js/jquery.form.js?version=@version@"></script>
+          src="js/jquery.form.js?version=@version@"></script>
   <script type="text/javascript" charset="utf-8"
-          src="http://<%= staticWebHost %>/cadcVOTV/javascript/aladin.js?version=@version@"></script>
+          src="cadcVOTV/javascript/aladin.js?version=@version@"></script>
   <script type="text/javascript"
-          src="http://<%= staticWebHost %>/wet/javascript/polyfills/detailssummary-min.js?version=@version@"></script>
+          src="wet/javascript/polyfills/detailssummary-min.js?version=@version@"></script>
   <script type="text/javascript"
-          src="http://<%= staticWebHost %>/cadcVOTV/javascript/jquery-ui-1.11.4.min.js?version=@version@"></script>
+          src="cadcVOTV/javascript/jquery-ui-1.11.4.min.js?version=@version@"></script>
 
   <!-- Moment for date parsing and formatting -->
   <script type="text/javascript"
-          src="http://<%= staticWebHost %>/_search/js/moment.min.js?version=@version@"></script>
+          src="js/moment.min.js?version=@version@"></script>
   <script type="text/javascript"
-          src="http://<%= staticWebHost %>/_search/js/json.human.js?version=@version@"></script>
+          src="js/json.human.js?version=@version@"></script>
   <script type="text/javascript"
-          src="http://<%= staticWebHost %>/cadcVOTV/javascript/wgxpath.install.js?version=@version@"></script>
+          src="cadcVOTV/javascript/wgxpath.install.js?version=@version@"></script>
   <script type="text/javascript"
-          src="http://<%= staticWebHost %>/_search/js/jquery.tooltipster.custom.min.js?version=@version@"></script>
+          src="js/jquery.tooltipster.custom.min.js?version=@version@"></script>
   <script type="text/javascript"
-          src="http://<%= staticWebHost %>/cadcVOTV/javascript/jquery.csv-0.71.min.js"></script>
+          src="cadcVOTV/javascript/jquery.csv-0.71.min.js"></script>
   <script type="text/javascript"
-          src="http://<%= staticWebHost %>/cadcVOTV/javascript/slick.core.js?version=@version@"></script>
+          src="cadcVOTV/javascript/slick.core.js?version=@version@"></script>
   <script type="text/javascript"
-          src="http://<%= staticWebHost %>/cadcVOTV/javascript/cadc.rowselectionmodel.js?version=@version@"></script>
+          src="cadcVOTV/javascript/cadc.rowselectionmodel.js?version=@version@"></script>
   <script type="text/javascript"
-          src="http://<%= staticWebHost %>/cadcVOTV/javascript/cadc.checkboxselectcolumn.js?version=@version@"></script>
+          src="cadcVOTV/javascript/cadc.checkboxselectcolumn.js?version=@version@"></script>
   <script type="text/javascript"
-          src="http://<%= staticWebHost %>/cadcVOTV/javascript/slick.grid-frozen.js?version=@version@"></script>
+          src="cadcVOTV/javascript/slick.grid-frozen.js?version=@version@"></script>
   <script type="text/javascript"
-          src="http://<%= staticWebHost %>/cadcVOTV/javascript/slick.dataview.js?version=@version@"></script>
+          src="cadcVOTV/javascript/slick.dataview.js?version=@version@"></script>
   <script type="text/javascript"
-          src="http://<%= staticWebHost %>/cadcVOTV/javascript/slick.pager.js?version=@version@"></script>
+          src="cadcVOTV/javascript/slick.pager.js?version=@version@"></script>
   <script type="text/javascript"
-          src="http://<%= staticWebHost %>/cadcVOTV/javascript/cadc.columnpicker.dialog.js?version=@version@"></script>
+          src="cadcVOTV/javascript/cadc.columnpicker.dialog.js?version=@version@"></script>
   <script type="text/javascript"
-          src="http://<%= staticWebHost %>/cadcVOTV/javascript/cadc.plugin.unitselection.js?version=@version@"></script>
+          src="cadcVOTV/javascript/cadc.plugin.unitselection.js?version=@version@"></script>
   <script type="text/javascript"
-          src="http://<%= staticWebHost %>/cadcVOTV/javascript/cadc.plugin.filter_suggest.js?version=@version@"></script>
+          src="cadcVOTV/javascript/cadc.plugin.filter_suggest.js?version=@version@"></script>
   <script type="text/javascript"
-          src="http://<%= staticWebHost %>/cadcVOTV/javascript/cadc.votable.js?version=@version@"></script>
+          src="cadcVOTV/javascript/cadc.votable.js?version=@version@"></script>
   <script type="text/javascript"
-          src="http://<%= staticWebHost %>/cadcVOTV/javascript/cadc.votable-reader.js?version=@version@"></script>
+          src="cadcVOTV/javascript/cadc.votable-reader.js?version=@version@"></script>
   <script type="text/javascript"
-          src="http://<%= staticWebHost %>/cadcVOTV/javascript/cadc.votv.js?version=@version@"></script>
+          src="cadcVOTV/javascript/cadc.votv.js?version=@version@"></script>
   <script type="text/javascript"
-          src="http://<%= staticWebHost %>/cadcVOTV/javascript/cadc.votv.comparer.js?version=@version@"></script>
+          src="cadcVOTV/javascript/cadc.votv.comparer.js?version=@version@"></script>
   <script type="text/javascript"
-          src="http://<%= staticWebHost %>/cadcJS/javascript/cadc.uri.js?version=@version@"></script>
+          src="cadcJS/javascript/cadc.uri.js?version=@version@"></script>
   <script type="text/javascript"
-          src="http://<%= staticWebHost %>/cadcVOTV/javascript/cadc.resultstate.js?version=@version@"></script>
+          src="cadcVOTV/javascript/cadc.resultstate.js?version=@version@"></script>
   <script type="text/javascript"
-          src="http://<%= staticWebHost %>/cadcVOTV/javascript/cadc.plugin.footprint-viewer.js?version=@version@"></script>
+          src="cadcVOTV/javascript/cadc.plugin.footprint-viewer.js?version=@version@"></script>
   <script type="text/javascript"
-          src="http://<%= staticWebHost %>/_search/js/validator.js?version=@version@"></script>
+          src="js/validator.js?version=@version@"></script>
   <script type="text/javascript"
-          src="http://<%= staticWebHost %>/_search/js/cadc.search.uws.js?version=@version@"></script>
+          src="js/cadc.search.uws.js?version=@version@"></script>
   <script type="text/javascript"
-          src="http://<%= staticWebHost %>/cadcJS/javascript/cadc.util.js?version=@version@"></script>
+          src="cadcJS/javascript/cadc.util.js?version=@version@"></script>
   <script type="text/javascript"
-          src="http://<%= staticWebHost %>/_search/js/cadc.search.format.js?version=@version@"></script>
+          src="js/cadc.search.format.js?version=@version@"></script>
   <script type="text/javascript"
-          src="http://<%= staticWebHost %>/_search/js/cadc.search.unitconversion.js?version=@version@"></script>
+          src="js/cadc.search.unitconversion.js?version=@version@"></script>
   <script type="text/javascript"
-          src="http://<%= staticWebHost %>/_search/js/cadc.search.columnbundles.js?version=@version@"></script>
+          src="js/cadc.search.columnbundles.js?version=@version@"></script>
   <script type="text/javascript"
-          src="http://<%= staticWebHost %>/_search/js/cadc.search.columns.js?version=@version@"></script>
+          src="js/cadc.search.columns.js?version=@version@"></script>
   <script type="text/javascript"
-          src="http://<%= staticWebHost %>/_search/js/cadc.search.core.js?version=@version@"></script>
+          src="js/cadc.search.core.js?version=@version@"></script>
   <script type="text/javascript"
-          src="http://<%= staticWebHost %>/_search/js/cadc.search.form.js?version=@version@"></script>
+          src="js/cadc.search.form.js?version=@version@"></script>
   <script type="text/javascript"
-          src="http://<%= staticWebHost %>/_search/js/cadc.search.preview.js?version=@version@"></script>
+          src="js/cadc.search.preview.js?version=@version@"></script>
   <script type="text/javascript"
-          src="http://<%= staticWebHost %>/_search/js/cadc.search.app.js?version=@version@"></script>
+          src="js/cadc.search.app.js?version=@version@"></script>
   <script type="text/javascript"
-          src="http://<%= staticWebHost %>/_search/js/cadc.search.tooltipcreator.js?version=@version@"></script>
+          src="js/cadc.search.tooltipcreator.js?version=@version@"></script>
 
   <script type="text/javascript"
-          src="http://<%= staticWebHost %>/_search/js/hierarchy.js?version=@version@"></script>
+          src="js/hierarchy.js?version=@version@"></script>
 
 <script type="text/javascript">
   $(document).ready(function ()
@@ -750,6 +743,10 @@
 
 </div>
 </div>
-<%--<% if (isDefaultTheme) { %>--%>
-<c:import url="<%= footerURL %>"/>
-<%--<% } %>--%>
+  <!-- Close off the wb-body -->
+</div>
+
+<c:import url="_page_footer_js.html" />
+
+</body>
+</html>

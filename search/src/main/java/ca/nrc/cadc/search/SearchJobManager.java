@@ -31,10 +31,7 @@ public class SearchJobManager extends SimpleJobManager
         final DatabaseJobPersistence jobPersist =
                 new PostgresJobPersistence(new ACIdentityManager());
         final JobExecutor jobExec = new SyncExecutor(jobPersist,
-                                                     AdvancedRunner.class)
-        {
-
-        };
+                                                     AdvancedRunner.class);
 
         super.setJobPersistence(jobPersist);
         super.setJobExecutor(jobExec);

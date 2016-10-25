@@ -34,6 +34,7 @@
 package ca.nrc.cadc.tap;
 
 
+import ca.nrc.cadc.uws.Job;
 
 public interface SyncTAPClient
 {
@@ -42,6 +43,8 @@ public interface SyncTAPClient
 
     /**
      * Execute this client's Job.
+     *
+     * @param job       The Job to execute.
      */
-    void execute();
+    void execute(final Job job);
 }

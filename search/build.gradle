@@ -23,7 +23,6 @@ dependencies {
     compile 'com.opencsv:opencsv:3.+'
     compile 'org.jdom:jdom2:2.+'
     compile 'org.json:json:20160810'
-
     compile 'org.opencadc:cadc-access-control:1.+'
     compile 'org.opencadc:cadc-access-control-identity:1.+'
     compile 'org.opencadc:cadc-uws:1.+'
@@ -42,6 +41,9 @@ dependencies {
 
     providedCompile 'javax.servlet:javax.servlet-api:3.1.+'
     providedCompile 'javax.servlet:javax.servlet-api:3.0.+'
+
+    runtime 'org.postgresql:postgresql:9.4.1209.jre7'
+    runtime 'ca.nrc.cadc:ws-util:1.+'
     runtime 'jstl:jstl:1.+'
 
     testCompile 'junit:junit:4.+'

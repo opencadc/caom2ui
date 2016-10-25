@@ -1,0 +1,472 @@
+/*
+  Advanced Search
+*/
+
+.clarify-message
+{
+  font-style: italic;
+  color: #4c4c4c;
+}
+
+.italic
+{
+  font-style: italic;
+}
+
+select.resolver_select
+{
+  width: 229px;
+}
+
+.dialog-close, .tooltip-close
+{
+  cursor: pointer;
+}
+
+.results-container
+{
+  position: relative;
+}
+
+.sub-label
+{
+  font-style: italic;
+  color: #5D4F4F;
+  margin: 0 0 0 6px;
+}
+
+.cadcvotv-empty-results-message
+{
+  color: #112E56 !important;
+  background: #EEF3F5 !important;
+  font-weight: bolder;
+  height: 100px !important;
+}
+
+.grid-container
+{
+  width: 1180px;
+  margin-top: 5px;
+}
+
+.grid-header
+{
+  text-align: left;
+  padding-left: 8px;
+}
+
+.grid-header-icon-span
+{
+  display: inline-block;
+  float: left;
+  width: 20px;
+}
+
+.grid-footer
+{
+  width: 100%;
+  font-family: Arial, serif;
+  font-size: 8pt;
+  color: black;
+  height: 24px;
+  border: 0 solid gray;
+  line-height: 24px;
+  text-align: right;
+}
+
+#resultTable
+{
+  width: 100%;
+  height: 640px;
+  outline: 0;
+  background: #fff;
+  border: 1px solid gray;
+}
+
+#errorTable
+{
+  width: 100%;
+  height: 300px;
+  outline: 0;
+  background: #fff;
+  border: 1px solid gray;
+}
+
+.slick-columnpicker-panel-link-label, .slick-columnpicker-panel-link-label:visited, .slick-columnpicker-panel-link-label:hover
+{
+  color: #0000dd;
+  cursor: pointer;
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+  text-decoration: underline;
+  margin-left: 20px;
+}
+
+.column_manager_columns
+{
+  overflow: hidden;
+}
+
+#column_manager_container
+{
+  overflow: hidden !important;
+  width: 583px;
+}
+
+div.align-middle.column-picker-icon
+{
+  vertical-align: middle !important;
+}
+
+#pager
+{
+  width: 100%;
+  height: 22px;
+}
+
+/* Pager and Grid items. */
+.ui-icon
+{
+  background-color: #fff;
+}
+
+.slick-cell
+{
+  /* Uncomment this cursor style to enable text selection inside a cell. */
+  cursor: auto;
+}
+
+.slick-cell .cellValue
+{
+  width: 100%;
+  display: table-cell;
+}
+
+.slick-row
+{
+  display: table-row;
+}
+
+.slick-row.even.active
+{
+  background: rgb(255, 255, 187);
+}
+
+.slick-row.odd.active
+{
+  background: rgb(255, 255, 187);
+}
+
+.slick-row .selected
+{
+  z-index: 10;
+  background: #207e0d;
+}
+
+.slick-row.odd
+{
+  background: rgba(238, 243, 245, 1.0);
+}
+
+.slick-row.odd:hover
+{
+  background: rgb(255, 255, 187);
+}
+
+.slick-row.even:hover
+{
+  background: rgb(255, 255, 187);
+}
+
+.grid-header .ui-icon
+{
+  margin: 4px 4px auto 6px;
+  background-color: transparent;
+  border-color: transparent;
+}
+
+.grid-header .ui-icon.ui-state-hover
+{
+  background-color: white;
+}
+
+.search_criteria_input
+{
+  padding-left: 0;
+  padding-right: 0;
+}
+
+
+/* Tooltip (Form) */
+.tooltipster-advanced-search, .tooltipster-advanced-search-resolver, .tooltipster-observation-details
+{
+  outline: 1px solid #BAB595;
+  background: #fff;
+  color: #000;
+}
+
+.tooltipster-advanced-search .tooltipster-content, .tooltipster-preview-thumbnail .tooltipster-content, .tooltipster-advanced-search-resolver .tooltipster-content, .tooltipster-observation-details .tooltipster-content
+{
+  font-size: 11px;
+  line-height: 110%;
+  padding: 0;
+}
+
+/* By default, it's loading. */
+.tooltipster-busy
+{
+  height: 20px;
+  background: url("/en/search/images/queryoverlay_small.gif") no-repeat center;
+}
+
+.tooltipster-observation-details
+{
+  width: auto !important;
+  overflow-x: scroll;
+}
+
+.tooltipster-observation-details .tooltipster-content .module-tool .tooltip_text
+{
+  overflow-y: auto;
+  resize: both;
+  height: 500px;
+}
+
+/* Tooltip for preview images. */
+.tooltipster-preview-thumbnail
+{
+  border: none;
+  background: none;
+  padding: 0;
+}
+
+/* Tooltip (Column Picker) */
+.tooltip .tooltip_header
+{
+  font-size: 12px;
+  font-weight: bold;
+  color: #4179B4;
+}
+
+.tooltipster-content .module-tool
+{
+  /*width: auto !important;*/
+  padding-top: 0 !important;
+}
+
+.tooltip_header
+{
+  font-size: 130%;
+  line-height: 25px;
+  margin: 0 !important;
+  padding-top: 1px;
+  border-bottom: 0.1em solid #ddd;
+  background-image: linear-gradient(rgba(23, 108, 167, 0.55), rgba(19, 88, 136, 0.85)) !important;
+  cursor: move;
+}
+
+.tooltip_header h6
+{
+  color: #FFF;
+}
+
+#tooltipColumnPickerHolder
+{
+  display: none;
+}
+
+.tooltip.columnpicker
+{
+  display: none;
+  text-align: left;
+  border: 1px solid #fff;
+  background: rgb(238, 243, 245);
+  width: 700px;
+  box-shadow: 0 0 8px #000000;
+  padding: 10px 15px;
+  z-index: 2147483647;
+}
+
+.tooltip h3
+{
+  font-size: 1.1em;
+  color: #4179B4;
+  line-height: 0;
+  padding-left: 0;
+}
+
+.tooltip p
+{
+  margin-top: 2px;
+  margin-bottom: 0;
+}
+
+.tooltip_content
+{
+  display: inline-block;
+  margin: auto;
+  width: 100%;
+  height: auto;
+}
+
+[class*="target_name_resolution_status"]
+{
+  margin-left: -0.5em;
+  min-height: 18px;
+}
+
+.target_name_resolution_status:hover
+{
+  background-color: rgba(0, 29, 69, 0.2);
+}
+
+.target_name_resolution_status.target_ok
+{
+  background: url("/en/search/images/ok_small.png") no-repeat center;
+}
+
+.target_name_resolution_status.target_not_found
+{
+  background: url("/en/search/images/not_found.png") no-repeat center;
+}
+
+.target_name_resolution_status.busy
+{
+  background: url("/en/search/images/queryoverlay_small.gif") no-repeat center;
+}
+
+ul.ui-autocomplete {
+  background-repeat: no-repeat;
+}
+
+select.hierarchy_select
+{
+  background-color: #fff;
+  width: 100%;
+}
+
+.download-options
+{
+  z-index: 100;
+}
+
+.targetList_clear
+{
+  cursor: pointer;
+}
+
+#target_name_resolution_status, #targetList_clear
+{
+  margin-left: -5px;
+}
+
+a.tooltip_example
+{
+  cursor: pointer;
+}
+
+a.advanced_search_tooltip_example, a.advanced_search_tooltip_example:visited
+{
+  color: blue;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.advanced_search_data_train
+{
+  /*border: solid 1px #aaa;*/
+  white-space: nowrap;
+  font-size: 1em;
+  letter-spacing: 1.2em;
+  /*line-height: .6em;*/
+  overflow: hidden;
+  /*width: 615px;*/
+  /*margin: 0 0 30px 0;*/
+}
+
+.advanced_search_hierarchy_select_div
+{
+  display: inline-block;
+  /*width: 10.5em;*/
+  letter-spacing: normal;
+  vertical-align: middle;
+  white-space: normal;
+}
+
+label.advanced_search_hierarchy_select_div_label
+{
+  height: 3em;
+}
+
+/* Template for the resolver tooltip. */
+.resolver-result-tooltip
+{
+  display: none;
+}
+
+div.slick-column-picker-tooltip-button-holder
+{
+  margin-top: 8px;
+  margin-bottom: 5px;
+}
+
+a.votable_link_csv
+{
+  margin-left: 0.3em;
+  margin-right: 0.3em;
+}
+
+span.result-state
+{
+  float: right
+}
+
+span.slick-column-picker-button
+{
+  border: 0.1em solid #ccc;
+  border-radius: 0.2em 0.2em;
+  margin: 3px;
+  cursor: pointer;
+  padding: 0.5em;
+}
+
+span.slick-column-picker-button:hover
+{
+  background: rgb(255, 255, 187);
+}
+
+.slick-header-column.ui-state-default
+{
+  color: #000;
+  font-weight: normal;
+}
+
+/**
+  Used to determine column widths.
+*/
+#lengthFinder
+{
+  position: absolute;
+  visibility: hidden;
+  height: auto;
+  width: auto;
+  white-space: nowrap;
+
+  /* Be generous with spacing. */
+  /*font-family: Courier New, Courier, monospace;*/
+  font-size: 1.1em;
+  font-family: Verdana, Arial, sans-serif;
+  /*font-size: 1.1em;*/
+}
+
+.tabs li {
+  border-bottom: inherit;
+}
+
+.tabs li.active {
+  border-bottom: 0;
+}
+
+/* Addition styles for bare theme */
+div#wb-core.base {
+  padding-top: 50px;
+}

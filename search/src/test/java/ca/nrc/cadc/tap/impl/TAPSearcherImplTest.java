@@ -39,6 +39,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import ca.nrc.cadc.reg.client.RegistryClient;
@@ -53,6 +54,7 @@ import ca.nrc.cadc.search.QueryGenerator;
 import ca.nrc.cadc.search.upload.UploadResults;
 import ca.nrc.cadc.uws.Job;
 import ca.nrc.cadc.uws.Parameter;
+import ca.nrc.cadc.uws.Result;
 import ca.nrc.cadc.uws.SyncResponseWriter;
 
 import org.junit.Test;
@@ -83,14 +85,19 @@ public class TAPSearcherImplTest extends AbstractUnitTest<TAPSearcherImpl>
     @Test
     public void search() throws Exception
     {
-        final Job mockJob = createMock(Job.class);
         final List<Parameter> parameters = new ArrayList<>();
         final Writer writer = new StringWriter();
 
-        parameters.add(new Parameter(UploadResults.UPLOAD_ROW_COUNT, "88"));
-        parameters.add(new Parameter(FormConstraint.FORM_NAME,
-                                     "Observation.collection" + Text.NAME));
-        parameters.add(new Parameter("Observation.collection", "VAL1"));
+        parameters.add(new Parameter("LANG", "ADQL"));
+        parameters.add(new Parameter("FORMAT", "votable"));
+        parameters.add(new Parameter("QUERY",
+                                     "SELECT * FROM TABLE WHERE UTYPE1 = VAL1"));
+        parameters.add(new Parameter("REQUEST", "doQuery"));
+        parameters.add(new Parameter("MAXREC", "11000"));
+
+        final Job dummyJob = new Job();
+
+        dummyJob.setParameterList(parameters);
 
         final List<SearchableFormConstraint> constraints = new ArrayList<>();
 
@@ -132,15 +139,30 @@ public class TAPSearcherImplTest extends AbstractUnitTest<TAPSearcherImpl>
             }
         });
 
-        mockTAPClient.execute();
+        final Job tapJob = new Job(dummyJob)
+        {
+
+            /**
+             * Why must I override equals here?  Why does the Job class not
+             * already have one?
+             *
+             * @param obj
+             * @return
+             */
+            @Override
+            public boolean equals(Object obj)
+            {
+                return dummyJob.getParameterList().equals(((Job) obj).
+                        getParameterList());
+            }
+        };
+        tapJob.setResultsList(null);
+
+        mockTAPClient.execute(tapJob);
         expectLastCall().once();
 
         expect(mockQueryGenerator.generate(templates))
                 .andReturn(stringBuilder).once();
-
-        expect(mockJob.getID()).andReturn("JOBID").times(2);
-
-        expect(mockJob.getParameterList()).andReturn(parameters).times(9);
 
         expect(mockSyncResponseWriter.getWriter()).andReturn(writer).times(2);
 
@@ -148,10 +170,8 @@ public class TAPSearcherImplTest extends AbstractUnitTest<TAPSearcherImpl>
                                                  "application/json");
         expectLastCall().once();
 
-        replay(mockJob, mockSyncResponseWriter, mockQueryGenerator,
-               mockTAPClient);
-        getTestSubject().search(mockJob);
-        verify(mockJob, mockSyncResponseWriter, mockQueryGenerator,
-               mockTAPClient);
+        replay(mockSyncResponseWriter, mockQueryGenerator, mockTAPClient);
+        getTestSubject().search(dummyJob);
+        verify(mockSyncResponseWriter, mockQueryGenerator, mockTAPClient);
     }
 }

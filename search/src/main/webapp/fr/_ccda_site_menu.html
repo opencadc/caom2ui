@@ -1,0 +1,112 @@
+<!--#set var="change_passwd_desc" value="Veuillez éditer les informations suivantes et cliquez sur le bouton « Changer le mot de passe » pour modifier ce dernier. "-->
+<!--#set var="required_label" value="obligatoire"-->
+<!--#set var="change_passwd_old_passwd_label" value="Mot de passe actuel"-->
+<!--#set var="change_passwd_new_passwd_label" value="Nouveau mot de passe"-->
+<!--#set var="change_passwd_confirm_passwd_label" value="Confirmation du mot de passe"-->
+<!--#set var="alphanumeric_label" value="alphanumérique seulement"-->
+<!--#set var="change_passwd_submit_button_label" value="Changer le mot de passe"-->
+<!--#set var="cancel_button_label" value="Annuler"-->
+
+<!-- Site menu components under banner. -->
+<div id="gcwu-psnb">
+  <h2>Menu du site</h2>
+
+  <div id="gcwu-psnb-in">
+    <div class="wet-boew-menubar mb-mega">
+      <div>
+        <!-- Hide this form when the page loads with wb-invisible. -->
+        <!--#include virtual='/cadc/includes/_change_passwd.html'-->
+        <ul class="mb-menu">
+          <li>
+            <section>
+              <h3><a href="/fr/?archives_telescopes">Donn&eacute;es des t&eacute;lescopes</a></h3>
+              <div class="mb-sm">
+                <div class="span-2">
+                  <ul>
+                    <li><a href="/fr/gemini">Gemini</a></li>
+                    <li><a href="/fr/tcfh">TCFH</a></li>
+                    <li><a href="/fr/tjcm">TJCM</a></li>
+                    <li><a href="/fr/hst">HST</a></li>
+                    <li><a href="/fr/blast">BLAST</a></li>
+                    <li><a href="/fr/most">MOST</a></li>
+                    <li><a href="/fr/ofa">OFA</a></li>
+                    <li><a href="/fr/macho/">MACHO</a></li>
+                    <li><a href="/fr/omm">OMM</a></li>
+                    <li><a href="/fr/fuse">FUSE</a></li>
+                    <li><a href="/fr/ukirt">UKIRT</a></li>
+                  </ul>
+                </div>
+                <div class="clear"></div>
+              </div>
+            </section>
+          </li>
+          <li>
+            <section>
+              <h3><a href="/fr/?autres_collections">Donn&eacute;es avanc&eacute;e</a></h3>
+              <div class="mb-sm">
+                <div class="span-2">
+                  <ul>
+                    <li><a href="/fr/megapipe">MegaPipe</a></li>
+                    <li><a href="/fr/hsthla">HLA</a></li>
+                    <li><a href="/fr/iris">IRIS</a></li>
+                    <li><a href="/fr/rcpg">RCPG</a></li>
+                    <li><a href="/fr/tcfh/cfhtls.html">CFHTLS</a></li>
+                    <li><a href="/fr/wirwolf">WIRwolf</a></li>
+                  </ul>
+                </div>
+                <div class="clear"></div>
+              </div>
+            </section>
+          </li>
+          <li>
+            <section>
+              <h3><a href="/fr/?services">Services</a></h3>
+              <div class="mb-sm">
+                <div class="span-2">
+                  <ul>
+                    <li><a href="/fr/rencontres">Rencontres</a></li>
+                    <li><a href="/fr/communaute">Communaut&eacute;</a></li>
+                    <li><a href="/fr/rioss">RIOSS</a></li>
+                    <li><a href="http://www.canfar.net" rel="external">CANFAR (Anglais seulement)</a></li>
+                    <li><a href="/fr/dss">DSS</a></li>
+                    <li><span>&nbsp;</span></li>
+                    <li><a href="/fr/groupes">Gestion de groupes</a></li>
+                  </ul>
+                </div>
+                <div class="clear"></div>
+              </div>
+            </section>
+          </li>
+          <li>
+            <div>
+              <a href="/fr/doc/">Documentation</a>
+            </div>
+          </li>
+          <li>
+            <div>
+              <a href="/fr/recherche/">Recherche avancée</a>
+            </div>
+          </li>
+          <li class="float-right">
+            <div>
+              <a class="access_control_link" href="/fr/connexion.html" data-authenticated-title="Votre profil." title="Voir plus de donn&eacute;es que vous avez acc&egrave;s.">Connexion</a>
+              <div id="profile_modal" class="profile_modal">
+                <a class="user_edit_profile" href="/fr/auth/actualiser.html">Modifier le profil</a>
+                <br />
+                <a class="change_password" href="#">Modifier le mot de passe</a>
+                <br />
+                <a id="download_certificate" class="download_certificate" href="/cred/priv?daysValid=30" title="Valide pour trente (30) jours">Obtenir un certificat</a>
+                <br />
+                <a class="access_control_logout" href="/access/logout">D&eacute;connexion</a>
+                <br />
+                <br />
+                <a class="cancel" href="#">Annuler</a>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End site menu components. -->

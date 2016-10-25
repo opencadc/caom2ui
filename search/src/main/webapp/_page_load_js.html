@@ -1,0 +1,135 @@
+<script src="js/cadc-ccda.js" type="text/javascript"></script>
+<script type="text/javascript">
+  $(document).ready(function()
+                    {
+                      $(document).on("pageinit", function ()
+                      {
+                        var $passwordModal = $("#change_password_modal");
+
+                        $("a.change_password").on({
+                                                    click: function (e)
+                                                    {
+                                                      e.preventDefault();
+
+                                                      setTimeout(function ()
+                                                                 {
+                                                                   // Unhide on click.
+                                                                   $passwordModal.removeClass("wb-invisible");
+                                                                   $passwordModal.popup("open");
+                                                                 }, 100);
+                                                    }
+                                                  });
+                      });
+
+                      // Set the target language for the language selector.  It's
+                      // setup like a loop to accomodate more languages (if need
+                      // be).
+                      // jenkinsd 2013.07.19
+                      //
+                      $("span.lang-link-target").each(function (linkIndex,
+                                                                linkItem)
+                                                      {
+                                                        var $nextSpan =
+                                                            $(linkItem);
+                                                        var $linkTargetLanguage =
+                                                            $nextSpan.attr("lang");
+                                                        var $languageLink =
+                                                            $("a.lang-link[lang='"
+                                                              +
+                                                              $linkTargetLanguage +
+                                                              "']");
+                                                        $languageLink.attr("href", $nextSpan.text());
+                                                      });
+
+                      // Translations.
+
+                      // Initialize, using the lang attribute of the html document.
+                      var i18n = $.i18n();
+
+                      i18n.load("/cadc/resources/" + i18n.locale + ".json",
+                                i18n.locale).done(function()
+                                                  {
+                                                    // Inside the cadc-ccda.js script.
+                                                    translateFields(i18n.locale);
+                                                  });
+                      // End translations.
+
+                      // Set the title based on the wb-cont item.
+                      var $contentTitleElement = $("#wb-cont");
+
+                      if ($contentTitleElement && $contentTitleElement.text())
+                      {
+                        var $title = $("title");
+                        var $titleText = $title.text();
+                        var $contentTitleElementText =
+                            $contentTitleElement.text();
+
+                        if ($titleText != $contentTitleElementText)
+                        {
+                          $title.text($contentTitleElementText + " - "
+                                      + $titleText);
+                        }
+                      }
+
+                      var $accessControlLink = $(".access_control_link");
+
+                      var userManager = new cadc.web.UserManager();
+                      userManager.subscribe(cadc.web.events.onUserLoad,
+                                            function (event, data)
+                                            {
+                                              var user = data.user;
+                                              if (user)
+                                              {
+                                                var $cancelLink = $("a.cancel");
+                                                var $logoutLink =
+                                                    $("a.access_control_logout");
+                                                var $userFullNameDisplay =
+                                                    $("span.user_full_name");
+
+                                                if ($userFullNameDisplay &&
+                                                    ($userFullNameDisplay.length
+                                                     > 0))
+                                                {
+                                                  $userFullNameDisplay.text(
+                                                      user.getFullName());
+                                                }
+
+                                                $logoutLink.attr("href", $logoutLink.attr("href")
+                                                                         + "?target="
+                                                                         + encodeURI(new cadc.web.util.currentURI().getTargetURL()));
+
+                                                $accessControlLink.unbind("click");
+                                                $cancelLink.unbind("click");
+
+                                                $accessControlLink.click(function (event)
+                                                                         {
+                                                                           event.preventDefault();
+                                                                           $(this).next("div.profile_modal").fadeToggle(300);
+                                                                         });
+
+                                                $cancelLink.click(function (event)
+                                                                  {
+                                                                    event.preventDefault();
+                                                                    $(this).parent().fadeOut("fast");
+                                                                  });
+
+                                                $accessControlLink.text(user.getFullName());
+                                                $accessControlLink.attr("title",
+                                                                        $accessControlLink.data("authenticated-title"));
+                                              }
+                                            });
+
+                      // add horizontal scroll bar on top WebRT35608
+                      $(".wmd-view-topscroll").scroll(function () {
+                        $(".wmd-view").scrollLeft($(".wmd-view-topscroll").scrollLeft());
+                      });
+
+                      $(".wmd-view").scroll(function () {
+                        $(".wmd-view-topscroll").scrollLeft($(".wmd-view").scrollLeft())
+                      });
+
+                      $('.scroll-div').css('width', $('.dynamic-div').outerWidth() );
+
+                      userManager.loadCurrent();
+                    });
+</script>

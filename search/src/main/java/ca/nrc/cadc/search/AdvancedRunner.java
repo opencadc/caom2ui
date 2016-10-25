@@ -64,7 +64,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Job runner for the Advanced Search.
  */
-class AdvancedRunner implements JobRunner
+public class AdvancedRunner implements JobRunner
 {
     private static final Logger LOGGER = Logger.getLogger(AdvancedRunner.class);
 
@@ -73,6 +73,11 @@ class AdvancedRunner implements JobRunner
     private SyncOutput syncOutput;
     private Searcher searcher;
     private Configuration configuration;
+
+
+    public AdvancedRunner()
+    {
+    }
 
 
     /**
@@ -114,13 +119,13 @@ class AdvancedRunner implements JobRunner
      */
     private void init() throws IOException, PositionParserException
     {
+        // Force a reload each time.
+        configuration = new SystemConfiguration();
+
         if (searcher == null)
         {
             createSearcher();
         }
-
-        // Force a reload each time.
-        configuration = new SystemConfiguration();
     }
 
     /*
