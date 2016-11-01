@@ -39,7 +39,6 @@ import ca.nrc.cadc.caom2.Observation;
 import ca.nrc.cadc.caom2.ObservationURI;
 import ca.nrc.cadc.net.HttpDownload;
 import ca.nrc.cadc.reg.Standards;
-import ca.nrc.cadc.reg.client.LocalAuthority;
 import ca.nrc.cadc.reg.client.RegistryClient;
 import org.junit.Test;
 
@@ -67,6 +66,8 @@ public class ObservationViewServletTest
             createMock(RequestDispatcher.class);
     private final HttpServletResponse mockResponse =
             createMock(HttpServletResponse.class);
+    private final ApplicationConfiguration mockConfiguration =
+            createMock(ApplicationConfiguration.class);
 
 
     @Test
@@ -195,7 +196,8 @@ public class ObservationViewServletTest
         final URL repoURL = new URL("http://mysite.com/caom2ops/meta");
         final HttpDownload mockDownloader = createMock(HttpDownload.class);
         final ObservationViewServlet testSubject =
-                new ObservationViewServlet(mockRegistryClient)
+                new ObservationViewServlet(mockRegistryClient,
+                                           mockConfiguration)
                 {
                     /**
                      * Testers or subclasses can override this as needed.
@@ -238,9 +240,14 @@ public class ObservationViewServletTest
                 once();
 
         expect(mockObservationReader.getObs()).andReturn(result).once();
-        
+
+        expect(mockConfiguration.getString(
+                ApplicationConfiguration.CAOM2OPS_SERVICE_URI_PROPERTY_KEY,
+                ApplicationConfiguration.DEFAULT_CAOM2OPS_SERVICE_URI_VALUE))
+                .andReturn("ivo://myhost.com/caom2-service").once();
+
         expect(mockRegistryClient.getServiceURL(URI.create(
-            ObservationViewServlet.CAOM2OPS_ID), Standards.CAOM2_OBS_20,
+                "ivo://myhost.com/caom2-service"), Standards.CAOM2_OBS_20,
                                                 AuthMethod.ANON))
             .andReturn(repoURL).once();
 
@@ -265,12 +272,12 @@ public class ObservationViewServletTest
 
         replay(mockRequest, mockErrorDispatcher, mockDisplayDispatcher,
                mockResponse, mockRegistryClient, mockDownloader,
-               mockObservationReader);
+               mockObservationReader, mockConfiguration);
 
         testSubject.doGet(mockRequest, mockResponse);
 
         verify(mockRequest, mockErrorDispatcher, mockDisplayDispatcher,
                mockResponse, mockRegistryClient, mockDownloader,
-               mockObservationReader);
+               mockObservationReader, mockConfiguration);
     }
 }

@@ -1,12 +1,11 @@
+<%@ page import="ca.nrc.cadc.ApplicationConfiguration" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" session="false"
          pageEncoding="UTF-8" %>
-<%@ page import="org.apache.commons.configuration2.Configuration" %>
-<%@ page import="org.apache.commons.configuration2.SystemConfiguration" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <%
-  final Configuration configuration = new SystemConfiguration();
+  final ApplicationConfiguration configuration = new ApplicationConfiguration();
   final String defaultTheme = "gcwu-fegc";
 
   // Conservative default.
@@ -24,7 +23,8 @@
                      + "/_page_header.html?LAST_MOD=$LastChangedDate$";
   String footerURL = requestHeaderLang + "/_page_footer.html";
   final String bannerURL = requestHeaderLang
-                           + "/_" + (requestHeaderLang.equals("fr") ? "ccda" : "cadc")
+                           + "/_" + (requestHeaderLang.equals("fr") ? "ccda"
+                                                                    : "cadc")
                            + "_banner.html";
   final String siteMenuURL = requestHeaderLang + "/_"
                              + (requestHeaderLang.equals("fr") ? "ccda"

@@ -39,12 +39,12 @@
 
 package ca.nrc.cadc.search;
 
+import ca.nrc.cadc.ApplicationConfiguration;
 import ca.nrc.cadc.caom2.CAOMQueryGeneratorImpl;
 import ca.nrc.cadc.caom2.ObsCoreQueryGeneratorImpl;
 import ca.nrc.cadc.net.TransientException;
 import ca.nrc.cadc.search.parser.exception.PositionParserException;
 import ca.nrc.cadc.search.upload.UploadResults;
-import ca.nrc.cadc.tap.SyncTAPClient;
 import ca.nrc.cadc.tap.impl.*;
 import ca.nrc.cadc.util.StringUtil;
 import ca.nrc.cadc.uws.*;
@@ -218,8 +218,8 @@ public class AdvancedRunner implements JobRunner
     private URI lookupServiceURI()
     {
         return URI.create(configuration.getString(
-                SyncTAPClient.TAP_SERVICE_URI_PROPERTY_KEY,
-                SyncTAPClient.DEFAULT_TAP_SERVICE_URI_VALUE));
+                ApplicationConfiguration.TAP_SERVICE_URI_PROPERTY_KEY,
+                ApplicationConfiguration.DEFAULT_TAP_SERVICE_URI_VALUE));
     }
 
     /**

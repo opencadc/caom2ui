@@ -66,99 +66,31 @@
  ************************************************************************
  */
 
-package ca.nrc.cadc.tap;
+package ca.nrc.cadc.caom2.ui;
 
-import ca.nrc.cadc.AbstractUnitTest;
-
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import ca.nrc.cadc.ApplicationConfiguration;
 import ca.nrc.cadc.auth.AuthMethod;
-import ca.nrc.cadc.reg.Standards;
-import ca.nrc.cadc.reg.client.RegistryClient;
+import ca.nrc.cadc.auth.PrincipalExtractor;
+import ca.nrc.cadc.auth.SSOCookieCredential;
 
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
-import java.net.URI;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
+import javax.security.auth.Subject;
+import java.util.HashSet;
+import java.util.Set;
 
-import ca.nrc.cadc.uws.Job;
-
-import org.junit.Test;
-
-import static org.easymock.EasyMock.*;
-import static org.junit.Assert.*;
-
-
-public class TAPServletTest extends AbstractUnitTest<TAPServlet>
+public class SubjectGenerator
 {
-    @Test
-    public void sendToTAP() throws Exception
+    public final Subject generate(final PrincipalExtractor principalExtractor)
     {
-        final boolean[] executeRan = new boolean[]{false};
+        final Set<Object> publicCred = new HashSet<>();
+        final SSOCookieCredential cookieCredential =
+                principalExtractor.getSSOCookieCredential();
 
-        final ApplicationConfiguration mockConfiguration =
-                createMock(ApplicationConfiguration.class);
-
-        final TAPServlet testSubject = new TAPServlet(mockConfiguration)
+        if (cookieCredential != null)
         {
-            /**
-             * Used for testers to override.
-             *
-             * @param syncTAPClient     The sync client.
-             */
-            @Override
-            void execute(final SyncTAPClient syncTAPClient, final Job j)
-            {
-                executeRan[0] = true;
-            }
-        };
+            publicCred.add(principalExtractor.getSSOCookieCredential());
+            publicCred.add(AuthMethod.COOKIE);
+        }
 
-        final HttpServletRequest mockRequest =
-                createMock(HttpServletRequest.class);
-
-        final Map<String, String[]> requestParameters = new HashMap<>();
-
-        requestParameters.put("QUERY", new String[]{"SELECT 1 FROM TABLE"});
-        requestParameters.put("NOUSE", new String[]{"1", "2"});
-        requestParameters.put("FORMAT", new String[]{"csv"});
-
-        final HttpServletResponse mockResponse =
-                createMock(HttpServletResponse.class);
-        final OutputStream _os = new ByteArrayOutputStream();
-        final RegistryClient mockRegistryClient =
-                createMock(RegistryClient.class);
-        final ServletOutputStream outputStream =
-                new StubServletOutputStream(_os);
-
-        expect(mockConfiguration.getString(
-                ApplicationConfiguration.TAP_SERVICE_URI_PROPERTY_KEY,
-                ApplicationConfiguration.DEFAULT_TAP_SERVICE_URI_VALUE))
-                .andReturn("schema://place/to/get/tap").once();
-
-        expect(mockResponse.getOutputStream()).andReturn(outputStream).once();
-        expect(mockRegistryClient.getServiceURL(
-                URI.create("schema://place/to/get/tap"),
-                Standards.TAP_SYNC_11,
-                AuthMethod.ANON))
-                .andReturn(new URL("http://www.site.com/example/tap"));
-        expect(mockRequest.getParameterMap()).andReturn(requestParameters)
-                .once();
-
-        expect(mockRequest.getParameter("tap_url")).andReturn(null).once();
-
-        replay(mockRequest, mockResponse, mockRegistryClient,
-               mockConfiguration);
-
-        testSubject.sendToTAP(mockRequest, mockResponse, mockRegistryClient);
-
-        assertTrue("Did not try to execute.", executeRan[0]);
-
-        verify(mockRequest, mockResponse, mockRegistryClient,
-               mockConfiguration);
+        return new Subject(false, principalExtractor.getPrincipals(),
+                            publicCred, new HashSet<>());
     }
 }

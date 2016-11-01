@@ -261,10 +261,6 @@
     <url-pattern>/validate/*</url-pattern>
   </servlet-mapping>
 
-  <welcome-file-list>
-    <welcome-file>/index.jsp</welcome-file>
-  </welcome-file-list>
-
   <!-- Define the public security role -->
   <security-role>
     <description>Public security role</description>

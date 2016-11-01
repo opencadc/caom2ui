@@ -68,6 +68,7 @@
 
 package ca.nrc.cadc.tap;
 
+import ca.nrc.cadc.ApplicationConfiguration;
 import ca.nrc.cadc.auth.AuthMethod;
 import ca.nrc.cadc.net.HttpDownload;
 import ca.nrc.cadc.reg.Standards;
@@ -77,9 +78,6 @@ import ca.nrc.cadc.tap.impl.SyncTAPClientImpl;
 import ca.nrc.cadc.util.StringUtil;
 import ca.nrc.cadc.uws.ExecutionPhase;
 import ca.nrc.cadc.uws.Job;
-import ca.nrc.cadc.uws.web.JobCreator;
-import org.apache.commons.configuration2.Configuration;
-import org.apache.commons.configuration2.SystemConfiguration;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -93,17 +91,18 @@ import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 
+
 public class TAPServlet extends HttpServlet
 {
-    private final Configuration configuration;
+    private final ApplicationConfiguration configuration;
 
 
     public TAPServlet()
     {
-        this(new SystemConfiguration());
+        this(new ApplicationConfiguration());
     }
 
-    public TAPServlet(Configuration configuration)
+    TAPServlet(final ApplicationConfiguration configuration)
     {
         this.configuration = configuration;
     }
@@ -227,7 +226,7 @@ public class TAPServlet extends HttpServlet
      * @param req               The HTTP Request.
      * @param resp              The HTTP Response.
      * @param registryClient    The registry client to lookup the service.
-     * @throws IOException
+     * @throws IOException      If URL management fails.
      */
     void sendToTAP(HttpServletRequest req, HttpServletResponse resp,
                    final RegistryClient registryClient)
@@ -262,8 +261,8 @@ public class TAPServlet extends HttpServlet
 
     /**
      * Used for testers to override.
-     * @param syncTAPClient
-     * @param job
+     * @param syncTAPClient             The TAP Client.
+     * @param job                       The Job to execute.
      */
     void execute(final SyncTAPClient syncTAPClient, final Job job)
     {
@@ -280,8 +279,9 @@ public class TAPServlet extends HttpServlet
     private URI lookupServiceURI()
     {
         final String serviceURIProperty =
-                configuration.getString(SyncTAPClient.TAP_SERVICE_URI_PROPERTY_KEY,
-                                        SyncTAPClient.DEFAULT_TAP_SERVICE_URI_VALUE);
+                configuration.getString(
+                        ApplicationConfiguration.TAP_SERVICE_URI_PROPERTY_KEY,
+                        ApplicationConfiguration.DEFAULT_TAP_SERVICE_URI_VALUE);
 
         return URI.create(serviceURIProperty);
     }

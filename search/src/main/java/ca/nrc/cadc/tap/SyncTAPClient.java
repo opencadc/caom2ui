@@ -38,9 +38,6 @@ import ca.nrc.cadc.uws.Job;
 
 public interface SyncTAPClient
 {
-    String TAP_SERVICE_URI_PROPERTY_KEY = "org.opencadc.search.tap-service-id";
-    String DEFAULT_TAP_SERVICE_URI_VALUE = "ivo://cadc.nrc.ca/tap";
-
     /**
      * Execute this client's Job.
      *

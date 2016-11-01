@@ -68,9 +68,8 @@
 
 package ca.nrc.cadc.caom2;
 
+import ca.nrc.cadc.ApplicationConfiguration;
 import ca.nrc.cadc.net.HttpDownload;
-import org.apache.commons.configuration2.Configuration;
-import org.apache.commons.configuration2.SystemConfiguration;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletResponse;
@@ -83,20 +82,15 @@ import java.net.URL;
 
 public class CAOM2Servlet extends HttpServlet
 {
-    private final static String CAOM2_UI_PROPERTY_KEY =
-            "org.opencadc.search.caom2ui-host";
-    private final static String DEFAULT_CAOM2_UI_HOST =
-            "www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca";
-
-    private final Configuration configuration;
+    private final ApplicationConfiguration configuration;
 
 
     public CAOM2Servlet()
     {
-        this(new SystemConfiguration());
+        this(new ApplicationConfiguration());
     }
 
-    public CAOM2Servlet(Configuration configuration)
+    CAOM2Servlet(ApplicationConfiguration configuration)
     {
         this.configuration = configuration;
     }
@@ -178,8 +172,9 @@ public class CAOM2Servlet extends HttpServlet
 
     private URL lookupCAOM2UIURL() throws IOException
     {
-        final String property = configuration.getString(CAOM2_UI_PROPERTY_KEY,
-                                                        DEFAULT_CAOM2_UI_HOST);
+        final String property = configuration.getString(
+                ApplicationConfiguration.CAOM2_UI_PROPERTY_KEY,
+                ApplicationConfiguration.DEFAULT_CAOM2_UI_HOST);
 
         return new URL("http://" + property + "/caom2ui");
     }

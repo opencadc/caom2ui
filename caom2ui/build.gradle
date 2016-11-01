@@ -31,6 +31,7 @@ dependencies {
     compile 'org.opencadc:cadc-registry:1.+'
     compile 'org.opencadc:cadc-vosi:1.+'
     compile 'org.apache.httpcomponents:httpclient:4.+'
+    compile 'org.apache.commons:commons-configuration2:2.+'
 
     providedCompile 'javax.servlet:javax.servlet-api:3.1.+'
     providedCompile 'javax.servlet:javax.servlet-api:3.0.+'
