@@ -48,7 +48,7 @@
 
   <filter>
     <filter-name>WebAccessControlFilter</filter-name>
-    <filter-class>ca.nrc.cadc.search.web.WebAccessControlFilter</filter-class>
+    <filter-class>ca.nrc.cadc.web.WebAccessControlFilter</filter-class>
   </filter>
 
   <filter-mapping>

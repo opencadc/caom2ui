@@ -135,10 +135,10 @@ public class TAPServletTest extends AbstractUnitTest<TAPServlet>
         final ServletOutputStream outputStream =
                 new StubServletOutputStream(_os);
 
-        expect(mockConfiguration.getString(
+        expect(mockConfiguration.lookupServiceURI(
                 ApplicationConfiguration.TAP_SERVICE_URI_PROPERTY_KEY,
-                ApplicationConfiguration.DEFAULT_TAP_SERVICE_URI_VALUE))
-                .andReturn("schema://place/to/get/tap").once();
+                ApplicationConfiguration.DEFAULT_TAP_SERVICE_URI))
+                .andReturn(URI.create("schema://place/to/get/tap")).once();
 
         expect(mockResponse.getOutputStream()).andReturn(outputStream).once();
         expect(mockRegistryClient.getServiceURL(

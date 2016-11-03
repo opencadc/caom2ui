@@ -116,9 +116,9 @@ public class ApplicationConfigurationTest
                                 parameters.fileBased().setFile(tmpConfigFile));
 
         // Add this after System properties.
-        testSubject.addConfiguration(builder.getConfiguration());
+        testSubject.configuration.addConfiguration(builder.getConfiguration());
 
-        assertEquals("Wrong value.", "VAL1", testSubject.getString(
+        assertEquals("Wrong value.", "VAL1", testSubject.lookup(
                 ApplicationConfiguration.class.getCanonicalName() + ".PROP1"));
     }
 
@@ -145,8 +145,8 @@ public class ApplicationConfigurationTest
                         parameters.fileBased().setFile(tmpConfigFile));
 
         // Add this after System properties.
-        testSubject.addConfiguration(builder.getConfiguration());
+        testSubject.configuration.addConfiguration(builder.getConfiguration());
 
-        assertEquals("Wrong value.", "VAL11", testSubject.getString("PROP1"));
+        assertEquals("Wrong value.", "VAL11", testSubject.lookup("PROP1"));
     }
 }

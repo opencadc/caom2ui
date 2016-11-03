@@ -68,6 +68,7 @@
 
 package ca.nrc.cadc;
 
+import ca.nrc.cadc.util.StringUtil;
 import org.apache.commons.configuration2.CombinedConfiguration;
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.SystemConfiguration;
@@ -79,18 +80,19 @@ import org.apache.commons.configuration2.tree.UnionCombiner;
 import org.apache.log4j.Logger;
 
 import java.io.File;
+import java.net.URI;
 
 
 /**
  * Configuration for this Application.  This will combine the System Properties
  * with the CADC File-based configuration in $HOME/config directory.
  */
-public class ApplicationConfiguration extends CombinedConfiguration
+public class ApplicationConfiguration
 {
     public static final String TAP_SERVICE_URI_PROPERTY_KEY =
             "org.opencadc.search.tap-service-id";
-    public static final String DEFAULT_TAP_SERVICE_URI_VALUE =
-            "ivo://cadc.nrc.ca/tap";
+    public static final URI DEFAULT_TAP_SERVICE_URI =
+            URI.create("ivo://cadc.nrc.ca/tap");
     public final static String CAOM2_UI_PROPERTY_KEY =
             "org.opencadc.search.caom2ui-host";
     public final static String DEFAULT_CAOM2_UI_HOST =
@@ -103,6 +105,10 @@ public class ApplicationConfiguration extends CombinedConfiguration
             System.getProperty("user.home") + File.pathSeparator
             + "config/org.opencadc.vosui.properties";
 
+    // Internally uses the Apache configurations.
+    // Make package private to allow tests to override.
+    final CombinedConfiguration configuration = new CombinedConfiguration();
+
 
     /**
      * Creates a new instance of {@code CombinedConfiguration} that uses
@@ -112,7 +118,7 @@ public class ApplicationConfiguration extends CombinedConfiguration
      */
     public ApplicationConfiguration()
     {
-        addConfiguration(new SystemConfiguration());
+        configuration.addConfiguration(new SystemConfiguration());
 
         final Parameters parameters = new Parameters();
         final FileBasedConfigurationBuilder<PropertiesConfiguration> builder =
@@ -123,7 +129,7 @@ public class ApplicationConfiguration extends CombinedConfiguration
 
         try
         {
-            addConfiguration(builder.getConfiguration());
+            configuration.addConfiguration(builder.getConfiguration());
         }
         catch (ConfigurationException e)
         {
@@ -131,5 +137,22 @@ public class ApplicationConfiguration extends CombinedConfiguration
                     "No configuration found at %s.\nUsing defaults.",
                     PROPERTIES_FILE_PATH));
         }
+    }
+
+
+    public URI lookupServiceURI(final String key, final URI defaultValue)
+    {
+        final String value = lookup(key);
+        return StringUtil.hasText(value) ? URI.create(value) : defaultValue;
+    }
+
+    public String lookup(final String key)
+    {
+        return configuration.getString(key);
+    }
+
+    public String lookup(final String key, final String defaultValue)
+    {
+        return configuration.getString(key, defaultValue);
     }
 }

@@ -71,6 +71,7 @@ package ca.nrc.cadc.search;
 import ca.nrc.cadc.auth.AuthMethod;
 import ca.nrc.cadc.reg.Standards;
 import ca.nrc.cadc.reg.client.RegistryClient;
+import ca.nrc.cadc.web.ConfigurableServlet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -86,7 +87,7 @@ import java.net.URLEncoder;
  * Servlet to redirect a caller to the appropriate place for a single request
  * download of a single CAOM-2 URI.
  */
-public class PackageServlet extends HttpServlet
+public class PackageServlet extends ConfigurableServlet
 {
     static final String CAOM2OPS_URI = "ivo://cadc.nrc.ca/caom2ops";
 

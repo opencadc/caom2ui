@@ -35,7 +35,7 @@ package ca.nrc.cadc.search.plugins;
 
 import ca.nrc.cadc.net.OutputStreamWrapper;
 import ca.nrc.cadc.search.upload.VOTableUploader;
-import ca.nrc.cadc.search.web.ServerToServerFTPTransfer;
+import ca.nrc.cadc.web.ServerToServerFTPTransfer;
 import ca.nrc.cadc.uws.web.InlineContentException;
 
 import java.io.IOException;

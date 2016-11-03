@@ -78,11 +78,11 @@ import ca.nrc.cadc.tap.impl.SyncTAPClientImpl;
 import ca.nrc.cadc.util.StringUtil;
 import ca.nrc.cadc.uws.ExecutionPhase;
 import ca.nrc.cadc.uws.Job;
+import ca.nrc.cadc.web.ConfigurableServlet;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -92,19 +92,15 @@ import java.net.URL;
 import java.util.ArrayList;
 
 
-public class TAPServlet extends HttpServlet
+public class TAPServlet extends ConfigurableServlet
 {
-    private final ApplicationConfiguration configuration;
-
-
     public TAPServlet()
     {
-        this(new ApplicationConfiguration());
     }
 
-    TAPServlet(final ApplicationConfiguration configuration)
+    TAPServlet(ApplicationConfiguration configuration)
     {
-        this.configuration = configuration;
+        super(configuration);
     }
 
 
@@ -253,7 +249,8 @@ public class TAPServlet extends HttpServlet
 
             final SyncTAPClient syncTAPClient =
                     new SyncTAPClientImpl(outputStream,
-                                          lookupServiceURL(registryClient), true);
+                                          lookupServiceURL(registryClient),
+                                          true);
 
             execute(syncTAPClient, job);
         }
@@ -278,12 +275,9 @@ public class TAPServlet extends HttpServlet
 
     private URI lookupServiceURI()
     {
-        final String serviceURIProperty =
-                configuration.getString(
-                        ApplicationConfiguration.TAP_SERVICE_URI_PROPERTY_KEY,
-                        ApplicationConfiguration.DEFAULT_TAP_SERVICE_URI_VALUE);
-
-        return URI.create(serviceURIProperty);
+        return getServiceID(
+                ApplicationConfiguration.TAP_SERVICE_URI_PROPERTY_KEY,
+                ApplicationConfiguration.DEFAULT_TAP_SERVICE_URI);
     }
 
     private Job createJob(final HttpServletRequest req)

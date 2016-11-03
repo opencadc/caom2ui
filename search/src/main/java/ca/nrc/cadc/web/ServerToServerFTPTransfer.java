@@ -66,7 +66,7 @@
  ************************************************************************
  */
 
-package ca.nrc.cadc.search.web;
+package ca.nrc.cadc.web;
 
 import ca.nrc.cadc.net.OutputStreamWrapper;
 import org.apache.commons.net.ftp.FTP;

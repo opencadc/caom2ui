@@ -172,7 +172,7 @@ public class CAOM2Servlet extends HttpServlet
 
     private URL lookupCAOM2UIURL() throws IOException
     {
-        final String property = configuration.getString(
+        final String property = configuration.lookup(
                 ApplicationConfiguration.CAOM2_UI_PROPERTY_KEY,
                 ApplicationConfiguration.DEFAULT_CAOM2_UI_HOST);
 

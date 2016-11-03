@@ -54,8 +54,6 @@ import java.io.*;
 import java.net.URI;
 import java.util.Date;
 
-import org.apache.commons.configuration2.Configuration;
-import org.apache.commons.configuration2.SystemConfiguration;
 import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpServletResponse;
@@ -72,7 +70,7 @@ public class AdvancedRunner implements JobRunner
     private JobUpdater jobUpdater;
     private SyncOutput syncOutput;
     private Searcher searcher;
-    private Configuration configuration;
+    private ApplicationConfiguration configuration;
 
 
     public AdvancedRunner()
@@ -120,7 +118,7 @@ public class AdvancedRunner implements JobRunner
     private void init() throws IOException, PositionParserException
     {
         // Force a reload each time.
-        configuration = new SystemConfiguration();
+        configuration = new ApplicationConfiguration();
 
         if (searcher == null)
         {
@@ -217,9 +215,9 @@ public class AdvancedRunner implements JobRunner
 
     private URI lookupServiceURI()
     {
-        return URI.create(configuration.getString(
+        return configuration.lookupServiceURI(
                 ApplicationConfiguration.TAP_SERVICE_URI_PROPERTY_KEY,
-                ApplicationConfiguration.DEFAULT_TAP_SERVICE_URI_VALUE));
+                ApplicationConfiguration.DEFAULT_TAP_SERVICE_URI);
     }
 
     /**
