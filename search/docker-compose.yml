@@ -1,20 +1,12 @@
 version: '2'
 services:
   ui:
-    image: opencadc/search
+    image: mach378.cadc.dao.nrc.ca:5000/opencadc_search
     ports:
       - '8080:8080'
       - '5555:5555'
     networks:
       - 'caom2'
-    environment:
-      - "CATALINA_OPTS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5555
-      -Djava.security.egd=file:/dev/./urandom -Djsse.enableSNIExtension=false
-      -Dorg.opencadc.search.theme=base -Dcadc.search.obs-core=true
-      -Dorg.opencadc.search.max-row-count=30000
-      -Dorg.opencadc.search.tap-service-id=ivo://cadc.nrc.ca/tap
-      -Dorg.opencadc.search.caom2ui-host=caom2ui:8080
-      -Dca.nrc.cadc.reg.client.RegistryClient.host=tap:8080"
     depends_on:
       - tap
       - caom2ui
@@ -31,6 +23,9 @@ services:
       - /usr/local/caom2ui/webapps:/usr/local/tomcat/webapps
   tap:
     image: opencadc/tap
+    ports:
+      - '8880:8080'
+      - '8855:5555'
     networks:
       - 'caom2'
     depends_on:

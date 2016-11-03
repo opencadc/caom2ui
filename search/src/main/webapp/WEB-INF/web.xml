@@ -60,36 +60,38 @@
     To make sure the logging level gets set before any
     logging gets done, set load-on-startup to a smaller
     whole number than is used for any other servlet
-    in this webapp.  This assumes Tomcat 5.5 or later.
-  -->
-  <servlet>
-    <servlet-name>logControl</servlet-name>
-    <servlet-class>ca.nrc.cadc.log.LogControlServlet</servlet-class>
-    <init-param>
-      <param-name>logLevel</param-name>
-      <param-value>info</param-value>
-    </init-param>
-    <init-param>
-      <param-name>logLevelPackages</param-name>
-      <param-value>
-        ca.nrc.cadc.uws
-        ca.nrc.cadc.tap
-        ca.nrc.cadc.vosi
-        ca.nrc.cadc.search
-        ca.nrc.cadc.caom2
-      </param-value>
-    </init-param>
-    <init-param>
-      <param-name>logAccessGroup</param-name>
-      <param-value>CADC</param-value>
-    </init-param>
-    <init-param>
-      <param-name>groupAuthorizer</param-name>
-      <param-value>ca.nrc.cadc.auth.CADCGroupAuthorizer</param-value>
-    </init-param>
-    <load-on-startup>1</load-on-startup>
+    in this webapp.  This assumes Tomcat 7.0 or later.
 
-  </servlet>
+    Uncomment this for debugging.
+    Don't forget to create a groupAuthorizer (Not included).
+  -->
+  <!--<servlet>-->
+    <!--<servlet-name>logControl</servlet-name>-->
+    <!--<servlet-class>ca.nrc.cadc.log.LogControlServlet</servlet-class>-->
+    <!--<init-param>-->
+      <!--<param-name>logLevel</param-name>-->
+      <!--<param-value>info</param-value>-->
+    <!--</init-param>-->
+    <!--<init-param>-->
+      <!--<param-name>logLevelPackages</param-name>-->
+      <!--<param-value>-->
+        <!--ca.nrc.cadc.uws-->
+        <!--ca.nrc.cadc.tap-->
+        <!--ca.nrc.cadc.vosi-->
+        <!--ca.nrc.cadc.search-->
+        <!--ca.nrc.cadc.caom2-->
+      <!--</param-value>-->
+    <!--</init-param>-->
+    <!--<init-param>-->
+      <!--<param-name>logAccessGroup</param-name>-->
+      <!--<param-value>CADC</param-value>-->
+    <!--</init-param>-->
+    <!--<init-param>-->
+      <!--<param-name>groupAuthorizer</param-name>-->
+      <!--<param-value>ca.nrc.cadc.auth.CADCGroupAuthorizer</param-value>-->
+    <!--</init-param>-->
+    <!--<load-on-startup>1</load-on-startup>-->
+  <!--</servlet>-->
 
   <!--
     Each of the Restlet servlets need to have their respective Restlet
@@ -185,10 +187,10 @@
 
   <!-- URL-to-servlet mapping -->
 
-  <servlet-mapping>
-    <servlet-name>logControl</servlet-name>
-    <url-pattern>/logControl</url-pattern>
-  </servlet-mapping>
+  <!--<servlet-mapping>-->
+    <!--<servlet-name>logControl</servlet-name>-->
+    <!--<url-pattern>/logControl</url-pattern>-->
+  <!--</servlet-mapping>-->
   <servlet-mapping>
     <servlet-name>doc</servlet-name>
     <url-pattern>/doc</url-pattern>

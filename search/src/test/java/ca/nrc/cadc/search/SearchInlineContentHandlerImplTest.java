@@ -31,15 +31,19 @@
  ****  C A N A D I A N   A S T R O N O M Y   D A T A   C E N T R E  *****
  ************************************************************************
  */
-package ca.nrc.cadc.search.upload;
+package ca.nrc.cadc.search;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
 import ca.nrc.cadc.AbstractUnitTest;
 
+import ca.nrc.cadc.net.OutputStreamWrapper;
+import ca.nrc.cadc.reg.client.RegistryClient;
 import ca.nrc.cadc.search.SearchInlineContentHandlerImpl;
+import ca.nrc.cadc.search.upload.VOTableUploader;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import static org.easymock.EasyMock.*;
@@ -48,8 +52,6 @@ import static org.easymock.EasyMock.*;
 public class SearchInlineContentHandlerImplTest
         extends AbstractUnitTest<SearchInlineContentHandlerImpl>
 {
-    private final VOTableUploader mockVOTableUploader =
-            createMock(VOTableUploader.class);
     private final static byte[] UPLOAD_BYTES = "m101 m87 TARGET".getBytes();
 
 
@@ -60,38 +62,19 @@ public class SearchInlineContentHandlerImplTest
 
         setTestSubject(new SearchInlineContentHandlerImpl()
         {
-            /**
-             * Obtain a new instance of the VOTableUploader.  Useful for overriding in
-             * testing.
-             *
-             * @param inputStream   The InputStream to use.
-             * @param uploadResults The UploadResults to update.
-             * @return VOTableUploader implementation instance.
-             */
             @Override
-            protected VOTableUploader createVOTableUploader(
-                    final InputStream inputStream,
-                    final UploadResults uploadResults)
+            protected URL secureUpload(VOTableUploader voTableUploader,
+                                       OutputStreamWrapper streamWrapper)
+                    throws IOException
             {
-                return getMockVOTableUploader();
+                return returnURL;
             }
         });
-
-        expect(getMockVOTableUploader().upload()).andReturn(returnURL).once();
-
-        replay(getMockVOTableUploader());
 
         final InputStream bytesIn = new ByteArrayInputStream(UPLOAD_BYTES);
         final URL returnURLFound =
                 getTestSubject().accept("MYUPLOAD", "text/xml", bytesIn);
 
         assertEquals("URLs should match.", returnURL, returnURLFound);
-
-        verify(getMockVOTableUploader());
-    }
-
-    public VOTableUploader getMockVOTableUploader()
-    {
-        return mockVOTableUploader;
     }
 }

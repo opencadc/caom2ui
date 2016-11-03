@@ -24,37 +24,59 @@
  *
  *
  * @author jenkinsd
- * 11/14/13 - 2:34 PM
+ * 11/14/13 - 2:45 PM
  *
  *
  *
  ****  C A N A D I A N   A S T R O N O M Y   D A T A   C E N T R E  *****
  ************************************************************************
  */
-package ca.nrc.cadc.search.upload;
+package ca.nrc.cadc.search.plugins;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-
-import ca.nrc.cadc.net.HttpUpload;
 import ca.nrc.cadc.net.OutputStreamWrapper;
+import ca.nrc.cadc.search.upload.VOTableUploader;
+import ca.nrc.cadc.search.web.ServerToServerFTPTransfer;
 import ca.nrc.cadc.uws.web.InlineContentException;
 
+import java.io.IOException;
+import java.net.URL;
 
-public interface VOTableUploader
+
+/**
+ * Default implementation of a VOTableUploader.
+ */
+public class FTPVOTableUploaderImpl implements VOTableUploader
 {
+    private final ServerToServerFTPTransfer ftpTransfer;
+
+
+    /**
+     * Default empty constructor.
+     */
+    FTPVOTableUploaderImpl()
+    {
+        this(new ServerToServerFTPTransfer("ftp", 21));
+    }
+
+    FTPVOTableUploaderImpl(final ServerToServerFTPTransfer ftpTransfer)
+    {
+        this.ftpTransfer = ftpTransfer;
+    }
+
     /**
      * Perform the upload.
      *
      * @param stream            The OutputStreamWrapper
      * @param filename          The filename to use.
-     *
-     * @return  The URL of where to get the upload.
-     * @throws InlineContentException   If the upload fails.
-     * @throws IOException    If the return URL cannot be obtained.
+     * @return The URL of where to get the upload.
+     * @throws InlineContentException If the upload fails.
+     * @throws IOException            If the return URL cannot be obtained.
      */
-    URL upload(final OutputStreamWrapper stream,
-               final String filename) throws InlineContentException,
-                                             IOException;
+    @Override
+    public URL upload(final OutputStreamWrapper stream, final String filename)
+            throws InlineContentException, IOException
+    {
+        ftpTransfer.send(stream, filename);
+        return new URL(String.format("ftp://ftp:21/%s", filename));
+    }
 }

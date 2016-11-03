@@ -39,29 +39,19 @@
 
 package ca.nrc.cadc.search;
 
-import java.io.InputStream;
 
+import ca.nrc.cadc.search.plugins.VOTableUploaderFactory;
 import ca.nrc.cadc.search.upload.*;
 
-import ca.nrc.cadc.net.OutputStreamWrapper;
 import ca.nrc.cadc.reg.client.RegistryClient;
 
 
 public class SearchInlineContentHandlerImpl extends AbstractInlineContentHandler
 {
-    private final RegistryClient registryClient;
-
-
     public SearchInlineContentHandlerImpl()
-    {
-        this(new RegistryClient());
-    }
-
-    public SearchInlineContentHandlerImpl(final RegistryClient registryClient)
     {
         super(new TAPUploadRandomAlphanumericFilenameGeneratorImpl(
                 "targetList-", ".xml"));
-        this.registryClient = registryClient;
     }
 
 
@@ -69,18 +59,13 @@ public class SearchInlineContentHandlerImpl extends AbstractInlineContentHandler
      * Obtain a new instance of the VOTableUploader.  Useful for overriding in
      * testing.
      *
-     * @param inputStream       The InputStream to use.
-     * @param uploadResults     The UploadResults to update.
-     * @return                  VOTableUploader implementation instance.
+     * @param registryClient        The RegistryClient to use for lookups.
+     * @return VOTableUploader implementation instance.
      */
     @Override
     protected VOTableUploader createVOTableUploader(
-            final InputStream inputStream, final UploadResults uploadResults)
+            final RegistryClient registryClient)
     {
-        final OutputStreamWrapper stream =
-                new VOTableOutputStream(inputStream, uploadResults,
-                                        new TargetNameResolverClientImpl());
-        return new VOTableUploaderImpl(stream, filenameGenerator,
-                                       registryClient);
+        return new VOTableUploaderFactory().createUploader();
     }
 }

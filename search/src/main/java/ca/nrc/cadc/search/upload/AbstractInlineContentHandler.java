@@ -68,27 +68,34 @@
 
 package ca.nrc.cadc.search.upload;
 
+import ca.nrc.cadc.auth.SSLUtil;
+import ca.nrc.cadc.net.OutputStreamWrapper;
+import ca.nrc.cadc.reg.client.RegistryClient;
+import ca.nrc.cadc.search.TargetNameResolverClientImpl;
 import ca.nrc.cadc.util.StringUtil;
 import ca.nrc.cadc.uws.JobInfo;
 import ca.nrc.cadc.uws.Parameter;
 import ca.nrc.cadc.uws.web.InlineContentException;
 import ca.nrc.cadc.uws.web.InlineContentHandler;
 
+import javax.security.auth.Subject;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
 public abstract class AbstractInlineContentHandler
         implements InlineContentHandler
 {
-    protected final Map<String, URL> uploadCache = new HashMap<>();
-    protected final List<Parameter> parameterList = new ArrayList<>();
-    protected final TAPUploadFilenameGenerator filenameGenerator;
+    private final Map<String, URL> uploadCache = new HashMap<>();
+    private final List<Parameter> parameterList = new ArrayList<>();
+    private final TAPUploadFilenameGenerator filenameGenerator;
 
 
     public AbstractInlineContentHandler(
@@ -101,12 +108,16 @@ public abstract class AbstractInlineContentHandler
      * Obtain a new instance of the VOTableUploader.  Useful for overriding in
      * testing.
      *
-     * @param inputStream       The InputStream to use.
-     * @param uploadResults     The UploadResults to update.
-     * @return                  VOTableUploader implementation instance.
+     * @param registryClient The RegistryClient for service lookups.
+     * @return VOTableUploader implementation instance.
      */
     protected abstract VOTableUploader createVOTableUploader(
-            final InputStream inputStream, final UploadResults uploadResults);
+            final RegistryClient registryClient);
+
+    RegistryClient createRegistryClient()
+    {
+        return new RegistryClient();
+    }
 
 
     @Override
@@ -166,8 +177,9 @@ public abstract class AbstractInlineContentHandler
         }
 
         // Upload the file to the data webservice.
+        final RegistryClient registryClient = createRegistryClient();
         final UploadResults uploadResults = new UploadResults(resolver, 0, 0);
-        final URL retURL = upload(inputStream, uploadResults);
+        final URL retURL = upload(inputStream, uploadResults, registryClient);
 
         addJobParameter(UploadResults.UPLOAD_RESOLVER, resolver);
         addJobParameter(UploadResults.UPLOAD_ROW_COUNT,
@@ -181,13 +193,13 @@ public abstract class AbstractInlineContentHandler
         return retURL;
     }
 
-    protected void addUploadCache(final URL url)
+    private void addUploadCache(final URL url)
     {
         uploadCache.put("targetList", url);
     }
 
-    protected void addJobParameter(final String paramName,
-                                   final String paramValue)
+    private void addJobParameter(final String paramName,
+                                 final String paramValue)
     {
         this.parameterList.add(new Parameter(paramName, paramValue));
     }
@@ -195,18 +207,52 @@ public abstract class AbstractInlineContentHandler
     /**
      * Perform the Upload.
      *
-     * @param inputStream               The InputStream of the file to PUT.
-     * @param uploadResults             The UploadResults to write to.
-     * @return                          The URL to obtain the results.
-     * @throws MalformedURLException    If the return URL cannot be obtained.
+     * @param inputStream    The InputStream of the file to PUT.
+     * @param uploadResults  The UploadResults to write to.
+     * @param registryClient The registry clietn to use for lookups.
+     * @return The URL to obtain the results.
+     * @throws IOException If the return URL cannot be obtained.
      */
     private URL upload(final InputStream inputStream,
-                       final UploadResults uploadResults)
-            throws MalformedURLException
+                       final UploadResults uploadResults,
+                       final RegistryClient registryClient) throws IOException
     {
         final VOTableUploader voTableUploader =
-                createVOTableUploader(inputStream, uploadResults);
-        return voTableUploader.upload();
+                createVOTableUploader(registryClient);
+        final OutputStreamWrapper stream =
+                new VOTableOutputStream(inputStream, uploadResults,
+                                        new TargetNameResolverClientImpl());
+        return secureUpload(voTableUploader, stream);
+    }
+
+    protected URL secureUpload(final VOTableUploader voTableUploader,
+                               final OutputStreamWrapper streamWrapper)
+            throws IOException
+    {
+        final Subject uploadAuth = createInternalUploadAuth();
+
+        try
+        {
+            return Subject.doAs(uploadAuth, new PrivilegedExceptionAction<URL>()
+            {
+                @Override
+                public URL run() throws Exception
+                {
+                    return voTableUploader.upload(streamWrapper,
+                                                  filenameGenerator.generate());
+                }
+            });
+        }
+        catch (Exception e)
+        {
+            throw new IOException(e);
+        }
+    }
+
+    private Subject createInternalUploadAuth()
+    {
+        return SSLUtil.createSubject(new File(System.getProperty("user.home")
+                                              + "/.ssl/cadcproxy.pem"));
     }
 
     /**

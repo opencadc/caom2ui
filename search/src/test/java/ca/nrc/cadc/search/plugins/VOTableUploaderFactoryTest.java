@@ -66,27 +66,41 @@
  ************************************************************************
  */
 
-package ca.nrc.cadc.search.web;
+package ca.nrc.cadc.search.plugins;
+
+import ca.nrc.cadc.AbstractUnitTest;
+import ca.nrc.cadc.search.upload.VOTableUploader;
+
+import org.junit.Test;
+import static org.junit.Assert.*;
+import static org.easymock.EasyMock.*;
 
 
-import javax.websocket.Session;
-
-import java.util.HashSet;
-import java.util.Set;
-
-
-public class AutocompleteSocketSessionManager
+public class VOTableUploaderFactoryTest
+        extends AbstractUnitTest<VOTableUploaderFactory>
 {
-    private final Set<Session> sessions = new HashSet<>();
-
-
-    void addSession(Session session)
+    @Test
+    public void createUploader() throws Exception
     {
-        sessions.add(session);
-    }
+        System.setProperty(
+                VOTableUploaderFactory.VOTABLE_UPLOADER_CLASSNAME_KEY,
+                TestVOTableUploader.class.getCanonicalName());
 
-    void removeSession(Session session)
-    {
-        sessions.remove(session);
+        final PluginClassLoader<TestVOTableUploader> mockPluginClassLoader =
+                createMock(PluginClassLoader.class);
+
+        testSubject = new VOTableUploaderFactory(mockPluginClassLoader);
+
+        expect(mockPluginClassLoader.loadClass(
+                TestVOTableUploader.class.getCanonicalName())).andReturn(
+                        TestVOTableUploader.class);
+
+        replay(mockPluginClassLoader);
+
+        final VOTableUploader uploader = testSubject.createUploader();
+
+        assertTrue("Should be test class.", uploader instanceof TestVOTableUploader);
+
+        verify(mockPluginClassLoader);
     }
 }

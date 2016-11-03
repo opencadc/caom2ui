@@ -66,51 +66,31 @@
  ************************************************************************
  */
 
-package ca.nrc.cadc.search.web;
+package ca.nrc.cadc.search.plugins;
 
-import org.apache.solr.client.solrj.StreamingResponseCallback;
-import org.apache.solr.common.SolrDocument;
+import ca.nrc.cadc.net.OutputStreamWrapper;
+import ca.nrc.cadc.search.upload.VOTableUploader;
+import ca.nrc.cadc.uws.web.InlineContentException;
 
 import java.io.IOException;
-import java.io.Writer;
+import java.net.URL;
 
 
-public class ResponseCallbackHandler extends StreamingResponseCallback
+class TestVOTableUploader implements VOTableUploader
 {
-    private final Writer writer;
-
-
-    public ResponseCallbackHandler(final Writer writer)
-    {
-        this.writer = writer;
-    }
-
-
+    /**
+     * Perform the upload.
+     *
+     * @param stream   The OutputStreamWrapper
+     * @param filename The filename to use.
+     * @return The URL of where to get the upload.
+     * @throws InlineContentException If the upload fails.
+     * @throws IOException            If the return URL cannot be obtained.
+     */
     @Override
-    public void streamSolrDocument(final SolrDocument doc)
+    public URL upload(OutputStreamWrapper stream, String filename)
+            throws InlineContentException, IOException
     {
-        try
-        {
-            writer.write(doc.toString());
-        }
-        catch (IOException e)
-        {
-            throw new StreamingIOException("Unable to write document.", e);
-        }
-    }
-
-    @Override
-    public void streamDocListInfo(final long numFound, final long start,
-                                  final Float maxScore)
-    {
-        try
-        {
-            writer.write("Found " + numFound + " items.");
-        }
-        catch (IOException e)
-        {
-            throw new StreamingIOException(
-                    "Unable to write document list info.", e);
-        }
+        return null;
     }
 }

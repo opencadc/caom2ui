@@ -31,15 +31,15 @@
  ****  C A N A D I A N   A S T R O N O M Y   D A T A   C E N T R E  *****
  ************************************************************************
  */
-package ca.nrc.cadc.search;
+package ca.nrc.cadc.search.plugins;
 
 
 import ca.nrc.cadc.AbstractUnitTest;
 import ca.nrc.cadc.auth.AuthMethod;
 import ca.nrc.cadc.net.HttpUpload;
+import ca.nrc.cadc.net.OutputStreamWrapper;
 import ca.nrc.cadc.reg.Standards;
 import ca.nrc.cadc.reg.client.RegistryClient;
-import ca.nrc.cadc.search.VOTableUploaderImpl;
 import ca.nrc.cadc.uws.web.InlineContentException;
 import org.junit.Test;
 
@@ -55,32 +55,30 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 
-public class VOTableUploaderImplTest
-        extends AbstractUnitTest<VOTableUploaderImpl>
+public class CADCHTTPDataVOTableUploaderImplTest
+        extends AbstractUnitTest<CADCHTTPDataVOTableUploaderImpl>
 {
-    final HttpUpload mockHTTPUpload = createMock(HttpUpload.class);
-    final RegistryClient mockRegistryClient = createMock(RegistryClient.class);
+    private final HttpUpload mockHTTPUpload = createMock(HttpUpload.class);
+    private final RegistryClient mockRegistryClient =
+            createMock(RegistryClient.class);
 
     @Test
     public void uploadGood() throws Exception
     {
         // Test with alternate ports.
-        final URL testURL =
-                new URL("https://mysite.com:3443/secure/tap/upload");
+        final URL uploadResultURL =
+                new URL("http://mysite.com:3080/secure/tap/upload/myfile");
         final URL dataHTTPURL = new URL("http://mysite.com:3080/data");
+        final OutputStreamWrapper mockOutputStreamWrapper =
+                createMock(OutputStreamWrapper.class);
 
-        setTestSubject(new VOTableUploaderImpl(mockHTTPUpload,
-                                               mockRegistryClient)
+        setTestSubject(new CADCHTTPDataVOTableUploaderImpl(mockRegistryClient)
         {
-            /**
-             * Execute the upload over HTTPS.
-             *
-             * @param upload The upload Runnable class.
-             */
             @Override
-            protected void secureUpload(Runnable upload)
+            HttpUpload createHttpUpload(OutputStreamWrapper stream,
+                                        String filename)
             {
-                upload.run();
+                return mockHTTPUpload;
             }
         });
 
@@ -91,40 +89,36 @@ public class VOTableUploaderImplTest
         expectLastCall().once();
 
         expect(mockRegistryClient.getServiceURL(
-            URI.create(VOTableUploaderImpl.DATA_URI),
+            URI.create(CADCHTTPDataVOTableUploaderImpl.DATA_URI),
             Standards.DATA_10,
             AuthMethod.COOKIE)).andReturn(dataHTTPURL).once();
 
-        expect(mockHTTPUpload.getURL()).andReturn(testURL).once();
+        expect(mockHTTPUpload.getURL()).andReturn(uploadResultURL).once();
         expect(mockHTTPUpload.getThrowable()).andReturn(null).once();
 
-        replay(mockHTTPUpload, mockRegistryClient);
+        replay(mockHTTPUpload, mockRegistryClient, mockOutputStreamWrapper);
 
         final URL expectedReturnURL1 =
-                new URL("http://mysite.com:3080/secure/tap/upload");
-        final URL returnURL1 = getTestSubject().upload();
+                new URL("http://mysite.com:3080/secure/tap/upload/myfile");
+        final URL returnURL1 = getTestSubject().upload(mockOutputStreamWrapper,
+                                                       "myfile");
 
         assertEquals("Return URL should match.", expectedReturnURL1,
                      returnURL1);
 
-        verify(mockHTTPUpload, mockRegistryClient);
+        verify(mockHTTPUpload, mockRegistryClient, mockOutputStreamWrapper);
     }
 
     @Test
     public void uploadException() throws Exception
     {
-        setTestSubject(new VOTableUploaderImpl(mockHTTPUpload,
-                                               mockRegistryClient)
+        setTestSubject(new CADCHTTPDataVOTableUploaderImpl(mockRegistryClient)
         {
-            /**
-             * Execute the upload over HTTPS.
-             *
-             * @param upload The upload Runnable class.
-             */
             @Override
-            protected void secureUpload(Runnable upload)
+            HttpUpload createHttpUpload(OutputStreamWrapper stream,
+                                        String filename)
             {
-                upload.run();
+                return mockHTTPUpload;
             }
         });
 
@@ -141,7 +135,7 @@ public class VOTableUploaderImplTest
 
         try
         {
-            getTestSubject().upload();
+            getTestSubject().upload(null, null);
             fail("Should throw exception.");
         }
         catch (InlineContentException e)

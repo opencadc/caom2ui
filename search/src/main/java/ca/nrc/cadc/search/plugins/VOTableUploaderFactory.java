@@ -66,149 +66,70 @@
  ************************************************************************
  */
 
-package ca.nrc.cadc.search.web;
+package ca.nrc.cadc.search.plugins;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.StreamingResponseCallback;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
-import org.json.JSONObject;
+import ca.nrc.cadc.ApplicationConfiguration;
+import ca.nrc.cadc.search.upload.VOTableUploader;
+import org.apache.commons.configuration2.Configuration;
 
-import javax.websocket.*;
-import javax.websocket.server.ServerEndpoint;
-import java.io.IOException;
-import java.io.Writer;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 
-
-@ServerEndpoint("/autocomplete")
-public class AutocompleteSocketServer
+public class VOTableUploaderFactory
 {
-    private static final String JSON_RESPONSE_PARAM = "wt=json";
-    private static final String DEFAULT_SOLR_URL = "http://solr:8983/solr";
-    private static final String DEFAULT_SOLR_URL_ENV = "SOLR_URL";
+    static final String VOTABLE_UPLOADER_CLASSNAME_KEY =
+            "org.opencadc.search.uploader";
+    private static final String DEFAULT_VOTABLE_UPLOADER =
+            CADCHTTPDataVOTableUploaderImpl.class.getName();
+    private final Configuration configuration = new ApplicationConfiguration();
+    private final PluginClassLoader<? extends VOTableUploader>
+            pluginClassLoader;
 
-    private AutocompleteSocketSessionManager autocompleteSocketSessionManager =
-            new AutocompleteSocketSessionManager();
 
-    private SolrClient _solrClient;
-
-
-    public AutocompleteSocketServer()
+    public VOTableUploaderFactory()
     {
-
+        this(new PluginClassLoader<CADCHTTPDataVOTableUploaderImpl>());
     }
 
-
-    /**
-     * For testing.
-     *
-     * @param _solrClient The client to use.
-     */
-    AutocompleteSocketServer(final SolrClient _solrClient)
+    VOTableUploaderFactory(
+            final PluginClassLoader<? extends VOTableUploader> pluginClassLoader)
     {
-        this._solrClient = _solrClient;
-    }
-
-
-    @OnOpen
-    public void onOpen(final Session session,
-                       final EndpointConfig endpointConfig)
-    {
-        autocompleteSocketSessionManager.addSession(session);
-        final String configuredSolrURL = System.getenv(DEFAULT_SOLR_URL_ENV);
-        final String solrURL;
-
-        if (configuredSolrURL == null)
-        {
-            solrURL = DEFAULT_SOLR_URL;
-        }
-        else
-        {
-            solrURL = configuredSolrURL;
-        }
-
-        _solrClient = new HttpSolrClient.Builder(solrURL).build();
-    }
-
-    @OnClose
-    public void onClose(final Session session, final CloseReason closeReason)
-    {
-        autocompleteSocketSessionManager.removeSession(session);
-    }
-
-
-    @OnMessage
-    public void handleMessage(final String message, final Session session)
-    {
-        final JSONObject jsonMessage = new JSONObject(message);
-
-        try
-        {
-            search(AutocompleteArea.valueOf(jsonMessage.getString("area")
-                                                    .toUpperCase()),
-                   jsonMessage.getString("term"),
-                   session.getBasicRemote().getSendWriter());
-        }
-        catch (IOException e)
-        {
-            autocompleteSocketSessionManager.removeSession(session);
-            onError(e);
-        }
-    }
-
-    @OnError
-    public void onError(final Throwable error)
-    {
-        Logger.getLogger(AutocompleteSocketServer.class.getName()).
-                log(Level.FATAL, null, error);
+        this.pluginClassLoader = pluginClassLoader;
     }
 
     /**
-     * Perform a text search and write the results.
+     * Create a new configured instance of a VOTable Uploader.
      *
-     * @param autocompleteArea The area (core) to search within.
-     * @param term             The term to search for.
-     * @param writer           To write out the results.
-     * @throws IOException For any writing errors.
+     * @return VOTable
+     * @throws IllegalArgumentException If the class cannot be found or
+     *                                  created.
      */
-    void search(final AutocompleteArea autocompleteArea,
-                       final String term, final Writer writer)
-            throws IOException
+    public VOTableUploader createUploader() throws IllegalArgumentException
     {
-        final SolrQuery solrQuery = new SolrQuery("*" + term + "*");
+        final String voTableUploaderClassName =
+                configuration.getString(VOTABLE_UPLOADER_CLASSNAME_KEY);
+
         try
         {
-            querySolr(solrQuery, autocompleteArea.name().toLowerCase(),
-                      createResponseCallback(writer));
-        }
-        finally
-        {
-            writer.flush();
-            writer.close();
-        }
-    }
+            final Class<? extends VOTableUploader> clazz =
+                    pluginClassLoader.loadClass(voTableUploaderClassName);
 
-    void querySolr(final SolrQuery solrQuery, final String coreName,
-                   final StreamingResponseCallback responseCallback)
-            throws IOException
-    {
-        try
-        {
-            Logger.getLogger(AutocompleteSocketServer.class).info("Looking up: " + solrQuery.getQuery());
-            _solrClient.queryAndStreamResponse(coreName, solrQuery,
-                                               responseCallback);
+            return clazz.newInstance();
         }
-        catch (SolrServerException e)
+        catch (Exception e)
         {
-            throw new IOException(e);
+            try
+            {
+                return (VOTableUploader) Class.forName(
+                        DEFAULT_VOTABLE_UPLOADER).newInstance();
+            }
+            catch (Exception e2)
+            {
+                throw new IllegalArgumentException(
+                        "No suitable plugins for VOTableUploader could be found.",
+                        e2);
+            }
         }
-    }
-
-    StreamingResponseCallback createResponseCallback(final Writer writer)
-    {
-        return new ResponseCallbackHandler(writer);
     }
 }

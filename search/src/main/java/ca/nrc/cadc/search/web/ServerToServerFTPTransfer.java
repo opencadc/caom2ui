@@ -68,52 +68,112 @@
 
 package ca.nrc.cadc.search.web;
 
-import ca.nrc.cadc.AbstractUnitTest;
+import ca.nrc.cadc.net.OutputStreamWrapper;
+import org.apache.commons.net.ftp.FTP;
+import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPReply;
 
-import java.io.StringWriter;
-import java.io.Writer;
-
-import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.StreamingResponseCallback;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.junit.Test;
-import static org.easymock.EasyMock.*;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.security.AccessControlException;
 
 
-public class AutocompleteSocketServerTest
-        extends AbstractUnitTest<AutocompleteSocketServer>
+public class ServerToServerFTPTransfer
 {
-    @Test
-    public void querySolr() throws Exception
+    // username and password.
+    private static final String CREDENTIAL = "WEBTMP";
+    private final String hostname;
+    private final int port;
+
+
+    public ServerToServerFTPTransfer(final String host, final int port)
     {
-        final SolrClient mockSolrClient = createMock(SolrClient.class);
+        this.hostname = host;
+        this.port = port;
+    }
 
-        final Writer writer = new StringWriter();
-        final ResponseCallbackHandler callback =
-                new ResponseCallbackHandler(writer);
 
-        testSubject = new AutocompleteSocketServer(mockSolrClient)
+    public void send(final OutputStreamWrapper outputStreamWrapper,
+                     final String filename)
+            throws IOException
+    {
+        final FTPClient ftpClient = connect();
+        ftpClient.setFileType(FTP.ASCII_FILE_TYPE);
+        ftpClient.enterLocalPassiveMode();
+
+        try
         {
-            @Override
-            StreamingResponseCallback createResponseCallback(Writer writer)
+            final OutputStream outputStream =
+                    ftpClient.storeFileStream(filename);
+
+            outputStreamWrapper.write(outputStream);
+
+            outputStream.flush();
+            outputStream.close();
+        }
+        finally
+        {
+            if (ftpClient.isConnected())
             {
-                return callback;
+                try
+                {
+                    ftpClient.disconnect();
+                }
+                catch (IOException f)
+                {
+                    // do nothing
+                }
             }
-        };
+        }
+    }
 
-        final SolrQuery query = new SolrQuery("galax");
+    private FTPClient connect() throws IOException
+    {
+        final FTPClient ftpClient = createFTPClient();
+        ftpClient.connect(hostname, port);
 
-        expect(mockSolrClient.queryAndStreamResponse("spatial", query,
-                                                     callback))
-                .andReturn(new QueryResponse()).once();
+        final int reply = ftpClient.getReplyCode();
 
-        replay(mockSolrClient);
+        if (!FTPReply.isPositiveCompletion(reply))
+        {
+            ftpClient.disconnect();
+            throw new IOException(
+                    String.format("FTP Connection failed with error code %d.",
+                                  reply));
+        }
+        else
+        {
+            return login(ftpClient);
+        }
+    }
 
-        testSubject.querySolr(query,
-                              AutocompleteArea.SPATIAL.name().toLowerCase(),
-                              callback);
+    /**
+     *
+     * @param ftpClient     The Connected client.
+     * @return              The mutated client, now authenticated.
+     * @throws AccessControlException    If login fails.
+     */
+    private FTPClient login(final FTPClient ftpClient)
+            throws AccessControlException, IOException
+    {
+        if (!ftpClient.login(CREDENTIAL, CREDENTIAL))
+        {
+            ftpClient.logout();
+            throw new AccessControlException(
+                    String.format("Login failed for %s", CREDENTIAL));
+        }
+        else
+        {
+            return ftpClient;
+        }
+    }
 
-        verify(mockSolrClient);
+    /**
+     * Override me to for testing.
+     * @return      FTPClient instance.
+     */
+    FTPClient createFTPClient()
+    {
+        return new FTPClient();
     }
 }

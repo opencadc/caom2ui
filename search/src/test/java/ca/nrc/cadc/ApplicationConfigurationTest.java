@@ -66,26 +66,87 @@
  ************************************************************************
  */
 
-package ca.nrc.cadc.search.web;
+package ca.nrc.cadc;
 
-public class StreamingIOException extends RuntimeException
+import java.io.File;
+import java.io.FileOutputStream;
+
+import org.apache.commons.configuration2.PropertiesConfiguration;
+import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
+import org.apache.commons.configuration2.builder.fluent.Parameters;
+import org.junit.After;
+import org.junit.Test;
+import static org.junit.Assert.*;
+
+
+public class ApplicationConfigurationTest
+        extends AbstractUnitTest<ApplicationConfiguration>
 {
-    /**
-     * Constructs a new runtime exception with the specified detail message and
-     * cause.  <p>Note that the detail message associated with
-     * {@code cause} is <i>not</i> automatically incorporated in
-     * this runtime exception's detail message.
-     *
-     * @param message the detail message (which is saved for later retrieval
-     *                by the {@link #getMessage()} method).
-     * @param cause   the cause (which is saved for later retrieval by the
-     *                {@link #getCause()} method).  (A <tt>null</tt> value is
-     *                permitted, and indicates that the cause is nonexistent or
-     *                unknown.)
-     * @since 1.4
-     */
-    public StreamingIOException(String message, Throwable cause)
+    @After
+    public void reset() throws Exception
     {
-        super(message, cause);
+        System.clearProperty(ApplicationConfiguration.class.getCanonicalName()
+                             + ".PROP1");
+    }
+
+    @Test
+    public void pullSystemProperty() throws Exception
+    {
+        final File tmpConfigFile = File.createTempFile("config-",
+                                                       ".properties");
+        final FileOutputStream fos = new FileOutputStream(tmpConfigFile);
+
+        fos.write("PROP2=VAL2\n".getBytes("UTF-8"));
+        fos.write((ApplicationConfiguration.class.getCanonicalName()
+                  + ".PROP1=VAL11").getBytes("UTF-8"));
+
+        fos.flush();
+        fos.close();
+
+        System.setProperty(ApplicationConfiguration.class.getCanonicalName()
+                           + ".PROP1", "VAL1");
+
+        testSubject = new ApplicationConfiguration();
+
+        final Parameters parameters = new Parameters();
+
+        final FileBasedConfigurationBuilder<PropertiesConfiguration> builder =
+                new FileBasedConfigurationBuilder<>(
+                        PropertiesConfiguration.class).configure(
+                                parameters.fileBased().setFile(tmpConfigFile));
+
+        // Add this after System properties.
+        testSubject.addConfiguration(builder.getConfiguration());
+
+        assertEquals("Wrong value.", "VAL1", testSubject.getString(
+                ApplicationConfiguration.class.getCanonicalName() + ".PROP1"));
+    }
+
+    @Test
+    public void pullFileProperty() throws Exception
+    {
+        final File tmpConfigFile = File.createTempFile("config-",
+                                                       ".properties");
+        final FileOutputStream fos = new FileOutputStream(tmpConfigFile);
+
+        fos.write("PROP2=VAL2\n".getBytes("UTF-8"));
+        fos.write("PROP1=VAL11".getBytes("UTF-8"));
+
+        fos.flush();
+        fos.close();
+
+        testSubject = new ApplicationConfiguration();
+
+        final Parameters parameters = new Parameters();
+
+        final FileBasedConfigurationBuilder<PropertiesConfiguration> builder =
+                new FileBasedConfigurationBuilder<>(
+                        PropertiesConfiguration.class).configure(
+                        parameters.fileBased().setFile(tmpConfigFile));
+
+        // Add this after System properties.
+        testSubject.addConfiguration(builder.getConfiguration());
+
+        assertEquals("Wrong value.", "VAL11", testSubject.getString("PROP1"));
     }
 }

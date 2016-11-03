@@ -61,8 +61,7 @@ public class VOTableOutputStream implements OutputStreamWrapper
         this.uploadResults = uploadResults;
     }
 
-    public void write(OutputStream outputStream)
-        throws IOException
+    public void write(OutputStream outputStream) throws IOException
     {
         final StreamingVOTableWriter writer =
                 new StreamingVOTableWriter(uploadResults,
