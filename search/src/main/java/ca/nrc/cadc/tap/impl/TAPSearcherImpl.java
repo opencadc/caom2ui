@@ -432,10 +432,19 @@ public class TAPSearcherImpl implements Searcher
                                final OutputStream outputStream,
                                final Job tapJob)
     {
-        final URL tapServiceURL =
+        URL tapServiceURL =
                 registryClient.getServiceURL(tapServiceURI,
                                              Standards.TAP_SYNC_11,
                                              AuthMethod.ANON);
+
+        try
+        {
+            tapServiceURL = new URL("http://tap:8080/tap/sync");
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException("Could not obtain service URL", e);
+        }
 
         return new SyncTAPClientImpl(outputStream, tapServiceURL, false);
     }

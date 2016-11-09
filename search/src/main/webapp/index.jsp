@@ -15,7 +15,7 @@
                                    ? "en" : contentLanguage;
 
   final String staticWebHost =
-      configuration.getString("org.opencadc.search.static-web-host",
+      configuration.lookup("org.opencadc.search.static-web-host",
                               "beta.cadc-ccda.hia-iha.nrc-cnrc.gc.ca");
   final String maintenanceWarningURL = requestHeaderLang
                                        + "/future_maintenance.html";
@@ -35,11 +35,11 @@
                                  ? "telecharger" : "download");
 
   final int maxRowLimit =
-      configuration.getInt("org.opencadc.search.max-row-count",
-                           defaultMaxRowLimit);
+      configuration.lookupInt("org.opencadc.search.max-row-count",
+                              defaultMaxRowLimit);
   final boolean showObsCoreTab =
-      configuration.getBoolean("org.opencadc.search.obs-core", false);
-  final String theme = configuration.getString("org.opencadc.search.theme", null);
+      configuration.lookupBoolean("org.opencadc.search.obs-core");
+  final String theme = configuration.lookup("org.opencadc.search.theme");
 
   if (theme != null)
   {

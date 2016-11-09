@@ -1,7 +1,7 @@
 version: '2'
 services:
   ui:
-    image: mach378.cadc.dao.nrc.ca:5000/opencadc_search
+    image: opencadc/search
     ports:
       - '8080:8080'
       - '5555:5555'
@@ -10,22 +10,34 @@ services:
     depends_on:
       - tap
       - caom2ui
+      - uwspg
     volumes:
       - /usr/local/search/webapps:/usr/local/tomcat/webapps
+  uwspg:
+    image: opencadc/uws_postgres
+    networks:
+      - 'caom2'
+    environment:
+      - POSTGRES_USER=uws
+      - POSTGRES_PASSWORD=astr0query
+      - PGDATA=/var/lib/postgresql/data/uws
+    volumes:
+      - /var/lib/postgresql/data
+      - /var/run/postgresql
   caom2ui:
     image: opencadc/caom2ui
-    ports:
-      - '3080:8080'
-      - '3555:5555'
+#    ports:
+#      - '3080:8080'
+#      - '3555:5555'
     networks:
       - 'caom2'
     volumes:
       - /usr/local/caom2ui/webapps:/usr/local/tomcat/webapps
   tap:
     image: opencadc/tap
-    ports:
-      - '8880:8080'
-      - '8855:5555'
+#    ports:
+#      - '4080:8080'
+#      - '8855:5555'
     networks:
       - 'caom2'
     depends_on:

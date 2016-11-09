@@ -268,9 +268,17 @@ public class TAPServlet extends ConfigurableServlet
 
     private URL lookupServiceURL(final RegistryClient registryClient)
     {
-        return registryClient.getServiceURL(lookupServiceURI(),
-                                            Standards.TAP_SYNC_11,
-                                            AuthMethod.ANON);
+        try
+        {
+            return new URL("http://tap:8080/tap/sync");
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException("Could not obtain service URL", e);
+        }
+//        return registryClient.getServiceURL(lookupServiceURI(),
+//                                            Standards.TAP_SYNC_11,
+//                                            AuthMethod.ANON);
     }
 
     private URI lookupServiceURI()

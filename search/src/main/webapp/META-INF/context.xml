@@ -3,28 +3,14 @@
 
   <WatchedResource>WEB-INF/web.xml</WatchedResource>
 
-  <Resource name="jdbc/uws-9"
-            auth="Container"
-            type="javax.sql.DataSource"
-            maxActive="1" maxIdle="1" maxWait="20000"
-            username="cadcuws" password="bc5e755f2be8e8"
-            driverClassName="org.postgresql.Driver"
-            url="jdbc:postgresql://132.246.217.20/cvodb"
-            removeAbandoned="true"
-            removeAbandonedTimeout="300"
-            logAbandoned="true"
-            testOnBorrow="true"
-            validationQuery="select 123"
-  />
-
   <!-- Data source for UWS jobs on Postgres -->
   <Resource name="jdbc/uws"
             auth="Container"
             type="javax.sql.DataSource"
             maxActive="1" maxIdle="1" maxWait="20000"
-            username="cadcuws" password="bc5e755f2be8e8"
+            username="uws" password="astr0query"
             driverClassName="org.postgresql.Driver"
-            url="jdbc:postgresql://132.246.217.20/cvodb"
+            url="jdbc:postgresql://uwspg:5432/uws"
             removeAbandoned="true"
             removeAbandonedTimeout="300"
             logAbandoned="true"

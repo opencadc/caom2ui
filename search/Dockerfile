@@ -10,10 +10,7 @@ WORKDIR ${CATALINA_HOME}
 
 # Clear out the webapps directory.
 RUN rm -rf webapps \
-  && mkdir webapps \
-  && mkdir /root/.ssl
-
-COPY cadcproxy.pem /root/.ssl/
+  && mkdir webapps
 
 # The SOURCE (first argument) is relative to this directory.  The
 # TARGET (second argument) is relative to the WORKDIR above.
