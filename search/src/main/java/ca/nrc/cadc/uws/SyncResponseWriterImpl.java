@@ -66,41 +66,60 @@
  ************************************************************************
  */
 
-package ca.nrc.cadc.search.plugins;
+package ca.nrc.cadc.uws;
 
-import ca.nrc.cadc.AbstractUnitTest;
-import ca.nrc.cadc.search.upload.VOTableUploader;
+import ca.nrc.cadc.uws.server.SyncOutput;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.easymock.EasyMock.*;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 
 
-public class VOTableUploaderFactoryTest
-        extends AbstractUnitTest<VOTableUploaderFactory>
+public class SyncResponseWriterImpl implements SyncResponseWriter
 {
-    @Test
-    public void createUploader() throws Exception
+    private final Writer writer;
+    private final SyncOutput syncOutput;
+
+
+    public SyncResponseWriterImpl(final SyncOutput so)
+            throws IOException
     {
-        System.setProperty(
-                VOTableUploaderFactory.VOTABLE_UPLOADER_CLASSNAME_KEY,
-                TestVOTableUploader.class.getCanonicalName());
+        this.syncOutput = so;
+        this.writer = new BufferedWriter(
+                new OutputStreamWriter(syncOutput.getOutputStream()));
+    }
 
-        final PluginClassLoader<TestVOTableUploader> mockPluginClassLoader =
-                createMock(PluginClassLoader.class);
 
-        testSubject = new VOTableUploaderFactory(mockPluginClassLoader);
+    @Override
+    public final Writer getWriter()
+    {
+        return writer;
+    }
 
-        expect(mockPluginClassLoader.loadClass(
-                TestVOTableUploader.class.getCanonicalName())).andReturn(
-                        TestVOTableUploader.class);
 
-        replay(mockPluginClassLoader);
+    /**
+     * Set the HTTP response code. Calls to this method that occur after the
+     * OutputStream is opened are silently ignored.
+     *
+     * @param code The desired Response code
+     */
+    @Override
+    public void setResponseCode(final int code)
+    {
+        syncOutput.setResponseCode(code);
+    }
 
-        final VOTableUploader uploader = testSubject.createUploader();
-
-        assertTrue("Should be test class.", uploader instanceof TestVOTableUploader);
-
-        verify(mockPluginClassLoader);
+    /**
+     * Set an HTTP header parameter. Calls to this method that occur after the
+     * OutputStream is opened are silently ignored.
+     *
+     * @param key   header key.
+     * @param value header value.
+     */
+    @Override
+    public void setResponseHeader(final String key, final String value)
+    {
+        syncOutput.setHeader(key, value);
     }
 }

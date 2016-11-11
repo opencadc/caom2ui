@@ -1,12 +1,10 @@
 
-package ca.nrc.cadc.search;
+package ca.nrc.cadc.uws;
 
 import ca.nrc.cadc.auth.ACIdentityManager;
 
 import ca.nrc.cadc.uws.server.DatabaseJobPersistence;
-import ca.nrc.cadc.uws.server.JobExecutor;
 import ca.nrc.cadc.uws.server.SimpleJobManager;
-import ca.nrc.cadc.uws.server.SyncExecutor;
 import ca.nrc.cadc.uws.server.impl.PostgresJobPersistence;
 
 
@@ -30,11 +28,8 @@ public class SearchJobManager extends SimpleJobManager
         // with different config.
         final DatabaseJobPersistence jobPersist =
                 new PostgresJobPersistence(new ACIdentityManager());
-        final JobExecutor jobExec = new SyncExecutor(jobPersist,
-                                                     AdvancedRunner.class);
 
         super.setJobPersistence(jobPersist);
-        super.setJobExecutor(jobExec);
         super.setMaxExecDuration(MAX_EXEC_DURATION);
         super.setMaxDestruction(MAX_DESTRUCTION);
         super.setMaxQuote(MAX_QUOTE);

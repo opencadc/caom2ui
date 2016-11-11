@@ -66,71 +66,59 @@
  ************************************************************************
  */
 
-package ca.nrc.cadc.search.plugins;
+package ca.nrc.cadc.uws;
 
-import ca.nrc.cadc.ApplicationConfiguration;
-import ca.nrc.cadc.search.upload.VOTableUploader;
-import org.apache.commons.configuration2.Configuration;
+import ca.nrc.cadc.uws.server.SyncOutput;
 
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.OutputStream;
 
-public class VOTableUploaderFactory
+public class HTTPResponseSyncOutput implements SyncOutput
 {
-    static final String VOTABLE_UPLOADER_CLASSNAME_KEY =
-            "org.opencadc.search.uploader";
-    private static final String DEFAULT_VOTABLE_UPLOADER =
-            CADCHTTPDataVOTableUploaderImpl.class.getName();
-    private final ApplicationConfiguration configuration =
-            new ApplicationConfiguration();
-    private final PluginClassLoader<? extends VOTableUploader>
-            pluginClassLoader;
+    private final HttpServletResponse response;
 
 
-    public VOTableUploaderFactory()
+    public HTTPResponseSyncOutput(HttpServletResponse response)
     {
-        this(new PluginClassLoader<CADCHTTPDataVOTableUploaderImpl>());
+        this.response = response;
     }
 
-    VOTableUploaderFactory(
-            final PluginClassLoader<? extends VOTableUploader> pluginClassLoader)
+
+    /**
+     * Set the HTTP response code. Calls to this method that occur after the
+     * OutputStream is opened are silently ignored.
+     *
+     * @param code
+     */
+    @Override
+    public void setResponseCode(int code)
     {
-        this.pluginClassLoader = pluginClassLoader;
+        response.setStatus(code);
     }
 
     /**
-     * Create a new configured instance of a VOTable Uploader.
+     * Set an HTTP header parameter. Calls to this method that occur after the
+     * OutputStream is opened are silently ignored.
      *
-     * @return VOTable
-     * @throws IllegalArgumentException If the class cannot be found or
-     *                                  created.
+     * @param key   header key.
+     * @param value header value.
      */
-    public VOTableUploader createUploader() throws IllegalArgumentException
+    @Override
+    public void setHeader(String key, String value)
     {
-        final String voTableUploaderClassName =
-                configuration.lookup(VOTABLE_UPLOADER_CLASSNAME_KEY);
+        response.setHeader(key, value);
+    }
 
-        try
-        {
-            final Class<? extends VOTableUploader> clazz =
-                    pluginClassLoader.loadClass(voTableUploaderClassName);
-
-            return clazz.newInstance();
-        }
-        catch (Exception e)
-        {
-            try
-            {
-                return (VOTableUploader) Class.forName(
-                        DEFAULT_VOTABLE_UPLOADER).newInstance();
-            }
-            catch (Exception e2)
-            {
-                throw new IllegalArgumentException(
-                        "No suitable plugins for VOTableUploader could be found.",
-                        e2);
-            }
-        }
+    /**
+     * Returns an OutputStream for streaming search results.
+     *
+     * @return OutputStream
+     * @throws IOException
+     */
+    @Override
+    public OutputStream getOutputStream() throws IOException
+    {
+        return response.getOutputStream();
     }
 }

@@ -58,21 +58,17 @@ public class SyncTAPClientImpl implements SyncTAPClient
             Logger.getLogger(SyncTAPClientImpl.class);
 
     private final URL tapServiceURL;
-    private final OutputStream outputStream;
     private final boolean followToResults;
 
 
     /**
      * Complete constructor.
-     * @param outputStream     The stream for the results of the client call.
      * @param tapServiceURL     The TAP service URL.
      * @param followToResults   Whether to follow redirects to the end result.
      */
-    public SyncTAPClientImpl(final OutputStream outputStream,
-                             final URL tapServiceURL,
+    public SyncTAPClientImpl(final URL tapServiceURL,
                              final boolean followToResults)
     {
-        this.outputStream = outputStream;
         this.tapServiceURL = tapServiceURL;
         this.followToResults = followToResults;
     }
@@ -84,7 +80,7 @@ public class SyncTAPClientImpl implements SyncTAPClient
      * @param job The Job to execute.
      */
     @Override
-    public void execute(final Job job)
+    public void execute(final Job job, final OutputStream outputStream)
     {
         try
         {
@@ -95,7 +91,7 @@ public class SyncTAPClientImpl implements SyncTAPClient
             }
 
             // POST PHASE=RUN to execute on server
-            postJob(tapServiceURL, job);
+            postJob(tapServiceURL, job, outputStream);
         }
         catch (Exception e)
         {
@@ -104,7 +100,7 @@ public class SyncTAPClientImpl implements SyncTAPClient
 
             try
             {
-                getOutputStream().write(error.getBytes());
+                outputStream.write(error.getBytes());
             }
             catch (IOException we)
             {
@@ -119,7 +115,7 @@ public class SyncTAPClientImpl implements SyncTAPClient
      *
      * @return      Map of Parameter name -> value.
      */
-    private Map<String, Object> getQueryPayload(final Job job)
+    protected Map<String, Object> getQueryPayload(final Job job)
     {
         final Map<String, Object> payload = new HashMap<>();
 
@@ -149,10 +145,11 @@ public class SyncTAPClientImpl implements SyncTAPClient
      * @param url           The URL to POST to.
      * @throws IOException  For any IO errors.
      */
-    private void postJob(final URL url, final Job job) throws IOException
+    private void postJob(final URL url, final Job job,
+                         final OutputStream outputStream) throws IOException
     {
         // POST the parameters to the tapServer.
-        final HttpPost httpPost = getPoster(url, job);
+        final HttpPost httpPost = getPoster(url, job, outputStream);
         httpPost.run();
 
         if (!followToResults)
@@ -165,20 +162,21 @@ public class SyncTAPClientImpl implements SyncTAPClient
             }
             else
             {
-                getOutputStream().write(
-                        redirectURL.toExternalForm().getBytes());
+                outputStream.write(redirectURL.toExternalForm().getBytes());
                 LOGGER.debug("Done writing out Response Body.");
             }
         }
     }
 
-    private HttpPost getPoster(final URL url, final Job job) throws IOException
+    private HttpPost getPoster(final URL url, final Job job,
+                               final OutputStream outputStream)
+            throws IOException
     {
         final HttpPost poster;
 
         if (followToResults)
         {
-            poster = new HttpPost(url, getQueryPayload(job), getOutputStream());
+            poster = new HttpPost(url, getQueryPayload(job), outputStream);
         }
         else
         {
@@ -186,11 +184,5 @@ public class SyncTAPClientImpl implements SyncTAPClient
         }
 
         return poster;
-    }
-
-
-    protected final OutputStream getOutputStream()
-    {
-        return outputStream;
     }
 }

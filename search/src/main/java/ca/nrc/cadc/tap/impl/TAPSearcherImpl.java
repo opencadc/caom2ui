@@ -34,11 +34,8 @@
 package ca.nrc.cadc.tap.impl;
 
 
-import ca.nrc.cadc.auth.AuthMethod;
 import ca.nrc.cadc.caom2.IntervalSearch;
 import ca.nrc.cadc.caom2.SpatialSearch;
-import ca.nrc.cadc.reg.Standards;
-import ca.nrc.cadc.reg.client.RegistryClient;
 import ca.nrc.cadc.search.*;
 import ca.nrc.cadc.search.cutout.Cutout;
 import ca.nrc.cadc.search.cutout.stc.STCCutoutImpl;
@@ -72,8 +69,6 @@ import javax.security.auth.Subject;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
@@ -100,7 +95,7 @@ public class TAPSearcherImpl implements Searcher
     private final SyncResponseWriter syncResponseWriter;
     private final JobUpdater jobUpdater;
     private final QueryGenerator queryGenerator;
-    private final URI tapServiceURI;
+    private final SyncTAPClient tapClient;
 
 
     /**
@@ -111,13 +106,13 @@ public class TAPSearcherImpl implements Searcher
      */
     public TAPSearcherImpl(final SyncResponseWriter writer,
                            final JobUpdater jobUpdater,
-                           final URI tapServiceURI,
+                           final SyncTAPClient tapClient,
                            final QueryGenerator queryGenerator)
             throws PositionParserException
     {
         this.syncResponseWriter = writer;
         this.jobUpdater = jobUpdater;
-        this.tapServiceURI = tapServiceURI;
+        this.tapClient = tapClient;
         this.queryGenerator = queryGenerator;
     }
 
@@ -201,8 +196,7 @@ public class TAPSearcherImpl implements Searcher
         }
         catch (JSONException | IOException e)
         {
-            throw new IllegalStateException("Unable to write out response.",
-                                            e);
+            throw new IllegalStateException("Unable to write out response.", e);
         }
         finally
         {
@@ -245,7 +239,8 @@ public class TAPSearcherImpl implements Searcher
             final OutputStream outputStream = new ByteArrayOutputStream();
 
             // Run the TAP job to do the ADQL query.
-            queryTAP(createTAPJob(job, templates), outputStream);
+            queryTAP(createTAPJob(job, queryGenerator.generate(
+                    templates).toString()), outputStream);
 
             final String resultsURLValue = outputStream.toString();
             final URL tapResultsURL = new URL(resultsURLValue);
@@ -420,42 +415,12 @@ public class TAPSearcherImpl implements Searcher
         }
     }
 
-    /**
-     * Obtain an appropriate TAP Client instance.
-     *
-     * @param registryClient An initialized Registry Client.
-     * @param outputStream   The stream to write out the redirect URL to.
-     * @param tapJob         The Job to execute.
-     * @return TapClient instance.  Never null.
-     */
-    SyncTAPClient getTAPClient(final RegistryClient registryClient,
-                               final OutputStream outputStream,
-                               final Job tapJob)
-    {
-        URL tapServiceURL =
-                registryClient.getServiceURL(tapServiceURI,
-                                             Standards.TAP_SYNC_11,
-                                             AuthMethod.ANON);
-
-        try
-        {
-            tapServiceURL = new URL("http://tap:8080/tap/sync");
-        }
-        catch (IOException e)
-        {
-            throw new RuntimeException("Could not obtain service URL", e);
-        }
-
-        return new SyncTAPClientImpl(outputStream, tapServiceURL, false);
-    }
-
-    private Job createTAPJob(final Job baseJob, final Templates templates)
+    private Job createTAPJob(final Job baseJob, final String query)
     {
         final List<Parameter> searchJobParameters = baseJob.getParameterList();
         final Job tapJob = new Job();
         tapJob.setRunID(baseJob.getID());
 
-        final String format;
         final String requestedFormat =
                 ParameterUtil.findParameterValue("format", searchJobParameters);
         final String uploadParameterValue =
@@ -465,22 +430,14 @@ public class TAPSearcherImpl implements Searcher
                                                       searchJobParameters);
         LOGGER.debug("MaxRecords: " + maxRecords);
 
-        if (!StringUtil.hasText(requestedFormat))
-        {
-            format = "votable";
-        }
-        else
-        {
-            format = requestedFormat;
-        }
+        final String format = StringUtil.hasText(requestedFormat)
+                              ? requestedFormat : "votable";
 
         final List<Parameter> tapJobParams = new ArrayList<>();
 
         tapJobParams.add(new Parameter("LANG", "ADQL"));
         tapJobParams.add(new Parameter("FORMAT", format));
-        tapJobParams.add(new Parameter("QUERY",
-                                       queryGenerator.generate(templates)
-                                               .toString()));
+        tapJobParams.add(new Parameter("QUERY", query));
         tapJobParams.add(new Parameter("REQUEST", "doQuery"));
         tapJobParams.add(new Parameter("MAXREC",
                                        StringUtil.hasText(maxRecords)
@@ -504,14 +461,10 @@ public class TAPSearcherImpl implements Searcher
      * @param outputStream  The stream to write out results to.
      * @throws IOException  Any writing errors.
      */
-    private void queryTAP(final Job tapJob, final OutputStream outputStream)
+    void queryTAP(final Job tapJob, final OutputStream outputStream)
             throws IOException
     {
         final Subject ownerSubject = tapJob.ownerSubject;
-
-        final RegistryClient registryClient = new RegistryClient();
-        final SyncTAPClient tapClient = getTAPClient(registryClient,
-                                                     outputStream, tapJob);
 
         try
         {
@@ -524,14 +477,14 @@ public class TAPSearcherImpl implements Searcher
                     @Override
                     public Void run()
                     {
-                        tapClient.execute(tapJob);
+                        tapClient.execute(tapJob, outputStream);
                         return null;
                     }
                 });
             }
             else
             {
-                tapClient.execute(tapJob);
+                tapClient.execute(tapJob, outputStream);
             }
         }
         finally

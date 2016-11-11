@@ -93,23 +93,14 @@
     <!--<load-on-startup>1</load-on-startup>-->
   <!--</servlet>-->
 
-  <!--
-    Each of the Restlet servlets need to have their respective Restlet
-    attributes set properly.
-  -->
   <!-- AdvancedSearch Servlet -->
   <servlet>
-    <servlet-name>SearchServlet</servlet-name>
-    <servlet-class>ca.nrc.cadc.uws.server.SyncServlet</servlet-class>
+    <servlet-name>SearchJobServlet</servlet-name>
+    <servlet-class>ca.nrc.cadc.web.SearchJobServlet</servlet-class>
     <init-param>
       <param-name>ca.nrc.cadc.uws.server.JobManager</param-name>
-      <param-value>ca.nrc.cadc.search.SearchJobManager</param-value>
+      <param-value>ca.nrc.cadc.uws.SearchJobManager</param-value>
     </init-param>
-    <init-param>
-      <param-name>ca.nrc.cadc.uws.web.InlineContentHandler</param-name>
-      <param-value>ca.nrc.cadc.search.SearchInlineContentHandlerImpl</param-value>
-    </init-param>
-    <load-on-startup>2</load-on-startup>
   </servlet>
 
   <servlet>
@@ -228,8 +219,9 @@
   </servlet-mapping>
 
   <servlet-mapping>
-    <servlet-name>SearchServlet</servlet-name>
+    <servlet-name>SearchJobServlet</servlet-name>
     <url-pattern>/find/*</url-pattern>
+    <url-pattern>/find</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>

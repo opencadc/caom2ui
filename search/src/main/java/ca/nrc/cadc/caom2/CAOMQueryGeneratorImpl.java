@@ -35,7 +35,6 @@ package ca.nrc.cadc.caom2;
 
 
 import ca.nrc.cadc.search.Templates;
-import ca.nrc.cadc.util.StringUtil;
 import ca.nrc.cadc.uws.Job;
 
 
@@ -70,45 +69,7 @@ public class CAOMQueryGeneratorImpl extends AbstractQueryGeneratorImpl
                                                   "target_name",
                                                   "position_bounds");
 
-        /*if (StringUtil.hasText(upload))
-        {
-            query = new StringBuilder(256);
-            final String uploadResolver = getUploadResolver();
-
-            // Parse the table name from the UPLOAD parameter.
-            final String table = upload.split(",")[0];
-            final ObservationListQueryGenerator.QueryParts parts =
-                    queryGenerator.getQueryParts(templates.getSearchTemplates(),
-                                                 customSelectList);
-
-            query.append("SELECT ");
-            query.append(parts.selectList);
-            query.append(",f.target,f.ra,f.dec,f.radius FROM ");
-            query.append("JOIN TAP_UPLOAD.");
-            query.append(table);
-            query.append(" as f on ");
-
-            if (StringUtil.hasText(uploadResolver)
-                && uploadResolver.equals("OBJECT"))
-            {
-                query.append("Observation.target_name = f.target ");
-            }
-            else
-            {
-                query.append("INTERSECTS(POINT('ICRS',f.ra,f.dec), ");
-                query.append("Plane.position_bounds) = 1 ");
-                //Char.SpatialAxis.Coverage.Support.Area
-            }
-
-            query.append(parts.fromClause);
-
-            if (parts.whereClause != null)
-            {
-                query.append(" WHERE ");
-                query.append(parts.whereClause);
-            }
-        }
-        else*/ if (customSelectList != null)
+        if (customSelectList != null)
         {
             query = queryGenerator.getSelectSQL(
                     templates.getSearchTemplates(),

@@ -31,7 +31,7 @@
  ****  C A N A D I A N   A S T R O N O M Y   D A T A   C E N T R E  *****
  ************************************************************************
  */
-package ca.nrc.cadc.search;
+package ca.nrc.cadc.uws;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
@@ -40,7 +40,7 @@ import java.util.*;
 import ca.nrc.cadc.AbstractUnitTest;
 import ca.nrc.cadc.date.DateUtil;
 import ca.nrc.cadc.net.TransientException;
-import ca.nrc.cadc.uws.*;
+import ca.nrc.cadc.search.Searcher;
 import ca.nrc.cadc.uws.server.JobUpdater;
 import ca.nrc.cadc.uws.server.SyncOutput;
 

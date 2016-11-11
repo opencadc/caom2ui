@@ -37,17 +37,23 @@
 ************************************************************************
 */
 
-package ca.nrc.cadc.search;
+package ca.nrc.cadc.uws;
 
 import ca.nrc.cadc.ApplicationConfiguration;
+import ca.nrc.cadc.auth.AuthMethod;
 import ca.nrc.cadc.caom2.CAOMQueryGeneratorImpl;
 import ca.nrc.cadc.caom2.ObsCoreQueryGeneratorImpl;
 import ca.nrc.cadc.net.TransientException;
+import ca.nrc.cadc.reg.Standards;
+import ca.nrc.cadc.reg.client.RegistryClient;
+import ca.nrc.cadc.search.ObsModel;
+import ca.nrc.cadc.search.QueryGenerator;
+import ca.nrc.cadc.search.Searcher;
 import ca.nrc.cadc.search.parser.exception.PositionParserException;
 import ca.nrc.cadc.search.upload.UploadResults;
+import ca.nrc.cadc.tap.SyncTAPClient;
 import ca.nrc.cadc.tap.impl.*;
 import ca.nrc.cadc.util.StringUtil;
-import ca.nrc.cadc.uws.*;
 import ca.nrc.cadc.uws.server.*;
 
 import java.io.*;
@@ -86,8 +92,9 @@ public class AdvancedRunner implements JobRunner
      * @param _syncOutput The Syncronous writer output.
      * @param _searcher   The base searcher.
      */
-    AdvancedRunner(final Job _job, final JobUpdater _jobUpdater,
-                   final SyncOutput _syncOutput, final Searcher _searcher)
+    public AdvancedRunner(final Job _job, final JobUpdater _jobUpdater,
+                          final SyncOutput _syncOutput,
+                          final Searcher _searcher)
     {
         this.job = _job;
         this.jobUpdater = _jobUpdater;
@@ -208,9 +215,15 @@ public class AdvancedRunner implements JobRunner
      */
     private void createSearcher() throws IOException, PositionParserException
     {
+        final RegistryClient registryClient = new RegistryClient();
+        final SyncTAPClient tapClient =
+                new SyncTAPClientImpl(
+                        registryClient.getServiceURL(lookupServiceURI(),
+                                                     Standards.TAP_SYNC_11,
+                                                     AuthMethod.ANON), false);
         this.searcher = new TAPSearcherImpl(
                 new SyncResponseWriterImpl(syncOutput),
-                jobUpdater, lookupServiceURI(), getQueryGenerator());
+                jobUpdater, tapClient, getQueryGenerator());
     }
 
     private URI lookupServiceURI()
@@ -361,6 +374,7 @@ public class AdvancedRunner implements JobRunner
                + "</VOTABLE>";
     }
 
+
     /**
      * Obtain the current date.  Implementors can override.
      *
@@ -369,63 +383,6 @@ public class AdvancedRunner implements JobRunner
     protected Date currentDate()
     {
         return new Date();
-    }
-
-
-    /**
-     * Implementation of the Synchronous writer.
-     */
-    private final class SyncResponseWriterImpl implements SyncResponseWriter
-    {
-        final Writer writer;
-        final SyncOutput syncOutput;
-
-
-        private SyncResponseWriterImpl(final SyncOutput so)
-                throws IOException
-        {
-            this.syncOutput = so;
-            this.writer = new BufferedWriter(
-                    new OutputStreamWriter(syncOutput.getOutputStream()));
-        }
-
-
-        final SyncOutput getSynchronousOutput()
-        {
-            return this.syncOutput;
-        }
-
-        @Override
-        public final Writer getWriter()
-        {
-            return writer;
-        }
-
-
-        /**
-         * Set the HTTP response code. Calls to this method that occur after the
-         * OutputStream is opened are silently ignored.
-         *
-         * @param code The desired Response code
-         */
-        @Override
-        public void setResponseCode(final int code)
-        {
-            getSynchronousOutput().setResponseCode(code);
-        }
-
-        /**
-         * Set an HTTP header parameter. Calls to this method that occur after the
-         * OutputStream is opened are silently ignored.
-         *
-         * @param key   header key.
-         * @param value header value.
-         */
-        @Override
-        public void setResponseHeader(final String key, final String value)
-        {
-            getSynchronousOutput().setHeader(key, value);
-        }
     }
 
 }

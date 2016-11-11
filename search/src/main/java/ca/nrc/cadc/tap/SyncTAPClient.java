@@ -36,6 +36,8 @@ package ca.nrc.cadc.tap;
 
 import ca.nrc.cadc.uws.Job;
 
+import java.io.OutputStream;
+
 public interface SyncTAPClient
 {
     /**
@@ -43,5 +45,5 @@ public interface SyncTAPClient
      *
      * @param job       The Job to execute.
      */
-    void execute(final Job job);
+    void execute(final Job job, final OutputStream outputStream);
 }

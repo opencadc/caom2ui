@@ -33,10 +33,7 @@
  */
 package ca.nrc.cadc.tap.impl;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.StringWriter;
-import java.io.Writer;
+import java.io.*;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -68,18 +65,20 @@ public class TAPSearcherImplTest extends AbstractUnitTest<TAPSearcherImpl>
             createMock(SyncResponseWriter.class);
     private final QueryGenerator mockQueryGenerator =
             createMock(QueryGenerator.class);
+    private final SyncTAPClient mockSyncTAPClient =
+            createMock(SyncTAPClient.class);
 
 
     @Test
     public void constructor() throws Exception
     {
         final Job mockJob = createMock(Job.class);
-        replay(mockJob, mockSyncResponseWriter);
+        replay(mockJob, mockSyncResponseWriter, mockSyncTAPClient);
 
         setTestSubject(new TAPSearcherImpl(mockSyncResponseWriter, null,
-                                           URI.create("ivo://tap/place"),
+                                           mockSyncTAPClient,
                                            mockQueryGenerator));
-        verify(mockJob, mockSyncResponseWriter);
+        verify(mockJob, mockSyncResponseWriter, mockSyncTAPClient);
     }
 
     @Test
@@ -103,45 +102,33 @@ public class TAPSearcherImplTest extends AbstractUnitTest<TAPSearcherImpl>
 
         constraints.add(new Text("Observation.collection", "VAL1", true));
 
-        final SyncTAPClient mockTAPClient = createMock(SyncTAPClient.class);
         final Templates templates = new Templates(constraints);
         final StringBuilder stringBuilder = new StringBuilder();
 
         stringBuilder.append("SELECT * FROM TABLE WHERE UTYPE1 = VAL1");
 
         setTestSubject(new TAPSearcherImpl(mockSyncResponseWriter, null,
-                                           URI.create("ivo://tap/place"),
+                                           mockSyncTAPClient,
                                            mockQueryGenerator)
         {
             /**
-             * Obtain an appropriate TAP Client instance.
+             * Issue a TAP query.
              *
-             * @param registryClient An initialized Registry Client.
-             * @param outputStream   The stream to write out the redirect URL to.
-             * @param tapJob         The Job to execute.
-             * @return TapClient instance.  Never null.
+             * @param tapJob       The TAP job to execute.
+             * @param outputStream The stream to write out results to.
+             * @throws IOException Any writing errors.
              */
             @Override
-            SyncTAPClient getTAPClient(RegistryClient registryClient,
-                                       OutputStream outputStream,
-                                       Job tapJob)
+            void queryTAP(Job tapJob, OutputStream outputStream) throws
+                                                                 IOException
             {
-                try
-                {
-                    outputStream.write("http://results.com/go/run".getBytes());
-                }
-                catch (IOException e)
-                {
-                    // Oh well...
-                }
-
-                return mockTAPClient;
+                outputStream.write("http://mysite.com/tap/jobs/88/run"
+                                           .getBytes());
             }
         });
 
         final Job tapJob = new Job(dummyJob)
         {
-
             /**
              * Why must I override equals here?  Why does the Job class not
              * already have one?
@@ -158,9 +145,6 @@ public class TAPSearcherImplTest extends AbstractUnitTest<TAPSearcherImpl>
         };
         tapJob.setResultsList(null);
 
-        mockTAPClient.execute(tapJob);
-        expectLastCall().once();
-
         expect(mockQueryGenerator.generate(templates))
                 .andReturn(stringBuilder).once();
 
@@ -170,8 +154,8 @@ public class TAPSearcherImplTest extends AbstractUnitTest<TAPSearcherImpl>
                                                  "application/json");
         expectLastCall().once();
 
-        replay(mockSyncResponseWriter, mockQueryGenerator, mockTAPClient);
+        replay(mockSyncResponseWriter, mockQueryGenerator, mockSyncTAPClient);
         getTestSubject().search(dummyJob);
-        verify(mockSyncResponseWriter, mockQueryGenerator, mockTAPClient);
+        verify(mockSyncResponseWriter, mockQueryGenerator, mockSyncTAPClient);
     }
 }

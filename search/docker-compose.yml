@@ -35,15 +35,16 @@ services:
       - /usr/local/caom2ui/webapps:/usr/local/tomcat/webapps
   tap:
     image: opencadc/tap
-#    ports:
+    ports:
 #      - '4080:8080'
-#      - '8855:5555'
+      - '4555:5555'
     networks:
       - 'caom2'
     depends_on:
       - tappg
     volumes:
       - /usr/local/tap/webapps:/usr/local/tomcat/webapps
+      - /var/run/tap/pub:/root/.pub
   tappg:
     image: opencadc/tap_postgres
     networks:

@@ -74,7 +74,10 @@ import javax.servlet.http.HttpServlet;
 import java.net.URI;
 
 
-public class ConfigurableServlet extends HttpServlet
+/**
+ * Base servlet to allow configuration.
+ */
+public abstract class ConfigurableServlet extends HttpServlet
 {
     private final ApplicationConfiguration configuration;
 

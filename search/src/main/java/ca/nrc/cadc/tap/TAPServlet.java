@@ -79,6 +79,7 @@ import ca.nrc.cadc.util.StringUtil;
 import ca.nrc.cadc.uws.ExecutionPhase;
 import ca.nrc.cadc.uws.Job;
 import ca.nrc.cadc.web.ConfigurableServlet;
+import org.apache.log4j.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -94,6 +95,8 @@ import java.util.ArrayList;
 
 public class TAPServlet extends ConfigurableServlet
 {
+    private static final Logger LOGGER = Logger.getLogger(TAPServlet.class);
+
     public TAPServlet()
     {
     }
@@ -248,11 +251,10 @@ public class TAPServlet extends ConfigurableServlet
             final Job job = createJob(req);
 
             final SyncTAPClient syncTAPClient =
-                    new SyncTAPClientImpl(outputStream,
-                                          lookupServiceURL(registryClient),
+                    new SyncTAPClientImpl(lookupServiceURL(registryClient),
                                           true);
 
-            execute(syncTAPClient, job);
+            execute(syncTAPClient, job, outputStream);
         }
     }
 
@@ -260,25 +262,30 @@ public class TAPServlet extends ConfigurableServlet
      * Used for testers to override.
      * @param syncTAPClient             The TAP Client.
      * @param job                       The Job to execute.
+     * @param outputStream              The Output Stream to write output to.
      */
-    void execute(final SyncTAPClient syncTAPClient, final Job job)
+    void execute(final SyncTAPClient syncTAPClient, final Job job,
+                 final OutputStream outputStream)
     {
-        syncTAPClient.execute(job);
+        syncTAPClient.execute(job, outputStream);
     }
 
     private URL lookupServiceURL(final RegistryClient registryClient)
     {
+        final URL serviceURL =
+                registryClient.getServiceURL(lookupServiceURI(),
+                                             Standards.TAP_SYNC_11,
+                                             AuthMethod.ANON);
+
         try
         {
+            LOGGER.info("Configured TAP Service URL: " + serviceURL);
             return new URL("http://tap:8080/tap/sync");
         }
         catch (IOException e)
         {
             throw new RuntimeException("Could not obtain service URL", e);
         }
-//        return registryClient.getServiceURL(lookupServiceURI(),
-//                                            Standards.TAP_SYNC_11,
-//                                            AuthMethod.ANON);
     }
 
     private URI lookupServiceURI()

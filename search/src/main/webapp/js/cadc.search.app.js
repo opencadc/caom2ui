@@ -745,7 +745,7 @@
             var $parentContainer = $checkboxSelect.parent("div");
 
             $parentContainer.empty();
-            $("<span class=\"_select_" + $rowItem.id + "\">N/A</span>").
+            $("<span class=F\"_select_" + $rowItem.id + "\">N/A</span>").
             appendTo($parentContainer);
           }
         };
