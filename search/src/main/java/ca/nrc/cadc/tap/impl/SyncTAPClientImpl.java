@@ -113,7 +113,8 @@ public class SyncTAPClientImpl implements SyncTAPClient
     /**
      * Build the payload to POST.
      *
-     * @return      Map of Parameter name -> value.
+     * @param job      The Job to get the payload for.
+     * @return      Map of Parameter name:value.
      */
     protected Map<String, Object> getQueryPayload(final Job job)
     {
