@@ -1,5 +1,7 @@
 language: java
 jdk:
   - oraclejdk8
+env:
+  - TERM=xterm
 script: for mod in caom2ui search; do cd $mod; gradle --info clean assemble javadoc || break -1; cd ..; done
 
