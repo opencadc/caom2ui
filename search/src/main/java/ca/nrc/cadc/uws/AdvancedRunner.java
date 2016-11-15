@@ -40,15 +40,16 @@
 package ca.nrc.cadc.uws;
 
 import ca.nrc.cadc.ApplicationConfiguration;
-import ca.nrc.cadc.auth.AuthMethod;
 import ca.nrc.cadc.caom2.CAOMQueryGeneratorImpl;
 import ca.nrc.cadc.caom2.ObsCoreQueryGeneratorImpl;
 import ca.nrc.cadc.net.TransientException;
-import ca.nrc.cadc.reg.Standards;
 import ca.nrc.cadc.reg.client.RegistryClient;
 import ca.nrc.cadc.search.ObsModel;
 import ca.nrc.cadc.search.QueryGenerator;
 import ca.nrc.cadc.search.Searcher;
+import ca.nrc.cadc.search.form.FormConstraint;
+import ca.nrc.cadc.search.form.Shape1;
+import ca.nrc.cadc.search.form.Text;
 import ca.nrc.cadc.search.parser.exception.PositionParserException;
 import ca.nrc.cadc.search.upload.UploadResults;
 import ca.nrc.cadc.tap.SyncTAPClient;
@@ -59,6 +60,7 @@ import ca.nrc.cadc.uws.server.*;
 import java.io.*;
 import java.net.URI;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 
@@ -71,12 +73,15 @@ import javax.servlet.http.HttpServletResponse;
 public class AdvancedRunner implements JobRunner
 {
     private static final Logger LOGGER = Logger.getLogger(AdvancedRunner.class);
+    private static String SHAPE1_UTYPE = "Plane.position.bounds";
+    private static String TEXT_UTYPE = "Observation.collection";
+
 
     private Job job;
     private JobUpdater jobUpdater;
     private SyncOutput syncOutput;
     private Searcher searcher;
-    private ApplicationConfiguration configuration;
+    private URI tapServiceURI;
 
 
     public AdvancedRunner()
@@ -91,21 +96,48 @@ public class AdvancedRunner implements JobRunner
      * @param _jobUpdater The JobUpdater.
      * @param _syncOutput The Syncronous writer output.
      * @param _searcher   The base searcher.
+     * @param  tapServiceURI    The service URI
      */
     public AdvancedRunner(final Job _job, final JobUpdater _jobUpdater,
                           final SyncOutput _syncOutput,
-                          final Searcher _searcher)
+                          final Searcher _searcher,
+                          final URI tapServiceURI)
     {
         this.job = _job;
         this.jobUpdater = _jobUpdater;
         this.syncOutput = _syncOutput;
         this.searcher = _searcher;
+        this.tapServiceURI = tapServiceURI;
     }
 
 
     public void setJob(final Job job)
     {
         this.job = job;
+
+//        Initialize the Job parameter list.
+//        If this is a QuickSearch query, the Job has target and optionally
+//        collection parameters.
+        final List<Parameter> parameters = this.job.getParameterList();
+        final String target = RegexParameterUtil.findParameterValue("target",
+                                                                    parameters);
+
+        if (StringUtil.hasText(target))
+        {
+            parameters.add(new Parameter(FormConstraint.FORM_NAME,
+                                         SHAPE1_UTYPE + Shape1.NAME));
+            parameters.add(new Parameter(SHAPE1_UTYPE + Shape1.VALUE, target));
+        }
+
+        final String collection =
+                RegexParameterUtil.findParameterValue("collection", parameters);
+
+        if (StringUtil.hasText(collection))
+        {
+            parameters.add(new Parameter(FormConstraint.FORM_NAME,
+                                         TEXT_UTYPE + Text.NAME));
+            parameters.add(new Parameter(TEXT_UTYPE + Text.VALUE, collection));
+        }
     }
 
     public void setJobUpdater(JobUpdater ju)
@@ -124,9 +156,6 @@ public class AdvancedRunner implements JobRunner
      */
     private void init() throws IOException, PositionParserException
     {
-        // Force a reload each time.
-        configuration = new ApplicationConfiguration();
-
         if (searcher == null)
         {
             createSearcher();
@@ -166,7 +195,7 @@ public class AdvancedRunner implements JobRunner
                 }
                 else
                 {
-                    searcher.search(job);
+                    searcher.search(job, tapServiceURI, wrapSyncOutput());
 
                     jobUpdater.setPhase(jobID,
                                         ExecutionPhase.EXECUTING,
@@ -216,21 +245,12 @@ public class AdvancedRunner implements JobRunner
     private void createSearcher() throws IOException, PositionParserException
     {
         final RegistryClient registryClient = new RegistryClient();
-        final SyncTAPClient tapClient =
-                new SyncTAPClientImpl(
-                        registryClient.getServiceURL(lookupServiceURI(),
-                                                     Standards.TAP_SYNC_11,
-                                                     AuthMethod.ANON), false);
+        final SyncTAPClient tapClient = new SyncTAPClientImpl(false,
+                                                              registryClient);
+
         this.searcher = new TAPSearcherImpl(
                 new SyncResponseWriterImpl(syncOutput),
                 jobUpdater, tapClient, getQueryGenerator());
-    }
-
-    private URI lookupServiceURI()
-    {
-        return configuration.lookupServiceURI(
-                ApplicationConfiguration.TAP_SERVICE_URI_PROPERTY_KEY,
-                ApplicationConfiguration.DEFAULT_TAP_SERVICE_URI);
     }
 
     /**
@@ -385,4 +405,8 @@ public class AdvancedRunner implements JobRunner
         return new Date();
     }
 
+    protected SyncResponseWriter wrapSyncOutput() throws IOException
+    {
+        return new SyncResponseWriterImpl(syncOutput);
+    }
 }

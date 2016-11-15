@@ -91,8 +91,18 @@ public class ApplicationConfiguration
 {
     public static final String TAP_SERVICE_URI_PROPERTY_KEY =
             "org.opencadc.search.tap-service-id";
+    public static final String TAP_SERVICE_HOST_PORT_PROPERTY_KEY =
+            "org.opencadc.search.tap-service-host-port";
     public static final URI DEFAULT_TAP_SERVICE_URI =
             URI.create("ivo://cadc.nrc.ca/tap");
+
+    public static final String CAOM2OPS_SERVICE_URI_PROPERTY_KEY =
+            "org.opencadc.search.caom2ops-service-id";
+    public static final String CAOM2OPS_SERVICE_HOST_PORT_PROPERTY_KEY =
+            "org.opencadc.search.caom2ops-service-host-port";
+    public static final URI DEFAULT_CAOM2OPS_SERVICE_URI =
+            URI.create("ivo://cadc.nrc.ca/caom2ops");
+
     public final static String CAOM2_UI_PROPERTY_KEY =
             "org.opencadc.search.caom2ui-host";
     public final static String DEFAULT_CAOM2_UI_HOST =
@@ -103,7 +113,7 @@ public class ApplicationConfiguration
 
     private static final String PROPERTIES_FILE_PATH =
             System.getProperty("user.home") + File.pathSeparator
-            + "config/org.opencadc.vosui.properties";
+            + "config/org.opencadc.search.properties";
 
     // Internally uses the Apache configurations.
     // Make package private to allow tests to override.

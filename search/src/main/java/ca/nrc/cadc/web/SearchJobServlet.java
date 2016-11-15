@@ -70,13 +70,11 @@ package ca.nrc.cadc.web;
 
 import ca.nrc.cadc.ApplicationConfiguration;
 import ca.nrc.cadc.auth.ACIdentityManager;
-import ca.nrc.cadc.auth.AuthMethod;
 import ca.nrc.cadc.auth.AuthenticationUtil;
 import ca.nrc.cadc.caom2.CAOMQueryGeneratorImpl;
 import ca.nrc.cadc.caom2.ObsCoreQueryGeneratorImpl;
 import ca.nrc.cadc.date.DateUtil;
 import ca.nrc.cadc.net.TransientException;
-import ca.nrc.cadc.reg.Standards;
 import ca.nrc.cadc.reg.client.RegistryClient;
 import ca.nrc.cadc.search.ObsModel;
 import ca.nrc.cadc.search.QueryGenerator;
@@ -92,7 +90,6 @@ import ca.nrc.cadc.uws.server.*;
 import ca.nrc.cadc.uws.server.impl.PostgresJobPersistence;
 import ca.nrc.cadc.uws.web.JobCreator;
 import org.apache.commons.fileupload.FileUploadException;
-import org.apache.log4j.Logger;
 
 import javax.security.auth.Subject;
 import javax.servlet.ServletConfig;
@@ -102,20 +99,14 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.net.URI;
-import java.net.URL;
 import java.security.PrivilegedExceptionAction;
 import java.util.*;
 
 
 public class SearchJobServlet extends SyncServlet
 {
-    private static final Logger LOGGER =
-            Logger.getLogger(SearchJobServlet.class);
-
     private JobManager jobManager;
-    private final ApplicationConfiguration configuration =
-            new ApplicationConfiguration();
+    private ApplicationConfiguration applicationConfiguration;
 
 
     @Override
@@ -123,6 +114,7 @@ public class SearchJobServlet extends SyncServlet
     {
         super.init(config);
         jobManager = createJobManager(config);
+        applicationConfiguration = new ApplicationConfiguration();
     }
 
     /**
@@ -236,30 +228,15 @@ public class SearchJobServlet extends SyncServlet
         }
     }
 
+    /**
+     * Obtain the current date in UTC.
+     *
+     * @return      The current Date in UTC.
+     */
     private Date currentDateUTC()
     {
         final Calendar calendar = Calendar.getInstance(DateUtil.UTC);
         return calendar.getTime();
-    }
-
-    private URL lookupTAPServiceURL()
-    {
-        final RegistryClient registryClient = new RegistryClient();
-        final URL tapServiceURL =
-                registryClient.getServiceURL(lookupServiceURI(),
-                                             Standards.TAP_SYNC_11,
-                                             AuthMethod.ANON);
-
-        try
-        {
-            LOGGER.info("Configured TAP Service ID: " + lookupServiceURI());
-            LOGGER.info("Configured TAP Service URL: " + tapServiceURL);
-            return new URL("http://tap:8080/tap/sync");
-        }
-        catch (IOException e)
-        {
-            throw new RuntimeException(e);
-        }
     }
 
     private void processRequest(final HttpServletRequest request,
@@ -323,12 +300,12 @@ public class SearchJobServlet extends SyncServlet
 
         final SyncOutput syncOutput = new HTTPResponseSyncOutput(response);
         final SyncTAPClient tapClient =
-                new SyncTAPClientImpl(lookupTAPServiceURL(), false)
+                new SyncTAPClientImpl(false, new RegistryClient())
                 {
                     /**
                      * Build the payload to POST.
                      *
-                     * @param job
+                     * @param job       The Job to get the payload for.
                      * @return Map of Parameter name -> value.
                      */
                     @Override
@@ -352,17 +329,13 @@ public class SearchJobServlet extends SyncServlet
                                            new SyncResponseWriterImpl(
                                                    syncOutput),
                                            jobUpdater, tapClient,
-                                           getQueryGenerator(auditJob)));
+                                           getQueryGenerator(auditJob)),
+                                   applicationConfiguration.lookupServiceURI(
+                                           ApplicationConfiguration.TAP_SERVICE_URI_PROPERTY_KEY,
+                                           ApplicationConfiguration.DEFAULT_TAP_SERVICE_URI));
 
         runner.run();
         response.setStatus(HttpServletResponse.SC_OK);
-    }
-
-    private URI lookupServiceURI()
-    {
-        return configuration.lookupServiceURI(
-                ApplicationConfiguration.TAP_SERVICE_URI_PROPERTY_KEY,
-                ApplicationConfiguration.DEFAULT_TAP_SERVICE_URI);
     }
 
     /**

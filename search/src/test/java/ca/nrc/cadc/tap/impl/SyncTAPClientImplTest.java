@@ -66,92 +66,56 @@
  ************************************************************************
  */
 
-package ca.nrc.cadc.tap;
+package ca.nrc.cadc.tap.impl;
 
 import ca.nrc.cadc.AbstractUnitTest;
-
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import ca.nrc.cadc.ApplicationConfiguration;
+
+import static org.easymock.EasyMock.*;
+
 import ca.nrc.cadc.auth.AuthMethod;
 import ca.nrc.cadc.reg.Standards;
 import ca.nrc.cadc.reg.client.RegistryClient;
+import ca.nrc.cadc.uws.Job;
+import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-
-import ca.nrc.cadc.uws.Job;
-
-import org.junit.Test;
-
-import static org.easymock.EasyMock.*;
-import static org.junit.Assert.*;
 
 
-public class TAPServletTest extends AbstractUnitTest<TAPServlet>
+public class SyncTAPClientImplTest extends AbstractUnitTest<SyncTAPClientImpl>
 {
     @Test
-    public void sendToTAP() throws Exception
+    public void execute() throws Exception
     {
-        final boolean[] executeRan = new boolean[]{false};
-
         final ApplicationConfiguration mockConfiguration =
                 createMock(ApplicationConfiguration.class);
+        final RegistryClient mockRegistryClient = createMock(
+                RegistryClient.class);
 
-        final TAPServlet testSubject = new TAPServlet(mockConfiguration)
-        {
-            /**
-             * Used for testers to override.
-             *
-             * @param syncTAPClient The TAP Client.
-             * @param job           The Job to execute.
-             * @param outputStream  The Output Stream to write output to.
-             */
-            @Override
-            void execute(SyncTAPClient syncTAPClient, Job job,
-                         OutputStream outputStream)
-            {
-                executeRan[0] = true;
-            }
-        };
+        testSubject = new SyncTAPClientImpl(mockConfiguration, false,
+                                            mockRegistryClient);
 
-        final HttpServletRequest mockRequest =
-                createMock(HttpServletRequest.class);
+        final URI testServiceURI = URI.create("ivo://mydomain.com/tap/service");
+        final OutputStream outputStream = new ByteArrayOutputStream();
+        final Job testJob = new Job();
 
-        final Map<String, String[]> requestParameters = new HashMap<>();
+        expect(mockConfiguration.lookup(
+                ApplicationConfiguration.TAP_SERVICE_HOST_PORT_PROPERTY_KEY))
+                .andReturn(null).once();
 
-        requestParameters.put("QUERY", new String[]{"SELECT 1 FROM TABLE"});
-        requestParameters.put("NOUSE", new String[]{"1", "2"});
-        requestParameters.put("FORMAT", new String[]{"csv"});
+        expect(mockRegistryClient.getServiceURL(
+                testServiceURI,
+                Standards.TAP_SYNC_11,
+                AuthMethod.ANON))
+                .andReturn(new URL("http://www.site.com/example/tap"));
 
-        final HttpServletResponse mockResponse =
-                createMock(HttpServletResponse.class);
-        final OutputStream _os = new ByteArrayOutputStream();
-        final RegistryClient mockRegistryClient =
-                createMock(RegistryClient.class);
-        final ServletOutputStream outputStream =
-                new StubServletOutputStream(_os);
+        replay(mockConfiguration, mockRegistryClient);
 
-        expect(mockResponse.getOutputStream()).andReturn(outputStream).once();
-        expect(mockRequest.getParameterMap()).andReturn(requestParameters)
-                .once();
+        testSubject.execute(testServiceURI, testJob, outputStream);
 
-        expect(mockRequest.getParameter("tap_url")).andReturn(null).once();
-
-        replay(mockRequest, mockResponse, mockRegistryClient,
-               mockConfiguration);
-
-        testSubject.sendToTAP(mockRequest, mockResponse, mockRegistryClient);
-
-        assertTrue("Did not try to execute.", executeRan[0]);
-
-        verify(mockRequest, mockResponse, mockRegistryClient,
-               mockConfiguration);
+        verify(mockConfiguration, mockRegistryClient);
     }
 }

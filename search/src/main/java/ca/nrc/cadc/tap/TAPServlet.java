@@ -69,9 +69,7 @@
 package ca.nrc.cadc.tap;
 
 import ca.nrc.cadc.ApplicationConfiguration;
-import ca.nrc.cadc.auth.AuthMethod;
 import ca.nrc.cadc.net.HttpDownload;
-import ca.nrc.cadc.reg.Standards;
 import ca.nrc.cadc.reg.client.RegistryClient;
 import ca.nrc.cadc.search.util.ParameterUtil;
 import ca.nrc.cadc.tap.impl.SyncTAPClientImpl;
@@ -79,7 +77,6 @@ import ca.nrc.cadc.util.StringUtil;
 import ca.nrc.cadc.uws.ExecutionPhase;
 import ca.nrc.cadc.uws.Job;
 import ca.nrc.cadc.web.ConfigurableServlet;
-import org.apache.log4j.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -95,8 +92,6 @@ import java.util.ArrayList;
 
 public class TAPServlet extends ConfigurableServlet
 {
-    private static final Logger LOGGER = Logger.getLogger(TAPServlet.class);
-
     public TAPServlet()
     {
     }
@@ -249,10 +244,8 @@ public class TAPServlet extends ConfigurableServlet
         else
         {
             final Job job = createJob(req);
-
             final SyncTAPClient syncTAPClient =
-                    new SyncTAPClientImpl(lookupServiceURL(registryClient),
-                                          true);
+                    new SyncTAPClientImpl(true, registryClient);
 
             execute(syncTAPClient, job, outputStream);
         }
@@ -267,25 +260,7 @@ public class TAPServlet extends ConfigurableServlet
     void execute(final SyncTAPClient syncTAPClient, final Job job,
                  final OutputStream outputStream)
     {
-        syncTAPClient.execute(job, outputStream);
-    }
-
-    private URL lookupServiceURL(final RegistryClient registryClient)
-    {
-        final URL serviceURL =
-                registryClient.getServiceURL(lookupServiceURI(),
-                                             Standards.TAP_SYNC_11,
-                                             AuthMethod.ANON);
-
-        try
-        {
-            LOGGER.info("Configured TAP Service URL: " + serviceURL);
-            return new URL("http://tap:8080/tap/sync");
-        }
-        catch (IOException e)
-        {
-            throw new RuntimeException("Could not obtain service URL", e);
-        }
+        syncTAPClient.execute(lookupServiceURI(), job, outputStream);
     }
 
     private URI lookupServiceURI()

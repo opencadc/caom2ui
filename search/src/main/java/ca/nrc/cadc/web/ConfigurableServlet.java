@@ -97,4 +97,9 @@ public abstract class ConfigurableServlet extends HttpServlet
     {
         return configuration.lookupServiceURI(lookupKey, defaultValue);
     }
+
+    protected String lookup(final String lookupKey)
+    {
+        return configuration.lookup(lookupKey);
+    }
 }

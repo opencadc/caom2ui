@@ -119,8 +119,8 @@ public class TAPSearcherImplTest extends AbstractUnitTest<TAPSearcherImpl>
              * @throws IOException Any writing errors.
              */
             @Override
-            void queryTAP(Job tapJob, OutputStream outputStream) throws
-                                                                 IOException
+            void queryTAP(final URI serviceURI, Job tapJob,
+                          OutputStream outputStream) throws IOException
             {
                 outputStream.write("http://mysite.com/tap/jobs/88/run"
                                            .getBytes());
@@ -155,7 +155,8 @@ public class TAPSearcherImplTest extends AbstractUnitTest<TAPSearcherImpl>
         expectLastCall().once();
 
         replay(mockSyncResponseWriter, mockQueryGenerator, mockSyncTAPClient);
-        getTestSubject().search(dummyJob);
+        getTestSubject().search(dummyJob, URI.create("ivo://mysite.com/service"),
+                                mockSyncResponseWriter);
         verify(mockSyncResponseWriter, mockQueryGenerator, mockSyncTAPClient);
     }
 }

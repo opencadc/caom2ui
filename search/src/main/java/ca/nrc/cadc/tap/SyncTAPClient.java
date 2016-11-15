@@ -37,13 +37,17 @@ package ca.nrc.cadc.tap;
 import ca.nrc.cadc.uws.Job;
 
 import java.io.OutputStream;
+import java.net.URI;
 
 public interface SyncTAPClient
 {
     /**
-     * Execute this client's Job.
+     * Execute the given Job.
      *
-     * @param job       The Job to execute.
+     * @param serviceURI            The TAP Service URI.
+     * @param job                   The Job to execute.
+     * @param outputStream          The OutputStream to write out results.
      */
-    void execute(final Job job, final OutputStream outputStream);
+    void execute(final URI serviceURI, final Job job,
+                 final OutputStream outputStream);
 }
