@@ -24,6 +24,29 @@ services:
     volumes:
       - /var/lib/postgresql/data
       - /var/run/postgresql
+  caom2ops:
+    image: opencadc/caom2ops
+    ports:
+#      - '6080:8080'
+      - '6555:5555'
+    networks:
+      - 'caom2'
+    depends_on:
+      - caom2opspg
+    volumes:
+      - /usr/local/caom2ops/webapps:/usr/local/tomcat/webapps
+#      - /var/run/caom2ops/pub:/root/.pub
+  caom2opspg:
+    image: opencadc/uws_postgres
+    networks:
+      - 'caom2'
+    environment:
+      - POSTGRES_USER=caom2ops
+      - POSTGRES_PASSWORD=astr0query
+      - PGDATA=/var/lib/postgresql/data/uws
+    volumes:
+      - /var/lib/postgresql/data
+      - /var/run/postgresql
   caom2ui:
     image: opencadc/caom2ui
 #    ports:
@@ -33,6 +56,8 @@ services:
       - 'caom2'
     volumes:
       - /usr/local/caom2ui/webapps:/usr/local/tomcat/webapps
+    depends_on:
+      - caom2ops
   tap:
     image: opencadc/tap
     ports:
