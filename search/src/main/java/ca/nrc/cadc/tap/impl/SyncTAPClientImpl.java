@@ -33,7 +33,12 @@
  */
 package ca.nrc.cadc.tap.impl;
 
+
+import ca.nrc.cadc.ApplicationConfiguration;
+import ca.nrc.cadc.auth.AuthMethod;
 import ca.nrc.cadc.net.HttpPost;
+import ca.nrc.cadc.reg.Standards;
+import ca.nrc.cadc.reg.client.RegistryClient;
 import ca.nrc.cadc.tap.SyncTAPClient;
 import ca.nrc.cadc.util.StringUtil;
 import ca.nrc.cadc.uws.Job;
@@ -43,6 +48,7 @@ import ca.nrc.cadc.uws.Parameter;
 import org.apache.log4j.Logger;
 
 import java.io.*;
+import java.net.URI;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
@@ -57,37 +63,65 @@ public class SyncTAPClientImpl implements SyncTAPClient
     private static final Logger LOGGER =
             Logger.getLogger(SyncTAPClientImpl.class);
 
-    private final URL tapServiceURL;
-    private final OutputStream outputStream;
+
+    private final ApplicationConfiguration applicationConfiguration;
     private final boolean followToResults;
+    private final RegistryClient registryClient;
 
 
-    /**
-     * Complete constructor.
-     * @param outputStream     The stream for the results of the client call.
-     * @param tapServiceURL     The TAP service URL.
-     * @param followToResults   Whether to follow redirects to the end result.
-     */
-    public SyncTAPClientImpl(final OutputStream outputStream,
-                             final URL tapServiceURL,
-                             final boolean followToResults)
+    public SyncTAPClientImpl(final boolean followToResults,
+                             final RegistryClient registryClient)
     {
-        this.outputStream = outputStream;
-        this.tapServiceURL = tapServiceURL;
+        this(new ApplicationConfiguration(), followToResults, registryClient);
+    }
+
+    SyncTAPClientImpl(ApplicationConfiguration applicationConfiguration,
+                      boolean followToResults, RegistryClient registryClient)
+    {
+        this.applicationConfiguration = applicationConfiguration;
         this.followToResults = followToResults;
+        this.registryClient = registryClient;
     }
 
 
+    private URL lookupServiceURL(final URI serviceURI) throws IOException
+    {
+        final URL serviceURL =
+                registryClient.getServiceURL(serviceURI, Standards.TAP_SYNC_11,
+                                             AuthMethod.ANON);
+        final String hostAndPort =
+                applicationConfiguration.lookup(
+                        ApplicationConfiguration.TAP_SERVICE_HOST_PORT_PROPERTY_KEY);
+
+        final URL tapServiceURL;
+
+        if (StringUtil.hasText(hostAndPort))
+        {
+            tapServiceURL = new URL(hostAndPort + "/" + serviceURL.getPath());
+        }
+        else
+        {
+            tapServiceURL = serviceURL;
+        }
+
+        LOGGER.info("Configured TAP Service URL: " + tapServiceURL);
+        return tapServiceURL;
+    }
+
     /**
-     * Execute this client's Job.
+     * Execute the given Job.
      *
-     * @param job The Job to execute.
+     * @param serviceURI   The TAP Service URI.
+     * @param job          The Job to execute.
+     * @param outputStream The OutputStream to write out results.
      */
     @Override
-    public void execute(final Job job)
+    public void execute(final URI serviceURI, final Job job,
+                        final OutputStream outputStream)
     {
         try
         {
+            final URL tapServiceURL = lookupServiceURL(serviceURI);
             if (tapServiceURL == null)
             {
                 throw new IllegalStateException(
@@ -95,7 +129,7 @@ public class SyncTAPClientImpl implements SyncTAPClient
             }
 
             // POST PHASE=RUN to execute on server
-            postJob(tapServiceURL, job);
+            postJob(tapServiceURL, job, outputStream);
         }
         catch (Exception e)
         {
@@ -104,7 +138,7 @@ public class SyncTAPClientImpl implements SyncTAPClient
 
             try
             {
-                getOutputStream().write(error.getBytes());
+                outputStream.write(error.getBytes());
             }
             catch (IOException we)
             {
@@ -117,9 +151,10 @@ public class SyncTAPClientImpl implements SyncTAPClient
     /**
      * Build the payload to POST.
      *
-     * @return      Map of Parameter name -> value.
+     * @param job      The Job to get the payload for.
+     * @return      Map of Parameter name:value.
      */
-    private Map<String, Object> getQueryPayload(final Job job)
+    protected Map<String, Object> getQueryPayload(final Job job)
     {
         final Map<String, Object> payload = new HashMap<>();
 
@@ -149,10 +184,11 @@ public class SyncTAPClientImpl implements SyncTAPClient
      * @param url           The URL to POST to.
      * @throws IOException  For any IO errors.
      */
-    private void postJob(final URL url, final Job job) throws IOException
+    private void postJob(final URL url, final Job job,
+                         final OutputStream outputStream) throws IOException
     {
         // POST the parameters to the tapServer.
-        final HttpPost httpPost = getPoster(url, job);
+        final HttpPost httpPost = getPoster(url, job, outputStream);
         httpPost.run();
 
         if (!followToResults)
@@ -165,20 +201,21 @@ public class SyncTAPClientImpl implements SyncTAPClient
             }
             else
             {
-                getOutputStream().write(
-                        redirectURL.toExternalForm().getBytes());
+                outputStream.write(redirectURL.toExternalForm().getBytes());
                 LOGGER.debug("Done writing out Response Body.");
             }
         }
     }
 
-    private HttpPost getPoster(final URL url, final Job job) throws IOException
+    private HttpPost getPoster(final URL url, final Job job,
+                               final OutputStream outputStream)
+            throws IOException
     {
         final HttpPost poster;
 
         if (followToResults)
         {
-            poster = new HttpPost(url, getQueryPayload(job), getOutputStream());
+            poster = new HttpPost(url, getQueryPayload(job), outputStream);
         }
         else
         {
@@ -186,11 +223,5 @@ public class SyncTAPClientImpl implements SyncTAPClient
         }
 
         return poster;
-    }
-
-
-    protected final OutputStream getOutputStream()
-    {
-        return outputStream;
     }
 }

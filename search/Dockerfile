@@ -1,7 +1,7 @@
 # Base Tomcat 8 JRE 8 image from CANFAR running on Alpine.
 FROM tomcat:8.5-alpine
 
-ENV CATALINA_OPTS "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5555 -Djava.security.egd=file:/dev/./urandom -Djsse.enableSNIExtension=false"
+ENV CATALINA_OPTS "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5555 -Djava.security.egd=file:/dev/./urandom -Djsse.enableSNIExtension=false -Dorg.opencadc.search.theme=base -Dorg.opencadc.search.obs-core=true -Dorg.opencadc.search.tap-service-host-port=http://tap:8080 -Dorg.opencadc.search.caom2ops-service-host-port=http://caom2ops:8080"
 
 # Working environment.  This will be set to the WORKDIR, which is the
 # current working directory in this context.
@@ -9,7 +9,8 @@ ENV CATALINA_HOME "/usr/local/tomcat"
 WORKDIR ${CATALINA_HOME}
 
 # Clear out the webapps directory.
-RUN ["rm", "-rf", "webapps/*"]
+RUN rm -rf webapps \
+  && mkdir webapps
 
 # The SOURCE (first argument) is relative to this directory.  The
 # TARGET (second argument) is relative to the WORKDIR above.

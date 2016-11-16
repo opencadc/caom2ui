@@ -66,32 +66,56 @@
  ************************************************************************
  */
 
-package ca.nrc.cadc.search.web;
+package ca.nrc.cadc.tap.impl;
+
+import ca.nrc.cadc.AbstractUnitTest;
+import ca.nrc.cadc.ApplicationConfiguration;
+
+import static org.easymock.EasyMock.*;
 
 import ca.nrc.cadc.auth.AuthMethod;
-import ca.nrc.cadc.auth.PrincipalExtractor;
-import ca.nrc.cadc.auth.SSOCookieCredential;
+import ca.nrc.cadc.reg.Standards;
+import ca.nrc.cadc.reg.client.RegistryClient;
+import ca.nrc.cadc.uws.Job;
+import org.junit.Test;
+
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
+import java.net.URI;
+import java.net.URL;
 
 
-import javax.security.auth.Subject;
-import java.util.HashSet;
-import java.util.Set;
-
-public class SubjectGenerator
+public class SyncTAPClientImplTest extends AbstractUnitTest<SyncTAPClientImpl>
 {
-    public final Subject generate(final PrincipalExtractor principalExtractor)
+    @Test
+    public void execute() throws Exception
     {
-        final Set<Object> publicCred = new HashSet<>();
-        final SSOCookieCredential cookieCredential =
-                principalExtractor.getSSOCookieCredential();
+        final ApplicationConfiguration mockConfiguration =
+                createMock(ApplicationConfiguration.class);
+        final RegistryClient mockRegistryClient = createMock(
+                RegistryClient.class);
 
-        if (cookieCredential != null)
-        {
-            publicCred.add(principalExtractor.getSSOCookieCredential());
-            publicCred.add(AuthMethod.COOKIE);
-        }
+        testSubject = new SyncTAPClientImpl(mockConfiguration, false,
+                                            mockRegistryClient);
 
-        return new Subject(false, principalExtractor.getPrincipals(),
-                            publicCred, new HashSet<>());
+        final URI testServiceURI = URI.create("ivo://mydomain.com/tap/service");
+        final OutputStream outputStream = new ByteArrayOutputStream();
+        final Job testJob = new Job();
+
+        expect(mockConfiguration.lookup(
+                ApplicationConfiguration.TAP_SERVICE_HOST_PORT_PROPERTY_KEY))
+                .andReturn(null).once();
+
+        expect(mockRegistryClient.getServiceURL(
+                testServiceURI,
+                Standards.TAP_SYNC_11,
+                AuthMethod.ANON))
+                .andReturn(new URL("http://www.site.com/example/tap"));
+
+        replay(mockConfiguration, mockRegistryClient);
+
+        testSubject.execute(testServiceURI, testJob, outputStream);
+
+        verify(mockConfiguration, mockRegistryClient);
     }
 }

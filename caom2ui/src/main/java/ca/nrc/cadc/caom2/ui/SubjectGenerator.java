@@ -66,9 +66,31 @@
  ************************************************************************
  */
 
-package ca.nrc.cadc.search.web;
+package ca.nrc.cadc.caom2.ui;
 
-public enum AutocompleteArea
+import ca.nrc.cadc.auth.AuthMethod;
+import ca.nrc.cadc.auth.PrincipalExtractor;
+import ca.nrc.cadc.auth.SSOCookieCredential;
+
+import javax.security.auth.Subject;
+import java.util.HashSet;
+import java.util.Set;
+
+public class SubjectGenerator
 {
-    SPATIAL, SPECTRAL, TEMPORAL
+    public final Subject generate(final PrincipalExtractor principalExtractor)
+    {
+        final Set<Object> publicCred = new HashSet<>();
+        final SSOCookieCredential cookieCredential =
+                principalExtractor.getSSOCookieCredential();
+
+        if (cookieCredential != null)
+        {
+            publicCred.add(principalExtractor.getSSOCookieCredential());
+            publicCred.add(AuthMethod.COOKIE);
+        }
+
+        return new Subject(false, principalExtractor.getPrincipals(),
+                            publicCred, new HashSet<>());
+    }
 }

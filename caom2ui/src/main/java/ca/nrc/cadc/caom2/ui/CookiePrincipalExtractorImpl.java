@@ -66,27 +66,100 @@
  ************************************************************************
  */
 
-package ca.nrc.cadc.search.web;
+package ca.nrc.cadc.caom2.ui;
 
+import ca.nrc.cadc.auth.*;
+import ca.nrc.cadc.net.NetUtil;
+import ca.nrc.cadc.util.StringUtil;
 
-import javax.websocket.Session;
-
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.security.Principal;
 import java.util.HashSet;
 import java.util.Set;
 
 
-public class AutocompleteSocketSessionManager
+public class CookiePrincipalExtractorImpl implements PrincipalExtractor
 {
-    private final Set<Session> sessions = new HashSet<>();
+    private final HttpServletRequest request;
+
+    private SSOCookieCredential cookieCredential;
+    private Principal cookiePrincipal;
 
 
-    void addSession(Session session)
+    public CookiePrincipalExtractorImpl(final HttpServletRequest request)
     {
-        sessions.add(session);
+        this.request = request;
+        init();
     }
 
-    void removeSession(Session session)
+
+    void init()
     {
-        sessions.remove(session);
+        final Cookie[] requestCookies = request.getCookies();
+        final Cookie[] cookies = (requestCookies == null)
+                                 ? new Cookie[0] : requestCookies;
+        for (final Cookie cookie : cookies)
+        {
+            if ("CADC_SSO".equals(cookie.getName())
+                && StringUtil.hasText(cookie.getValue()))
+            {
+                try
+                {
+                    cookiePrincipal =
+                            new CookiePrincipal(
+                                    cookie.getValue());
+                    cookieCredential =
+                            new SSOCookieCredential(
+                                    cookie.getValue(),
+                                    NetUtil.getDomainName(
+                                            request.getRequestURL().toString()));
+                }
+                catch (IOException e)
+                {
+                    System.out.println(
+                            "Cannot use SSO Cookie. Reason: "
+                            + e.getMessage());
+                }
+            }
+        }
+    }
+
+
+    @Override
+    public Set<Principal> getPrincipals()
+    {
+        final Set<Principal> principals = new HashSet<>();
+
+        addHTTPPrincipal(principals);
+
+        return principals;
+    }
+
+    @Override
+    public X509CertificateChain getCertificateChain()
+    {
+        return null;
+    }
+
+    @Override
+    public DelegationToken getDelegationToken()
+    {
+        return null;
+    }
+
+    @Override
+    public SSOCookieCredential getSSOCookieCredential()
+    {
+        return cookieCredential;
+    }
+
+    private void addHTTPPrincipal(Set<Principal> principals)
+    {
+        if (cookiePrincipal != null)
+        {
+            principals.add(cookiePrincipal);
+        }
     }
 }

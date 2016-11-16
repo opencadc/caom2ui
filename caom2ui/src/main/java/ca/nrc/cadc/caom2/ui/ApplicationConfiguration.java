@@ -66,51 +66,61 @@
  ************************************************************************
  */
 
-package ca.nrc.cadc.search.web;
-
-import org.apache.solr.client.solrj.StreamingResponseCallback;
-import org.apache.solr.common.SolrDocument;
-
-import java.io.IOException;
-import java.io.Writer;
+package ca.nrc.cadc.caom2.ui;
 
 
-public class ResponseCallbackHandler extends StreamingResponseCallback
+import org.apache.commons.configuration2.CombinedConfiguration;
+import org.apache.commons.configuration2.PropertiesConfiguration;
+import org.apache.commons.configuration2.SystemConfiguration;
+import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
+import org.apache.commons.configuration2.builder.fluent.Parameters;
+import org.apache.commons.configuration2.ex.ConfigurationException;
+import org.apache.commons.configuration2.tree.UnionCombiner;
+import org.apache.log4j.Logger;
+
+import java.io.File;
+
+
+public class ApplicationConfiguration extends CombinedConfiguration
 {
-    private final Writer writer;
+    public static final String CAOM2OPS_SERVICE_URI_PROPERTY_KEY =
+            "org.opencadc.search.caom2ops-service-id";
+    public static final String DEFAULT_CAOM2OPS_SERVICE_URI_VALUE =
+            "ivo://cadc.nrc.ca/caom2ops";
+    private static final Logger LOGGER =
+            Logger.getLogger(ApplicationConfiguration.class);
+
+    private static final String PROPERTIES_FILE_PATH =
+            System.getProperty("user.home") + File.pathSeparator
+            + "config/org.opencadc.caom2ui.properties";
 
 
-    public ResponseCallbackHandler(final Writer writer)
+    /**
+     * Creates a new instance of {@code CombinedConfiguration} that uses
+     * a union combiner.
+     *
+     * @see UnionCombiner
+     */
+    public ApplicationConfiguration()
     {
-        this.writer = writer;
-    }
+        addConfiguration(new SystemConfiguration());
 
+        final Parameters parameters = new Parameters();
+        final FileBasedConfigurationBuilder<PropertiesConfiguration> builder =
+                new FileBasedConfigurationBuilder<>(
+                        PropertiesConfiguration.class).configure(
+                        parameters.properties().setFileName(
+                                PROPERTIES_FILE_PATH));
 
-    @Override
-    public void streamSolrDocument(final SolrDocument doc)
-    {
         try
         {
-            writer.write(doc.toString());
+            addConfiguration(builder.getConfiguration());
         }
-        catch (IOException e)
+        catch (ConfigurationException e)
         {
-            throw new StreamingIOException("Unable to write document.", e);
-        }
-    }
-
-    @Override
-    public void streamDocListInfo(final long numFound, final long start,
-                                  final Float maxScore)
-    {
-        try
-        {
-            writer.write("Found " + numFound + " items.");
-        }
-        catch (IOException e)
-        {
-            throw new StreamingIOException(
-                    "Unable to write document list info.", e);
+            LOGGER.warn(String.format(
+                    "No configuration found at %s.\nUsing defaults.",
+                    PROPERTIES_FILE_PATH));
         }
     }
 }

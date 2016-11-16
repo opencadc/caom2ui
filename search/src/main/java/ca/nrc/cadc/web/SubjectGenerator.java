@@ -66,92 +66,32 @@
  ************************************************************************
  */
 
-package ca.nrc.cadc.tap;
+package ca.nrc.cadc.web;
 
-import ca.nrc.cadc.AbstractUnitTest;
-
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import ca.nrc.cadc.ApplicationConfiguration;
 import ca.nrc.cadc.auth.AuthMethod;
-import ca.nrc.cadc.reg.Standards;
-import ca.nrc.cadc.reg.client.RegistryClient;
-
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
-import java.net.URI;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-
-import ca.nrc.cadc.uws.Job;
-
-import org.junit.Test;
-
-import static org.easymock.EasyMock.*;
-import static org.junit.Assert.*;
+import ca.nrc.cadc.auth.PrincipalExtractor;
+import ca.nrc.cadc.auth.SSOCookieCredential;
 
 
-public class TAPServletTest extends AbstractUnitTest<TAPServlet>
+import javax.security.auth.Subject;
+import java.util.HashSet;
+import java.util.Set;
+
+public class SubjectGenerator
 {
-    @Test
-    public void sendToTAP() throws Exception
+    public final Subject generate(final PrincipalExtractor principalExtractor)
     {
-        final boolean[] executeRan = new boolean[]{false};
+        final Set<Object> publicCred = new HashSet<>();
+        final SSOCookieCredential cookieCredential =
+                principalExtractor.getSSOCookieCredential();
 
-        final ApplicationConfiguration mockConfiguration =
-                createMock(ApplicationConfiguration.class);
-
-        final TAPServlet testSubject = new TAPServlet(mockConfiguration)
+        if (cookieCredential != null)
         {
-            /**
-             * Used for testers to override.
-             *
-             * @param syncTAPClient The TAP Client.
-             * @param job           The Job to execute.
-             * @param outputStream  The Output Stream to write output to.
-             */
-            @Override
-            void execute(SyncTAPClient syncTAPClient, Job job,
-                         OutputStream outputStream)
-            {
-                executeRan[0] = true;
-            }
-        };
+            publicCred.add(principalExtractor.getSSOCookieCredential());
+            publicCred.add(AuthMethod.COOKIE);
+        }
 
-        final HttpServletRequest mockRequest =
-                createMock(HttpServletRequest.class);
-
-        final Map<String, String[]> requestParameters = new HashMap<>();
-
-        requestParameters.put("QUERY", new String[]{"SELECT 1 FROM TABLE"});
-        requestParameters.put("NOUSE", new String[]{"1", "2"});
-        requestParameters.put("FORMAT", new String[]{"csv"});
-
-        final HttpServletResponse mockResponse =
-                createMock(HttpServletResponse.class);
-        final OutputStream _os = new ByteArrayOutputStream();
-        final RegistryClient mockRegistryClient =
-                createMock(RegistryClient.class);
-        final ServletOutputStream outputStream =
-                new StubServletOutputStream(_os);
-
-        expect(mockResponse.getOutputStream()).andReturn(outputStream).once();
-        expect(mockRequest.getParameterMap()).andReturn(requestParameters)
-                .once();
-
-        expect(mockRequest.getParameter("tap_url")).andReturn(null).once();
-
-        replay(mockRequest, mockResponse, mockRegistryClient,
-               mockConfiguration);
-
-        testSubject.sendToTAP(mockRequest, mockResponse, mockRegistryClient);
-
-        assertTrue("Did not try to execute.", executeRan[0]);
-
-        verify(mockRequest, mockResponse, mockRegistryClient,
-               mockConfiguration);
+        return new Subject(false, principalExtractor.getPrincipals(),
+                            publicCred, new HashSet<>());
     }
 }

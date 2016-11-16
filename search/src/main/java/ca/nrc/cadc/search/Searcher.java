@@ -34,11 +34,12 @@
 package ca.nrc.cadc.search;
 
 import ca.nrc.cadc.uws.Job;
+import ca.nrc.cadc.uws.SyncResponseWriter;
+
+import java.net.URI;
 
 public interface Searcher
 {
-    String SHAPE1_UTYPE = "Plane.position.bounds";
-    String TEXT_UTYPE = "Observation.collection";
     Integer DEFAULT_MAXREC = 11000;
 
 
@@ -46,8 +47,11 @@ public interface Searcher
      * Execute the search, and write out the results to this implementation's
      * writer.
      *
-     * @param   job         The Job to execute.
+     * @param job         The Job to execute.
+     * @param serviceURI  The Service URI to use.
+     * @param syncResponseWriter        The writer to write to.
      * @throws Exception    Any unforeseen errors.
      */
-    void search(final Job job) throws Exception;
+    void search(final Job job, final URI serviceURI,
+                final SyncResponseWriter syncResponseWriter) throws Exception;
 }

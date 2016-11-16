@@ -3,57 +3,14 @@
 
   <WatchedResource>WEB-INF/web.xml</WatchedResource>
 
-  <Resource name="jdbc/uws-9"
-            auth="Container"
-            type="javax.sql.DataSource"
-            maxActive="1" maxIdle="1" maxWait="20000"
-            username="tap" password="astr0query"
-            driverClassName="org.postgresql.Driver"
-            url="jdbc:postgresql://tappg:5432/tap"
-            removeAbandoned="true"
-            removeAbandonedTimeout="300"
-            logAbandoned="true"
-            testOnBorrow="true"
-            validationQuery="select 123"
-  />
-
-  <!-- production server(s) -->
-  <Resource name="jdbc/uws-201"
-            auth="Container"
-            type="javax.sql.DataSource"
-            maxActive="1" maxIdle="1" maxWait="20000"
-            username="tap" password="astr0query"
-            driverClassName="org.postgresql.Driver"
-            url="jdbc:postgresql://tappg:5432/tap"
-            removeAbandoned="true"
-            removeAbandonedTimeout="300"
-            logAbandoned="true"
-            testOnBorrow="true"
-            validationQuery="select 123"
-  />
-
-  <Resource name="jdbc/uws-202"
-            auth="Container"
-            type="javax.sql.DataSource"
-            maxActive="1" maxIdle="1" maxWait="20000"
-            username="tap" password="astr0query"
-            driverClassName="org.postgresql.Driver"
-            url="jdbc:postgresql://tappg:5432/tap"
-            removeAbandoned="true"
-            removeAbandonedTimeout="300"
-            logAbandoned="true"
-            testOnBorrow="true"
-            validationQuery="select 123"
-  />
-
   <!-- Data source for UWS jobs on Postgres -->
   <Resource name="jdbc/uws"
             auth="Container"
             type="javax.sql.DataSource"
             maxActive="1" maxIdle="1" maxWait="20000"
-            username="tap" password="astr0query"
+            username="uws" password="astr0query"
             driverClassName="org.postgresql.Driver"
-            url="jdbc:postgresql://tappg:5432/tap"
+            url="jdbc:postgresql://uwspg:5432/uws"
             removeAbandoned="true"
             removeAbandonedTimeout="300"
             logAbandoned="true"

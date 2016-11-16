@@ -1,4 +1,4 @@
-<%@ taglib uri="WEB-INF/c.tld" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
 <%--
 This JSP page renders a CAOM Artifact in an HTML table.

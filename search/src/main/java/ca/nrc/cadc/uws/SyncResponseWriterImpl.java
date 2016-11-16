@@ -66,149 +66,60 @@
  ************************************************************************
  */
 
-package ca.nrc.cadc.search.web;
+package ca.nrc.cadc.uws;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.StreamingResponseCallback;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
-import org.json.JSONObject;
+import ca.nrc.cadc.uws.server.SyncOutput;
 
-import javax.websocket.*;
-import javax.websocket.server.ServerEndpoint;
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.Writer;
 
 
-@ServerEndpoint("/autocomplete")
-public class AutocompleteSocketServer
+public class SyncResponseWriterImpl implements SyncResponseWriter
 {
-    private static final String JSON_RESPONSE_PARAM = "wt=json";
-    private static final String DEFAULT_SOLR_URL = "http://solr:8983/solr";
-    private static final String DEFAULT_SOLR_URL_ENV = "SOLR_URL";
-
-    private AutocompleteSocketSessionManager autocompleteSocketSessionManager =
-            new AutocompleteSocketSessionManager();
-
-    private SolrClient _solrClient;
+    private final Writer writer;
+    private final SyncOutput syncOutput;
 
 
-    public AutocompleteSocketServer()
+    public SyncResponseWriterImpl(final SyncOutput so)
+            throws IOException
     {
+        this.syncOutput = so;
+        this.writer = new BufferedWriter(
+                new OutputStreamWriter(syncOutput.getOutputStream()));
+    }
 
+
+    @Override
+    public final Writer getWriter()
+    {
+        return writer;
     }
 
 
     /**
-     * For testing.
+     * Set the HTTP response code. Calls to this method that occur after the
+     * OutputStream is opened are silently ignored.
      *
-     * @param _solrClient The client to use.
+     * @param code The desired Response code
      */
-    AutocompleteSocketServer(final SolrClient _solrClient)
+    @Override
+    public void setResponseCode(final int code)
     {
-        this._solrClient = _solrClient;
-    }
-
-
-    @OnOpen
-    public void onOpen(final Session session,
-                       final EndpointConfig endpointConfig)
-    {
-        autocompleteSocketSessionManager.addSession(session);
-        final String configuredSolrURL = System.getenv(DEFAULT_SOLR_URL_ENV);
-        final String solrURL;
-
-        if (configuredSolrURL == null)
-        {
-            solrURL = DEFAULT_SOLR_URL;
-        }
-        else
-        {
-            solrURL = configuredSolrURL;
-        }
-
-        _solrClient = new HttpSolrClient.Builder(solrURL).build();
-    }
-
-    @OnClose
-    public void onClose(final Session session, final CloseReason closeReason)
-    {
-        autocompleteSocketSessionManager.removeSession(session);
-    }
-
-
-    @OnMessage
-    public void handleMessage(final String message, final Session session)
-    {
-        final JSONObject jsonMessage = new JSONObject(message);
-
-        try
-        {
-            search(AutocompleteArea.valueOf(jsonMessage.getString("area")
-                                                    .toUpperCase()),
-                   jsonMessage.getString("term"),
-                   session.getBasicRemote().getSendWriter());
-        }
-        catch (IOException e)
-        {
-            autocompleteSocketSessionManager.removeSession(session);
-            onError(e);
-        }
-    }
-
-    @OnError
-    public void onError(final Throwable error)
-    {
-        Logger.getLogger(AutocompleteSocketServer.class.getName()).
-                log(Level.FATAL, null, error);
+        syncOutput.setResponseCode(code);
     }
 
     /**
-     * Perform a text search and write the results.
+     * Set an HTTP header parameter. Calls to this method that occur after the
+     * OutputStream is opened are silently ignored.
      *
-     * @param autocompleteArea The area (core) to search within.
-     * @param term             The term to search for.
-     * @param writer           To write out the results.
-     * @throws IOException For any writing errors.
+     * @param key   header key.
+     * @param value header value.
      */
-    void search(final AutocompleteArea autocompleteArea,
-                       final String term, final Writer writer)
-            throws IOException
+    @Override
+    public void setResponseHeader(final String key, final String value)
     {
-        final SolrQuery solrQuery = new SolrQuery("*" + term + "*");
-        try
-        {
-            querySolr(solrQuery, autocompleteArea.name().toLowerCase(),
-                      createResponseCallback(writer));
-        }
-        finally
-        {
-            writer.flush();
-            writer.close();
-        }
-    }
-
-    void querySolr(final SolrQuery solrQuery, final String coreName,
-                   final StreamingResponseCallback responseCallback)
-            throws IOException
-    {
-        try
-        {
-            Logger.getLogger(AutocompleteSocketServer.class).info("Looking up: " + solrQuery.getQuery());
-            _solrClient.queryAndStreamResponse(coreName, solrQuery,
-                                               responseCallback);
-        }
-        catch (SolrServerException e)
-        {
-            throw new IOException(e);
-        }
-    }
-
-    StreamingResponseCallback createResponseCallback(final Writer writer)
-    {
-        return new ResponseCallbackHandler(writer);
+        syncOutput.setHeader(key, value);
     }
 }

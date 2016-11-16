@@ -66,54 +66,31 @@
  ************************************************************************
  */
 
-package ca.nrc.cadc.search.web;
+package ca.nrc.cadc.search.plugins;
 
-import ca.nrc.cadc.AbstractUnitTest;
+import ca.nrc.cadc.net.OutputStreamWrapper;
+import ca.nrc.cadc.search.upload.VOTableUploader;
+import ca.nrc.cadc.uws.web.InlineContentException;
 
-import java.io.StringWriter;
-import java.io.Writer;
-
-import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.StreamingResponseCallback;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.junit.Test;
-import static org.easymock.EasyMock.*;
+import java.io.IOException;
+import java.net.URL;
 
 
-public class AutocompleteSocketServerTest
-        extends AbstractUnitTest<AutocompleteSocketServer>
+class TestVOTableUploader implements VOTableUploader
 {
-    @Test
-    public void querySolr() throws Exception
+    /**
+     * Perform the upload.
+     *
+     * @param stream   The OutputStreamWrapper
+     * @param filename The filename to use.
+     * @return The URL of where to get the upload.
+     * @throws InlineContentException If the upload fails.
+     * @throws IOException            If the return URL cannot be obtained.
+     */
+    @Override
+    public URL upload(OutputStreamWrapper stream, String filename)
+            throws InlineContentException, IOException
     {
-        final SolrClient mockSolrClient = createMock(SolrClient.class);
-
-        final Writer writer = new StringWriter();
-        final ResponseCallbackHandler callback =
-                new ResponseCallbackHandler(writer);
-
-        testSubject = new AutocompleteSocketServer(mockSolrClient)
-        {
-            @Override
-            StreamingResponseCallback createResponseCallback(Writer writer)
-            {
-                return callback;
-            }
-        };
-
-        final SolrQuery query = new SolrQuery("galax");
-
-        expect(mockSolrClient.queryAndStreamResponse("spatial", query,
-                                                     callback))
-                .andReturn(new QueryResponse()).once();
-
-        replay(mockSolrClient);
-
-        testSubject.querySolr(query,
-                              AutocompleteArea.SPATIAL.name().toLowerCase(),
-                              callback);
-
-        verify(mockSolrClient);
+        return null;
     }
 }

@@ -1,4 +1,4 @@
-<%@ taglib uri="WEB-INF/c.tld" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
 
 <jsp:useBean id="obs" scope="request" type="ca.nrc.cadc.caom2.Observation"/>

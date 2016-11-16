@@ -46,18 +46,21 @@ public class ObservationViewServlet extends HttpServlet
             + "trouvé, ou vous n'avez pas permission.  S'il "
             + "vous plaît connecter et essayez à nouveau.";
 
-    static final String CAOM2OPS_ID = "ivo://cadc.nrc.ca/caom2ops";
 
     private final RegistryClient registryClient;
+    private final ApplicationConfiguration applicationConfiguration;
+
 
     public ObservationViewServlet()
     {
-        this(new RegistryClient());
+        this(new RegistryClient(), new ApplicationConfiguration());
     }
 
-    ObservationViewServlet(final RegistryClient registryClient)
+    ObservationViewServlet(final RegistryClient registryClient,
+                           final ApplicationConfiguration applicationConfiguration)
     {
         this.registryClient = registryClient;
+        this.applicationConfiguration = applicationConfiguration;
     }
 
 
@@ -173,8 +176,10 @@ public class ObservationViewServlet extends HttpServlet
                 ? AuthMethod.ANON : AuthMethod.COOKIE;
 
         final URL repoURL = registryClient.getServiceURL(
-                URI.create(CAOM2OPS_ID), Standards.CAOM2_OBS_20,
-                authMethod);
+                URI.create(applicationConfiguration.getString(
+                        ApplicationConfiguration.CAOM2OPS_SERVICE_URI_PROPERTY_KEY,
+                        ApplicationConfiguration.DEFAULT_CAOM2OPS_SERVICE_URI_VALUE)),
+                Standards.CAOM2_OBS_20, authMethod);
 
         final URIBuilder builder = new URIBuilder(repoURL.toURI());
 

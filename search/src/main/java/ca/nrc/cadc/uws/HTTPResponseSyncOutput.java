@@ -66,26 +66,59 @@
  ************************************************************************
  */
 
-package ca.nrc.cadc.search.web;
+package ca.nrc.cadc.uws;
 
-public class StreamingIOException extends RuntimeException
+import ca.nrc.cadc.uws.server.SyncOutput;
+
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.OutputStream;
+
+public class HTTPResponseSyncOutput implements SyncOutput
 {
-    /**
-     * Constructs a new runtime exception with the specified detail message and
-     * cause.  <p>Note that the detail message associated with
-     * {@code cause} is <i>not</i> automatically incorporated in
-     * this runtime exception's detail message.
-     *
-     * @param message the detail message (which is saved for later retrieval
-     *                by the {@link #getMessage()} method).
-     * @param cause   the cause (which is saved for later retrieval by the
-     *                {@link #getCause()} method).  (A <tt>null</tt> value is
-     *                permitted, and indicates that the cause is nonexistent or
-     *                unknown.)
-     * @since 1.4
-     */
-    public StreamingIOException(String message, Throwable cause)
+    private final HttpServletResponse response;
+
+
+    public HTTPResponseSyncOutput(HttpServletResponse response)
     {
-        super(message, cause);
+        this.response = response;
+    }
+
+
+    /**
+     * Set the HTTP response code. Calls to this method that occur after the
+     * OutputStream is opened are silently ignored.
+     *
+     * @param code
+     */
+    @Override
+    public void setResponseCode(int code)
+    {
+        response.setStatus(code);
+    }
+
+    /**
+     * Set an HTTP header parameter. Calls to this method that occur after the
+     * OutputStream is opened are silently ignored.
+     *
+     * @param key   header key.
+     * @param value header value.
+     */
+    @Override
+    public void setHeader(String key, String value)
+    {
+        response.setHeader(key, value);
+    }
+
+    /**
+     * Returns an OutputStream for streaming search results.
+     *
+     * @return OutputStream
+     * @throws IOException
+     */
+    @Override
+    public OutputStream getOutputStream() throws IOException
+    {
+        return response.getOutputStream();
     }
 }

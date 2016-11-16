@@ -68,16 +68,17 @@
 
 package ca.nrc.cadc.search;
 
+import ca.nrc.cadc.ApplicationConfiguration;
 import ca.nrc.cadc.auth.AuthMethod;
 import ca.nrc.cadc.reg.Standards;
 import ca.nrc.cadc.reg.client.RegistryClient;
+import ca.nrc.cadc.util.StringUtil;
+import ca.nrc.cadc.web.ConfigurableServlet;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
 
@@ -86,19 +87,16 @@ import java.net.URLEncoder;
  * Servlet to redirect a caller to the appropriate place for a single request
  * download of a single CAOM-2 URI.
  */
-public class PackageServlet extends HttpServlet
+public class PackageServlet extends ConfigurableServlet
 {
-    static final String CAOM2OPS_URI = "ivo://cadc.nrc.ca/caom2ops";
-
-
     /**
      * Only supported method.  This will accept an ID parameter in the request
      * to query on.
      *
-     * @param request               The HTTP Request.
-     * @param response              The HTTP Response.
-     * @throws ServletException     Servlet related errors.
-     * @throws IOException          Any other errors.
+     * @param request  The HTTP Request.
+     * @param response The HTTP Response.
+     * @throws ServletException Servlet related errors.
+     * @throws IOException      Any other errors.
      */
     @Override
     protected void doGet(final HttpServletRequest request,
@@ -113,21 +111,43 @@ public class PackageServlet extends HttpServlet
      * Handle a GET request with the given Registry client to perform the
      * lookup.
      *
-     * @param request               The HTTP Request.
-     * @param response              The HTTP Response.
-     * @param registryClient        The RegistryClient to do lookups.
-     * @throws IOException
+     * @param request        The HTTP Request.
+     * @param response       The HTTP Response.
+     * @param registryClient The RegistryClient to do lookups.
+     * @throws IOException If the redirect URL is bad.
      */
     void get(final HttpServletRequest request,
              final HttpServletResponse response,
              final RegistryClient registryClient) throws IOException
     {
-        URL serviceURL = registryClient.getServiceURL(URI.create(CAOM2OPS_URI),
-                                                      Standards.PKG_10,
-                                                      AuthMethod.COOKIE);
-        System.out.println("pkgurl: " + serviceURL.toExternalForm());
-        URL redirectURL = new URL(serviceURL.toExternalForm() + "?ID=" +
-                                  URLEncoder.encode(request.getParameter("ID"), "UTF-8"));
+        final URL serviceURL = registryClient.getServiceURL(
+                getServiceID(
+                        ApplicationConfiguration.CAOM2OPS_SERVICE_URI_PROPERTY_KEY,
+                        ApplicationConfiguration.DEFAULT_CAOM2OPS_SERVICE_URI),
+                Standards.PKG_10, AuthMethod.COOKIE);
+
+        final String hostAndPort =
+                lookup(ApplicationConfiguration.
+                               CAOM2OPS_SERVICE_HOST_PORT_PROPERTY_KEY);
+
+        final URL caom2OpsServiceURL;
+
+        if (StringUtil.hasText(hostAndPort))
+        {
+            caom2OpsServiceURL =
+                    new URL(hostAndPort + "/" + serviceURL.getPath());
+        }
+        else
+        {
+            caom2OpsServiceURL = serviceURL;
+        }
+
+        System.out.println("pkgurl: " + caom2OpsServiceURL.toExternalForm());
+
+        final URL redirectURL =
+                new URL(caom2OpsServiceURL.toExternalForm()
+                        + "?ID=" + URLEncoder.encode(request.getParameter("ID"),
+                                                     "UTF-8"));
         response.sendRedirect(redirectURL.toExternalForm());
     }
 }

@@ -48,7 +48,7 @@
 
   <filter>
     <filter-name>WebAccessControlFilter</filter-name>
-    <filter-class>ca.nrc.cadc.search.web.WebAccessControlFilter</filter-class>
+    <filter-class>ca.nrc.cadc.web.WebAccessControlFilter</filter-class>
   </filter>
 
   <filter-mapping>
@@ -60,54 +60,47 @@
     To make sure the logging level gets set before any
     logging gets done, set load-on-startup to a smaller
     whole number than is used for any other servlet
-    in this webapp.  This assumes Tomcat 5.5 or later.
-  -->
-  <servlet>
-    <servlet-name>logControl</servlet-name>
-    <servlet-class>ca.nrc.cadc.log.LogControlServlet</servlet-class>
-    <init-param>
-      <param-name>logLevel</param-name>
-      <param-value>info</param-value>
-    </init-param>
-    <init-param>
-      <param-name>logLevelPackages</param-name>
-      <param-value>
-        ca.nrc.cadc.uws
-        ca.nrc.cadc.tap
-        ca.nrc.cadc.vosi
-        ca.nrc.cadc.search
-        ca.nrc.cadc.caom2
-      </param-value>
-    </init-param>
-    <init-param>
-      <param-name>logAccessGroup</param-name>
-      <param-value>CADC</param-value>
-    </init-param>
-    <init-param>
-      <param-name>groupAuthorizer</param-name>
-      <param-value>ca.nrc.cadc.auth.CADCGroupAuthorizer</param-value>
-    </init-param>
-    <load-on-startup>1</load-on-startup>
+    in this webapp.  This assumes Tomcat 7.0 or later.
 
-  </servlet>
-
-  <!--
-    Each of the Restlet servlets need to have their respective Restlet
-    attributes set properly.
+    Uncomment this for debugging.
+    Don't forget to create a groupAuthorizer (Not included).
   -->
+  <!--<servlet>-->
+    <!--<servlet-name>logControl</servlet-name>-->
+    <!--<servlet-class>ca.nrc.cadc.log.LogControlServlet</servlet-class>-->
+    <!--<init-param>-->
+      <!--<param-name>logLevel</param-name>-->
+      <!--<param-value>info</param-value>-->
+    <!--</init-param>-->
+    <!--<init-param>-->
+      <!--<param-name>logLevelPackages</param-name>-->
+      <!--<param-value>-->
+        <!--ca.nrc.cadc.uws-->
+        <!--ca.nrc.cadc.tap-->
+        <!--ca.nrc.cadc.vosi-->
+        <!--ca.nrc.cadc.search-->
+        <!--ca.nrc.cadc.caom2-->
+      <!--</param-value>-->
+    <!--</init-param>-->
+    <!--<init-param>-->
+      <!--<param-name>logAccessGroup</param-name>-->
+      <!--<param-value>CADC</param-value>-->
+    <!--</init-param>-->
+    <!--<init-param>-->
+      <!--<param-name>groupAuthorizer</param-name>-->
+      <!--<param-value>ca.nrc.cadc.auth.CADCGroupAuthorizer</param-value>-->
+    <!--</init-param>-->
+    <!--<load-on-startup>1</load-on-startup>-->
+  <!--</servlet>-->
+
   <!-- AdvancedSearch Servlet -->
   <servlet>
-    <servlet-name>SearchServlet</servlet-name>
-    <servlet-class>ca.nrc.cadc.uws.server.SyncServlet</servlet-class>
+    <servlet-name>SearchJobServlet</servlet-name>
+    <servlet-class>ca.nrc.cadc.web.SearchJobServlet</servlet-class>
     <init-param>
       <param-name>ca.nrc.cadc.uws.server.JobManager</param-name>
-      <param-value>ca.nrc.cadc.search.SearchJobManager</param-value>
+      <param-value>ca.nrc.cadc.uws.SearchJobManager</param-value>
     </init-param>
-    <init-param>
-      <param-name>ca.nrc.cadc.uws.web.InlineContentHandler</param-name>
-      <param-value>ca.nrc.cadc.search.SearchInlineContentHandlerImpl</param-value>
-    </init-param>
-    <load-on-startup>2</load-on-startup>
   </servlet>
 
   <servlet>
@@ -185,10 +178,10 @@
 
   <!-- URL-to-servlet mapping -->
 
-  <servlet-mapping>
-    <servlet-name>logControl</servlet-name>
-    <url-pattern>/logControl</url-pattern>
-  </servlet-mapping>
+  <!--<servlet-mapping>-->
+    <!--<servlet-name>logControl</servlet-name>-->
+    <!--<url-pattern>/logControl</url-pattern>-->
+  <!--</servlet-mapping>-->
   <servlet-mapping>
     <servlet-name>doc</servlet-name>
     <url-pattern>/doc</url-pattern>
@@ -226,8 +219,9 @@
   </servlet-mapping>
 
   <servlet-mapping>
-    <servlet-name>SearchServlet</servlet-name>
+    <servlet-name>SearchJobServlet</servlet-name>
     <url-pattern>/find/*</url-pattern>
+    <url-pattern>/find</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>
@@ -260,10 +254,6 @@
     <servlet-name>FormValidationServlet</servlet-name>
     <url-pattern>/validate/*</url-pattern>
   </servlet-mapping>
-
-  <welcome-file-list>
-    <welcome-file>/index.jsp</welcome-file>
-  </welcome-file-list>
 
   <!-- Define the public security role -->
   <security-role>

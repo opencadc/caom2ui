@@ -80,6 +80,21 @@ public class ParameterUtil
         return list.toArray(new String[list.size()]);
     }
 
+    public Map<String, Object> asMap(final List<Parameter> parameters)
+    {
+        final Map<String, Object> map = new HashMap<>();
+
+        if (parameters != null)
+        {
+            for (final Parameter parameter : parameters)
+            {
+                map.put(parameter.getName(), parameter.getValue());
+            }
+        }
+
+        return map;
+    }
+
     /**
      * Pull the Job related parameters from the given request.
      * @param request           The request to pull from.

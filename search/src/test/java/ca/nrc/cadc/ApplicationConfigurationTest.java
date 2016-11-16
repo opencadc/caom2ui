@@ -66,92 +66,87 @@
  ************************************************************************
  */
 
-package ca.nrc.cadc.tap;
+package ca.nrc.cadc;
 
-import ca.nrc.cadc.AbstractUnitTest;
+import java.io.File;
+import java.io.FileOutputStream;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import ca.nrc.cadc.ApplicationConfiguration;
-import ca.nrc.cadc.auth.AuthMethod;
-import ca.nrc.cadc.reg.Standards;
-import ca.nrc.cadc.reg.client.RegistryClient;
-
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
-import java.net.URI;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-
-import ca.nrc.cadc.uws.Job;
-
+import org.apache.commons.configuration2.PropertiesConfiguration;
+import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
+import org.apache.commons.configuration2.builder.fluent.Parameters;
+import org.junit.After;
 import org.junit.Test;
-
-import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 
-public class TAPServletTest extends AbstractUnitTest<TAPServlet>
+public class ApplicationConfigurationTest
+        extends AbstractUnitTest<ApplicationConfiguration>
 {
-    @Test
-    public void sendToTAP() throws Exception
+    @After
+    public void reset() throws Exception
     {
-        final boolean[] executeRan = new boolean[]{false};
+        System.clearProperty(ApplicationConfiguration.class.getCanonicalName()
+                             + ".PROP1");
+    }
 
-        final ApplicationConfiguration mockConfiguration =
-                createMock(ApplicationConfiguration.class);
+    @Test
+    public void pullSystemProperty() throws Exception
+    {
+        final File tmpConfigFile = File.createTempFile("config-",
+                                                       ".properties");
+        final FileOutputStream fos = new FileOutputStream(tmpConfigFile);
 
-        final TAPServlet testSubject = new TAPServlet(mockConfiguration)
-        {
-            /**
-             * Used for testers to override.
-             *
-             * @param syncTAPClient The TAP Client.
-             * @param job           The Job to execute.
-             * @param outputStream  The Output Stream to write output to.
-             */
-            @Override
-            void execute(SyncTAPClient syncTAPClient, Job job,
-                         OutputStream outputStream)
-            {
-                executeRan[0] = true;
-            }
-        };
+        fos.write("PROP2=VAL2\n".getBytes("UTF-8"));
+        fos.write((ApplicationConfiguration.class.getCanonicalName()
+                  + ".PROP1=VAL11").getBytes("UTF-8"));
 
-        final HttpServletRequest mockRequest =
-                createMock(HttpServletRequest.class);
+        fos.flush();
+        fos.close();
 
-        final Map<String, String[]> requestParameters = new HashMap<>();
+        System.setProperty(ApplicationConfiguration.class.getCanonicalName()
+                           + ".PROP1", "VAL1");
 
-        requestParameters.put("QUERY", new String[]{"SELECT 1 FROM TABLE"});
-        requestParameters.put("NOUSE", new String[]{"1", "2"});
-        requestParameters.put("FORMAT", new String[]{"csv"});
+        testSubject = new ApplicationConfiguration();
 
-        final HttpServletResponse mockResponse =
-                createMock(HttpServletResponse.class);
-        final OutputStream _os = new ByteArrayOutputStream();
-        final RegistryClient mockRegistryClient =
-                createMock(RegistryClient.class);
-        final ServletOutputStream outputStream =
-                new StubServletOutputStream(_os);
+        final Parameters parameters = new Parameters();
 
-        expect(mockResponse.getOutputStream()).andReturn(outputStream).once();
-        expect(mockRequest.getParameterMap()).andReturn(requestParameters)
-                .once();
+        final FileBasedConfigurationBuilder<PropertiesConfiguration> builder =
+                new FileBasedConfigurationBuilder<>(
+                        PropertiesConfiguration.class).configure(
+                                parameters.fileBased().setFile(tmpConfigFile));
 
-        expect(mockRequest.getParameter("tap_url")).andReturn(null).once();
+        // Add this after System properties.
+        testSubject.configuration.addConfiguration(builder.getConfiguration());
 
-        replay(mockRequest, mockResponse, mockRegistryClient,
-               mockConfiguration);
+        assertEquals("Wrong value.", "VAL1", testSubject.lookup(
+                ApplicationConfiguration.class.getCanonicalName() + ".PROP1"));
+    }
 
-        testSubject.sendToTAP(mockRequest, mockResponse, mockRegistryClient);
+    @Test
+    public void pullFileProperty() throws Exception
+    {
+        final File tmpConfigFile = File.createTempFile("config-",
+                                                       ".properties");
+        final FileOutputStream fos = new FileOutputStream(tmpConfigFile);
 
-        assertTrue("Did not try to execute.", executeRan[0]);
+        fos.write("PROP2=VAL2\n".getBytes("UTF-8"));
+        fos.write("PROP1=VAL11".getBytes("UTF-8"));
 
-        verify(mockRequest, mockResponse, mockRegistryClient,
-               mockConfiguration);
+        fos.flush();
+        fos.close();
+
+        testSubject = new ApplicationConfiguration();
+
+        final Parameters parameters = new Parameters();
+
+        final FileBasedConfigurationBuilder<PropertiesConfiguration> builder =
+                new FileBasedConfigurationBuilder<>(
+                        PropertiesConfiguration.class).configure(
+                        parameters.fileBased().setFile(tmpConfigFile));
+
+        // Add this after System properties.
+        testSubject.configuration.addConfiguration(builder.getConfiguration());
+
+        assertEquals("Wrong value.", "VAL11", testSubject.lookup("PROP1"));
     }
 }

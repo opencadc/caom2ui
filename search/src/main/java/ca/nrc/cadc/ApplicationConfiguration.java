@@ -66,100 +66,113 @@
  ************************************************************************
  */
 
-package ca.nrc.cadc.search.web;
+package ca.nrc.cadc;
 
-import ca.nrc.cadc.auth.*;
-import ca.nrc.cadc.net.NetUtil;
 import ca.nrc.cadc.util.StringUtil;
+import org.apache.commons.configuration2.CombinedConfiguration;
+import org.apache.commons.configuration2.PropertiesConfiguration;
+import org.apache.commons.configuration2.SystemConfiguration;
+import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
+import org.apache.commons.configuration2.builder.fluent.Parameters;
+import org.apache.commons.configuration2.ex.ConfigurationException;
+import org.apache.commons.configuration2.tree.UnionCombiner;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.security.Principal;
-import java.util.HashSet;
-import java.util.Set;
+import org.apache.log4j.Logger;
+
+import java.io.File;
+import java.net.URI;
 
 
-public class CookiePrincipalExtractorImpl implements PrincipalExtractor
+/**
+ * Configuration for this Application.  This will combine the System Properties
+ * with the CADC File-based configuration in $HOME/config directory.
+ */
+public class ApplicationConfiguration
 {
-    private final HttpServletRequest request;
+    public static final String TAP_SERVICE_URI_PROPERTY_KEY =
+            "org.opencadc.search.tap-service-id";
+    public static final String TAP_SERVICE_HOST_PORT_PROPERTY_KEY =
+            "org.opencadc.search.tap-service-host-port";
+    public static final URI DEFAULT_TAP_SERVICE_URI =
+            URI.create("ivo://cadc.nrc.ca/tap");
 
-    private SSOCookieCredential cookieCredential;
-    private Principal cookiePrincipal;
+    public static final String CAOM2OPS_SERVICE_URI_PROPERTY_KEY =
+            "org.opencadc.search.caom2ops-service-id";
+    public static final String CAOM2OPS_SERVICE_HOST_PORT_PROPERTY_KEY =
+            "org.opencadc.search.caom2ops-service-host-port";
+    public static final URI DEFAULT_CAOM2OPS_SERVICE_URI =
+            URI.create("ivo://cadc.nrc.ca/caom2ops");
+
+    public final static String CAOM2_UI_PROPERTY_KEY =
+            "org.opencadc.search.caom2ui-host";
+    public final static String DEFAULT_CAOM2_UI_HOST =
+            "www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca";
+
+    private static final Logger LOGGER =
+            Logger.getLogger(ApplicationConfiguration.class);
+
+    private static final String PROPERTIES_FILE_PATH =
+            System.getProperty("user.home") + File.pathSeparator
+            + "config/org.opencadc.search.properties";
+
+    // Internally uses the Apache configurations.
+    // Make package private to allow tests to override.
+    final CombinedConfiguration configuration = new CombinedConfiguration();
 
 
-    public CookiePrincipalExtractorImpl(final HttpServletRequest request)
+    /**
+     * Creates a new instance of {@code CombinedConfiguration} that uses
+     * a union combiner.
+     *
+     * @see UnionCombiner
+     */
+    public ApplicationConfiguration()
     {
-        this.request = request;
-        init();
-    }
+        configuration.addConfiguration(new SystemConfiguration());
 
+        final Parameters parameters = new Parameters();
+        final FileBasedConfigurationBuilder<PropertiesConfiguration> builder =
+                new FileBasedConfigurationBuilder<>(
+                        PropertiesConfiguration.class).configure(
+                                parameters.properties().setFileName(
+                                        PROPERTIES_FILE_PATH));
 
-    void init()
-    {
-        final Cookie[] requestCookies = request.getCookies();
-        final Cookie[] cookies = (requestCookies == null)
-                                 ? new Cookie[0] : requestCookies;
-        for (final Cookie cookie : cookies)
+        try
         {
-            if ("CADC_SSO".equals(cookie.getName())
-                && StringUtil.hasText(cookie.getValue()))
-            {
-                try
-                {
-                    cookiePrincipal =
-                            new CookiePrincipal(
-                                    cookie.getValue());
-                    cookieCredential =
-                            new SSOCookieCredential(
-                                    cookie.getValue(),
-                                    NetUtil.getDomainName(
-                                            request.getRequestURL().toString()));
-                }
-                catch (IOException e)
-                {
-                    System.out.println(
-                            "Cannot use SSO Cookie. Reason: "
-                            + e.getMessage());
-                }
-            }
+            configuration.addConfiguration(builder.getConfiguration());
+        }
+        catch (ConfigurationException e)
+        {
+            LOGGER.warn(String.format(
+                    "No configuration found at %s.\nUsing defaults.",
+                    PROPERTIES_FILE_PATH));
         }
     }
 
 
-    @Override
-    public Set<Principal> getPrincipals()
+    public URI lookupServiceURI(final String key, final URI defaultValue)
     {
-        final Set<Principal> principals = new HashSet<>();
-
-        addHTTPPrincipal(principals);
-
-        return principals;
+        final String value = lookup(key);
+        return StringUtil.hasText(value) ? URI.create(value) : defaultValue;
     }
 
-    @Override
-    public X509CertificateChain getCertificateChain()
+    public String lookup(final String key)
     {
-        return null;
+        return configuration.getString(key);
     }
 
-    @Override
-    public DelegationToken getDelegationToken()
+    public int lookupInt(final String key, final int defaultValue)
     {
-        return null;
+        return configuration.getInt(key, defaultValue);
     }
 
-    @Override
-    public SSOCookieCredential getSSOCookieCredential()
+    public boolean lookupBoolean(final String key)
     {
-        return cookieCredential;
+        return configuration.getBoolean(key, true);
     }
 
-    private void addHTTPPrincipal(Set<Principal> principals)
+    public String lookup(final String key, final String defaultValue)
     {
-        if (cookiePrincipal != null)
-        {
-            principals.add(cookiePrincipal);
-        }
+        return configuration.getString(key, defaultValue);
     }
 }

@@ -1501,10 +1501,9 @@
     /**
      * Action to perform before form serialization begins.
      */
-//    function beforeSerialize(arr, $form, options)
-    function beforeSerialize()
+    function beforeSerialize(_form)
     {
-      $("#UPLOAD").remove();
+      _form.find("#UPLOAD").remove();
 
       var inputFile = $("input:file[name='targetList']");
       if (inputFile && !inputFile.prop("disabled") && (inputFile.val() !== ""))
@@ -1515,7 +1514,7 @@
         upload.prop("id", "UPLOAD");
         upload.prop("value", "search_upload,param:targetList");
 
-        getForm().append(upload);
+        _form.append(upload);
 
         // Update the file input name with the value from the target list
         // select.
@@ -1526,9 +1525,7 @@
       }
 
       // Save the form to sessionStorage.
-
-      // Observation.observationID=val1&Plane.position.bounds=m101
-      sessionStorage.setItem('form_data', getForm().serialize());
+      sessionStorage.setItem('form_data', _form.serialize());
       sessionStorage.setItem('isReload', false);
     }
 
@@ -1595,63 +1592,71 @@
           alert("Error: " + e.message);
         }
 
-        getForm().ajaxSubmit(
+        var currentForm = getForm();
+        beforeSerialize(currentForm);
+
+        var formData = new FormData(currentForm[0]);
+
+        // getForm().ajaxSubmit(
+        $.post(
           {
             url: ca.nrc.cadc.search.SEARCH_RUN,
-            target: "#file_upload_response",
+            // target: "#file_upload_response",
+            contentType: false,
             dataType: "json",
-            beforeSubmit: beforeSerialize,
-            success: function (json, textStatus, request)
-            {
-              getForm().find("input:hidden#target").remove();
-              getForm().find("input:hidden#collection").remove();
-
-              _selfForm.currentRequest = null;
-
-              var args =
-              {
-                "data": json,
-                "success": true,
-                "startDate": netStart,
-                "cadcForm": _selfForm
-              };
-
-              trigger(ca.nrc.cadc.search.events.onSubmitComplete, args);
-            },
-            error: function (request, textStatus, data)
-            {
-              console.error("Error: " + request.responseText);
-
-              trigger(ca.nrc.cadc.search.events.onSubmitComplete,
-                      {
-                        "error_url": request.responseText,
-                        "success": false,
-                        "startDate": netStart,
-                        "cadcForm": _selfForm
-                      });
-            },
-            complete: function (request, textStatus, data)
-            {
-              if (textStatus == "timeout")
-              {
-                alert("The search took too long to return.\n" +
-                      "Please refine your search or try again later.");
-
-                trigger(ca.nrc.cadc.search.events.onSubmitComplete,
-                        {
-                          "success": false,
-                          "startDate": netStart,
-                          "cadcForm": _selfForm,
-                          "error": {
-                            status: request.status,
-                            message: textStatus
-                          }
-                        });
-              }
-            },
-            iframe: isUpload,
+            data: formData,
+            processData: false,
+            // iframe: isUpload,
             xhr: createRequest
-          });
+          })
+          .done(function(json)
+                {
+                  currentForm.find("input:hidden#target").remove();
+                  currentForm.find("input:hidden#collection").remove();
+
+                  _selfForm.currentRequest = null;
+
+                  var args =
+                  {
+                    "data": json,
+                    "success": true,
+                    "startDate": netStart,
+                    "cadcForm": _selfForm
+                  };
+
+                  trigger(ca.nrc.cadc.search.events.onSubmitComplete, args);
+                })
+          .fail(function (request)
+                {
+                  console.error("Error: " + request.responseText);
+
+                  trigger(ca.nrc.cadc.search.events.onSubmitComplete,
+                          {
+                            "error_url": request.responseText,
+                            "success": false,
+                            "startDate": netStart,
+                            "cadcForm": _selfForm
+                          });
+                })
+          .always(function(request, textStatus)
+                  {
+                    if (textStatus == "timeout")
+                    {
+                      alert("The search took too long to return.\n" +
+                            "Please refine your search or try again later.");
+
+                      trigger(ca.nrc.cadc.search.events.onSubmitComplete,
+                              {
+                                "success": false,
+                                "startDate": netStart,
+                                "cadcForm": _selfForm,
+                                "error": {
+                                  status: request.status,
+                                  message: textStatus
+                                }
+                              });
+                    }
+                  });
       }
     }
 

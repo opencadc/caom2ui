@@ -36,15 +36,18 @@ package ca.nrc.cadc.tap;
 
 import ca.nrc.cadc.uws.Job;
 
+import java.io.OutputStream;
+import java.net.URI;
+
 public interface SyncTAPClient
 {
-    String TAP_SERVICE_URI_PROPERTY_KEY = "org.opencadc.search.tap-service-id";
-    String DEFAULT_TAP_SERVICE_URI_VALUE = "ivo://cadc.nrc.ca/tap";
-
     /**
-     * Execute this client's Job.
+     * Execute the given Job.
      *
-     * @param job       The Job to execute.
+     * @param serviceURI            The TAP Service URI.
+     * @param job                   The Job to execute.
+     * @param outputStream          The OutputStream to write out results.
      */
-    void execute(final Job job);
+    void execute(final URI serviceURI, final Job job,
+                 final OutputStream outputStream);
 }

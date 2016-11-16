@@ -68,23 +68,19 @@
 
 package ca.nrc.cadc.tap;
 
-import ca.nrc.cadc.auth.AuthMethod;
+import ca.nrc.cadc.ApplicationConfiguration;
 import ca.nrc.cadc.net.HttpDownload;
-import ca.nrc.cadc.reg.Standards;
 import ca.nrc.cadc.reg.client.RegistryClient;
 import ca.nrc.cadc.search.util.ParameterUtil;
 import ca.nrc.cadc.tap.impl.SyncTAPClientImpl;
 import ca.nrc.cadc.util.StringUtil;
 import ca.nrc.cadc.uws.ExecutionPhase;
 import ca.nrc.cadc.uws.Job;
-import ca.nrc.cadc.uws.web.JobCreator;
-import org.apache.commons.configuration2.Configuration;
-import org.apache.commons.configuration2.SystemConfiguration;
+import ca.nrc.cadc.web.ConfigurableServlet;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -93,19 +89,16 @@ import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 
-public class TAPServlet extends HttpServlet
+
+public class TAPServlet extends ConfigurableServlet
 {
-    private final Configuration configuration;
-
-
     public TAPServlet()
     {
-        this(new SystemConfiguration());
     }
 
-    public TAPServlet(Configuration configuration)
+    TAPServlet(ApplicationConfiguration configuration)
     {
-        this.configuration = configuration;
+        super(configuration);
     }
 
 
@@ -227,7 +220,7 @@ public class TAPServlet extends HttpServlet
      * @param req               The HTTP Request.
      * @param resp              The HTTP Response.
      * @param registryClient    The registry client to lookup the service.
-     * @throws IOException
+     * @throws IOException      If URL management fails.
      */
     void sendToTAP(HttpServletRequest req, HttpServletResponse resp,
                    final RegistryClient registryClient)
@@ -251,39 +244,30 @@ public class TAPServlet extends HttpServlet
         else
         {
             final Job job = createJob(req);
-
             final SyncTAPClient syncTAPClient =
-                    new SyncTAPClientImpl(outputStream,
-                                          lookupServiceURL(registryClient), true);
+                    new SyncTAPClientImpl(true, registryClient);
 
-            execute(syncTAPClient, job);
+            execute(syncTAPClient, job, outputStream);
         }
     }
 
     /**
      * Used for testers to override.
-     * @param syncTAPClient
-     * @param job
+     * @param syncTAPClient             The TAP Client.
+     * @param job                       The Job to execute.
+     * @param outputStream              The Output Stream to write output to.
      */
-    void execute(final SyncTAPClient syncTAPClient, final Job job)
+    void execute(final SyncTAPClient syncTAPClient, final Job job,
+                 final OutputStream outputStream)
     {
-        syncTAPClient.execute(job);
-    }
-
-    private URL lookupServiceURL(final RegistryClient registryClient)
-    {
-        return registryClient.getServiceURL(lookupServiceURI(),
-                                            Standards.TAP_SYNC_11,
-                                            AuthMethod.ANON);
+        syncTAPClient.execute(lookupServiceURI(), job, outputStream);
     }
 
     private URI lookupServiceURI()
     {
-        final String serviceURIProperty =
-                configuration.getString(SyncTAPClient.TAP_SERVICE_URI_PROPERTY_KEY,
-                                        SyncTAPClient.DEFAULT_TAP_SERVICE_URI_VALUE);
-
-        return URI.create(serviceURIProperty);
+        return getServiceID(
+                ApplicationConfiguration.TAP_SERVICE_URI_PROPERTY_KEY,
+                ApplicationConfiguration.DEFAULT_TAP_SERVICE_URI);
     }
 
     private Job createJob(final HttpServletRequest req)

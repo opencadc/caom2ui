@@ -66,92 +66,114 @@
  ************************************************************************
  */
 
-package ca.nrc.cadc.tap;
+package ca.nrc.cadc.web;
 
-import ca.nrc.cadc.AbstractUnitTest;
+import ca.nrc.cadc.net.OutputStreamWrapper;
+import org.apache.commons.net.ftp.FTP;
+import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPReply;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import ca.nrc.cadc.ApplicationConfiguration;
-import ca.nrc.cadc.auth.AuthMethod;
-import ca.nrc.cadc.reg.Standards;
-import ca.nrc.cadc.reg.client.RegistryClient;
-
-import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URI;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-
-import ca.nrc.cadc.uws.Job;
-
-import org.junit.Test;
-
-import static org.easymock.EasyMock.*;
-import static org.junit.Assert.*;
+import java.security.AccessControlException;
 
 
-public class TAPServletTest extends AbstractUnitTest<TAPServlet>
+public class ServerToServerFTPTransfer
 {
-    @Test
-    public void sendToTAP() throws Exception
+    // username and password.
+    private static final String CREDENTIAL = "WEBTMP";
+    private final String hostname;
+    private final int port;
+
+
+    public ServerToServerFTPTransfer(final String host, final int port)
     {
-        final boolean[] executeRan = new boolean[]{false};
+        this.hostname = host;
+        this.port = port;
+    }
 
-        final ApplicationConfiguration mockConfiguration =
-                createMock(ApplicationConfiguration.class);
 
-        final TAPServlet testSubject = new TAPServlet(mockConfiguration)
+    public void send(final OutputStreamWrapper outputStreamWrapper,
+                     final String filename)
+            throws IOException
+    {
+        final FTPClient ftpClient = connect();
+        ftpClient.setFileType(FTP.ASCII_FILE_TYPE);
+        ftpClient.enterLocalPassiveMode();
+
+        try
         {
-            /**
-             * Used for testers to override.
-             *
-             * @param syncTAPClient The TAP Client.
-             * @param job           The Job to execute.
-             * @param outputStream  The Output Stream to write output to.
-             */
-            @Override
-            void execute(SyncTAPClient syncTAPClient, Job job,
-                         OutputStream outputStream)
+            final OutputStream outputStream =
+                    ftpClient.storeFileStream(filename);
+
+            outputStreamWrapper.write(outputStream);
+
+            outputStream.flush();
+            outputStream.close();
+        }
+        finally
+        {
+            if (ftpClient.isConnected())
             {
-                executeRan[0] = true;
+                try
+                {
+                    ftpClient.disconnect();
+                }
+                catch (IOException f)
+                {
+                    // do nothing
+                }
             }
-        };
+        }
+    }
 
-        final HttpServletRequest mockRequest =
-                createMock(HttpServletRequest.class);
+    private FTPClient connect() throws IOException
+    {
+        final FTPClient ftpClient = createFTPClient();
+        ftpClient.connect(hostname, port);
 
-        final Map<String, String[]> requestParameters = new HashMap<>();
+        final int reply = ftpClient.getReplyCode();
 
-        requestParameters.put("QUERY", new String[]{"SELECT 1 FROM TABLE"});
-        requestParameters.put("NOUSE", new String[]{"1", "2"});
-        requestParameters.put("FORMAT", new String[]{"csv"});
+        if (!FTPReply.isPositiveCompletion(reply))
+        {
+            ftpClient.disconnect();
+            throw new IOException(
+                    String.format("FTP Connection failed with error code %d.",
+                                  reply));
+        }
+        else
+        {
+            return login(ftpClient);
+        }
+    }
 
-        final HttpServletResponse mockResponse =
-                createMock(HttpServletResponse.class);
-        final OutputStream _os = new ByteArrayOutputStream();
-        final RegistryClient mockRegistryClient =
-                createMock(RegistryClient.class);
-        final ServletOutputStream outputStream =
-                new StubServletOutputStream(_os);
+    /**
+     *
+     * @param ftpClient     The Connected client.
+     * @return              The mutated client, now authenticated.
+     * @throws AccessControlException    If login fails.
+     */
+    private FTPClient login(final FTPClient ftpClient)
+            throws AccessControlException, IOException
+    {
+        if (!ftpClient.login(CREDENTIAL, CREDENTIAL))
+        {
+            ftpClient.logout();
+            throw new AccessControlException(
+                    String.format("Login failed for %s", CREDENTIAL));
+        }
+        else
+        {
+            return ftpClient;
+        }
+    }
 
-        expect(mockResponse.getOutputStream()).andReturn(outputStream).once();
-        expect(mockRequest.getParameterMap()).andReturn(requestParameters)
-                .once();
-
-        expect(mockRequest.getParameter("tap_url")).andReturn(null).once();
-
-        replay(mockRequest, mockResponse, mockRegistryClient,
-               mockConfiguration);
-
-        testSubject.sendToTAP(mockRequest, mockResponse, mockRegistryClient);
-
-        assertTrue("Did not try to execute.", executeRan[0]);
-
-        verify(mockRequest, mockResponse, mockRegistryClient,
-               mockConfiguration);
+    /**
+     * Override me to for testing.
+     * @return      FTPClient instance.
+     */
+    FTPClient createFTPClient()
+    {
+        return new FTPClient();
     }
 }

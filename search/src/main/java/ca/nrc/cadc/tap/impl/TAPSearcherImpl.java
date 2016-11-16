@@ -34,18 +34,12 @@
 package ca.nrc.cadc.tap.impl;
 
 
-import ca.nrc.cadc.auth.AuthMethod;
 import ca.nrc.cadc.caom2.IntervalSearch;
 import ca.nrc.cadc.caom2.SpatialSearch;
-import ca.nrc.cadc.reg.Standards;
-import ca.nrc.cadc.reg.client.RegistryClient;
 import ca.nrc.cadc.search.*;
 import ca.nrc.cadc.search.cutout.Cutout;
 import ca.nrc.cadc.search.cutout.stc.STCCutoutImpl;
-import ca.nrc.cadc.search.form.FormConstraint;
 import ca.nrc.cadc.search.form.FormErrors;
-import ca.nrc.cadc.search.form.Shape1;
-import ca.nrc.cadc.search.form.Text;
 import ca.nrc.cadc.search.parser.Resolver;
 import ca.nrc.cadc.search.parser.TargetData;
 import ca.nrc.cadc.search.parser.TargetParser;
@@ -72,7 +66,6 @@ import javax.security.auth.Subject;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.security.PrivilegedAction;
@@ -100,7 +93,7 @@ public class TAPSearcherImpl implements Searcher
     private final SyncResponseWriter syncResponseWriter;
     private final JobUpdater jobUpdater;
     private final QueryGenerator queryGenerator;
-    private final URI tapServiceURI;
+    private final SyncTAPClient tapClient;
 
 
     /**
@@ -111,13 +104,13 @@ public class TAPSearcherImpl implements Searcher
      */
     public TAPSearcherImpl(final SyncResponseWriter writer,
                            final JobUpdater jobUpdater,
-                           final URI tapServiceURI,
+                           final SyncTAPClient tapClient,
                            final QueryGenerator queryGenerator)
             throws PositionParserException
     {
         this.syncResponseWriter = writer;
         this.jobUpdater = jobUpdater;
-        this.tapServiceURI = tapServiceURI;
+        this.tapClient = tapClient;
         this.queryGenerator = queryGenerator;
     }
 
@@ -139,39 +132,16 @@ public class TAPSearcherImpl implements Searcher
      * Execute the search, and write out the results to this implementation's
      * writer.
      *
-     * @param job The Job to execute.
-     * @throws Exception        Any uncaught errors.
+     * @param job                The Job to execute.
+     * @param serviceURI         The Service URI to use.
+     * @param syncResponseWriter The writer to write to.
+     * @throws Exception Any unforeseen errors.
      */
     @Override
-    public void search(final Job job) throws Exception
+    public void search(final Job job, final URI serviceURI,
+                       final SyncResponseWriter syncResponseWriter)
+            throws Exception
     {
-        /*
-            Initialize the Job parameter list.
-            If this is a QuickSearch query, the Job has target and optionally
-            collection parameters.  If there was a file upload, there is an
-            errorCount parameter.
-         */
-        final List<Parameter> parameters = job.getParameterList();
-        final String target = RegexParameterUtil.findParameterValue("target",
-                                                                    parameters);
-
-        if (StringUtil.hasText(target))
-        {
-            parameters.add(new Parameter(FormConstraint.FORM_NAME,
-                                         SHAPE1_UTYPE + Shape1.NAME));
-            parameters.add(new Parameter(SHAPE1_UTYPE + Shape1.VALUE, target));
-        }
-
-        final String collection =
-                RegexParameterUtil.findParameterValue("collection", parameters);
-
-        if (StringUtil.hasText(collection))
-        {
-            parameters.add(new Parameter(FormConstraint.FORM_NAME,
-                                         TEXT_UTYPE + Text.NAME));
-            parameters.add(new Parameter(TEXT_UTYPE + Text.VALUE, collection));
-        }
-
         // Validate search form.
         final FormData formData = new FormData(job);
         final FormErrors formError = new FormErrors();
@@ -194,15 +164,14 @@ public class TAPSearcherImpl implements Searcher
             }
             else
             {
-                runSearch(jsonWriter, job, formData, formError);
+                runSearch(serviceURI, jsonWriter, job, formData);
             }
 
             jsonWriter.endObject();
         }
         catch (JSONException | IOException e)
         {
-            throw new IllegalStateException("Unable to write out response.",
-                                            e);
+            throw new IllegalStateException("Unable to write out response.", e);
         }
         finally
         {
@@ -220,20 +189,21 @@ public class TAPSearcherImpl implements Searcher
     /**
      * Execute the TAP search and write out the JSON results.
      *
+     * @param serviceURI    The TAP Service URI.
      * @param jsonWriter The Writer for the JSON results.
      * @param formData   The FormData object.
-     * @param formError  The FormErrors object, for form input fields.
+
      * @throws IOException   Any I/O weirdness.
      * @throws JSONException Any weirdness writing out JSON.
      */
-    private void runSearch(final JSONWriter jsonWriter, final Job job,
-                           final FormData formData,
-                           final FormErrors formError) throws IOException,
-                                                              JSONException
+    private void runSearch(final URI serviceURI, final JSONWriter jsonWriter,
+                           final Job job, final FormData formData)
+            throws IOException, JSONException
     {
         // Generate the ADQL query string.
         final Templates templates =
                 new Templates(formData.getFormConstraints());
+        final FormErrors formError = new FormErrors();
 
         if (!templates.isValid(formError))
         {
@@ -245,7 +215,8 @@ public class TAPSearcherImpl implements Searcher
             final OutputStream outputStream = new ByteArrayOutputStream();
 
             // Run the TAP job to do the ADQL query.
-            queryTAP(createTAPJob(job, templates), outputStream);
+            queryTAP(serviceURI, createTAPJob(job, queryGenerator.generate(
+                    templates).toString()), outputStream);
 
             final String resultsURLValue = outputStream.toString();
             final URL tapResultsURL = new URL(resultsURLValue);
@@ -374,38 +345,23 @@ public class TAPSearcherImpl implements Searcher
                 final Resolver resolver =
                         new ResolverImpl(new TargetNameResolverClientImpl());
                 final TargetParser targetParser = new TargetParser(resolver);
-
-                jsonWriter.key("resolver_data").object();
                 final TargetData targetData = targetParser.parse(targetValue,
                                                                  resolverName);
                 System.out.println(targetData);
 
-                final String raValue;
+                final String raValue =
+                        (targetData.getRA() == null)
+                        ? targetData.getRaRange().getRange()
+                        : Double.toString(targetData.getRA());
 
-                if (targetData.getRA() == null)
-                {
-                    raValue = targetData.getRaRange().getRange();
-                }
-                else
-                {
-                    raValue = Double.toString(targetData.getRA());
-                }
+                final String decValue =
+                        (targetData.getDec() == null)
+                        ? targetData.getDecRange().getRange()
+                        : Double.toString(targetData.getDec());
 
+                jsonWriter.key("resolver_data").object();
                 jsonWriter.key("ra").value(raValue);
-
-                final String decValue;
-
-                if (targetData.getDec() == null)
-                {
-                    decValue = targetData.getDecRange().getRange();
-                }
-                else
-                {
-                    decValue = Double.toString(targetData.getDec());
-                }
-
                 jsonWriter.key("dec").value(decValue);
-
                 jsonWriter.key("coordsys").value(targetData.getCoordsys());
                 jsonWriter.key("service").value(targetData.getService());
 
@@ -420,33 +376,12 @@ public class TAPSearcherImpl implements Searcher
         }
     }
 
-    /**
-     * Obtain an appropriate TAP Client instance.
-     *
-     * @param registryClient An initialized Registry Client.
-     * @param outputStream   The stream to write out the redirect URL to.
-     * @param tapJob         The Job to execute.
-     * @return TapClient instance.  Never null.
-     */
-    SyncTAPClient getTAPClient(final RegistryClient registryClient,
-                               final OutputStream outputStream,
-                               final Job tapJob)
-    {
-        final URL tapServiceURL =
-                registryClient.getServiceURL(tapServiceURI,
-                                             Standards.TAP_SYNC_11,
-                                             AuthMethod.ANON);
-
-        return new SyncTAPClientImpl(outputStream, tapServiceURL, false);
-    }
-
-    private Job createTAPJob(final Job baseJob, final Templates templates)
+    private Job createTAPJob(final Job baseJob, final String query)
     {
         final List<Parameter> searchJobParameters = baseJob.getParameterList();
         final Job tapJob = new Job();
         tapJob.setRunID(baseJob.getID());
 
-        final String format;
         final String requestedFormat =
                 ParameterUtil.findParameterValue("format", searchJobParameters);
         final String uploadParameterValue =
@@ -456,22 +391,14 @@ public class TAPSearcherImpl implements Searcher
                                                       searchJobParameters);
         LOGGER.debug("MaxRecords: " + maxRecords);
 
-        if (!StringUtil.hasText(requestedFormat))
-        {
-            format = "votable";
-        }
-        else
-        {
-            format = requestedFormat;
-        }
+        final String format = StringUtil.hasText(requestedFormat)
+                              ? requestedFormat : "votable";
 
         final List<Parameter> tapJobParams = new ArrayList<>();
 
         tapJobParams.add(new Parameter("LANG", "ADQL"));
         tapJobParams.add(new Parameter("FORMAT", format));
-        tapJobParams.add(new Parameter("QUERY",
-                                       queryGenerator.generate(templates)
-                                               .toString()));
+        tapJobParams.add(new Parameter("QUERY", query));
         tapJobParams.add(new Parameter("REQUEST", "doQuery"));
         tapJobParams.add(new Parameter("MAXREC",
                                        StringUtil.hasText(maxRecords)
@@ -491,18 +418,16 @@ public class TAPSearcherImpl implements Searcher
     /**
      * Issue a TAP query.
      *
+     * @param serviceURI    The TAP Service URI.
      * @param tapJob        The TAP job to execute.
      * @param outputStream  The stream to write out results to.
      * @throws IOException  Any writing errors.
      */
-    private void queryTAP(final Job tapJob, final OutputStream outputStream)
+    void queryTAP(final URI serviceURI, final Job tapJob,
+                  final OutputStream outputStream)
             throws IOException
     {
         final Subject ownerSubject = tapJob.ownerSubject;
-
-        final RegistryClient registryClient = new RegistryClient();
-        final SyncTAPClient tapClient = getTAPClient(registryClient,
-                                                     outputStream, tapJob);
 
         try
         {
@@ -515,14 +440,14 @@ public class TAPSearcherImpl implements Searcher
                     @Override
                     public Void run()
                     {
-                        tapClient.execute(tapJob);
+                        tapClient.execute(serviceURI, tapJob, outputStream);
                         return null;
                     }
                 });
             }
             else
             {
-                tapClient.execute(tapJob);
+                tapClient.execute(serviceURI, tapJob, outputStream);
             }
         }
         finally
