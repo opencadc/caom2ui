@@ -24,9 +24,9 @@ Simply drop the WAR into a Java Servlet Container, then point a browser to:
 
 To bring up the form.  By default, this will connect to the [CADC TAP service](http://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/tap), but can be configured with the `org.opencadc.search.tap-service-id` system property like so:
 
-`-Dca.nrc.cadc.reg.client.RegistryClient.host=<YOUR HOST> -Dorg.opencadc.search.tap-service-id=ivo://<YOUR DOMAIN>/tap-service`
+`-Dca.nrc.cadc.reg.client.RegistryClient.host=%YOUR HOST% -Dorg.opencadc.search.tap-service-id=ivo://%YOUR DOMAIN%/tap-service`
 
-Where `<YOUR HOST>` is the location of a running TAP web service, and the service id is made up of your Oragnization's service URI policy.
+Where `%YOUR HOST%` is the location of a running TAP web service, and the service id is made up of your Oragnization's service URI policy.
 
 #### Running with Docker
 
@@ -40,25 +40,45 @@ To have a constructed docker image ready to run (run `docker images` to see if i
 
 The provided [`docker-compose`](docker-compose.yml) file will construct a fully working system using the pre-built images in [OpenCADC](https://hub.docker.com/r/opencadc/).
 
-Ideally, the database (`tappg`) should have mounted volumes to move state out of the container:
+Ideally, the databases (`tappg`, `uwspg`, `caom2opspg`) should have mounted volumes to move state out of the container:
 
 ```YAML
 ...
+    uwspg:
+    image: opencadc/uws_postgres
+    networks:
+        - 'caom2'
+    environment:
+        - POSTGRES_USER=uws
+        - POSTGRES_PASSWORD=astr0query
+        - PGDATA=/var/lib/postgresql/data/uws
+    volumes:
+        - /var/lib/postgresql/data
+        - /var/run/postgresql
     tappg:
     image: opencadc/tap_postgres
     networks:
-    - 'caom2'
+        - 'caom2'
     environment:
-    - POSTGRES_USER=tap
-    - POSTGRES_PASSWORD=astr0query
-    - PGDATA=/var/lib/postgresql/data/tap
+        - POSTGRES_USER=tap
+        - POSTGRES_PASSWORD=astr0query
+        - PGDATA=/var/lib/postgresql/data/tap
     volumes:
-    - /var/lib/postgresql/data:/var/lib/postgresql/data
-    - /var/run/postgresql/tap:/var/run/postgresql
+        - /var/lib/postgresql/data
+        - /var/run/postgresql
+    caom2opspg:
+    image: opencadc/uws_postgres
+    networks:
+        - 'caom2'
+    environment:
+        - POSTGRES_USER=caom2ops
+        - POSTGRES_PASSWORD=astr0query
+        - PGDATA=/var/lib/postgresql/data/uws
+    volumes:
+        - /var/lib/postgresql/data
+        - /var/run/postgresql
 ...
 ```
-
-Where the `/var/lib/postgresql/data` and `/var/run/postgresql/tap` directories are on the host, and are mounted as their mapped volumes (i.e. after the colon).
 
 Notice that the `PGDATA` variable is set to `/var/lib/postgresql/data/tap`, so the `tap` directory will need to be created in the host's `/var/lib/postgresql/data` directory.
 
