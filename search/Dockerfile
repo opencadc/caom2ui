@@ -1,7 +1,7 @@
 # Base Tomcat 8 JRE 8 image from CANFAR running on Alpine.
 FROM tomcat:8.5-alpine
 
-ENV CATALINA_OPTS "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5555 -Djava.security.egd=file:/dev/./urandom -Djsse.enableSNIExtension=false -Dorg.opencadc.search.theme=base -Dorg.opencadc.search.obs-core=true -Dorg.opencadc.search.tap-service-host-port=http://tap:8080 -Dorg.opencadc.search.caom2ops-service-host-port=http://caom2ops:8080"
+ENV CATALINA_OPTS "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5555 -Djava.security.egd=file:/dev/./urandom -Djsse.enableSNIExtension=false"
 
 # Working environment.  This will be set to the WORKDIR, which is the
 # current working directory in this context.
@@ -19,3 +19,7 @@ RUN rm -rf webapps \
 # For development purposes, pass the -v ${PATH_TO_LOCAL_BUILD_WAR_DIR}:/usr/local/tomcat/webapps to the run command
 #
 COPY *.war webapps/
+
+VOLUME /root/config
+
+COPY org.opencadc.search.properties /root/config/

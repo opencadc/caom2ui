@@ -83,6 +83,7 @@ task copySQL(type: Copy) {
 task initDockerize(type: Copy, dependsOn: [build, copySQL]) {
     from 'Dockerfile'
     from 'Dockerfile-uwspg'
+    from 'org.opencadc.search.properties'
     into 'docker/'
 }
 
