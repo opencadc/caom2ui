@@ -178,7 +178,7 @@ public class SearchJobServlet extends SyncServlet
         {
             final Subject subject = AuthenticationUtil.getSubject(request);
 
-            if (subject == null)
+            if ((subject == null) || (subject.getPrincipals().isEmpty()))
             {
                 processRequest(request, response);
             }

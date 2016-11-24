@@ -18,6 +18,8 @@
   });
 
 
+
+
   /**
    * AladinLite footprint viewer.  This is incorporated as a Plugin to allow
    *
@@ -25,10 +27,9 @@
    */
   function AladinLiteFootprintViewer(_inputs)
   {
-    var PI_OVER_180 = Math.PI / 180.0;
-    var DEG_PER_ARC_SEC = 1.0 / 3600.0;
     var POLYGON_SPLIT = "Polygon ICRS";
     var DEFAULT_FOV_DEGREES = 180;
+    var DEFAULT_FOV_BUFFER = (500 / 100);
 
     var _self = this;
     var _defaults = {
@@ -52,27 +53,35 @@
       fovFieldID: "fov",
       colour: "orange",
       navigateToSelected: true,
+      maxRowCount: false,
       highlightColour: "yellow",
       /**
        * Perform further calculations on the FOV before setting it.  Useful
-       * for further reducing it (e.g. from square degrees to degrees).
+       * for further reducing it (e.g. from square degrees to degrees), or
+       * buffering the field with some padding.
+       *
        * @param {Number} fovValue
        * @return  {Number}
        */
       afterFOVCalculation: function (fovValue)
       {
-        return fovValue;
+        return fovValue * DEFAULT_FOV_BUFFER;
       },
       onHover: true,
-      onClick: false,
-      coords: [1000, -1000, 0, 0]   // Remember to slice this!
+      onClick: false
+    };
+
+    // Start with opposite max values.
+    this.fovBox = {
+      raLeft: null,
+      raRight: null,
+      decTop: null,
+      decBottom: null
     };
 
     this.grid = null;
 
-    /**
-     * {cadc.vot.Viewer}
-     */
+    // {cadc.vot.Viewer}
     this.viewer = null;
     this.handler = new Slick.EventHandler();
 
@@ -103,11 +112,6 @@
     this.defaultRA = null;
     this.defaultDec = null;
 
-    // Field of View calculation
-    // For FOV computation.
-    this.DEC = null;
-    this.RA0 = null;
-    this.RA180 = null;
     this.fieldOfViewSetFlag = false;
 
     /**
@@ -152,9 +156,6 @@
       _self.aladin = A.aladin(inputs.targetSelector, inputs.aladin_options);
       _self.aladinOverlay =
         A.graphicOverlay({color: inputs.colour, lineWidth: 3});
-      _self.DEC = _defaults.coords.slice(0);
-      _self.RA0 = _defaults.coords.slice(0);
-      _self.RA180 = _defaults.coords.slice(0);
       _self.aladin.addOverlay(_self.aladinOverlay);
       _self.currentFootprint = A.graphicOverlay({
                                                   name: "current",
@@ -162,6 +163,9 @@
                                                   lineWidth: 5
                                                 });
       _self.aladin.addOverlay(_self.currentFootprint);
+      _self.viewAladinButton = $("#slick-visualize");
+      _self.viewAladinStatus = $("#slick-visualize-status");
+      _self.rowCount = 0;
 
       if (inputs.fov != null)
       {
@@ -178,7 +182,31 @@
         else
         {
           _self.viewer.subscribe(cadc.vot.events.onRowAdded,
-                                 handleAddFootprint);
+                                 function(e, args)
+                                 {
+                                   handleAddFootprint(e, args);
+
+                                   if (inputs.maxRowCount)
+                                   {
+                                     if (_self.rowCount === 0)
+                                     {
+                                       // _self.viewAladinButton.removeClass("button-disabled");
+                                       _self.viewAladinButton.removeClass("ui-disabled");
+                                       _self.viewAladinStatus.addClass("wb-invisible");
+                                     }
+
+                                     _self.rowCount++;
+
+                                     if ((_self.rowCount > inputs.maxRowCount)
+                                         && (_self.viewAladinButton.hasClass(
+                                         "ui-disabled") === false))
+                                     {
+                                       // _self.viewAladinButton.addClass("button-disabled");
+                                       _self.viewAladinButton.addClass("ui-disabled");
+                                       _self.viewAladinStatus.removeClass("wb-invisible");
+                                     }
+                                   }
+                                 });
 
           _self.viewer.subscribe(cadc.vot.events.onDataLoaded,
                                  function ()
@@ -236,9 +264,6 @@
       _self.fieldOfViewSetFlag = false;
       _self.defaultRA = null;
       _self.defaultDec = null;
-      _self.DEC = _defaults.coords.slice(0);
-      _self.RA0 = _defaults.coords.slice(0);
-      _self.RA180 = _defaults.coords.slice(0);
 
       _resetCurrent();
     }
@@ -256,6 +281,12 @@
       _self.RA0 = null;
       _self.RA180 = null;
       _self.fieldOfViewSetFlag = false;
+      _self.fovBox = {
+        raLeft: null,
+        raRight: null,
+        decTop: null,
+        decBottom: null
+      };
 
       if (inputs.toggleSwitchSelector != null)
       {
@@ -269,70 +300,74 @@
       }
     }
 
-    function _calcFOV()
+    /**
+     * Return the calculated maximums for a box.
+     *
+     * @param _footprint    Footprint string of coordinates.
+     * @returns {{maxRA: *, minRA: *, maxDec: *, minDec: *}}
+     * @private
+     */
+    function _calculateFootprintFOV(_footprint)
     {
-      _self.RA0[2] = (0.5 * (_self.RA0[0] + _self.RA0[1] ));
-      _self.RA0[3] = (_self.RA0[1] - _self.RA0[0]);
+      var footprintItems = $.trim(_footprint).split(" ");
+      var fl = footprintItems.length;
+      var raValues = [];
+      var decValues = [];
 
-      _self.RA180[2] = (0.5 * (_self.RA180[0] + _self.RA180[1] ));
-      _self.RA180[3] = (_self.RA180[1] - _self.RA180[0]);
-
-      _self.DEC[2] = (0.5 * (_self.DEC[0] + _self.DEC[1] ));
-      _self.DEC[3] = (_self.DEC[1] - _self.DEC[0]);
-
-      var aRA = _self.RA0.slice(0);
-
-      if (_self.RA0[3] > _self.RA180[3])
+      for (var f = 0; f < fl; f++)
       {
-        _self.RA180[0] = ((_self.RA180[0] + 180.0) % 360.0);
-        _self.RA180[1] = ((_self.RA180[1] + 180.0) % 360.0);
-        _self.RA180[2] = ((_self.RA180[2] + 180.0) % 360.0);
-
-        aRA = _self.RA180.slice(0);
+        // Even numbers are RA values.
+        if ((f % 2) === 0)
+        {
+          raValues.push(Number(footprintItems[f]));
+        }
+        else
+        {
+          decValues.push(Number(footprintItems[f]));
+        }
       }
 
-      return aRA;
+      return {
+        maxRA: Math.max.apply(null, raValues),
+        minRA: Math.min.apply(null, raValues),
+        maxDec: Math.max.apply(null, decValues),
+        minDec: Math.min.apply(null, decValues)
+      };
     }
 
-    function _calcRowFOV(_decValue, _raValue, _halfFOV)
+    /**
+     * Update the current FOV box.
+     *
+     * @param _footprint  The footprint string, with only coordinate points.
+     * @private
+     */
+    function _updateFOV(_footprint)
     {
-      var mi = _decValue - _halfFOV;
-      var ma = _decValue + _halfFOV;
+      var rowFOVBox = _calculateFootprintFOV(_footprint);
 
-      if (_self.DEC[0] > mi)
+      var maxRA = rowFOVBox.maxRA;
+      var minRA = rowFOVBox.minRA;
+      var maxDec = rowFOVBox.maxDec;
+      var minDec = rowFOVBox.minDec;
+
+      if ((_self.fovBox.raLeft == null) || (_self.fovBox.raLeft < maxRA))
       {
-        _self.DEC[0] = mi;
+        _self.fovBox.raLeft = maxRA;
       }
 
-      if (_self.DEC[1] < ma)
+      if ((_self.fovBox.raRight == null) || (_self.fovBox.raRight > minRA))
       {
-        _self.DEC[1] = ma;
+        _self.fovBox.raRight = minRA;
       }
 
-      mi = (((_raValue - _halfFOV) + 360.0 ) % 360.0);
-      ma = (((_raValue + _halfFOV) + 360.0 ) % 360.0);
-
-      if (_self.RA0[0] > mi)
+      if ((_self.fovBox.decTop == null) || (_self.fovBox.decTop < maxDec))
       {
-        _self.RA0[0] = mi;
+        _self.fovBox.decTop = maxDec;
       }
 
-      if (_self.RA0[1] < ma)
+      if ((_self.fovBox.decBottom == null) || (_self.fovBox.decBottom > minDec))
       {
-        _self.RA0[1] = ma;
-      }
-
-      mi = (mi + 180.0) % 360.0;
-      ma = (ma + 180.0) % 360.0;
-
-      if (_self.RA180[0] > mi)
-      {
-        _self.RA180[0] = mi;
-      }
-
-      if (_self.RA180[1] < ma)
-      {
-        _self.RA180[1] = ma;
+        _self.fovBox.decBottom = minDec;
       }
     }
 
@@ -355,14 +390,8 @@
           }
         }
 
-        if (footprintElements.length > 0)
-        {
-          sanitizedFootprint = POLYGON_SPLIT + footprintElements.join(" ");
-        }
-        else
-        {
-          sanitizedFootprint = null;
-        }
+        sanitizedFootprint = (footprintElements.length > 0)
+          ? (POLYGON_SPLIT + footprintElements.join(" ")) : null;
       }
       else
       {
@@ -392,16 +421,14 @@
           {
             _self.aladin.gotoRaDec(raValue, decValue);
 
-            var fovValue = _dataRow[_self.fovFieldID];
-            if (fovValue != null)
-            {
-              if (inputs.afterFOVCalculation != null)
-              {
-                fovValue = inputs.afterFOVCalculation(fovValue);
-              }
-
-              _self.aladin.setFoV(fovValue);
-            }
+            var selectedRowFOVBox =
+              _calculateFootprintFOV(selectedFootprint.substr(
+                POLYGON_SPLIT.length));
+            var fieldOfView =
+              Math.max((selectedRowFOVBox.maxRA - selectedRowFOVBox.minRA),
+                       (selectedRowFOVBox.maxDec - selectedRowFOVBox.minDec));
+            _self.aladin.setFoV(Math.min(DEFAULT_FOV_DEGREES,
+                                         inputs.afterFOVCalculation(fieldOfView)));
           }
         }
         else
@@ -455,7 +482,7 @@
         _self.defaultDec = decValue;
       }
 
-      var halfFOV = 0.5 * DEG_PER_ARC_SEC * _row[_self.fovFieldID];
+      // var halfFOV = 0.5 * DEG_PER_ARC_SEC * _row[_self.fovFieldID];
 
       if (polygonValue != null)
       {
@@ -473,41 +500,26 @@
 
             if (inputs.fov == null)
             {
-              _calcRowFOV(Number(decValue), Number(raValue), halfFOV);
+              _updateFOV(nextFootprint.substr(POLYGON_SPLIT.length));
             }
           }
         }
       }
     }
 
+    /**
+     * Set the Field of View.  This is used when the data is done loading
+     * completely, or the data has filtered down.
+     *
+     * @private
+     */
     function _setFieldOfView()
     {
-      var fieldOfView = -1;
-
-      if (inputs.fov == null)
-      {
-        var aRA = _calcFOV();
-
-        // Add 20% to add some space around the footprints
-        fieldOfView = Math.max(_self.DEC[3], (aRA[3] * Math.cos(_self.DEC[2]
-                      * PI_OVER_180))) * 1.2;
-      }
-      else
-      {
-        fieldOfView = Number(inputs.fov);
-      }
-
-      if (fieldOfView < 0)
-      {
-        fieldOfView = DEFAULT_FOV_DEGREES;
-      }
-
-      if (inputs.afterFOVCalculation != null)
-      {
-        fieldOfView = inputs.afterFOVCalculation(fieldOfView);
-      }
-
-      _self.aladin.setFoV(Math.min(DEFAULT_FOV_DEGREES, fieldOfView));
+      var fieldOfView =
+        Math.max((_self.fovBox.raLeft - _self.fovBox.raRight),
+                 (_self.fovBox.decTop - _self.fovBox.decBottom));
+      _self.aladin.setFoV(Math.min(DEFAULT_FOV_DEGREES,
+                                   inputs.afterFOVCalculation(fieldOfView)));
       _self.fieldOfViewSetFlag = true;
 
       if ((_self.defaultRA != null) && (_self.defaultDec != null))
