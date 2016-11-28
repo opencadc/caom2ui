@@ -1,5 +1,7 @@
 (function ($)
 {
+  var currentURI = new cadc.web.util.currentURI();
+
   $.extend(true, window, {
     "ca": {
       "nrc": {
@@ -10,14 +12,14 @@
             "FORM_LABEL_INPUT_LENGTH": 12,
             "TARGET_FORM_LABEL_INPUT_LENGTH": 24,
             "CHECKBOX_CHECKED_REGEX": /^true|on$/g,
-            "AUTOCOMPLETE_ENDPOINT": "/search/unitconversion/",
-            "SEARCH_RUN": "/search/find",
+            "AUTOCOMPLETE_ENDPOINT": currentURI.getPath() + "/unitconversion/",
+            "SEARCH_RUN": "find",
             "AUTOCOMPLETE_TAP_REQUEST_DATA": {
-              "endpoint": "/search/tap",
+              "endpoint": currentURI.getPath() + "/tap",
               "payload": {
                 "LANG": "ADQL",
                 "FORMAT": "CSV",
-                "QUERY": "select {0} from caom2.distinct_{0} where lower({0}) like '%{1}%' order by {0}"
+                "QUERY": "select {1} from caom2.distinct_{1} where lower({1}) like '%{2}%' order by {1}"
               },
               "fields": {
                 "Observation.proposal.pi": {
@@ -302,7 +304,7 @@
 
       if (!getTableMetadata().hasFieldWithID(_utype) && !utypeFields.extended)
       {
-        var strUtil = new cadc.web.util.StringUtil();
+        var strUtil = new org.opencadc.StringUtil();
 
         getTableMetadata().insertField(_order,
                                        new cadc.vot.Field(
@@ -313,7 +315,7 @@
                                          utypeFields.unit ? utypeFields.unit :
                                          _unit,
                                          strUtil.contains(_datatype,
-                                                          "INTERVAL")
+                                                          "INTERVAL", false)
                                            ? "INTERVAL" : null,// xtype not
                                          // normally
                                          // available
@@ -643,6 +645,7 @@
                 // Reset each time as they type.
                 suggestionKeys.length = 0;
 
+                var stringUtil = new org.opencadc.StringUtil();
                 var field =
                   ca.nrc.cadc.search.AUTOCOMPLETE_TAP_REQUEST_DATA.fields[id];
                 var defaultData =
@@ -650,9 +653,9 @@
                 var payload =
                   $.extend({}, defaultData,
                            {
-                             "QUERY": new cadc.web.util.StringUtil(
-                               defaultData.QUERY).format(field.tap_column,
-                                                         req.term.toLowerCase())
+                             "QUERY": stringUtil.format(defaultData.QUERY,
+                                                        field.tap_column,
+                                                        req.term.toLowerCase())
                            });
 
                 $.get(ca.nrc.cadc.search.AUTOCOMPLETE_TAP_REQUEST_DATA.endpoint,

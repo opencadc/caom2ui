@@ -28,6 +28,8 @@
 
 (function ($)
 {
+  var currentURI = new cadc.web.util.currentURI();
+
   $.extend(true, window, {
       "ca": {
         "nrc": {
@@ -152,7 +154,7 @@
                     return ca.nrc.cadc.search.datatrain.sortNumericDescending(val1, val2);
                   }
                 },
-                "ENDPOINT": "/search/tap",
+                "ENDPOINT": currentURI.getPath() + "/tap",
                 "DataTrain": DataTrain,
                 "events": {
                   "onDataTrainLoaded": new jQuery.Event("AdvancedSearch:onDataTrainLoaded"),

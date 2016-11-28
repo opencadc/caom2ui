@@ -6,20 +6,20 @@
       "nrc": {
         "cadc": {
           "search": {
-            "TAP_SYNC": "/search/tap",
-            "SEARCH_RUN": "/search/find",
+            "TAP_SYNC": "{1}/tap",
+            // "SEARCH_RUN": "{1}/find",
             "i18n": {
               "en": {
                 "ONE_CLICK_DOWNLOAD_TIP": "Single file or .tar if multiple files",
-                "ROW_COUNT_MESSAGE": "Showing {0} rows ({1} before filtering)."
+                "ROW_COUNT_MESSAGE": "Showing {1} rows ({2} before filtering)."
               },
               "fr": {
                 "ONE_CLICK_DOWNLOAD_TIP": "Seul fichier ou .tar si plusieurs",
-                "ROW_COUNT_MESSAGE": "Affichage de {0} résultats ({1} avant l'application du filtre)."
+                "ROW_COUNT_MESSAGE": "Affichage de {1} résultats ({2} avant l'application du filtre)."
               }
             },
-            "PACKAGE_SERVICE_ENDPOINT": "/search/package",
-            "UNIT_CONVERSION_ENDPOINT": "/search/unitconversion/",
+            "PACKAGE_SERVICE_ENDPOINT": "{1}/package",
+            "UNIT_CONVERSION_ENDPOINT": "{1}/unitconversion/",
             "QUICKSEARCH_SELECTOR": ".quicksearch_link",
             "GRID_SELECTOR": "#resultTable",
             "RESULTS_PAGE_SIZE": 500,
@@ -39,11 +39,14 @@
    *
    * @param _pageLanguage   The language from the page.
    * @param _autoInitFlag   Whether to autoinitialize this application.
+   * @param _contextPath    The application context path.
    * @constructor
    */
-  function AdvancedSearchApp(_pageLanguage, _autoInitFlag)
+  function AdvancedSearchApp(_pageLanguage, _autoInitFlag, _contextPath)
   {
     var _self = this;
+
+    var stringUtil = new org.opencadc.StringUtil();
 
     // Stat fields to show on result table.
     var netEnd, loadStart, loadEnd;
@@ -230,7 +233,7 @@
         new ca.nrc.cadc.search.FormConfiguration(
           new ca.nrc.cadc.search.ObsCore.FormConfiguration());
 
-      $.get(ca.nrc.cadc.search.TAP_SYNC,
+      $.get(stringUtil.format(ca.nrc.cadc.search.TAP_SYNC, [_contextPath]),
             {
               REQUEST: "doQuery",
               LANG: "ADQL",
@@ -523,7 +526,7 @@
           repopulateForm(formDataMap);
 
           var netStart = (new Date()).getTime();
-          $.post(ca.nrc.cadc.search.SEARCH_RUN,
+          $.post(stringUtil.format(ca.nrc.cadc.search.TAP_SYNC, [_contextPath]),
                  formData,
                  function (json)
                  {
@@ -767,9 +770,9 @@
 
         var rowCountMessage = function (totalRows, rowCount)
         {
-          return new cadc.web.util.StringUtil(
-            ca.nrc.cadc.search.i18n[getPageLanguage()]["ROW_COUNT_MESSAGE"]).
-          format(totalRows, rowCount);
+          return stringUtil.format(
+            ca.nrc.cadc.search.i18n[getPageLanguage()]["ROW_COUNT_MESSAGE"],
+            totalRows, rowCount);
         };
 
         var oneClickDownloadTitle = function ()
@@ -813,7 +816,7 @@
           columnFilterPluginName: "suggest",
           enableOneClickDownload: true,
           oneClickDownloadTitle: oneClickDownloadTitle(),
-          oneClickDownloadURL: ca.nrc.cadc.search.PACKAGE_SERVICE_ENDPOINT,
+          oneClickDownloadURL: stringUtil.format(ca.nrc.cadc.search.PACKAGE_SERVICE_ENDPOINT, _contextPath),
           oneClickDownloadURLColumnID: getActiveForm().getConfiguration().getDownloadAccessKey(),
           headerCheckboxLabel: "Mark",
           rowManager: {
@@ -1397,7 +1400,7 @@
     function setJobParameters(jobParams, callback)
     {
       var queryParam = "QUERY=" + encodeURIComponent(getADQL(true));
-      var votableURL = ca.nrc.cadc.search.TAP_SYNC
+      var votableURL = stringUtil.format(ca.nrc.cadc.search.TAP_SYNC, [_contextPath])
                        + "?LANG=ADQL&REQUEST=doQuery&" + queryParam;
 
       if (jobParams.upload_url && (jobParams.upload_url != null))
@@ -1638,7 +1641,7 @@
                  + totalLoadTime + secondsString;
         };
 
-        loadUWSJob(ca.nrc.cadc.search.TAP_SYNC + "?tap_url="
+        loadUWSJob(stringUtil.format(ca.nrc.cadc.search.TAP_SYNC, [_contextPath]) + "?tap_url="
                    + encodeURIComponent(json.job_url), function (event, args)
         {
           sessionStorage.setItem("uws_job", JSON.stringify(args.job));
@@ -1676,7 +1679,7 @@
         resultsVOTV.clearColumnFilters();
 
         resultsVOTV.build({
-                            url: ca.nrc.cadc.search.TAP_SYNC + "?tap_url="
+                            url: stringUtil.format(ca.nrc.cadc.search.TAP_SYNC, [_contextPath]) + "?tap_url="
                                  + encodeURIComponent(json.results_url),
                             useRelativeURL: true,
                             type: $("input[name='format']").val(),

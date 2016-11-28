@@ -166,9 +166,9 @@ public class ApplicationConfiguration
         return configuration.getInt(key, defaultValue);
     }
 
-    public boolean lookupBoolean(final String key)
+    public boolean lookupBoolean(final String key, final boolean defaultValue)
     {
-        return configuration.getBoolean(key, true);
+        return configuration.getBoolean(key, defaultValue);
     }
 
     public String lookup(final String key, final String defaultValue)

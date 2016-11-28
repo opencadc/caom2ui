@@ -189,6 +189,7 @@ public class SyncTAPClientImpl implements SyncTAPClient
     {
         // POST the parameters to the tapServer.
         final HttpPost httpPost = getPoster(url, job, outputStream);
+        httpPost.setFollowRedirects(followToResults);
         httpPost.run();
 
         if (!followToResults)

@@ -8,13 +8,15 @@
 
 (function ($)
 {
+  var currentURI = new cadc.web.util.currentURI();
+
   // register namespace
   $.extend(true, window, {
     "ca": {
       "nrc": {
         "cadc": {
           "search": {
-            "PREVIEW_URL_PREFIX": "/search/preview",
+            "PREVIEW_URL_PREFIX": currentURI.getPath() + "/preview",
             "Preview": Preview
           }
         }

@@ -5,7 +5,7 @@
       "nrc": {
         "cadc": {
           "search": {
-            "DETAILS_BASE_URL": "/search/caom2ui/view/",
+            "DETAILS_BASE_URL": "caom2ui/view/",
             "CAOM2_RESOLVER_VALUE_KEY": "Plane.position.bounds@Shape1Resolver.value",
             "OBSCORE_RESOLVER_VALUE_KEY": "Char.SpatialAxis.Coverage.Support.Area@Shape1Resolver.value",
             "CAOM2_TARGET_NAME_VALUE_KEY": "Plane.position.bounds@Shape1.value",

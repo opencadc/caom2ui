@@ -4,18 +4,32 @@
   <WatchedResource>WEB-INF/web.xml</WatchedResource>
 
   <!-- Data source for UWS jobs on Postgres -->
-  <Resource name="jdbc/uws"
-            auth="Container"
-            type="javax.sql.DataSource"
-            maxActive="1" maxIdle="1" maxWait="20000"
-            username="uws" password="astr0query"
-            driverClassName="org.postgresql.Driver"
-            url="jdbc:postgresql://uwspg:5432/uws"
-            removeAbandoned="true"
-            removeAbandonedTimeout="300"
-            logAbandoned="true"
-            testOnBorrow="true"
-            validationQuery="select 123"
-  />
+  <!--<Resource name="jdbc/uws"-->
+            <!--auth="Container"-->
+            <!--type="javax.sql.DataSource"-->
+            <!--maxActive="1" maxIdle="1" maxWait="20000"-->
+            <!--username="uws" password="astr0query"-->
+            <!--driverClassName="org.postgresql.Driver"-->
+            <!--url="jdbc:postgresql://uwspg:5432/uws"-->
+            <!--removeAbandoned="true"-->
+            <!--removeAbandonedTimeout="300"-->
+            <!--logAbandoned="true"-->
+            <!--testOnBorrow="true"-->
+            <!--validationQuery="select 123"-->
+  <!--/>-->
+
+  <!-- development server -->
+  <ResourceLink name="jdbc/uws-9"
+                global="jdbc/postgresql-uws-9"
+                type="javax.sql.DataSource"/>
+
+  <!-- production servers -->
+  <ResourceLink name="jdbc/uws-201"
+                global="jdbc/postgresql-uws-201"
+                type="javax.sql.DataSource"/>
+
+  <ResourceLink name="jdbc/uws-202"
+                global="jdbc/postgresql-uws-202"
+                type="javax.sql.DataSource"/>
 
 </Context>

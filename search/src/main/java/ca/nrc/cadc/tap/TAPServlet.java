@@ -234,8 +234,7 @@ public class TAPServlet extends ConfigurableServlet
             resp.setContentType("text/csv");
 
             final HttpDownload httpDownload =
-                    new HttpDownload(new URL(sourceURL),
-                                     resp.getOutputStream());
+                    new HttpDownload(new URL(sourceURL), outputStream);
             httpDownload.setFollowRedirects(true);
             httpDownload.run();
 

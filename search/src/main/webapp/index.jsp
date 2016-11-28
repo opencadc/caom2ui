@@ -38,8 +38,9 @@
       configuration.lookupInt("org.opencadc.search.max-row-count",
                               defaultMaxRowLimit);
   final boolean showObsCoreTab =
-      configuration.lookupBoolean("org.opencadc.search.obs-core");
-  final String theme = configuration.lookup("org.opencadc.search.theme");
+      configuration.lookupBoolean("org.opencadc.search.obs-core", true);
+  final String theme = configuration.lookup("org.opencadc.search.theme",
+                                            "base");
 
   if (theme != null)
   {
@@ -161,7 +162,7 @@
 <!-- CAOM2 Query Tab -->
 <div id="queryFormTab">
   <form id="queryForm" name="queryForm" class="queryForm advanced_search_form"
-        method="post" action="/search/find"
+        method="post" action="${pageContext.request.contextPath}/find"
         enctype="multipart/form-data">
 
     <!-- Used by VOView to sort the results. -->
@@ -324,7 +325,7 @@
 <!-- ObsCore Query Tab -->
 <div id="obsCoreQueryFormTab">
   <form id="obscoreQueryForm" name="obscoreQueryForm" class="queryForm"
-        method="post" action="/search/find"
+        method="post" action="${pageContext.request.contextPath}/find"
         enctype="multipart/form-data">
 
     <!-- Used by VOView to sort the results. -->
@@ -637,6 +638,9 @@
   <script type="text/javascript"
           src="cadcVOTV/javascript/jquery-ui-1.11.4.min.js?version=@version@"></script>
 
+  <script type="text/javascript"
+          src="cadcJS/javascript/org.opencadc.js"></script>
+
   <!-- Moment for date parsing and formatting -->
   <script type="text/javascript"
           src="js/moment.min.js?version=@version@"></script>
@@ -712,7 +716,8 @@
   $(document).ready(function ()
                     {
                       var searchApp =
-                          new ca.nrc.cadc.search.AdvancedSearchApp($("html").prop("lang"), false);
+                          new ca.nrc.cadc.search.AdvancedSearchApp($("html").prop("lang"), false,
+                            "${pageContext.request.contextPath}");
 
                       searchApp.subscribe(ca.nrc.cadc.search.events.onAdvancedSearchInit,
                                           function ()

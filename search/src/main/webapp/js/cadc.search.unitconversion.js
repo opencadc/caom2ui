@@ -35,7 +35,7 @@
         "cadc": {
           "search": {
             "unitconversion": {
-              "PREVIEW_URL_PREFIX": "/search/preview",
+              "PREVIEW_URL_PREFIX": "preview",
 
               // Month lengths in days.
               "mtab": [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31],

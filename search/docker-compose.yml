@@ -12,7 +12,8 @@ services:
       - caom2ui
       - uwspg
     volumes:
-      - /usr/local/tomcat/webapps
+      - /usr/local/search/webapps:/usr/local/tomcat/webapps
+      - /usr/local/search/config:/root/config
   uwspg:
     image: opencadc/uws_postgres
     networks:
@@ -26,9 +27,6 @@ services:
       - /var/run/postgresql
   caom2ops:
     image: opencadc/caom2ops
-    ports:
-#      - '6080:8080'
-      - '6555:5555'
     networks:
       - 'caom2'
     depends_on:
@@ -49,20 +47,25 @@ services:
       - /var/run/postgresql
   caom2ui:
     image: opencadc/caom2ui
-#    ports:
-#      - '3080:8080'
-#      - '3555:5555'
     networks:
       - 'caom2'
     volumes:
       - /usr/local/tomcat/webapps
     depends_on:
       - caom2ops
+  caom2repo:
+    image: opencadc/caom2repo
+    ports:
+      - '3000:8080'
+    networks:
+      - 'caom2'
+    depends_on:
+      - tappg
+    volumes:
+      - /usr/local/search/config:/root/config
+      - /usr/local/caom2repo/webapps:/usr/local/tomcat/webapps
   tap:
     image: opencadc/tap
-    ports:
-#      - '4080:8080'
-      - '4555:5555'
     networks:
       - 'caom2'
     depends_on:
