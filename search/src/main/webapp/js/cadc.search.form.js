@@ -12,10 +12,10 @@
             "FORM_LABEL_INPUT_LENGTH": 12,
             "TARGET_FORM_LABEL_INPUT_LENGTH": 24,
             "CHECKBOX_CHECKED_REGEX": /^true|on$/g,
-            "AUTOCOMPLETE_ENDPOINT": "unitconversion/",
-            "SEARCH_RUN": "find",
+            "AUTOCOMPLETE_ENDPOINT": currentURI.getPath() + "unitconversion/",
+            "SEARCH_RUN": currentURI.getPath() + "find",
             "AUTOCOMPLETE_TAP_REQUEST_DATA": {
-              "endpoint": "tap",
+              "endpoint": currentURI.getPath() + "tap",
               "payload": {
                 "LANG": "ADQL",
                 "FORMAT": "CSV",

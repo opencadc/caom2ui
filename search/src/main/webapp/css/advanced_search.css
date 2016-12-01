@@ -470,3 +470,7 @@ span.slick-column-picker-button:hover
 div#wb-core.base {
   padding-top: 50px;
 }
+
+canvas.aladin-imageCanvas {
+  background-color: rgba(255, 255, 255, 0.8);
+}

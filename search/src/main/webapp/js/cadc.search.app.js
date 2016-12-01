@@ -8,7 +8,7 @@
       "nrc": {
         "cadc": {
           "search": {
-            "TAP_SYNC": currentURI.getPath() + "tap",
+            "TAP_SYNC": "{1}/tap",
             "i18n": {
               "en": {
                 "ONE_CLICK_DOWNLOAD_TIP": "Single file or .tar if multiple files",
@@ -46,8 +46,6 @@
   function AdvancedSearchApp(_pageLanguage, _autoInitFlag, _contextPath)
   {
     var _self = this;
-
-    var stringUtil = new org.opencadc.StringUtil();
 
     // Stat fields to show on result table.
     var netEnd, loadStart, loadEnd;
@@ -227,14 +225,17 @@
                      + "table_name='caom2.Plane') and utype like 'caom2:%') or "
                      + "(table_name='ivoa.ObsCore' and utype like 'obscore:%')";
 
+      var stringUtil = new org.opencadc.StringUtil();
       var caomFormConfig =
         new ca.nrc.cadc.search.FormConfiguration(
           new ca.nrc.cadc.search.CAOM2.FormConfiguration());
       var obsCoreFormConfig =
         new ca.nrc.cadc.search.FormConfiguration(
           new ca.nrc.cadc.search.ObsCore.FormConfiguration());
+      var tapSearchURL =
+        stringUtil.format(ca.nrc.cadc.search.TAP_SYNC, [_contextPath]);
 
-      $.get(stringUtil.format(ca.nrc.cadc.search.TAP_SYNC, [_contextPath]),
+      $.get(tapSearchURL,
             {
               REQUEST: "doQuery",
               LANG: "ADQL",
@@ -526,6 +527,7 @@
           var formDataMap = deserializeFormData(formData);
           repopulateForm(formDataMap);
 
+          var stringUtil = new org.opencadc.StringUtil();
           var netStart = (new Date()).getTime();
           $.post(stringUtil.format(ca.nrc.cadc.search.TAP_SYNC, [_contextPath]),
                  formData,
@@ -739,11 +741,9 @@
 
         var formatCheckbox = function ($rowItem)
         {
-          var stringUtil =
-            new cadc.web.util.StringUtil(
-              $rowItem[getActiveForm().getDownloadAccessKey()]);
-
-          if (!stringUtil.hasText())
+          var stringUtil = new org.opencadc.StringUtil();
+          if (!stringUtil.hasText(
+            $rowItem[getActiveForm().getDownloadAccessKey()]))
           {
             var $checkboxSelect = $("input:checkbox._select_" + $rowItem.id);
             var $parentContainer = $checkboxSelect.parent("div");
@@ -771,15 +771,18 @@
 
         var rowCountMessage = function (totalRows, rowCount)
         {
-          return stringUtil.format(
-            ca.nrc.cadc.search.i18n[getPageLanguage()]["ROW_COUNT_MESSAGE"],
-            totalRows, rowCount);
+          var stringUtil = new org.opencadc.StringUtil();
+          var formattedRowCountMessage = stringUtil.format(
+            ca.nrc.cadc.search.i18n[_self.pageLanguage]["ROW_COUNT_MESSAGE"],
+            [totalRows, rowCount]);
+
+          return formattedRowCountMessage;
         };
 
         var oneClickDownloadTitle = function ()
         {
-          return ca.nrc.cadc.search.
-            i18n[getPageLanguage()]["ONE_CLICK_DOWNLOAD_TIP"];
+          return ca.nrc.cadc.search.i18n[_self.pageLanguage]
+            ["ONE_CLICK_DOWNLOAD_TIP"];
         };
 
         // Options for the CADC VOTV instance
@@ -1401,6 +1404,7 @@
     function setJobParameters(jobParams, callback)
     {
       var queryParam = "QUERY=" + encodeURIComponent(getADQL(true));
+      var stringUtil = new org.opencadc.StringUtil();
       var votableURL = stringUtil.format(ca.nrc.cadc.search.TAP_SYNC, [_contextPath])
                        + "?LANG=ADQL&REQUEST=doQuery&" + queryParam;
 
@@ -1642,7 +1646,12 @@
                  + totalLoadTime + secondsString;
         };
 
-        loadUWSJob(stringUtil.format(ca.nrc.cadc.search.TAP_SYNC, [_contextPath]) + "?tap_url="
+        var stringUtil = new org.opencadc.StringUtil();
+
+        var tapSearchURL =
+          stringUtil.format(ca.nrc.cadc.search.TAP_SYNC, [_contextPath]);
+
+        loadUWSJob(tapSearchURL + "?tap_url="
                    + encodeURIComponent(json.job_url), function (event, args)
         {
           sessionStorage.setItem("uws_job", JSON.stringify(args.job));
@@ -1678,9 +1687,8 @@
         }
 
         resultsVOTV.clearColumnFilters();
-
         resultsVOTV.build({
-                            url: stringUtil.format(ca.nrc.cadc.search.TAP_SYNC, [_contextPath]) + "?tap_url="
+                            url: tapSearchURL + "?tap_url="
                                  + encodeURIComponent(json.results_url),
                             useRelativeURL: true,
                             type: $("input[name='format']").val(),

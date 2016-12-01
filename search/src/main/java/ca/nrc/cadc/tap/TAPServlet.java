@@ -217,13 +217,13 @@ public class TAPServlet extends ConfigurableServlet
     /**
      * Create a job and query TAP.
      *
-     * @param req               The HTTP Request.
-     * @param resp              The HTTP Response.
-     * @param registryClient    The registry client to lookup the service.
-     * @throws IOException      If URL management fails.
+     * @param req            The HTTP Request.
+     * @param resp           The HTTP Response.
+     * @param registryClient The registry client to lookup the service.
+     * @throws IOException If URL management fails.
      */
-    void sendToTAP(HttpServletRequest req, HttpServletResponse resp,
-                   final RegistryClient registryClient)
+    private void sendToTAP(HttpServletRequest req, HttpServletResponse resp,
+                           final RegistryClient registryClient)
             throws IOException
     {
         final OutputStream outputStream = resp.getOutputStream();
@@ -252,12 +252,13 @@ public class TAPServlet extends ConfigurableServlet
 
     /**
      * Used for testers to override.
-     * @param syncTAPClient             The TAP Client.
-     * @param job                       The Job to execute.
-     * @param outputStream              The Output Stream to write output to.
+     *
+     * @param syncTAPClient The TAP Client.
+     * @param job           The Job to execute.
+     * @param outputStream  The Output Stream to write output to.
      */
-    void execute(final SyncTAPClient syncTAPClient, final Job job,
-                 final OutputStream outputStream)
+    private void execute(final SyncTAPClient syncTAPClient, final Job job,
+                         final OutputStream outputStream)
     {
         syncTAPClient.execute(lookupServiceURI(), job, outputStream);
     }

@@ -102,7 +102,8 @@
      */
     function hasText(_str)
     {
-      return hasLength(_str) && ($.trim(_str) !== "");
+      var wrapper = String(_str);
+      return hasLength(wrapper) && ($.trim(wrapper) !== "");
     }
 
     /**
