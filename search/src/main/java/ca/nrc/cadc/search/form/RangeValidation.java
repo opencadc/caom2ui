@@ -38,7 +38,7 @@ import ca.nrc.cadc.util.StringUtil;
 
 /**
  * Class to represent a constraint entered from the form, that displays a range.
- * <p></p>
+ * <p/>
  * Things that should always be true:
  * - units for the constraint should be set
  * - set a range for the constraint.  If the form field has a single

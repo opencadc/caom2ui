@@ -83,9 +83,9 @@ import java.io.File;
 
 public class ApplicationConfiguration extends CombinedConfiguration
 {
-    public static final String CAOM2OPS_SERVICE_URI_PROPERTY_KEY =
+    public static final String CAOM2META_SERVICE_URI_PROPERTY_KEY =
             "org.opencadc.search.caom2ops-service-id";
-    public static final String DEFAULT_CAOM2OPS_SERVICE_URI_VALUE =
+    public static final String DEFAULT_CAOM2META_SERVICE_URI_VALUE =
             "ivo://cadc.nrc.ca/caom2ops";
     private static final Logger LOGGER =
             Logger.getLogger(ApplicationConfiguration.class);

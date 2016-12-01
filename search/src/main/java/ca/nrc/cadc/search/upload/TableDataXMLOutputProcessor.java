@@ -75,7 +75,7 @@ public class TableDataXMLOutputProcessor extends AbstractXMLOutputProcessor
 
     /**
      * This will handle printing of an {@link org.jdom2.Element}.
-     * <p></p>
+     * <p/>
      * This method arranges for outputting the Element infrastructure including
      * Namespace Declarations and Attributes.
      *

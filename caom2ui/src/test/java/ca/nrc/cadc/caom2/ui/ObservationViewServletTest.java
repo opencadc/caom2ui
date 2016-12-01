@@ -242,8 +242,8 @@ public class ObservationViewServletTest
         expect(mockObservationReader.getObs()).andReturn(result).once();
 
         expect(mockConfiguration.getString(
-                ApplicationConfiguration.CAOM2OPS_SERVICE_URI_PROPERTY_KEY,
-                ApplicationConfiguration.DEFAULT_CAOM2OPS_SERVICE_URI_VALUE))
+                ApplicationConfiguration.CAOM2META_SERVICE_URI_PROPERTY_KEY,
+                ApplicationConfiguration.DEFAULT_CAOM2META_SERVICE_URI_VALUE))
                 .andReturn("ivo://myhost.com/caom2-service").once();
 
         expect(mockRegistryClient.getServiceURL(URI.create(

@@ -154,7 +154,7 @@
                     return ca.nrc.cadc.search.datatrain.sortNumericDescending(val1, val2);
                   }
                 },
-                "ENDPOINT": currentURI.getPath() + "/tap",
+                "ENDPOINT": currentURI.getPath() + "tap",
                 "DataTrain": DataTrain,
                 "events": {
                   "onDataTrainLoaded": new jQuery.Event("AdvancedSearch:onDataTrainLoaded"),
@@ -186,9 +186,10 @@ function DataTrain(_modelDataSource, _autoInitFlag)
     var tapQuery = createTAPQuery();
 
     $.get(ca.nrc.cadc.search.datatrain.ENDPOINT, {
-      "LANG": "ADQL",
-      "FORMAT": "CSV",
-      "QUERY": tapQuery
+      REQUEST: "doQuery",
+      LANG: "ADQL",
+      FORMAT: "CSV",
+      QUERY: tapQuery
     }).done(function (data)
             {
               load(data);

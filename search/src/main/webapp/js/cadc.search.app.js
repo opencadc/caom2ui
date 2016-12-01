@@ -1,13 +1,14 @@
 (function ($)
 {
+  var currentURI = new cadc.web.util.currentURI();
+
   // register namespace
   $.extend(true, window, {
     "ca": {
       "nrc": {
         "cadc": {
           "search": {
-            "TAP_SYNC": "{1}/tap",
-            // "SEARCH_RUN": "{1}/find",
+            "TAP_SYNC": currentURI.getPath() + "tap",
             "i18n": {
               "en": {
                 "ONE_CLICK_DOWNLOAD_TIP": "Single file or .tar if multiple files",
@@ -18,8 +19,8 @@
                 "ROW_COUNT_MESSAGE": "Affichage de {1} résultats ({2} avant l'application du filtre)."
               }
             },
-            "PACKAGE_SERVICE_ENDPOINT": "{1}/package",
-            "UNIT_CONVERSION_ENDPOINT": "{1}/unitconversion/",
+            "PACKAGE_SERVICE_ENDPOINT": currentURI.getPath() + "package",
+            "UNIT_CONVERSION_ENDPOINT": currentURI.getPath() + "unitconversion",
             "QUICKSEARCH_SELECTOR": ".quicksearch_link",
             "GRID_SELECTOR": "#resultTable",
             "RESULTS_PAGE_SIZE": 500,
@@ -816,7 +817,7 @@
           columnFilterPluginName: "suggest",
           enableOneClickDownload: true,
           oneClickDownloadTitle: oneClickDownloadTitle(),
-          oneClickDownloadURL: stringUtil.format(ca.nrc.cadc.search.PACKAGE_SERVICE_ENDPOINT, _contextPath),
+          oneClickDownloadURL: ca.nrc.cadc.search.PACKAGE_SERVICE_ENDPOINT,
           oneClickDownloadURLColumnID: getActiveForm().getConfiguration().getDownloadAccessKey(),
           headerCheckboxLabel: "Mark",
           rowManager: {

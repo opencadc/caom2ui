@@ -43,7 +43,7 @@ public class Enumerated extends AbstractScalarFormConstraint implements Searchab
 {    
     // Constants used to construct name for form elements.
     public static final String NAME = "@Enumerated";
-    static final String UTYPE = "@Enumerated.utype";
+    public static final String UTYPE = "@Enumerated.utype";
 //    public static final String LABEL = "@Enumerated.label";
     
     // Label for the list.
@@ -79,7 +79,7 @@ public class Enumerated extends AbstractScalarFormConstraint implements Searchab
      * 
      * @return String concatenation of the utype and error message.
      */
-    String getErrorMessage()
+    public String getErrorMessage()
     {
         return "";
     }

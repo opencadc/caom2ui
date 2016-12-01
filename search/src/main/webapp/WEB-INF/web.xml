@@ -101,6 +101,10 @@
       <param-name>ca.nrc.cadc.uws.server.JobManager</param-name>
       <param-value>ca.nrc.cadc.uws.SearchJobManager</param-value>
     </init-param>
+    <init-param>
+      <param-name>ca.nrc.cadc.uws.web.InlineContentHandler</param-name>
+      <param-value>ca.nrc.cadc.uws.SearchInlineContentHandler</param-value>
+    </init-param>
   </servlet>
 
   <servlet>

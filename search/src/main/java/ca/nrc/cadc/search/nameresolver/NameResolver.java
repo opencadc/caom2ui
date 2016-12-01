@@ -28,7 +28,6 @@
 
 package ca.nrc.cadc.search.nameresolver;
 
-import ca.nrc.cadc.astro.ConversionUtil;
 import ca.nrc.cadc.search.nameresolver.exception.ClientException;
 import ca.nrc.cadc.search.nameresolver.exception.TargetNotFoundException;
 import ca.nrc.cadc.search.nameresolver.exception.WebServiceException;
@@ -41,21 +40,22 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 
+import ca.nrc.cadc.astro.CoordUtil;
 import ca.nrc.cadc.util.StringUtil;
 
 
 /**
  * Client Class to query the Name Resolver servlet using an HTTP GET request. The Name Resolver servlet
  * attempts to resolve a target name to RA and DEC coordinates in degrees.
- * <p></p>
+ * <p/>
  * Four methods are provided to resolve a target name. Each method takes the target name,
  * then optionally either a service argument, or cached argument , or both.
- * <p></p>
+ * <p/>
  * By default Name Resolver concurrently queries NED at CalTech, Simbad at CDS, and VizieR at CDS and CADC,
  * returning the first positive result. The service argument can specify any combination of NED, SIMBAD,
  * or VIZIER, comma delimited if more than one is specified, no spaces allowed. The service argument
  * is not case sensitive.
- * <p></p>
+ * <p/>
  * The cached argument is true to return results from the Name Resolver cache (the default), or false
  * to force the Name Resolver to query the services for the target without checking it's cached results.
  *
@@ -81,19 +81,12 @@ public class NameResolver
     private static final String TIME = "time(ms)=";
     private static final String[] SERVICES = new String[]{"NED", "SIMBAD",
                                                           "VIZIER", "ALL"};
-    private final ConversionUtil conversionUtil;
 
     /**
      * Constructs a new CADCResolver initialized with the default services and cached values.
      */
     public NameResolver()
     {
-        this(new ConversionUtil());
-    }
-
-    public NameResolver(final ConversionUtil conversionUtil)
-    {
-        this.conversionUtil = conversionUtil;
     }
 
     /**
@@ -220,11 +213,13 @@ public class NameResolver
             final String[] results = sb.toString().split("\n");
             for (final String result : results)
             {
-                if (result.startsWith(TARGET))
+                final String res = result.trim();
+
+                if (res.startsWith(TARGET))
                 {
-                    if (TARGET.length() < result.length())
+                    if (TARGET.length() < res.length())
                     {
-                        data.target = result.substring(TARGET.length());
+                        data.target = res.substring(TARGET.length()).trim();
                     }
                     else
                     {
@@ -232,11 +227,11 @@ public class NameResolver
                     }
 
                 }
-                else if (result.startsWith(SERVICE))
+                else if (res.startsWith(SERVICE))
                 {
-                    if (SERVICE.length() < result.length())
+                    if (SERVICE.length() < res.length())
                     {
-                        data.service = result.substring(SERVICE.length());
+                        data.service = res.substring(SERVICE.length()).trim();
                     }
                     else
                     {
@@ -244,47 +239,47 @@ public class NameResolver
                     }
 
                 }
-                else if (result.startsWith(COORDSYS))
+                else if (res.startsWith(COORDSYS))
                 {
-                    if (COORDSYS.length() < result.length())
+                    if (COORDSYS.length() < res.length())
                     {
-                        data.coordsys = result.substring(COORDSYS.length());
+                        data.coordsys = res.substring(COORDSYS.length()).trim();
                     }
                     else
                     {
                         throw new ClientException("Coordinate system not found in query results");
                     }
                 }
-                else if (result.startsWith(RA))
+                else if (res.startsWith(RA))
                 {
-                    if (RA.length() < result.length())
+                    if (RA.length() < res.length())
                     {
-                        data.ra = conversionUtil.raToDegrees(
-                                result.substring(RA.length()));
+                        data.ra = CoordUtil.raToDegrees(
+                                res.substring(RA.length()));
                     }
                     else
                     {
                         throw new ClientException("RA not found in query results");
                     }
                 }
-                else if (result.startsWith(DEC))
+                else if (res.startsWith(DEC))
                 {
-                    if (DEC.length() < result.length())
+                    if (DEC.length() < res.length())
                     {
-                        data.dec = conversionUtil.decToDegrees(
-                                result.substring(DEC.length()));
+                        data.dec = CoordUtil.decToDegrees(res.substring(
+                                DEC.length()));
                     }
                     else
                     {
                         throw new ClientException("DEC not found in query results");
                     }
                 }
-                else if (result.startsWith(TIME))
+                else if (res.startsWith(TIME))
                 {
-                    if (TIME.length() < result.length())
+                    if (TIME.length() < res.length())
                     {
-                        data.time = Integer.parseInt(
-                                result.substring(TIME.length()));
+                        data.time = Integer.parseInt(res.substring(
+                                TIME.length()));
                     }
                     else
                     {
@@ -295,28 +290,28 @@ public class NameResolver
                 {
                     if (maxDetail)
                     {
-                        if (result.startsWith(ONAME))
+                        if (res.startsWith(ONAME))
                         {
-                            if (ONAME.length() < result.length())
+                            if (ONAME.length() < res.length())
                             {
-                                data.objectName = result
-                                        .substring(ONAME.length());
+                                data.objectName = res
+                                        .substring(ONAME.length()).trim();
                             }
                         }
-                        else if (result.startsWith(OTYPE))
+                        else if (res.startsWith(OTYPE))
                         {
-                            if (OTYPE.length() < result.length())
+                            if (OTYPE.length() < res.length())
                             {
-                                data.objectType = result
-                                        .substring(OTYPE.length());
+                                data.objectType = res
+                                        .substring(OTYPE.length()).trim();
                             }
                         }
-                        else if (result.startsWith(MTYPE))
+                        else if (res.startsWith(MTYPE))
                         {
-                            if (MTYPE.length() < result.length())
+                            if (MTYPE.length() < res.length())
                             {
-                                data.morphologyType = result
-                                        .substring(MTYPE.length());
+                                data.morphologyType = res
+                                        .substring(MTYPE.length()).trim();
                             }
                         }
                     }

@@ -46,13 +46,13 @@ import org.apache.log4j.Logger;
 
 
 /**
- * %SEPARATOR% ∈ (%SPACE%, comma)
- * %ENERGY% ::= %value%[[%SPACE%]%UNIT%]
- * %ENERGY_SPEC% ::= %NAME%
- * ::= %ENERGY_VALUE%
- * ::= %ENERGY_VALUE%%SEPARATOR%%TOLERANCE%
- * ::= %ENERGY_VALUE%%SEPARATOR%%ENERGY_VALUE%
- * ::= %ENERGY_VALUE%%SEPARATOR%%ENERGY_VALUE%%SEPARATOR%%TOLERANCE%
+ * <sep> ∈ (space, comma)
+ * <energy> ::= <value>[[<space>]<unit>]
+ * <energyspec> ::= <name>
+ * ::= <energy>
+ * ::= <energy><sep><tolerance>
+ * ::= <energy><sep><energy>
+ * ::= <energy><sep><energy><sep><tolerance>
  *
  * @author jburke
  */

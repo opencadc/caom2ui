@@ -58,16 +58,11 @@ public class EnergyUnitConverter implements UnitConverter
     }
 
     /**
-     * Convert the supplied value/units to a value expressed in core energy
-     * units.
-     *
-     * @param value     The value to convert.
-     * @param units     The unit to convert to.
-     * @return          double conversion to metres.
+     * Convert the supplied value/units to a value expressed in core energy units.
      */
     public double convert(double value, String units)
     {
-        return toMetres(value, units);
+        return toMeters(value, units);
     }
 
     /**
@@ -77,24 +72,24 @@ public class EnergyUnitConverter implements UnitConverter
      * @param units
      * @return wavelength in meters
      */
-    public double toMetres(double d, String units)
+    public double toMeters(double d, String units)
     {
         int i = ArrayUtil.matches("^" + units + "$", FREQ_UNITS, true);
         if (i != -1)
         {
-            return freqToMetres(d, i);
+            return freqToMeters(d, i);
         }
 
         i = ArrayUtil.matches("^" + units + "$", EN_UNITS, true);
         if (i != -1)
         {
-            return energyToMetres(d, i);
+            return energyToMeters(d, i);
         }
 
         i = ArrayUtil.matches("^" + units + "$", WAVE_UNITS, true);
         if (i != -1)
         {
-            return wavelengthToMetres(d, i);
+            return wavelengthToMeters(d, i);
         }
 
         throw new IllegalArgumentException("Unknown units: " + units);
@@ -140,8 +135,8 @@ public class EnergyUnitConverter implements UnitConverter
      */
     public double toDeltaMeters(double d1, double d2, String units)
     {
-        double w1 = toMetres(d1, units);
-        double w2 = toMetres(d2, units);
+        double w1 = toMeters(d1, units);
+        double w2 = toMeters(d2, units);
         return Math.abs(w2 - w1);
     }
 
@@ -160,33 +155,19 @@ public class EnergyUnitConverter implements UnitConverter
         return Math.abs(f2 - f1);
     }
 
-    /**
-     * Frequency to metre conversion.
-     *
-     * @param d
-     * @param i
-     * @return
-     */
-    private double freqToMetres(double d, int i)
+    private double freqToMeters(double d, int i)
     {
         final double nu = d * FREQ_MULT[i];
         return c / nu;
     }
 
-    /**
-     * Any energy value to metres.
-     *
-     * @param d
-     * @param i
-     * @return
-     */
-    private double energyToMetres(double d, int i)
+    private double energyToMeters(double d, int i)
     {
         final double e = eV * d * EN_MULT[i];
         return c * h / e;
     }
 
-    private double wavelengthToMetres(double d, int i)
+    private double wavelengthToMeters(double d, int i)
     {
         return d * WAVE_MULT[i];
     }
@@ -198,7 +179,7 @@ public class EnergyUnitConverter implements UnitConverter
 
     private double energyToHz(double d, int i)
     {
-        double w = energyToMetres(d, i);
+        double w = energyToMeters(d, i);
         return c / w;
     }
 
@@ -215,7 +196,7 @@ public class EnergyUnitConverter implements UnitConverter
         for (String u : WAVE_UNITS)
         {
             System.out.println("absolute: 5" + u + " = " + euc
-                    .toMetres(5.0, u) + "m == " + euc.toHz(5.0, u) + "Hz");
+                    .toMeters(5.0, u) + "m == " + euc.toHz(5.0, u) + "Hz");
             System.out.println("relative: 4-6" + u + " = " + euc
                     .toDeltaMeters(4.0, 6.0, u) + "m == " + euc
                                        .toDeltaHz(4.0, 6.0, u) + "Hz");
@@ -225,7 +206,7 @@ public class EnergyUnitConverter implements UnitConverter
         for (String u : FREQ_UNITS)
         {
             System.out.println("absolute: 5" + u + " = " + euc
-                    .toMetres(5.0, u) + "m == " + euc.toHz(5.0, u) + "Hz");
+                    .toMeters(5.0, u) + "m == " + euc.toHz(5.0, u) + "Hz");
             System.out.println("relative: 4-6" + u + " = " + euc
                     .toDeltaMeters(4.0, 6.0, u) + "m == " + euc
                                        .toDeltaHz(4.0, 6.0, u) + "Hz");
@@ -235,7 +216,7 @@ public class EnergyUnitConverter implements UnitConverter
         for (String u : EN_UNITS)
         {
             System.out.println("absolute: 5" + u + " = " + euc
-                    .toMetres(5.0, u) + "m == " + euc.toHz(5.0, u) + "Hz");
+                    .toMeters(5.0, u) + "m == " + euc.toHz(5.0, u) + "Hz");
             System.out.println("relative: 4-6" + u + " = " + euc
                     .toDeltaMeters(4.0, 6.0, u) + "m == " + euc
                                        .toDeltaHz(4.0, 6.0, u) + "Hz");

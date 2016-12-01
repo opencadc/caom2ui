@@ -39,7 +39,6 @@
 
 package ca.nrc.cadc.search.parser;
 
-import ca.nrc.cadc.astro.ConversionUtil;
 import ca.nrc.cadc.search.parser.exception.DateParserException;
 import java.util.Calendar;
 import java.util.Date;
@@ -53,15 +52,15 @@ import org.apache.log4j.Logger;
  *         HH ∈ [0, 23]
  *        mjd ∈ [toMJD(1900), toMJD(2100)]
  *         jd ∈ [toJD(1900), toJD(2100)]
- *      %sep% ∈ (space, comma)
- *  %iso_sep% ∈ (space, T)
+ *      <sep> ∈ (space, comma)
+ *  <iso_sep> ∈ (space, T)
  *
- *     %date% ::= %yyyy%[-%MM%[-%dd%]]
- *     %time% ::= %HH%[:%mm%[:%ss%]]
- *  %iso8601% ::= %date%[%iso_sep%%time%]
+ *     <date> ::= <yyyy>[-<MM>[-<dd>]]
+ *     <time> ::= <HH>[:<mm>[:<ss>]]
+ *  <iso8601> ::= <date>[<iso_sep><time>]
  *
- * %timespec% ::= %timespec%[%sep%%timespec%]
- * %timespec% ::= %jd%|%mjd%|%iso8601%
+ * <timespec> ::= <timespec>[<sep><timespec>]
+ * <timespec> ::= <jd>|<mjd>|<iso8601>
  *
  * @author jburke
  */
@@ -91,7 +90,6 @@ public class DateParser
     public static String DATE_SEPARATER = "[-]";
     public static String TIME_SEPARATER = "[:.]";
 
-    private final ConversionUtil conversionUtil = new ConversionUtil();
     public static final TimeZone UTC = TimeZone.getTimeZone("UTC");
 
     private Date date;
@@ -187,7 +185,7 @@ public class DateParser
             int dot = tokens[0].indexOf(".");
             if (dot == -1)
             {
-                // No decimal places given so day precision.
+                // No decimal places given so day percision.
                 lastParsedField = Calendar.DAY_OF_MONTH;
             }
             else
@@ -655,9 +653,9 @@ public class DateParser
      * @param mjd the MJD value
      * @return a Date in the UTC time zone
      */
-    public Calendar toCalendar(double mjd)
+    public static Calendar toCalendar(double mjd)
     {
-        int[] ymd = conversionUtil.slaDjcl(mjd);
+        int[] ymd = slaDjcl(mjd);
 
         // fraction of a day
         double frac = mjd - ((double) (long) mjd);
@@ -684,6 +682,80 @@ public class DateParser
         cal.set(Calendar.MILLISECOND, ms);
 
         return cal;
+    }
+
+    //void slaDjcl ( double djm, int *iy, int *im, int *id, double *fd, int *j)
+    private static int[] slaDjcl(double djm)
+    /*
+     **  - - - - - - - -
+     **   s l a D j c l
+     **  - - - - - - - -
+     **
+     **  Modified Julian Date to Gregorian year, month, day,
+     **  and fraction of a day.
+     **
+     **  Given:
+     **     djm      double     Modified Julian Date (JD-2400000.5)
+     **
+     **  Returned:
+     **     *iy      int        year
+     **     *im      int        month
+     **     *id      int        day
+     **     *fd      double     fraction of day
+     **     *j       int        status:
+     **                      -1 = unacceptable date (before 4701BC March 1)
+     **
+     **  The algorithm is derived from that of Hatcher 1984 (QJRAS 25, 53-55).
+     **
+     **  Defined in slamac.h:  dmod
+     **
+     **  Last revision:   12 March 1998
+     **
+     **  Copyright P.T.Wallace.  All rights reserved.
+     */
+    {
+        //System.out.println("[slaDjcl] " + djm);
+        //double f, d;
+        //double f;
+        long ld, jd, n4, nd10;
+
+        /* Check if date is acceptable */
+        if ((djm <= -2395520.0) || (djm >= 1e9))
+        //{
+        //*j = -1;
+        //return;
+        {
+            throw new IllegalArgumentException("MJD out of valid range");
+        //}
+        //else
+        //{
+        //	*j = 0;
+
+        /* Separate day and fraction */
+        //f = dmod ( djm, 1.0 );
+        //if ( f < 0.0 ) f += 1.0;
+        //d = djm - f;
+        //d = dnint ( d );
+        }
+        ld = (long) djm;
+
+        /* Express day in Gregorian calendar */
+        //jd = (long) dnint ( d ) + 2400001;
+        jd = ld + 2400001L;
+        n4 = 4L * (jd + ((6L * ((4L * jd - 17918L) / 146097L)) / 4L + 1L) / 2L - 37L);
+        nd10 = 10L * (((n4 - 237L) % 1461L) / 4L) + 5L;
+        //*iy = (int) (n4/1461L-4712L);
+        //*im = (int) (((nd10/306L+2L)%12L)+1L);
+        //*id = (int) ((nd10%306L)/10L+1L);
+        //*fd = f;
+        int[] ret = new int[3];
+        ret[0] = (int) (n4 / 1461L - 4712L);
+        ret[1] = (int) (((nd10 / 306L + 2L) % 12L) + 1L);
+        ret[2] = (int) ((nd10 % 306L) / 10L + 1L);
+
+        //*j = 0;
+        return ret;
+    //}
     }
 
     public Date getDate()

@@ -2,7 +2,7 @@
  ************************************************************************
  ****  C A N A D I A N   A S T R O N O M Y   D A T A   C E N T R E  *****
  *
- * (c) 2013.                         (c) 2013.
+ * (c) 2012.                         (c) 2012.
  * National Research Council            Conseil national de recherches
  * Ottawa, Canada, K1A 0R6              Ottawa, Canada, K1A 0R6
  * All rights reserved                  Tous droits reserves
@@ -24,59 +24,50 @@
  *
  *
  * @author jenkinsd
- * 11/14/13 - 2:45 PM
+ * 6/11/12 - 9:13 AM
  *
  *
  *
  ****  C A N A D I A N   A S T R O N O M Y   D A T A   C E N T R E  *****
  ************************************************************************
  */
-package ca.nrc.cadc.search.plugins;
+package ca.nrc.cadc.uws.server;
 
-import ca.nrc.cadc.net.OutputStreamWrapper;
-import ca.nrc.cadc.search.upload.VOTableUploader;
-import ca.nrc.cadc.web.ServerToServerFTPTransfer;
-import ca.nrc.cadc.uws.web.InlineContentException;
-
-import java.io.IOException;
-import java.net.URL;
+import ca.nrc.cadc.uws.Job;
 
 
-/**
- * Default implementation of a VOTableUploader.
- */
-public class FTPVOTableUploaderImpl implements VOTableUploader
+public class SyncExecutor extends AbstractExecutor
 {
-    private final ServerToServerFTPTransfer ftpTransfer;
-
-
     /**
-     * Default empty constructor.
-     */
-    FTPVOTableUploaderImpl()
-    {
-        this(new ServerToServerFTPTransfer("ftp", 21));
-    }
-
-    FTPVOTableUploaderImpl(final ServerToServerFTPTransfer ftpTransfer)
-    {
-        this.ftpTransfer = ftpTransfer;
-    }
-
-    /**
-     * Perform the upload.
+     * Complete constructor.
      *
-     * @param stream            The OutputStreamWrapper
-     * @param filename          The filename to use.
-     * @return The URL of where to get the upload.
-     * @throws InlineContentException If the upload fails.
-     * @throws IOException            If the return URL cannot be obtained.
+     * @param jobUpdater            The Job persistence object.
+     * @param jobRunnerClass        The Class to instantiate to run the Job.
+     */
+    public SyncExecutor(final JobUpdater jobUpdater,
+                        final Class<? extends JobRunner> jobRunnerClass)
+    {
+        super(jobUpdater, jobRunnerClass);
+    }
+
+
+    /**
+     * Execute the job asynchronously.
+     *
+     * @param job           The Job to execute.
+     * @param jobRunner     The runner class to run the Job.
      */
     @Override
-    public URL upload(final OutputStreamWrapper stream, final String filename)
-            throws InlineContentException, IOException
+    protected void executeAsync(final Job job, final JobRunner jobRunner)
     {
-        ftpTransfer.send(stream, filename);
-        return new URL(String.format("ftp://ftp:21/%s", filename));
+        throw new IllegalStateException("Asynchronous access prohibited.  "
+                                        + "Use the ThreadExecutor instead.");
+    }
+
+    @Override
+    protected void abortJob(final String jobID)
+    {
+        throw new IllegalStateException("Asynchronous access prohibited.  "
+                                        + "Use the ThreadExecutor instead.");
     }
 }

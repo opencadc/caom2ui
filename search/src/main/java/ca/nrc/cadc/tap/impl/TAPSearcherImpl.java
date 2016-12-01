@@ -196,8 +196,8 @@ public class TAPSearcherImpl implements Searcher
      * @throws IOException   Any I/O weirdness.
      * @throws JSONException Any weirdness writing out JSON.
      */
-    private void runSearch(final URI serviceURI, final JSONWriter jsonWriter,
-                           final Job job, final FormData formData)
+    void runSearch(final URI serviceURI, final JSONWriter jsonWriter,
+                   final Job job, final FormData formData)
             throws IOException, JSONException
     {
         // Generate the ADQL query string.

@@ -33,12 +33,9 @@
  */
 package ca.nrc.cadc.search.upload;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import ca.nrc.cadc.net.HttpUpload;
-import ca.nrc.cadc.net.OutputStreamWrapper;
 import ca.nrc.cadc.uws.web.InlineContentException;
 
 
@@ -47,14 +44,9 @@ public interface VOTableUploader
     /**
      * Perform the upload.
      *
-     * @param stream            The OutputStreamWrapper
-     * @param filename          The filename to use.
-     *
      * @return  The URL of where to get the upload.
      * @throws InlineContentException   If the upload fails.
-     * @throws IOException    If the return URL cannot be obtained.
+     * @throws MalformedURLException    If the return URL cannot be obtained.
      */
-    URL upload(final OutputStreamWrapper stream,
-               final String filename) throws InlineContentException,
-                                             IOException;
+    URL upload() throws InlineContentException, MalformedURLException;
 }

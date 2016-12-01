@@ -96,11 +96,11 @@ public class ApplicationConfiguration
     public static final URI DEFAULT_TAP_SERVICE_URI =
             URI.create("ivo://cadc.nrc.ca/tap");
 
-    public static final String CAOM2OPS_SERVICE_URI_PROPERTY_KEY =
+    public static final String CAOM2PKG_SERVICE_URI_PROPERTY_KEY =
             "org.opencadc.search.caom2ops-service-id";
-    public static final String CAOM2OPS_SERVICE_HOST_PORT_PROPERTY_KEY =
+    public static final String CAOM2PKG_SERVICE_HOST_PORT_PROPERTY_KEY =
             "org.opencadc.search.caom2ops-service-host-port";
-    public static final URI DEFAULT_CAOM2OPS_SERVICE_URI =
+    public static final URI DEFAULT_CAOM2PKG_SERVICE_URI =
             URI.create("ivo://cadc.nrc.ca/caom2ops");
 
     public final static String CAOM2_UI_PROPERTY_KEY =

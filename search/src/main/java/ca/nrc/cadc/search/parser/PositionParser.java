@@ -39,8 +39,7 @@
 
 package ca.nrc.cadc.search.parser;
 
-import ca.nrc.cadc.astro.ConversionUtil;
-
+import ca.nrc.cadc.astro.CoordUtil;
 
 /**
  *
@@ -48,31 +47,18 @@ import ca.nrc.cadc.astro.ConversionUtil;
  */
 public class PositionParser extends AbstractPositionParser
 {
-    private final ConversionUtil conversionUtil;
-
-
-    public PositionParser()
-    {
-        this(new ConversionUtil());
-    }
-
-    PositionParser(final ConversionUtil conversionUtil)
-    {
-        this.conversionUtil = conversionUtil;
-    }
-
 
     @Override
     protected Double raToDegrees(final String ra)
     {
         // CoordUtil has a bug in it, which means we need to force lower case.
-        return conversionUtil.raToDegrees(ra.toLowerCase());
+        return CoordUtil.raToDegrees(ra.toLowerCase());
     }
 
     @Override
     protected Double decToDegrees(final String dec)
     {
         // CoordUtil has a bug in it, which means we need to force lower case.
-        return conversionUtil.decToDegrees(dec.toLowerCase());
+        return CoordUtil.decToDegrees(dec.toLowerCase());
     }
 }

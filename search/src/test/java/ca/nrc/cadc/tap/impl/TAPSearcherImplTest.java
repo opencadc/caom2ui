@@ -39,21 +39,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import ca.nrc.cadc.reg.client.RegistryClient;
+import ca.nrc.cadc.search.FormData;
 import ca.nrc.cadc.search.Templates;
-import ca.nrc.cadc.search.form.FormConstraint;
 import ca.nrc.cadc.search.form.SearchableFormConstraint;
 import ca.nrc.cadc.search.form.Text;
 import ca.nrc.cadc.tap.SyncTAPClient;
 
 import ca.nrc.cadc.AbstractUnitTest;
 import ca.nrc.cadc.search.QueryGenerator;
-import ca.nrc.cadc.search.upload.UploadResults;
 import ca.nrc.cadc.uws.Job;
 import ca.nrc.cadc.uws.Parameter;
-import ca.nrc.cadc.uws.Result;
 import ca.nrc.cadc.uws.SyncResponseWriter;
 
+import org.json.JSONWriter;
 import org.junit.Test;
 import static org.easymock.EasyMock.*;
 
@@ -84,6 +82,7 @@ public class TAPSearcherImplTest extends AbstractUnitTest<TAPSearcherImpl>
     @Test
     public void search() throws Exception
     {
+        final FormData mockFormData = createMock(FormData.class);
         final List<Parameter> parameters = new ArrayList<>();
         final Writer writer = new StringWriter();
 
@@ -148,15 +147,19 @@ public class TAPSearcherImplTest extends AbstractUnitTest<TAPSearcherImpl>
         expect(mockQueryGenerator.generate(templates))
                 .andReturn(stringBuilder).once();
 
-        expect(mockSyncResponseWriter.getWriter()).andReturn(writer).times(2);
+        final JSONWriter jsonWriter = new JSONWriter(writer);
 
-        mockSyncResponseWriter.setResponseHeader("Content-Type",
-                                                 "application/json");
-        expectLastCall().once();
+        expect(mockFormData.getFormConstraints()).andReturn(constraints).once();
+        expect(mockFormData.getFormValueUnits()).andReturn(
+                new HashMap<String, String>());
 
-        replay(mockSyncResponseWriter, mockQueryGenerator, mockSyncTAPClient);
-        getTestSubject().search(dummyJob, URI.create("ivo://mysite.com/service"),
-                                mockSyncResponseWriter);
-        verify(mockSyncResponseWriter, mockQueryGenerator, mockSyncTAPClient);
+        replay(mockFormData, mockQueryGenerator, mockSyncTAPClient);
+
+        jsonWriter.object();
+        getTestSubject().runSearch(URI.create("ivo://mysite.com/service"),
+                                   jsonWriter, dummyJob, mockFormData);
+        jsonWriter.endObject();
+
+        verify(mockFormData, mockQueryGenerator, mockSyncTAPClient);
     }
 }

@@ -177,8 +177,8 @@ public class ObservationViewServlet extends HttpServlet
 
         final URL repoURL = registryClient.getServiceURL(
                 URI.create(applicationConfiguration.getString(
-                        ApplicationConfiguration.CAOM2OPS_SERVICE_URI_PROPERTY_KEY,
-                        ApplicationConfiguration.DEFAULT_CAOM2OPS_SERVICE_URI_VALUE)),
+                        ApplicationConfiguration.CAOM2META_SERVICE_URI_PROPERTY_KEY,
+                        ApplicationConfiguration.DEFAULT_CAOM2META_SERVICE_URI_VALUE)),
                 Standards.CAOM2_OBS_20, authMethod);
 
         final URIBuilder builder = new URIBuilder(repoURL.toURI());

@@ -45,7 +45,7 @@ public interface FormConstraint
     /**
      * Length of unique id string.
      */
-    String FORM_NAME = "Form.name";
+    static final String FORM_NAME = "Form.name";
     
     /**
      * A form is valid if all form values have been successfully
@@ -82,7 +82,7 @@ public interface FormConstraint
      * Obtain the operand used.
      *
      * @return      Operand instance.  Defaults to EQUALS.
-     * @see ca.nrc.cadc.search.parser.Operand
+     * @see ca.nrc.cadc.search.form.Operand
      */
     Operand getOperand();
 

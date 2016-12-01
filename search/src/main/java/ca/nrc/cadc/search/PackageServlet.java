@@ -72,7 +72,6 @@ import ca.nrc.cadc.ApplicationConfiguration;
 import ca.nrc.cadc.auth.AuthMethod;
 import ca.nrc.cadc.reg.Standards;
 import ca.nrc.cadc.reg.client.RegistryClient;
-import ca.nrc.cadc.util.StringUtil;
 import ca.nrc.cadc.web.ConfigurableServlet;
 
 import javax.servlet.ServletException;
@@ -93,10 +92,10 @@ public class PackageServlet extends ConfigurableServlet
      * Only supported method.  This will accept an ID parameter in the request
      * to query on.
      *
-     * @param request  The HTTP Request.
-     * @param response The HTTP Response.
-     * @throws ServletException Servlet related errors.
-     * @throws IOException      Any other errors.
+     * @param request               The HTTP Request.
+     * @param response              The HTTP Response.
+     * @throws ServletException     Servlet related errors.
+     * @throws IOException          Any other errors.
      */
     @Override
     protected void doGet(final HttpServletRequest request,
@@ -111,10 +110,10 @@ public class PackageServlet extends ConfigurableServlet
      * Handle a GET request with the given Registry client to perform the
      * lookup.
      *
-     * @param request        The HTTP Request.
-     * @param response       The HTTP Response.
-     * @param registryClient The RegistryClient to do lookups.
-     * @throws IOException If the redirect URL is bad.
+     * @param request               The HTTP Request.
+     * @param response              The HTTP Response.
+     * @param registryClient        The RegistryClient to do lookups.
+     * @throws IOException
      */
     void get(final HttpServletRequest request,
              final HttpServletResponse response,
@@ -122,32 +121,14 @@ public class PackageServlet extends ConfigurableServlet
     {
         final URL serviceURL = registryClient.getServiceURL(
                 getServiceID(
-                        ApplicationConfiguration.CAOM2OPS_SERVICE_URI_PROPERTY_KEY,
-                        ApplicationConfiguration.DEFAULT_CAOM2OPS_SERVICE_URI),
+                        ApplicationConfiguration.CAOM2PKG_SERVICE_URI_PROPERTY_KEY,
+                        ApplicationConfiguration.DEFAULT_CAOM2PKG_SERVICE_URI),
                 Standards.PKG_10, AuthMethod.COOKIE);
 
-        final String hostAndPort =
-                lookup(ApplicationConfiguration.
-                               CAOM2OPS_SERVICE_HOST_PORT_PROPERTY_KEY);
-
-        final URL caom2OpsServiceURL;
-
-        if (StringUtil.hasText(hostAndPort))
-        {
-            caom2OpsServiceURL =
-                    new URL(hostAndPort + "/" + serviceURL.getPath());
-        }
-        else
-        {
-            caom2OpsServiceURL = serviceURL;
-        }
-
-        System.out.println("pkgurl: " + caom2OpsServiceURL.toExternalForm());
-
         final URL redirectURL =
-                new URL(caom2OpsServiceURL.toExternalForm()
-                        + "?ID=" + URLEncoder.encode(request.getParameter("ID"),
-                                                     "UTF-8"));
+                new URL(serviceURL.toExternalForm() + "?ID="
+                        + URLEncoder.encode(request.getParameter("ID"),
+                                            "UTF-8"));
         response.sendRedirect(redirectURL.toExternalForm());
     }
 }

@@ -12,10 +12,10 @@
             "FORM_LABEL_INPUT_LENGTH": 12,
             "TARGET_FORM_LABEL_INPUT_LENGTH": 24,
             "CHECKBOX_CHECKED_REGEX": /^true|on$/g,
-            "AUTOCOMPLETE_ENDPOINT": currentURI.getPath() + "/unitconversion/",
+            "AUTOCOMPLETE_ENDPOINT": "unitconversion/",
             "SEARCH_RUN": "find",
             "AUTOCOMPLETE_TAP_REQUEST_DATA": {
-              "endpoint": currentURI.getPath() + "/tap",
+              "endpoint": "tap",
               "payload": {
                 "LANG": "ADQL",
                 "FORMAT": "CSV",
@@ -1578,15 +1578,15 @@
                       _selfForm.targetTooltipsters[1].enable();
                     }
                   });
-        var inputFile = $("input:file");
-        var isUpload = (inputFile && (inputFile.val() !== ""));
+
         toggleDisabled($("input[name='targetList']"), false);
 
         var netStart = (new Date()).getTime();
+        var currentForm = getForm();
 
         try
         {
-          $("input." + getConfiguration().getName() + "_selectlist").val(
+          currentForm.find("input." + getConfiguration().getName() + "_selectlist").val(
             getConfiguration().getSelectListString(false));
         }
         catch (e)
@@ -1595,21 +1595,17 @@
           alert("Error: " + e.message);
         }
 
-        var currentForm = getForm();
         beforeSerialize(currentForm);
 
         var formData = new FormData(currentForm[0]);
 
-        // getForm().ajaxSubmit(
         $.post(
           {
             url: ca.nrc.cadc.search.SEARCH_RUN,
-            // target: "#file_upload_response",
             contentType: false,
             dataType: "json",
             data: formData,
             processData: false,
-            // iframe: isUpload,
             xhr: createRequest
           })
           .done(function(json)

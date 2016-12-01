@@ -54,7 +54,7 @@ public class TargetData
     }
 
     /**
-     * Constructor.
+     * Full constructor.
      *
      * @param target         the target to resolve.
      * @param ra             the target RA.

@@ -93,14 +93,15 @@ public class UnitConversionServlet extends HttpServlet
     /**
      * Write out the JSON autocomplete source to the given response.
      *
-     * @param utype    The utype of the field.
-     * @param request  The HTTP Request.
-     * @param response The Response.
+     * @param utype The utype of the field.
+     * @param request   The HTTP Request.
+     * @param response  The Response.
      * @throws IOException If any unforeseen exception occurs.
      */
-    private void writeSourceJSON(final String utype,
-                                 final HttpServletRequest request,
-                                 final HttpServletResponse response)
+    @SuppressWarnings("unchecked")
+    protected void writeSourceJSON(final String utype,
+                                   final HttpServletRequest request,
+                                   final HttpServletResponse response)
             throws IOException
     {
         response.setContentType("application/json");
@@ -140,9 +141,9 @@ public class UnitConversionServlet extends HttpServlet
      * @param requestParameters The parameters from the request.
      * @throws org.json.JSONException If anything goes wrong writing data.
      */
-    void writeJSON(final String uType, final String value,
-                   final JSONWriter jsonWriter,
-                   final Map<String, String[]> requestParameters)
+    protected void writeJSON(final String uType, final String value,
+                             final JSONWriter jsonWriter,
+                             final Map<String, String[]> requestParameters)
             throws JSONException
     {
         if (StringUtil.hasText(value))
@@ -188,7 +189,7 @@ public class UnitConversionServlet extends HttpServlet
         }
     }
 
-    private boolean isObservationDateUType(final String utype)
+    boolean isObservationDateUType(final String utype)
     {
         return utype.equals("Plane.time.bounds")
                || utype.equals("Plane.time.bounds_PRESET")
@@ -203,7 +204,7 @@ public class UnitConversionServlet extends HttpServlet
      * @param number The constraint.
      * @return String value to display.
      */
-    String getNumericDisplayValue(final java.lang.Number number)
+    protected String getNumericDisplayValue(final java.lang.Number number)
     {
         final java.lang.Number safeNumber;
 
@@ -274,7 +275,7 @@ public class UnitConversionServlet extends HttpServlet
      * @param displayUnit       The value of the units.
      * @return String of the converted range.
      */
-    String getNumericRangeValue(
+    protected String getNumericRangeValue(
             final AbstractNumericFormConstraint numericConstraint,
             final String displayUnit)
     {
@@ -338,8 +339,7 @@ public class UnitConversionServlet extends HttpServlet
         return " (" + s + " " + displayUnit + ")";
     }
 
-
-    private String formatDate(final java.util.Date date)
+    String formatDate(final java.util.Date date)
     {
         return DATE_FORMATTER.format(date);
     }
@@ -427,8 +427,10 @@ public class UnitConversionServlet extends HttpServlet
      * @param dateConstraint The Date constraint as submitted.
      * @throws JSONException For any JSON error(s).
      */
-    void writeDate(final JSONWriter jsonWriter, final FormErrors formErrors,
-                   final Date dateConstraint) throws JSONException
+    protected void writeDate(final JSONWriter jsonWriter,
+                             final FormErrors formErrors,
+                             final Date dateConstraint)
+            throws JSONException
     {
         jsonWriter.array();
 
@@ -498,9 +500,9 @@ public class UnitConversionServlet extends HttpServlet
      * @param formErrors            The FormErrors object to populate, if necessary.
      * @throws JSONException Any JSON writing errors.
      */
-    private void writeNumericEnergy(
-            final AbstractNumericFormConstraint numericFormConstraint,
-            final JSONWriter jsonWriter, final FormErrors formErrors)
+    void writeNumericEnergy(final AbstractNumericFormConstraint numericFormConstraint,
+                            final JSONWriter jsonWriter,
+                            final FormErrors formErrors)
             throws JSONException
     {
         jsonWriter.array();
@@ -528,9 +530,8 @@ public class UnitConversionServlet extends HttpServlet
      * @param formErrors The FormErrors object to populate, if necessary.
      * @throws JSONException Any JSON writing errors.
      */
-    private void writeNumeric(final String utype, final String value,
-                              final JSONWriter jsonWriter,
-                              final FormErrors formErrors)
+    void writeNumeric(final String utype, final String value,
+                      final JSONWriter jsonWriter, final FormErrors formErrors)
             throws JSONException
     {
         final Number number = new Number(value, utype);
@@ -588,9 +589,8 @@ public class UnitConversionServlet extends HttpServlet
      * @param resolverValue The resolver value desired.
      * @throws JSONException Any JSON writing errors.
      */
-    private void writeTargetResolution(final JSONWriter jsonWriter,
-                                       final String value,
-                                       final String resolverValue)
+    void writeTargetResolution(final JSONWriter jsonWriter, final String value,
+                               final String resolverValue)
             throws JSONException
     {
         try
@@ -616,7 +616,7 @@ public class UnitConversionServlet extends HttpServlet
 
     }
 
-    private String targetData(final TargetData targetData)
+    String targetData(final TargetData targetData)
     {
         return ((targetData.getTarget() == null)
                 ? "" : "target: " + targetData.getTarget())

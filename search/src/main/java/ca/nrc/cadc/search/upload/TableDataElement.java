@@ -43,6 +43,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import ca.nrc.cadc.search.parser.resolver.TargetNameResolverClient;
+import org.jdom2.Content;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
 
@@ -56,7 +57,7 @@ public class TableDataElement extends Element
     private Iterator iterator;
 
     // Counts of table rows and processing errors.
-    private UploadResults uploadResults;
+    UploadResults uploadResults;
 
     private final TargetNameResolverClient targetNameResolverClient;
 
@@ -66,12 +67,11 @@ public class TableDataElement extends Element
      *
      * @param iterator          The iterator for content.
      * @param namespace         XML Namespace.
-     * @param targetNameResolverClient      Name resolution client.
      * @param uploadResults     Upload Results of the uploaded file.
      */
-    public TableDataElement(final Iterator iterator, final Namespace namespace,
+    public TableDataElement(Iterator iterator, Namespace namespace,
                             final TargetNameResolverClient targetNameResolverClient,
-                            final UploadResults uploadResults)
+                            UploadResults uploadResults)
     {
         super("TABLEDATA", namespace);
         this.iterator = iterator;
@@ -83,15 +83,14 @@ public class TableDataElement extends Element
     /**
      * Returns a ResultSetList, which wraps a List
      * around a ResultSet.
-     *
-     * @return List of results.
+     * @return a ResultSetList
      */
     @Override
     @SuppressWarnings("unchecked")
     public List getContent()
     {
         return new StreamingIteratorList(iterator, namespace,
-                                         targetNameResolverClient,
-                                         uploadResults);
+                                         targetNameResolverClient, uploadResults);
     }
+
 }
