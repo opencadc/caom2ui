@@ -71,6 +71,7 @@ clean {
 
 task initDockerize(type: Copy, dependsOn: build) {
     from 'Dockerfile'
+    from 'org.opencadc.caom2ui.properties'
     into 'docker/'
 }
 

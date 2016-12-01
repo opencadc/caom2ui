@@ -9,7 +9,8 @@ ENV CATALINA_HOME "/usr/local/tomcat"
 WORKDIR ${CATALINA_HOME}
 
 # Clear out the webapps directory.
-RUN ["rm", "-rf", "webapps/*"]
+RUN rm -rf webapps \
+  && mkdir webapps
 
 # The SOURCE (first argument) is relative to this directory.  The
 # TARGET (second argument) is relative to the WORKDIR above.
@@ -18,3 +19,7 @@ RUN ["rm", "-rf", "webapps/*"]
 # For development purposes, pass the -v ${PATH_TO_LOCAL_BUILD_WAR_DIR}:/usr/local/tomcat/webapps to the run command
 #
 COPY *.war webapps/
+
+VOLUME /root/config
+
+COPY org.opencadc.caom2ui.properties /root/config/
