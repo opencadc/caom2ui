@@ -38,19 +38,21 @@ import ca.nrc.cadc.search.upload.UploadResults;
 import ca.nrc.cadc.uws.Job;
 import ca.nrc.cadc.uws.ParameterUtil;
 
+import java.util.List;
+
 
 public abstract class AbstractQueryGeneratorImpl implements QueryGenerator
 {
     private final Job job;
 
 
-    protected AbstractQueryGeneratorImpl(final Job job)
+    AbstractQueryGeneratorImpl(final Job job)
     {
         this.job = job;
     }
 
 
-    protected String getCustomSelectList()
+    String getSelectClause()
     {
         return getParameterValue("SelectList");
     }
@@ -60,7 +62,7 @@ public abstract class AbstractQueryGeneratorImpl implements QueryGenerator
         return getParameterValue("UPLOAD");
     }
 
-    protected String getUploadResolver()
+    String getUploadResolver()
     {
         return getParameterValue(UploadResults.UPLOAD_RESOLVER);
     }
@@ -69,6 +71,12 @@ public abstract class AbstractQueryGeneratorImpl implements QueryGenerator
     {
         return ParameterUtil.findParameterValue(key,
                                                 getJob().getParameterList());
+    }
+
+    StringBuilder generate(final SearchTemplateQueryGenerator queryGenerator,
+                           final List<SearchTemplate> searchTemplates)
+    {
+        return queryGenerator.getSelectSQL(searchTemplates, getSelectClause());
     }
 
     protected Job getJob()

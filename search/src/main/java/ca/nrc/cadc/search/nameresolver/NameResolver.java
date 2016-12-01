@@ -28,6 +28,9 @@
 
 package ca.nrc.cadc.search.nameresolver;
 
+import ca.nrc.cadc.auth.AuthMethod;
+import ca.nrc.cadc.reg.Standards;
+import ca.nrc.cadc.reg.client.RegistryClient;
 import ca.nrc.cadc.search.nameresolver.exception.ClientException;
 import ca.nrc.cadc.search.nameresolver.exception.TargetNotFoundException;
 import ca.nrc.cadc.search.nameresolver.exception.WebServiceException;
@@ -35,10 +38,7 @@ import ca.nrc.cadc.search.nameresolver.exception.WebServiceException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLEncoder;
+import java.net.*;
 
 import ca.nrc.cadc.astro.CoordUtil;
 import ca.nrc.cadc.util.StringUtil;
@@ -65,8 +65,6 @@ public class NameResolver
 {
     private static final int NAME_RESOLVER_HTTP_ERROR_CODE = 425;
 
-    private static final String REQUEST_URL =
-            "http://localhost/NameResolver/find?format=ascii&target=";
     private static final String SERVICE_PARAMETER = "&service=";
     private static final String CACHED_PARAMETER = "&cached=";
     private static final String MAX_DETAIL_PARAMETER = "&detail=max";
@@ -395,25 +393,35 @@ public class NameResolver
     /**
      * Construct the Name Resolver query url string.
      */
-    private String getUrlString(final String encodedTarget, final String service,
-                                final boolean cached, final boolean maxDetail)
+    private String getUrlString(final String encodedTarget,
+                                final String service, final boolean cached,
+                                final boolean maxDetail)
     {
-        StringBuilder sb = new StringBuilder();
-        sb.append(REQUEST_URL);
+        final RegistryClient registryClient = new RegistryClient();
+        final URL resolverURL = registryClient.getServiceURL(
+                URI.create("ivo://cadc.nrc.ca/resolver"), Standards.RESOLVER_10,
+                AuthMethod.ANON);
+        final StringBuilder sb = new StringBuilder();
+
+        sb.append(resolverURL.toString());
+        sb.append("?format=ascii&target=");
         sb.append(encodedTarget);
+
         if (service != null)
         {
             sb.append(SERVICE_PARAMETER).append(service.toLowerCase());
         }
+
         if (!cached)
         {
             sb.append(CACHED_PARAMETER).append("no");
         }
+
         if (maxDetail)
         {
             sb.append(MAX_DETAIL_PARAMETER);
         }
+
         return sb.toString();
     }
-
 }

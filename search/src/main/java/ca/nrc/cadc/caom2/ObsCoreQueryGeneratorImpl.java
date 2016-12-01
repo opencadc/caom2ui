@@ -34,12 +34,16 @@
 package ca.nrc.cadc.caom2;
 
 import ca.nrc.cadc.search.Templates;
-import ca.nrc.cadc.util.StringUtil;
 import ca.nrc.cadc.uws.Job;
 
 
 public class ObsCoreQueryGeneratorImpl extends AbstractQueryGeneratorImpl
 {
+    /**
+     * Only available constructor.
+     *
+     * @param job       The job being submitted.
+     */
     public ObsCoreQueryGeneratorImpl(final Job job)
     {
         super(job);
@@ -55,63 +59,11 @@ public class ObsCoreQueryGeneratorImpl extends AbstractQueryGeneratorImpl
     @Override
     public StringBuilder generate(final Templates templates)
     {
-        final StringBuilder query;
-        final String customSelectList = getCustomSelectList();
-        final String upload = getUpload();
-
         final ObsCoreListQueryGenerator queryGenerator =
-                new ObsCoreListQueryGenerator(upload, getUploadResolver(),
-                                              "target_name", "s_fov");
+                new ObsCoreListQueryGenerator(getUpload(), getUploadResolver(),
+                                              "target_name",
+                                              "s_fov");
 
-        /*if (StringUtil.hasText(upload))
-        {
-            query = new StringBuilder(256);
-            final String uploadResolver = getUploadResolver();
-
-            // Parse the table name from the UPLOAD parameter.
-            final String table = upload.split(",")[0];
-            final ObsCoreListQueryGenerator.QueryParts parts =
-                    queryGenerator.getQueryParts(templates.getSearchTemplates(),
-                                                 customSelectList);
-
-            query.append("SELECT ");
-            query.append(parts.selectList);
-            query.append(", f.target, f.ra, f.dec, f.radius FROM ");
-            query.append(parts.fromClause);
-            query.append(" JOIN TAP_UPLOAD.");
-            query.append(table);
-            query.append(" as f on ");
-
-            if (StringUtil.hasText(uploadResolver)
-                && uploadResolver.equals("OBJECT"))
-            {
-                query.append("target_name = f.target ");
-            }
-            else
-            {
-                query.append("INTERSECTS(POINT('ICRS',f.ra,f.dec), ");
-                query.append("s_fov) = 1 ");
-            }
-
-            if (parts.whereClause != null)
-            {
-                query.append(" WHERE ");
-                query.append(parts.whereClause);
-            }
-
-        }
-        else*/ if (customSelectList != null)
-        {
-            query = queryGenerator.getSelectSQL(
-                    templates.getSearchTemplates(),
-                    customSelectList);
-        }
-        else
-        {
-            query = queryGenerator.getSelectSQL(
-                    templates.getSearchTemplates());
-        }
-
-        return query;
+        return generate(queryGenerator, templates.getSearchTemplates());
     }
 }

@@ -9,10 +9,11 @@ import ca.nrc.cadc.util.StringUtil;
 
 /**
  * Generate an ADQL query for a list of observation-join-plane.
- * 
+ *
  * @author pdowler
  */
 public class ObservationListQueryGenerator
+        implements SearchTemplateQueryGenerator
 {
     private ADQLImpl adqlImpl;
 
@@ -26,33 +27,21 @@ public class ObservationListQueryGenerator
                                      targetNameField, targetCoordField);
     }
 
-
-    /**
-     * Obtain the Select clause for the SQL query.
-     *
-     * @param templates         List of SearchTemplate objects.
-     * @return complete ADQL query on CAOM Observation(s) at depth=2
-     */
-    public StringBuilder getSelectSQL(final List<SearchTemplate> templates)
-    {
-        return getSelectSQL(templates,
-                            adqlImpl.getObservationSelectList().toString());
-    }
-
     /**
      * Generate an ADQL query with custom select-list.
      *
-     * @param templates         The Templates object.
-     * @param selectList        The Select list.
-     * @return                  String SQL.
+     * @param templates    The Templates object.
+     * @param selectClauseItems The Select column list (Sans SELECT keyword).
+     * @return String SQL.
      */
+    @Override
     public StringBuilder getSelectSQL(final List<SearchTemplate> templates,
-                                      final String selectList)
+                                      final String selectClauseItems)
     {
         final StringBuilder sb = new StringBuilder();
 
         sb.append("SELECT ");
-        sb.append(adqlImpl.getSelectList(selectList));
+        sb.append(adqlImpl.getSelectList(selectClauseItems));
 
         if (adqlImpl.hasUpload())
         {
@@ -63,9 +52,9 @@ public class ObservationListQueryGenerator
         sb.append(adqlImpl.getFrom(Plane.class, 2));
 
         final List<SearchTemplate> ammendedTemplates =
-                new ArrayList<SearchTemplate>(templates);
+                new ArrayList<>(templates);
         final List<SearchTemplate> junkFlagTemplates =
-                new ArrayList<SearchTemplate>(2);
+                new ArrayList<>(2);
 
         junkFlagTemplates.add(new IsNull("Plane.quality_flag"));
         junkFlagTemplates.add(new TextSearch("Plane.quality_flag", "junk",

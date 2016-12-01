@@ -61,26 +61,12 @@ public class CAOMQueryGeneratorImpl extends AbstractQueryGeneratorImpl
     @Override
     public StringBuilder generate(final Templates templates)
     {
-        final StringBuilder query;
-        final String customSelectList = getCustomSelectList();
-        final String upload = getUpload();
         final ObservationListQueryGenerator queryGenerator =
-                new ObservationListQueryGenerator(upload, getUploadResolver(),
+                new ObservationListQueryGenerator(getUpload(),
+                                                  getUploadResolver(),
                                                   "target_name",
                                                   "position_bounds");
 
-        if (customSelectList != null)
-        {
-            query = queryGenerator.getSelectSQL(
-                    templates.getSearchTemplates(),
-                    customSelectList);
-        }
-        else
-        {
-            query = queryGenerator.getSelectSQL(
-                    templates.getSearchTemplates());
-        }
-
-        return query;
+        return generate(queryGenerator, templates.getSearchTemplates());
     }
 }

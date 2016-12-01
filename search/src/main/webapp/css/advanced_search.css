@@ -215,7 +215,7 @@ div.align-middle.column-picker-icon
 .tooltipster-busy
 {
   height: 20px;
-  background: url("/en/search/images/queryoverlay_small.gif") no-repeat center;
+  background: url("../images/queryoverlay_small.gif") no-repeat center;
 }
 
 .tooltipster-observation-details
@@ -321,17 +321,17 @@ div.align-middle.column-picker-icon
 
 .target_name_resolution_status.target_ok
 {
-  background: url("/en/search/images/ok_small.png") no-repeat center;
+  background: url("../images/ok_small.png") no-repeat center;
 }
 
 .target_name_resolution_status.target_not_found
 {
-  background: url("/en/search/images/not_found.png") no-repeat center;
+  background: url("../images/not_found.png") no-repeat center;
 }
 
 .target_name_resolution_status.busy
 {
-  background: url("/en/search/images/queryoverlay_small.gif") no-repeat center;
+  background: url("../images/queryoverlay_small.gif") no-repeat center;
 }
 
 ul.ui-autocomplete {

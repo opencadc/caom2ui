@@ -17,11 +17,11 @@ import java.util.TreeMap;
  */
 public class ADQLImpl extends AbstractPersistenceService
 {
-    static final String CAOM2_ENERGY_UTYPE = "Plane.energy.bounds";
-    static final String CAOM2_TIME_UTYPE = "Plane.time.bounds";
-    static final String OBSCORE_ENERGY_UTYPE =
+    private static final String CAOM2_ENERGY_UTYPE = "Plane.energy.bounds";
+    private static final String CAOM2_TIME_UTYPE = "Plane.time.bounds";
+    private static final String OBSCORE_ENERGY_UTYPE =
             "Char.SpectralAxis.Coverage.Bounds.Limits";
-    static final String OBSCORE_TIME_UTYPE =
+    private static final String OBSCORE_TIME_UTYPE =
             "Char.TemporalAxis.Coverage.Bounds.Limits";
 
 
@@ -33,9 +33,9 @@ public class ADQLImpl extends AbstractPersistenceService
     private final String targetCoordField;
 
 
-    public ADQLImpl(final String schema, final String _upload,
-                    final String _uploadResolver, final String _targetNameField,
-                    final String _targetCoordField)
+    ADQLImpl(final String schema, final String _upload,
+             final String _uploadResolver, final String _targetNameField,
+             final String _targetCoordField)
     {
         super(null, schema, null);
 
@@ -131,7 +131,6 @@ public class ADQLImpl extends AbstractPersistenceService
                             .getPosition());
         }
 
-        //log.debug(s + " -> " + ret);
         return sb.toString();
     }
 
@@ -142,7 +141,7 @@ public class ADQLImpl extends AbstractPersistenceService
      * @param col The column to search on.
      * @return String SQL fragment.
      */
-    String toIntersectSQL(final IntervalSearch s, final String col)
+    private String toIntersectSQL(final IntervalSearch s, final String col)
     {
         final StringBuilder sb = new StringBuilder();
         final double lowerValue = (s.getLower() == null) ? 0.0 : s.getLower();
@@ -168,35 +167,21 @@ public class ADQLImpl extends AbstractPersistenceService
      * @param col2 The upper bound column to search on.
      * @return String SQL fragment.
      */
-    String toIntervalSQL(final IntervalSearch s, final String col1,
-                         final String col2)
+    private String toIntervalSQL(final IntervalSearch s, final String col1,
+                                 final String col2)
     {
         final StringBuilder sb = new StringBuilder();
 
         if ((s.getLower() != null) && (s.getUpper() != null))
         {
-            if (s.getLower().equals(s.getUpper()))
-            {
-                // contains
-                sb.append(col1);
-                sb.append(" <= ");
-                sb.append(s.getLower());
-                sb.append(" AND ");
-                sb.append(s.getLower());
-                sb.append(" <= ");
-                sb.append(col2);
-            }
-            else
-            {
-                // intersects
-                sb.append(col1);
-                sb.append(" <= ");
-                sb.append(s.getUpper());
-                sb.append(" AND ");
-                sb.append(s.getLower());
-                sb.append(" <= ");
-                sb.append(col2);
-            }
+            // contains
+            sb.append(col1);
+            sb.append(" <= ");
+            sb.append(s.getUpper());
+            sb.append(" AND ");
+            sb.append(s.getLower());
+            sb.append(" <= ");
+            sb.append(col2);
         }
         else if (s.getUpper() != null)
         {
@@ -414,164 +399,6 @@ public class ADQLImpl extends AbstractPersistenceService
         return fromClause;
     }
 
-    // we override getObservationSelectList and do not support insert/delete
-    // so we do not need column metadata
-    protected StringBuilder getObservationSelectList()
-    {
-        return getObservationSelectList(2);
-    }
-
-    private StringBuilder getObservationSelectList(int lod)
-    {
-        final StringBuilder sb = new StringBuilder();
-        sb.append(getColumnName("Observation.previewURL"));
-        sb.append(" AS Preview");
-        sb.append(", ");
-        sb.append(getColumnName("Observation.collection"));
-        sb.append(" AS Collection");
-        sb.append(", ");
-        sb.append(getColumnName("Observation.observationID"));
-        sb.append(" AS \"Collection ID\"");
-
-        // telescope
-        sb.append(", ");
-        sb.append(getColumnName("Observation.telescope.name"));
-        sb.append(" AS Telescope");
-        // instrument
-        sb.append(", ");
-        sb.append(getColumnName("Observation.instrument.name"));
-        sb.append(" AS Instrument");
-
-        //IVOA and/or ObsCore
-        sb.append(", ");
-        sb.append(getColumnName("Plane.energy.emBand"));
-        sb.append(" AS \"EM band\"");
-        sb.append(", ");
-        sb.append(getColumnName("Plane.dataProductType"));
-        sb.append(" AS \"Data Product Type\"");
-        sb.append(", ");
-        sb.append(getColumnName("Plane.calibrationLevel"));
-        sb.append(" AS \"Calibration Level\"");
-
-        // target
-        sb.append(", ");
-        sb.append(getColumnName("Observation.target.name"));
-        sb.append(" AS Target");
-
-        // central coordinates
-        sb.append(", ");
-        sb.append("x(");
-        sb.append(getColumnName("Plane.position.bounds"));
-        sb.append(") AS RA");
-        sb.append(", ");
-        sb.append("y(");
-        sb.append(getColumnName("Plane.position.bounds"));
-        sb.append(") AS DEC");
-
-        sb.append(", ");
-        sb.append(getColumnName("Plane.time.exposure"));
-        sb.append(" AS \"Exposure Time\"");
-
-        // filter
-        sb.append(", ");
-        sb.append(getColumnName("Plane.energy.bandpassName"));
-        sb.append(" AS Filter");
-
-        // proposal
-        sb.append(", ");
-        sb.append(getColumnName("Observation.proposal.id"));
-        sb.append(" AS \"Proposal ID\"");
-
-        if (lod > 1)
-        {
-            sb.append(", ");
-            sb.append(getColumnName("Plane.energy.bounds.cval1"));
-            sb.append(" AS \"Min Wavelength\"");
-            sb.append(", ");
-            sb.append(getColumnName("Plane.energy.bounds.cval2"));
-            sb.append(" AS \"Max Wavelength\"");
-
-            // time bounds and exposure
-            sb.append(", ");
-            sb.append(getColumnName("Plane.time.bounds.cval1"));
-            sb.append(" AS \"Start Time\"");
-            sb.append(", ");
-            sb.append(getColumnName("Plane.time.bounds.cval2"));
-            sb.append(" AS \"End Time\"");
-
-            // position details
-            sb.append(", ");
-            sb.append(getColumnName("Plane.position.bounds"));
-            sb.append(" AS \"Position Bounds\"");
-
-            sb.append(", ");
-            sb.append("AREA(").append(getColumnName("Plane.position.bounds"))
-                    .append(")");
-            sb.append(" AS Area");
-
-            sb.append(", ");
-            sb.append(getColumnName("Plane.position.dimension1"));
-            sb.append(" AS \"Position Dimension1\"");
-            sb.append(", ");
-            sb.append(getColumnName("Plane.position.dimension2"));
-            sb.append(" AS \"Position Dimension2\"");
-
-            sb.append(", ");
-            sb.append(getColumnName("Plane.position.sampleSize"));
-            sb.append(" AS \"Position Sample Size\"");
-
-            // energy details
-            sb.append(", ");
-            sb.append(getColumnName("Plane.energy.dimension"));
-            sb.append(" AS \"Energy dimension\"");
-
-            sb.append(", ");
-            sb.append(getColumnName("Plane.energy.sampleSize"));
-            sb.append(" AS \"Energy sample size\"");
-
-            // time details
-            sb.append(", ");
-            sb.append(getColumnName("Plane.time.dimension"));
-            sb.append(" AS \"Time dimension\"");
-
-            sb.append(", ");
-            sb.append(getColumnName("Plane.time.sampleSize"));
-            sb.append(" AS \"Time sample size\"");
-
-            // polarization
-            sb.append(", ");
-            sb.append(getColumnName("Plane.polarization"));
-            sb.append(" AS \"Polarization\"");
-
-            sb.append(", ");
-            sb.append(getColumnName("Plane.polarization.dimension"));
-            sb.append(" AS \"Polarization dimension\"");
-
-
-            sb.append(", ");
-            sb.append(getColumnName("Observation.proposal.title"));
-            sb.append(" AS \"Proposal Title\"");
-
-            // project info
-            sb.append(", ");
-            sb.append(getColumnName("Observation.project"));
-            sb.append(" AS \"Observation Project\"");
-
-            sb.append(", ");
-            sb.append(getColumnName("Plane.project"));
-            sb.append(" AS \"Plane Project\"");
-        }
-
-        //sb.append(", ");
-        //sb.append(getColumnName("Plane.accessURL"));
-        //sb.append(" AS \"Download\"");
-
-        // planeID for download
-        sb.append(", ");
-        sb.append(getColumnName("Plane.planeID"));
-
-        return sb;
-    }
 
     /**
      * Obtain the sanitized SELECT list.
@@ -579,10 +406,11 @@ public class ADQLImpl extends AbstractPersistenceService
      * @param utypeSelectList The provided SELECT list.
      * @return String SELECT list.
      */
-    public String getSelectList(final String utypeSelectList)
+    String getSelectList(final String utypeSelectList)
     {
-        StringBuilder sb = new StringBuilder();
-        String[] parts = utypeSelectList.split(",");
+        final StringBuilder sb = new StringBuilder();
+        final String[] parts = utypeSelectList.split(",");
+
         for (final String item : parts)
         {
             final String trimItem = item.trim();
@@ -676,7 +504,7 @@ public class ADQLImpl extends AbstractPersistenceService
         return sb.toString();
     }
 
-    public boolean hasUpload()
+    boolean hasUpload()
     {
         return StringUtil.hasText(getUpload());
     }
@@ -686,17 +514,17 @@ public class ADQLImpl extends AbstractPersistenceService
         return upload;
     }
 
-    public String getUploadResolver()
+    private String getUploadResolver()
     {
         return uploadResolver;
     }
 
-    public String getTargetNameField()
+    private String getTargetNameField()
     {
         return targetNameField;
     }
 
-    public String getTargetCoordField()
+    private String getTargetCoordField()
     {
         return targetCoordField;
     }
