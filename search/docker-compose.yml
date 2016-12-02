@@ -60,8 +60,8 @@ services:
       - 'caom2'
     depends_on:
       - tappg
-#    volumes:
-#      - /usr/local/search/config:/root/config
+    volumes:
+      - /usr/local/search/config:/root/config
 #      - /usr/local/search/caom2repo/webapps:/usr/local/tomcat/webapps
   tap:
     image: opencadc/tap
@@ -69,9 +69,10 @@ services:
       - 'caom2'
     depends_on:
       - tappg
+      - tapuwspg
     volumes:
-      - /usr/local/search/tap/webapps:/usr/local/tomcat/webapps
       - /usr/local/search/pub:/root/.pub
+      # - /usr/local/search/tap/webapps:/usr/local/tomcat/webapps
   tappg:
     image: opencadc/tap_postgres
     networks:
@@ -80,6 +81,17 @@ services:
       - POSTGRES_USER=tap
       - POSTGRES_PASSWORD=astr0query
       - PGDATA=/var/lib/postgresql/data/tap
+    volumes:
+      - /var/lib/postgresql/data
+      - /var/run/postgresql
+  tapuwspg:
+    image: opencadc/uws_postgres
+    networks:
+      - 'caom2'
+    environment:
+      - POSTGRES_USER=tapuws
+      - POSTGRES_PASSWORD=astr0query
+      - PGDATA=/var/lib/postgresql/data/uws
     volumes:
       - /var/lib/postgresql/data
       - /var/run/postgresql
