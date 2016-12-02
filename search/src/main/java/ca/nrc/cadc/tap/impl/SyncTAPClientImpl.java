@@ -45,10 +45,12 @@ import ca.nrc.cadc.uws.Job;
 import ca.nrc.cadc.uws.JobAttribute;
 import ca.nrc.cadc.uws.Parameter;
 
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.log4j.Logger;
 
 import java.io.*;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
@@ -84,25 +86,28 @@ public class SyncTAPClientImpl implements SyncTAPClient
     }
 
 
-    private URL lookupServiceURL(final URI serviceURI) throws IOException
+    private URL lookupServiceURL(final URI serviceURI)
+            throws IOException, URISyntaxException
     {
         final URL serviceURL =
                 registryClient.getServiceURL(serviceURI, Standards.TAP_SYNC_11,
                                              AuthMethod.ANON);
-        final String hostAndPort =
+        final String tapServiceHost =
                 applicationConfiguration.lookup(
-                        ApplicationConfiguration.TAP_SERVICE_HOST_PORT_PROPERTY_KEY);
+                        ApplicationConfiguration.TAP_SERVICE_HOST_PORT_PROPERTY_KEY,
+                        ApplicationConfiguration.DEFAULT_TAP_SERVICE_HOST_PORT);
 
-        final URL tapServiceURL;
+        final URIBuilder builder = new URIBuilder(serviceURL.toURI());
 
-        if (StringUtil.hasText(hostAndPort))
+        if (StringUtil.hasText(tapServiceHost))
         {
-            tapServiceURL = new URL(hostAndPort + "/" + serviceURL.getPath());
+            final URI tapServiceURI = URI.create(tapServiceHost);
+
+            builder.setHost(tapServiceURI.getHost());
+            builder.setPort(tapServiceURI.getPort());
         }
-        else
-        {
-            tapServiceURL = serviceURL;
-        }
+
+        final URL tapServiceURL = builder.build().toURL();
 
         LOGGER.info("Configured TAP Service URL: " + tapServiceURL);
         return tapServiceURL;

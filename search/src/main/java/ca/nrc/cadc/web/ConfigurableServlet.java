@@ -102,4 +102,9 @@ public abstract class ConfigurableServlet extends HttpServlet
     {
         return configuration.lookup(lookupKey);
     }
+
+    public String lookup(final String key, final String defaultValue)
+    {
+        return configuration.lookup(key, defaultValue);
+    }
 }

@@ -161,21 +161,24 @@ public class CAOM2Servlet extends HttpServlet
                          final HttpServletResponse resp)
             throws ServletException, IOException
     {
+        resp.setContentType("text/html");
+
         final URL configuredURL = lookupCAOM2UIURL();
         final HttpDownload download =
                 new HttpDownload(new URL(configuredURL.toExternalForm()
                                          + req.getPathInfo()),
                                  resp.getOutputStream());
         download.setFollowRedirects(true);
+        download.setRequestProperty("Content-Type", "text/html");
         download.run();
     }
 
     private URL lookupCAOM2UIURL() throws IOException
     {
         final String property = configuration.lookup(
-                ApplicationConfiguration.CAOM2_UI_PROPERTY_KEY,
-                ApplicationConfiguration.DEFAULT_CAOM2_UI_HOST);
+                ApplicationConfiguration.CAOM2_UI_HOST_PORT_PROPERTY_KEY,
+                ApplicationConfiguration.DEFAULT_CAOM2_UI_HOST_PORT);
 
-        return new URL("http://" + property + "/caom2ui");
+        return new URL(property + "/caom2ui");
     }
 }

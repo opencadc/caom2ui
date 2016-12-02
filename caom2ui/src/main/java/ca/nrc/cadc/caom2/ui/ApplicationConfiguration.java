@@ -69,6 +69,7 @@
 package ca.nrc.cadc.caom2.ui;
 
 
+import ca.nrc.cadc.util.StringUtil;
 import org.apache.commons.configuration2.CombinedConfiguration;
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.SystemConfiguration;
@@ -79,20 +80,31 @@ import org.apache.commons.configuration2.tree.UnionCombiner;
 import org.apache.log4j.Logger;
 
 import java.io.File;
+import java.net.URI;
 
 
-public class ApplicationConfiguration extends CombinedConfiguration
+public class ApplicationConfiguration
 {
-    public static final String CAOM2META_SERVICE_URI_PROPERTY_KEY =
-            "org.opencadc.search.caom2ops-service-id";
-    public static final String DEFAULT_CAOM2META_SERVICE_URI_VALUE =
-            "ivo://cadc.nrc.ca/caom2ops";
+    static final String CAOM2META_SERVICE_URI_PROPERTY_KEY =
+            "org.opencadc.caom2ui.caom2ops-service-id";
+    static final String CAOM2META_SERVICE_HOST_PORT_PROPERTY_KEY =
+            "org.opencadc.caom2ui.caom2ops-service-host-port";
+    static final String DEFAULT_CAOM2META_SERVICE_HOST_PORT =
+            "http://caom2ops:8080";
+    static final URI DEFAULT_CAOM2META_SERVICE_URI =
+            URI.create("ivo://cadc.nrc.ca/caom2ops");
+
     private static final Logger LOGGER =
             Logger.getLogger(ApplicationConfiguration.class);
 
     private static final String PROPERTIES_FILE_PATH =
             System.getProperty("user.home") + File.pathSeparator
             + "config/org.opencadc.caom2ui.properties";
+
+
+    // Internally uses the Apache configurations.
+    // Make package private to allow tests to override.
+    final CombinedConfiguration configuration = new CombinedConfiguration();
 
 
     /**
@@ -103,7 +115,7 @@ public class ApplicationConfiguration extends CombinedConfiguration
      */
     public ApplicationConfiguration()
     {
-        addConfiguration(new SystemConfiguration());
+        configuration.addConfiguration(new SystemConfiguration());
 
         final Parameters parameters = new Parameters();
         final FileBasedConfigurationBuilder<PropertiesConfiguration> builder =
@@ -114,7 +126,7 @@ public class ApplicationConfiguration extends CombinedConfiguration
 
         try
         {
-            addConfiguration(builder.getConfiguration());
+            configuration.addConfiguration(builder.getConfiguration());
         }
         catch (ConfigurationException e)
         {
@@ -122,5 +134,32 @@ public class ApplicationConfiguration extends CombinedConfiguration
                     "No configuration found at %s.\nUsing defaults.",
                     PROPERTIES_FILE_PATH));
         }
+    }
+
+
+    public URI lookupServiceURI(final String key, final URI defaultValue)
+    {
+        final String value = lookup(key);
+        return StringUtil.hasText(value) ? URI.create(value) : defaultValue;
+    }
+
+    public String lookup(final String key)
+    {
+        return configuration.getString(key);
+    }
+
+    public int lookupInt(final String key, final int defaultValue)
+    {
+        return configuration.getInt(key, defaultValue);
+    }
+
+    public boolean lookupBoolean(final String key, final boolean defaultValue)
+    {
+        return configuration.getBoolean(key, defaultValue);
+    }
+
+    public String lookup(final String key, final String defaultValue)
+    {
+        return configuration.getString(key, defaultValue);
     }
 }

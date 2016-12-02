@@ -72,12 +72,16 @@ import ca.nrc.cadc.ApplicationConfiguration;
 import ca.nrc.cadc.auth.AuthMethod;
 import ca.nrc.cadc.reg.Standards;
 import ca.nrc.cadc.reg.client.RegistryClient;
+import ca.nrc.cadc.util.StringUtil;
 import ca.nrc.cadc.web.ConfigurableServlet;
+import org.apache.http.client.utils.URIBuilder;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
 
@@ -102,7 +106,14 @@ public class PackageServlet extends ConfigurableServlet
                          final HttpServletResponse response)
             throws ServletException, IOException
     {
-        get(request, response, new RegistryClient());
+        try
+        {
+            get(request, response, new RegistryClient());
+        }
+        catch (URISyntaxException e)
+        {
+            throw new IOException(e);
+        }
     }
 
 
@@ -113,11 +124,13 @@ public class PackageServlet extends ConfigurableServlet
      * @param request               The HTTP Request.
      * @param response              The HTTP Response.
      * @param registryClient        The RegistryClient to do lookups.
-     * @throws IOException
+     * @throws IOException          Any request access problems.
+     * @throws URISyntaxException   For uri issues.
      */
     void get(final HttpServletRequest request,
              final HttpServletResponse response,
-             final RegistryClient registryClient) throws IOException
+             final RegistryClient registryClient)
+            throws IOException, URISyntaxException
     {
         final URL serviceURL = registryClient.getServiceURL(
                 getServiceID(
@@ -125,10 +138,22 @@ public class PackageServlet extends ConfigurableServlet
                         ApplicationConfiguration.DEFAULT_CAOM2PKG_SERVICE_URI),
                 Standards.PKG_10, AuthMethod.COOKIE);
 
-        final URL redirectURL =
-                new URL(serviceURL.toExternalForm() + "?ID="
-                        + URLEncoder.encode(request.getParameter("ID"),
-                                            "UTF-8"));
-        response.sendRedirect(redirectURL.toExternalForm());
+        final URIBuilder builder = new URIBuilder(serviceURL.toURI());
+
+        final String pkgServiceHost =
+                lookup(ApplicationConfiguration.CAOM2PKG_SERVICE_HOST_PORT_PROPERTY_KEY,
+                       ApplicationConfiguration.DEFAULT_CAOM2PKG_SERVICE_HOST_PORT);
+
+        if (StringUtil.hasText(pkgServiceHost))
+        {
+            final URI metaServiceURI = URI.create(pkgServiceHost);
+
+            builder.setHost(metaServiceURI.getHost());
+            builder.setPort(metaServiceURI.getPort());
+        }
+
+        builder.addParameter("ID", request.getParameter("ID"));
+
+        response.sendRedirect(builder.build().toURL().toExternalForm());
     }
 }

@@ -93,6 +93,8 @@ public class ApplicationConfiguration
             "org.opencadc.search.tap-service-id";
     public static final String TAP_SERVICE_HOST_PORT_PROPERTY_KEY =
             "org.opencadc.search.tap-service-host-port";
+    public static final String DEFAULT_TAP_SERVICE_HOST_PORT =
+            "http://tap:8080";
     public static final URI DEFAULT_TAP_SERVICE_URI =
             URI.create("ivo://cadc.nrc.ca/tap");
 
@@ -102,11 +104,13 @@ public class ApplicationConfiguration
             "org.opencadc.search.caom2ops-service-host-port";
     public static final URI DEFAULT_CAOM2PKG_SERVICE_URI =
             URI.create("ivo://cadc.nrc.ca/caom2ops");
+    public static final String DEFAULT_CAOM2PKG_SERVICE_HOST_PORT =
+            "http://caom2ops:8080";
 
-    public final static String CAOM2_UI_PROPERTY_KEY =
-            "org.opencadc.search.caom2ui-host";
-    public final static String DEFAULT_CAOM2_UI_HOST =
-            "www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca";
+    public final static String CAOM2_UI_HOST_PORT_PROPERTY_KEY =
+            "org.opencadc.search.caom2ui-host-port";
+    public final static String DEFAULT_CAOM2_UI_HOST_PORT =
+            "http://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca";
 
     private static final Logger LOGGER =
             Logger.getLogger(ApplicationConfiguration.class);

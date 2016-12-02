@@ -191,6 +191,7 @@ public class ObservationViewServletTest
             }
         };
 
+        final URI serviceURI = URI.create("ivo://myhost.com/caom2-service");
         final ObservationViewServlet.ReadAction mockObservationReader =
                 createMock(ObservationViewServlet.ReadAction.class);
         final URL repoURL = new URL("http://mysite.com/caom2ops/meta");
@@ -241,13 +242,19 @@ public class ObservationViewServletTest
 
         expect(mockObservationReader.getObs()).andReturn(result).once();
 
-        expect(mockConfiguration.getString(
+        expect(mockConfiguration.lookupServiceURI(
                 ApplicationConfiguration.CAOM2META_SERVICE_URI_PROPERTY_KEY,
-                ApplicationConfiguration.DEFAULT_CAOM2META_SERVICE_URI_VALUE))
-                .andReturn("ivo://myhost.com/caom2-service").once();
+                ApplicationConfiguration.DEFAULT_CAOM2META_SERVICE_URI))
+                .andReturn(serviceURI).once();
 
-        expect(mockRegistryClient.getServiceURL(URI.create(
-                "ivo://myhost.com/caom2-service"), Standards.CAOM2_OBS_20,
+        expect(mockConfiguration.lookup(
+                ApplicationConfiguration.CAOM2META_SERVICE_HOST_PORT_PROPERTY_KEY,
+                ApplicationConfiguration.DEFAULT_CAOM2META_SERVICE_HOST_PORT))
+                .andReturn(ApplicationConfiguration
+                                   .DEFAULT_CAOM2META_SERVICE_HOST_PORT).once();
+
+        expect(mockRegistryClient.getServiceURL(serviceURI,
+                                                Standards.CAOM2_OBS_20,
                                                 AuthMethod.ANON))
             .andReturn(repoURL).once();
 

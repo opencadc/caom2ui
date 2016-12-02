@@ -11,6 +11,7 @@ import ca.nrc.cadc.net.HttpDownload;
 import ca.nrc.cadc.net.InputStreamWrapper;
 import ca.nrc.cadc.reg.Standards;
 import ca.nrc.cadc.reg.client.RegistryClient;
+import ca.nrc.cadc.util.StringUtil;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.log4j.Logger;
 
@@ -176,12 +177,25 @@ public class ObservationViewServlet extends HttpServlet
                 ? AuthMethod.ANON : AuthMethod.COOKIE;
 
         final URL repoURL = registryClient.getServiceURL(
-                URI.create(applicationConfiguration.getString(
+                applicationConfiguration.lookupServiceURI(
                         ApplicationConfiguration.CAOM2META_SERVICE_URI_PROPERTY_KEY,
-                        ApplicationConfiguration.DEFAULT_CAOM2META_SERVICE_URI_VALUE)),
+                        ApplicationConfiguration.DEFAULT_CAOM2META_SERVICE_URI),
                 Standards.CAOM2_OBS_20, authMethod);
 
         final URIBuilder builder = new URIBuilder(repoURL.toURI());
+
+        final String metaServiceHost =
+                applicationConfiguration.lookup(
+                        ApplicationConfiguration.CAOM2META_SERVICE_HOST_PORT_PROPERTY_KEY,
+                        ApplicationConfiguration.DEFAULT_CAOM2META_SERVICE_HOST_PORT);
+
+        if (StringUtil.hasText(metaServiceHost))
+        {
+            final URI metaServiceURI = URI.create(metaServiceHost);
+
+            builder.setHost(metaServiceURI.getHost());
+            builder.setPort(metaServiceURI.getPort());
+        }
 
         builder.addParameter("ID", uri.getURI().toString());
 
