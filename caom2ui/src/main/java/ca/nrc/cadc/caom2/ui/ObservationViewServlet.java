@@ -264,12 +264,15 @@ public class ObservationViewServlet extends HttpServlet
                 }
                 else
                 {
-                    message = "Failed to get observation '%s' from caom2meta. "
+                    message = "Failed to get observation '%s' from '%s'. "
                               + "| Impossible d'obtenir l'observation '%s' "
                               + "de caom2meta.";
                 }
 
-                throw new RuntimeException(String.format(message, uri, uri));
+                throw new RuntimeException(
+                        String.format(message, uri,
+                                      downloader.getURL().toExternalForm(),
+                                      uri));
             }
 
             return null;

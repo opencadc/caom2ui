@@ -766,7 +766,8 @@
 
         var isRowDisabled = function (row)
         {
-          return (row[getActiveForm().getDownloadAccessKey()] == null);
+          var downloadableKey = getActiveForm().getDownloadAccessKey();
+          return (row.getCellValue(downloadableKey) == null);
         };
 
         var rowCountMessage = function (totalRows, rowCount)

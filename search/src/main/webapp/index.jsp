@@ -30,9 +30,11 @@
                              + (requestHeaderLang.equals("fr") ? "ccda"
                                                                : "cadc")
                              + "_site_menu.html";
-  final String downloadLink = requestHeaderLang + "/"
-                              + (requestHeaderLang.equals("fr")
-                                 ? "telecharger" : "download");
+//  final String downloadLink = requestHeaderLang + "/"
+//                              + (requestHeaderLang.equals("fr")
+//                                 ? "telecharger" : "download");
+
+  final String downloadLink = "/downloadManager/download";
 
   final int maxRowLimit =
       configuration.lookupInt("org.opencadc.search.max-row-count",

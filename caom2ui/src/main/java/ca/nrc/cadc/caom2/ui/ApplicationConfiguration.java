@@ -98,7 +98,7 @@ public class ApplicationConfiguration
             Logger.getLogger(ApplicationConfiguration.class);
 
     private static final String PROPERTIES_FILE_PATH =
-            System.getProperty("user.home") + File.pathSeparator
+            System.getProperty("user.home") + File.separator
             + "config/org.opencadc.caom2ui.properties";
 
 

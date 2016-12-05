@@ -16,7 +16,7 @@
       "nrc": {
         "cadc": {
           "search": {
-            "PREVIEW_URL_PREFIX": currentURI.getPath() + "/preview",
+            "PREVIEW_URL_PREFIX": currentURI.getPath() + "preview",
             "Preview": Preview
           }
         }
