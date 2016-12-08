@@ -37,7 +37,8 @@
               "FormConfiguration": CAOM2FormConfiguration,
               "config": {
                 "id": "CAOM2",
-                "download_access_key": "caom2:Plane.uri.downloadable",
+                "download_access_key": "caom2:Plane.publisherID",
+                "row_disabled_key": "caom2:Plane.uri.downloadable",
                 "default_sort_column": "caom2:Plane.time.bounds.lower",
                 "collection_select_id": "Observation.collection",
                 "footprint_column_id": "caom2:Plane.position.bounds",
@@ -52,28 +53,7 @@
               "config": {
                 "id": "ObsCore",
                 "download_access_key": "obscore:Curation.PublisherDID.downloadable",
-                "default_sort_column": "obscore:Char.TimeAxis.Coverage.Bounds.Limits.StartTime",
-                "collection_select_id": "DataID.Collection",
-                "footprint_column_id": "obscore:Char.SpatialAxis.Coverage.Support.Area",
-                "ra_column_id": "obscore:Char.SpatialAxis.Coverage.Location.Coord.Position2D.Value2.C1",
-                "dec_column_id": "obscore:Char.SpatialAxis.Coverage.Location.Coord.Position2D.Value2.C2",
-                "fov_column_id": "obscore:Char.SpatialAxis.Coverage.Bounds.Extent.diameter"
-              }
-            },
-            "types": {
-              "CAOM2": {
-                "id": "CAOM2",
-                "download_access_key": "caom2:Plane.uri.downloadable",
-                "default_sort_column": "caom2:Plane.time.bounds.lower",
-                "collection_select_id": "Observation.collection",
-                "footprint_column_id": "caom2:Plane.position.bounds",
-                "ra_column_id": "caom2:Plane.position.bounds.cval1",
-                "dec_column_id": "caom2:Plane.position.bounds.cval2",
-                "fov_column_id": "caom2:Plane.position.bounds.area"
-              },
-              "ObsCore": {
-                "id": "ObsCore",
-                "download_access_key": "obscore:Curation.PublisherDID.downloadable",
+                "row_disabled_key": "obscore:Curation.PublisherDID.downloadable",
                 "default_sort_column": "obscore:Char.TimeAxis.Coverage.Bounds.Limits.StartTime",
                 "collection_select_id": "DataID.Collection",
                 "footprint_column_id": "obscore:Char.SpatialAxis.Coverage.Support.Area",
@@ -126,6 +106,11 @@
     function getDownloadAccessKey()
     {
       return _selfFormConfiguration._config.getConfig().download_access_key;
+    }
+
+    function getRowDisabledKey()
+    {
+      return _selfFormConfiguration._config.getConfig().row_disabled_key;
     }
 
     /**
@@ -422,6 +407,7 @@
     $.extend(this,
              {
                "getDownloadAccessKey": getDownloadAccessKey,
+               "getRowDisabledKey": getRowDisabledKey,
                "getSelectListString": getSelectListString,
                "getColumnOptions": getColumnOptions,
                "getTableMetadata": getTableMetadata,
@@ -654,8 +640,8 @@
                   $.extend({}, defaultData,
                            {
                              "QUERY": stringUtil.format(defaultData.QUERY,
-                                                        field.tap_column,
-                                                        req.term.toLowerCase())
+                                                        [field.tap_column,
+                                                         req.term.toLowerCase()])
                            });
 
                 $.get(ca.nrc.cadc.search.AUTOCOMPLETE_TAP_REQUEST_DATA.endpoint,
@@ -1206,6 +1192,11 @@
     function getDownloadAccessKey()
     {
       return getConfiguration().getDownloadAccessKey();
+    }
+
+    function getRowDisabledKey()
+    {
+      return getConfiguration().getRowDisabledKey();
     }
 
     function getConfiguration()
@@ -1892,6 +1883,7 @@
                "getID": getID,
                "getName": getName,
                "getDownloadAccessKey": getDownloadAccessKey,
+               "getRowDisabledKey": getRowDisabledKey,
                "getResultsTableMetadata": getResultsTableMetadata,
                "getConfiguration": getConfiguration,
                "isActive": isActive,

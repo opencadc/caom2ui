@@ -39,7 +39,7 @@ services:
     networks:
       - 'caom2'
     environment:
-      - POSTGRES_USER=caom2ops
+      - POSTGRES_USER=uws
       - POSTGRES_PASSWORD=astr0query
       - PGDATA=/var/lib/postgresql/data/uws
     volumes:
@@ -62,7 +62,8 @@ services:
       - tappg
     volumes:
       - /usr/local/search/config:/root/config
-#      - /usr/local/search/caom2repo/webapps:/usr/local/tomcat/webapps
+      - /usr/local/search/caom2repo/ssl:/root/.ssl
+      - /usr/local/search/caom2repo/webapps:/usr/local/tomcat/webapps
   tap:
     image: opencadc/tap
     networks:

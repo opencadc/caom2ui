@@ -743,7 +743,7 @@
         {
           var stringUtil = new org.opencadc.StringUtil();
           if (!stringUtil.hasText(
-            $rowItem[getActiveForm().getDownloadAccessKey()]))
+            $rowItem[getActiveForm().getRowDisabledKey()]))
           {
             var $checkboxSelect = $("input:checkbox._select_" + $rowItem.id);
             var $parentContainer = $checkboxSelect.parent("div");
@@ -766,7 +766,7 @@
 
         var isRowDisabled = function (row)
         {
-          var downloadableKey = getActiveForm().getDownloadAccessKey();
+          var downloadableKey = getActiveForm().getRowDisabledKey();
           return (row.getCellValue(downloadableKey) == null);
         };
 
@@ -952,7 +952,7 @@
                                      $.each(resultsVOTV.getSelectedRows(), function (arrayIndex, selectedRowIndex)
                                      {
                                        var $nextRow = resultsVOTV.getRow(selectedRowIndex);
-                                       var $nextPlaneURI = $nextRow["caom2:Plane.uri.downloadable"];
+                                       var $nextPlaneURI = $nextRow[getActiveForm().getDownloadAccessKey()];
 
                                        var $input = $("<input>");
                                        $input.prop("type", "hidden");

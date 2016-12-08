@@ -60,6 +60,7 @@
                   "caom2:Plane.provenance.runID",
                   "caom2:Plane.provenance.lastExecuted",
                   "caom2:Plane.provenance.inputs",
+                  "caom2:Plane.publisherID",
                   "caom2:Plane.id",
                   "caom2:Plane.uri.downloadable",
                   "caom2:Plane.uri"
@@ -121,6 +122,7 @@
                   "caom2:Plane.provenance.inputs",
                   "caom2:Plane.energy.restwav",
                   "caom2:Observation.requirements.flag",
+                  "caom2:Plane.publisherID",
                   "caom2:Plane.id",
                   "caom2:Plane.uri.downloadable",
                   "caom2:Plane.uri"
@@ -182,6 +184,7 @@
                   "caom2:Plane.provenance.inputs",
                   "caom2:Plane.energy.restwav",
                   "caom2:Observation.requirements.flag",
+                  "caom2:Plane.publisherID",
                   "caom2:Plane.id",
                   "caom2:Plane.uri.downloadable",
                   "caom2:Plane.uri"
@@ -232,6 +235,7 @@
                   "caom2:Plane.provenance.runID",
                   "caom2:Plane.provenance.lastExecuted",
                   "caom2:Plane.energy.restwav",
+                  "caom2:Plane.publisherID",
                   "caom2:Plane.id",
                   "caom2:Plane.uri.downloadable",
                   "caom2:Plane.uri"
@@ -293,6 +297,7 @@
                   "caom2:Plane.provenance.inputs",
                   "caom2:Plane.energy.restwav",
                   "caom2:Observation.requirements.flag",
+                  "caom2:Plane.publisherID",
                   "caom2:Plane.id",
                   "caom2:Plane.uri.downloadable",
                   "caom2:Plane.uri"
@@ -351,6 +356,7 @@
                   "caom2:Plane.provenance.inputs",
                   "caom2:Plane.energy.restwav",
                   "caom2:Observation.requirements.flag",
+                  "caom2:Plane.publisherID",
                   "caom2:Plane.id",
                   "caom2:Plane.uri.downloadable",
                   "caom2:Plane.uri"
@@ -410,6 +416,7 @@
                   "caom2:Plane.provenance.inputs",
                   "caom2:Plane.energy.restwav",
                   "caom2:Observation.requirements.flag",
+                  "caom2:Plane.publisherID",
                   "caom2:Plane.id",
                   "caom2:Plane.uri.downloadable",
                   "caom2:Plane.uri"

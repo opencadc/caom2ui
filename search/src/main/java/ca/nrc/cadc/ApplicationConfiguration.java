@@ -110,7 +110,7 @@ public class ApplicationConfiguration
     public final static String CAOM2_UI_HOST_PORT_PROPERTY_KEY =
             "org.opencadc.search.caom2ui-host-port";
     public final static String DEFAULT_CAOM2_UI_HOST_PORT =
-            "http://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca";
+            "http://caom2ui:8080";
 
     private static final Logger LOGGER =
             Logger.getLogger(ApplicationConfiguration.class);

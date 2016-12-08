@@ -676,6 +676,10 @@
                     ]
                   }
                 },
+                "caom2:Plane.publisherID": {
+                  "label": "Publisher ID",
+                  "fitMax": true
+                },
                 "obscore:Char.SpatialAxis.Coverage.Bounds.Extent.diameter": {
                   "fitMax": true,
                   "label": "s_fov",
