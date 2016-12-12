@@ -238,7 +238,8 @@ public class TAPServlet extends ConfigurableServlet
             httpDownload.setFollowRedirects(true);
             httpDownload.run();
 
-            resp.setContentLengthLong(httpDownload.getContentLength());
+            resp.setHeader("Content-Length", Long.toString(
+                    httpDownload.getContentLength()));
         }
         else
         {

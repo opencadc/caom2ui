@@ -22,9 +22,9 @@ services:
       - POSTGRES_USER=uws
       - POSTGRES_PASSWORD=astr0query
       - PGDATA=/var/lib/postgresql/data/uws
-    volumes:
-      - /var/lib/postgresql/data
-      - /var/run/postgresql
+#    volumes:
+#      - /var/lib/postgresql/data
+#      - /var/run/postgresql
   caom2ops:
     image: opencadc/caom2ops
     networks:
@@ -33,6 +33,7 @@ services:
       - caom2opspg
     volumes:
       - /usr/local/search/caom2ops/webapps:/usr/local/tomcat/webapps
+      - /usr/local/search/config:/root/config
       - /root/.pub
   caom2opspg:
     image: opencadc/uws_postgres
@@ -42,9 +43,9 @@ services:
       - POSTGRES_USER=uws
       - POSTGRES_PASSWORD=astr0query
       - PGDATA=/var/lib/postgresql/data/uws
-    volumes:
-      - /var/lib/postgresql/data
-      - /var/run/postgresql
+#    volumes:
+#      - /var/lib/postgresql/data
+#      - /var/run/postgresql
   caom2ui:
     image: opencadc/caom2ui
     networks:
@@ -82,9 +83,9 @@ services:
       - POSTGRES_USER=tap
       - POSTGRES_PASSWORD=astr0query
       - PGDATA=/var/lib/postgresql/data/tap
-    volumes:
-      - /var/lib/postgresql/data
-      - /var/run/postgresql
+#    volumes:
+#      - /var/lib/postgresql/data
+#      - /var/run/postgresql
   tapuwspg:
     image: opencadc/uws_postgres
     networks:
@@ -93,9 +94,9 @@ services:
       - POSTGRES_USER=tapuws
       - POSTGRES_PASSWORD=astr0query
       - PGDATA=/var/lib/postgresql/data/uws
-    volumes:
-      - /var/lib/postgresql/data
-      - /var/run/postgresql
+#    volumes:
+#      - /var/lib/postgresql/data
+#      - /var/run/postgresql
 
 # Create the network 'archive' for which this system will run within.
 networks:
