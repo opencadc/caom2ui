@@ -44,6 +44,7 @@ import ca.nrc.cadc.AbstractUnitTest;
 import ca.nrc.cadc.search.parser.exception.TargetParserException;
 
 import org.junit.Test;
+
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -64,7 +65,7 @@ public class TargetParserTest extends AbstractUnitTest<TargetParser>
     {
         try
         {
-            final TargetParser parser = new TargetParser(getMockResolver());
+            final TargetParser parser = new TargetParser(mockResolver);
             parser.parse(null, null);
 
             fail("Failed to throw TargetParserException parsing null string");
@@ -98,32 +99,32 @@ public class TargetParserTest extends AbstractUnitTest<TargetParser>
 
         for (final String t : targets)
         {
-            reset(getMockResolver());
-            final TargetParser parser = new TargetParser(getMockResolver());
+            reset(mockResolver);
+            final TargetParser parser = new TargetParser(mockResolver);
 
-            replay(getMockResolver());
+            replay(mockResolver);
 
             final TargetData data = parser.parse(t, "SIMBAD");
 
             assertEquals("Wrong RA for " + t, 188.733d, data.getRA(), 0.01d);
             assertEquals("Wrong Dec for " + t, 56.722d, data.getDec(), 0.01d);
 
-            verify(getMockResolver());
+            verify(mockResolver);
         }
 
         for (final String t : noSecondTargets)
         {
-            reset(getMockResolver());
-            final TargetParser parser = new TargetParser(getMockResolver());
+            reset(mockResolver);
+            final TargetParser parser = new TargetParser(mockResolver);
 
-            replay(getMockResolver());
+            replay(mockResolver);
 
             final TargetData data = parser.parse(t, "SIMBAD");
 
             assertEquals("Wrong RA for " + t, 188.5d, data.getRA(), 0.0d);
             assertEquals("Wrong Dec for " + t, 56.722d, data.getDec(), 0.01d);
 
-            verify(getMockResolver());
+            verify(mockResolver);
         }
     }
 
@@ -145,11 +146,11 @@ public class TargetParserTest extends AbstractUnitTest<TargetParser>
 
         for (final String t : targets)
         {
-            reset(getMockResolver());
+            reset(mockResolver);
             final TargetParser parser =
-                    new TargetParser(getMockResolver());
+                    new TargetParser(mockResolver);
 
-            replay(getMockResolver());
+            replay(mockResolver);
 
             final TargetData data = parser.parse(t, "SIMBAD");
 
@@ -157,16 +158,16 @@ public class TargetParserTest extends AbstractUnitTest<TargetParser>
             assertEquals("Wrong Dec for " + t, 45.0, data.getDec(), 0.0d);
             assertEquals("Wrong Radius for " + t, 6.0d, data.getRadius(), 0.0d);
 
-            verify(getMockResolver());
+            verify(mockResolver);
         }
 
         for (final String t : arcSecondTargets)
         {
-            reset(getMockResolver());
+            reset(mockResolver);
             final TargetParser parser =
-                    new TargetParser(getMockResolver());
+                    new TargetParser(mockResolver);
 
-            replay(getMockResolver());
+            replay(mockResolver);
 
             final TargetData data = parser.parse(t, "SIMBAD");
 
@@ -174,17 +175,17 @@ public class TargetParserTest extends AbstractUnitTest<TargetParser>
             assertEquals("Wrong Dec for " + t, 45.0, data.getDec(), 0.0d);
             assertEquals("Wrong Radius for " + t, 0.1d, data.getRadius(), 0.0d);
 
-            verify(getMockResolver());
+            verify(mockResolver);
         }
 
         // TEST 3
 
-        reset(getMockResolver());
+        reset(mockResolver);
         final String TARGET_1 = "123 , 45 , 6\"";
         final TargetParser parser =
-                new TargetParser(getMockResolver());
+                new TargetParser(mockResolver);
 
-        replay(getMockResolver());
+        replay(mockResolver);
 
         final TargetData data = parser.parse(TARGET_1, "SIMBAD");
 
@@ -193,15 +194,15 @@ public class TargetParserTest extends AbstractUnitTest<TargetParser>
         assertEquals("Wrong Radius for " + TARGET_1, 0.001666d,
                      data.getRadius(), 0.0001d);
 
-        verify(getMockResolver());
+        verify(mockResolver);
 
         // TEST 4
-        reset(getMockResolver());
+        reset(mockResolver);
         final String TARGET_2 = "12 34 56 56 43 21, 6''";
         final TargetParser parser2 =
-                new TargetParser(getMockResolver());
+                new TargetParser(mockResolver);
 
-        replay(getMockResolver());
+        replay(mockResolver);
 
         final TargetData data2 = parser2.parse(TARGET_2, "SIMBAD");
 
@@ -212,7 +213,7 @@ public class TargetParserTest extends AbstractUnitTest<TargetParser>
         assertEquals("Wrong Radius for " + TARGET_2, 0.001666d,
                      data2.getRadius(), 0.0001d);
 
-        verify(getMockResolver());
+        verify(mockResolver);
     }
 
     @Test
@@ -236,7 +237,7 @@ public class TargetParserTest extends AbstractUnitTest<TargetParser>
         for (final String t : targets)
         {
             final TargetParser parser =
-                    new TargetParser(getMockResolver());
+                    new TargetParser(mockResolver);
             final TargetData data = parser.parse(t, "SIMBAD");
             final String equivalentTarget = targets[(int) index];
 
@@ -253,16 +254,16 @@ public class TargetParserTest extends AbstractUnitTest<TargetParser>
     public final void parseRadius() throws Exception
     {
         final String t = "12 34 56 56 43 21";
-        final TargetParser parser = new TargetParser(getMockResolver());
+        final TargetParser parser = new TargetParser(mockResolver);
         final TargetData data = parser.parse(t, "SIMBAD");
 
-        replay(getMockResolver());
+        replay(mockResolver);
 
         assertEquals(188.7D, data.getRA(), 0.1D);
         assertEquals(56.7D, data.getDec(), 0.1D);
         assertEquals("Radius should be 0.0", 0.0, data.getRadius(), 0.0);
 
-        verify(getMockResolver());
+        verify(mockResolver);
     }
 
     @Test
@@ -284,13 +285,13 @@ public class TargetParserTest extends AbstractUnitTest<TargetParser>
 
         for (final String t : shouldPass)
         {
-            reset(getMockResolver());
-            final TargetParser parser = new TargetParser(getMockResolver());
+            reset(mockResolver);
+            final TargetParser parser = new TargetParser(mockResolver);
 
-            replay(getMockResolver());
+            replay(mockResolver);
             assertTrue(t + " failed test", parser.isQueryInDegrees(t));
 
-            verify(getMockResolver());
+            verify(mockResolver);
         }
 
         final String[] shouldFail =
@@ -305,19 +306,47 @@ public class TargetParserTest extends AbstractUnitTest<TargetParser>
 
         for (final String t : shouldFail)
         {
-            reset(getMockResolver());
-            final TargetParser parser = new TargetParser(getMockResolver());
+            reset(mockResolver);
+            final TargetParser parser = new TargetParser(mockResolver);
 
-            replay(getMockResolver());
+            replay(mockResolver);
             assertFalse(t + " failed test", parser.isQueryInDegrees(t));
 
-            verify(getMockResolver());
+            verify(mockResolver);
         }
 
     }
 
-    public Resolver getMockResolver()
+    @Test
+    public final void parseNameRadius() throws Exception
     {
-        return mockResolver;
+        final String target = "M101 0.5";
+        final String resolver = "SIMBAD";
+
+        reset(mockResolver);
+        final TargetParser testSubject =
+                new TargetParser(mockResolver);
+        final TargetData resolverData = new TargetData("M101 0.5",
+                                                       13.5D, null, // raRange
+                                                       -13.5D, null, // decRange
+                                                       0.5, // radius
+                                                       "COORD",
+                                                       "SIMBAD",
+                                                       88,
+                                                       "M101",
+                                                       null,
+                                                       null);
+
+        expect(mockResolver.resolveTarget(target, resolver)).andReturn(
+                resolverData).once();
+
+        replay(mockResolver);
+
+        final TargetData resultData = testSubject.parse(target, resolver);
+
+        assertEquals("Wrong radius.", 0.5D, resultData.getRadius(), 0.0D);
+        assertEquals("Wrong object name.", "M101", resultData.getObjectName());
+
+        verify(mockResolver);
     }
 }

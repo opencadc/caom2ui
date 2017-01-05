@@ -64,7 +64,6 @@ version = '1001'
 
 // Modify this to your liking!
 def docker_image_name = 'opencadc/search'
-def docker_uwspg_image_name = 'opencadc/uws_postgres'
 
 war {
     archiveName = 'search##' + project.version + '.war'
@@ -87,7 +86,6 @@ task copySQL(type: Copy) {
 
 task initDockerize(type: Copy, dependsOn: [build, copySQL]) {
     from 'Dockerfile'
-    from 'Dockerfile-uwspg'
     from 'org.opencadc.search.properties'
     into 'docker/'
 }
@@ -98,11 +96,7 @@ task copyWAR(type: Copy, dependsOn: war) {
     include '*.war'
 }
 
-task dockerizeUWSPG(type: Exec, dependsOn: [initDockerize]) {
-    commandLine 'docker', 'build', '-t', docker_uwspg_image_name, '-f', './docker/Dockerfile-uwspg', './docker/'
-}
-
-task dockerize(type: Exec, dependsOn: [initDockerize, dockerizeUWSPG, copyWAR]) {
+task dockerize(type: Exec, dependsOn: [initDockerize, copyWAR]) {
     commandLine 'docker', 'build', '-t', docker_image_name, '-f', './docker/Dockerfile', './docker/'
 }
 
