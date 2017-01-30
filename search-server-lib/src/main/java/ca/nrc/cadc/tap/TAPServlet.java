@@ -68,7 +68,7 @@
 
 package ca.nrc.cadc.tap;
 
-import ca.nrc.cadc.ApplicationConfiguration;
+import ca.nrc.cadc.config.ApplicationConfiguration;
 import ca.nrc.cadc.net.HttpDownload;
 import ca.nrc.cadc.reg.client.RegistryClient;
 import ca.nrc.cadc.search.util.ParameterUtil;
@@ -92,6 +92,11 @@ import java.util.ArrayList;
 
 public class TAPServlet extends ConfigurableServlet
 {
+    public static final String TAP_SERVICE_URI_PROPERTY_KEY =
+            "org.opencadc.search.tap-service-id";
+    public static final URI DEFAULT_TAP_SERVICE_URI =
+            URI.create("ivo://cadc.nrc.ca/tap");
+
     public TAPServlet()
     {
     }
@@ -267,8 +272,8 @@ public class TAPServlet extends ConfigurableServlet
     private URI lookupServiceURI()
     {
         return getServiceID(
-                ApplicationConfiguration.TAP_SERVICE_URI_PROPERTY_KEY,
-                ApplicationConfiguration.DEFAULT_TAP_SERVICE_URI);
+                TAP_SERVICE_URI_PROPERTY_KEY,
+                DEFAULT_TAP_SERVICE_URI);
     }
 
     private Job createJob(final HttpServletRequest req)

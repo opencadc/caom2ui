@@ -7,6 +7,7 @@ import ca.nrc.cadc.caom2.Observation;
 import ca.nrc.cadc.caom2.ObservationURI;
 import ca.nrc.cadc.caom2.xml.ObservationParsingException;
 import ca.nrc.cadc.caom2.xml.ObservationReader;
+import ca.nrc.cadc.config.ApplicationConfiguration;
 import ca.nrc.cadc.net.HttpDownload;
 import ca.nrc.cadc.net.InputStreamWrapper;
 import ca.nrc.cadc.reg.Standards;
@@ -46,6 +47,15 @@ public class ObservationViewServlet extends HttpServlet
             + "try again. | l'Observation '%s' pas "
             + "trouvé, ou vous n'avez pas permission.  S'il "
             + "vous plaît connecter et essayez à nouveau.";
+
+    static final String CAOM2META_SERVICE_URI_PROPERTY_KEY =
+            "org.opencadc.caom2ui.caom2ops-service-id";
+    static final String CAOM2META_SERVICE_HOST_PORT_PROPERTY_KEY =
+            "org.opencadc.caom2ui.caom2ops-service-host-port";
+    static final String DEFAULT_CAOM2META_SERVICE_HOST_PORT =
+            "http://caom2ops:8080";
+    static final URI DEFAULT_CAOM2META_SERVICE_URI =
+            URI.create("ivo://cadc.nrc.ca/caom2ops");
 
 
     private final RegistryClient registryClient;
@@ -178,16 +188,16 @@ public class ObservationViewServlet extends HttpServlet
 
         final URL repoURL = registryClient.getServiceURL(
                 applicationConfiguration.lookupServiceURI(
-                        ApplicationConfiguration.CAOM2META_SERVICE_URI_PROPERTY_KEY,
-                        ApplicationConfiguration.DEFAULT_CAOM2META_SERVICE_URI),
+                        CAOM2META_SERVICE_URI_PROPERTY_KEY,
+                        DEFAULT_CAOM2META_SERVICE_URI),
                 Standards.CAOM2_OBS_20, authMethod);
 
         final URIBuilder builder = new URIBuilder(repoURL.toURI());
 
         final String metaServiceHost =
                 applicationConfiguration.lookup(
-                        ApplicationConfiguration.CAOM2META_SERVICE_HOST_PORT_PROPERTY_KEY,
-                        ApplicationConfiguration.DEFAULT_CAOM2META_SERVICE_HOST_PORT);
+                        CAOM2META_SERVICE_HOST_PORT_PROPERTY_KEY,
+                        DEFAULT_CAOM2META_SERVICE_HOST_PORT);
 
         if (StringUtil.hasText(metaServiceHost))
         {

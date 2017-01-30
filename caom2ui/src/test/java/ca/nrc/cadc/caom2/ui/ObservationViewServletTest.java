@@ -37,6 +37,7 @@ import ca.nrc.cadc.auth.AuthMethod;
 import ca.nrc.cadc.caom2.Algorithm;
 import ca.nrc.cadc.caom2.Observation;
 import ca.nrc.cadc.caom2.ObservationURI;
+import ca.nrc.cadc.config.ApplicationConfiguration;
 import ca.nrc.cadc.net.HttpDownload;
 import ca.nrc.cadc.reg.Standards;
 import ca.nrc.cadc.reg.client.RegistryClient;
@@ -243,14 +244,14 @@ public class ObservationViewServletTest
         expect(mockObservationReader.getObs()).andReturn(result).once();
 
         expect(mockConfiguration.lookupServiceURI(
-                ApplicationConfiguration.CAOM2META_SERVICE_URI_PROPERTY_KEY,
-                ApplicationConfiguration.DEFAULT_CAOM2META_SERVICE_URI))
+                ObservationViewServlet.CAOM2META_SERVICE_URI_PROPERTY_KEY,
+                ObservationViewServlet.DEFAULT_CAOM2META_SERVICE_URI))
                 .andReturn(serviceURI).once();
 
         expect(mockConfiguration.lookup(
-                ApplicationConfiguration.CAOM2META_SERVICE_HOST_PORT_PROPERTY_KEY,
-                ApplicationConfiguration.DEFAULT_CAOM2META_SERVICE_HOST_PORT))
-                .andReturn(ApplicationConfiguration
+                ObservationViewServlet.CAOM2META_SERVICE_HOST_PORT_PROPERTY_KEY,
+                ObservationViewServlet.DEFAULT_CAOM2META_SERVICE_HOST_PORT))
+                .andReturn(ObservationViewServlet
                                    .DEFAULT_CAOM2META_SERVICE_HOST_PORT).once();
 
         expect(mockRegistryClient.getServiceURL(serviceURI,

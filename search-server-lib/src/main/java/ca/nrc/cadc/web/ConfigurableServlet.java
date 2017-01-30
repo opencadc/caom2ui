@@ -68,7 +68,7 @@
 
 package ca.nrc.cadc.web;
 
-import ca.nrc.cadc.ApplicationConfiguration;
+import ca.nrc.cadc.config.ApplicationConfiguration;
 
 import javax.servlet.http.HttpServlet;
 import java.net.URI;

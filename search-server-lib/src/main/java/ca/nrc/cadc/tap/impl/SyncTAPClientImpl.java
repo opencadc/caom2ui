@@ -34,8 +34,8 @@
 package ca.nrc.cadc.tap.impl;
 
 
-import ca.nrc.cadc.ApplicationConfiguration;
 import ca.nrc.cadc.auth.AuthMethod;
+import ca.nrc.cadc.config.ApplicationConfiguration;
 import ca.nrc.cadc.net.HttpPost;
 import ca.nrc.cadc.reg.Standards;
 import ca.nrc.cadc.reg.client.RegistryClient;
@@ -64,6 +64,9 @@ public class SyncTAPClientImpl implements SyncTAPClient
 {
     private static final Logger LOGGER =
             Logger.getLogger(SyncTAPClientImpl.class);
+    static final String TAP_SERVICE_HOST_PORT_PROPERTY_KEY =
+            "org.opencadc.search.tap-service-host-port";
+    static final String DEFAULT_TAP_SERVICE_HOST_PORT = "http://tap:8080";
 
 
     private final ApplicationConfiguration applicationConfiguration;
@@ -94,8 +97,8 @@ public class SyncTAPClientImpl implements SyncTAPClient
                                              AuthMethod.ANON);
         final String tapServiceHost =
                 applicationConfiguration.lookup(
-                        ApplicationConfiguration.TAP_SERVICE_HOST_PORT_PROPERTY_KEY,
-                        ApplicationConfiguration.DEFAULT_TAP_SERVICE_HOST_PORT);
+                        TAP_SERVICE_HOST_PORT_PROPERTY_KEY,
+                        DEFAULT_TAP_SERVICE_HOST_PORT);
 
         final URIBuilder builder = new URIBuilder(serviceURL.toURI());
 

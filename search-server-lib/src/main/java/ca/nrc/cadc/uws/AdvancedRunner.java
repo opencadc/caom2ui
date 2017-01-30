@@ -39,7 +39,6 @@
 
 package ca.nrc.cadc.uws;
 
-import ca.nrc.cadc.ApplicationConfiguration;
 import ca.nrc.cadc.caom2.CAOMQueryGeneratorImpl;
 import ca.nrc.cadc.caom2.ObsCoreQueryGeneratorImpl;
 import ca.nrc.cadc.net.TransientException;
@@ -73,8 +72,6 @@ import javax.servlet.http.HttpServletResponse;
 public class AdvancedRunner implements JobRunner
 {
     private static final Logger LOGGER = Logger.getLogger(AdvancedRunner.class);
-    private static String SHAPE1_UTYPE = "Plane.position.bounds";
-    private static String TEXT_UTYPE = "Observation.collection";
 
 
     private Job job;
@@ -124,6 +121,7 @@ public class AdvancedRunner implements JobRunner
 
         if (StringUtil.hasText(target))
         {
+            String SHAPE1_UTYPE = "Plane.position.bounds";
             parameters.add(new Parameter(FormConstraint.FORM_NAME,
                                          SHAPE1_UTYPE + Shape1.NAME));
             parameters.add(new Parameter(SHAPE1_UTYPE + Shape1.VALUE, target));
@@ -134,6 +132,7 @@ public class AdvancedRunner implements JobRunner
 
         if (StringUtil.hasText(collection))
         {
+            String TEXT_UTYPE = "Observation.collection";
             parameters.add(new Parameter(FormConstraint.FORM_NAME,
                                          TEXT_UTYPE + Text.NAME));
             parameters.add(new Parameter(TEXT_UTYPE + Text.VALUE, collection));

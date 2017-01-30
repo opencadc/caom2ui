@@ -68,7 +68,7 @@
 
 package ca.nrc.cadc.web;
 
-import ca.nrc.cadc.ApplicationConfiguration;
+import ca.nrc.cadc.config.ApplicationConfiguration;
 import ca.nrc.cadc.auth.ACIdentityManager;
 import ca.nrc.cadc.auth.AuthenticationUtil;
 import ca.nrc.cadc.caom2.CAOMQueryGeneratorImpl;
@@ -99,12 +99,18 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.net.URI;
 import java.security.PrivilegedExceptionAction;
 import java.util.*;
 
 
 public class SearchJobServlet extends SyncServlet
 {
+    static final String TAP_SERVICE_URI_PROPERTY_KEY =
+            "org.opencadc.search.tap-service-id";
+    static final URI DEFAULT_TAP_SERVICE_URI =
+            URI.create("ivo://cadc.nrc.ca/tap");
+
     private JobManager jobManager;
     private ApplicationConfiguration applicationConfiguration;
 
@@ -331,8 +337,8 @@ public class SearchJobServlet extends SyncServlet
                                            jobUpdater, tapClient,
                                            getQueryGenerator(auditJob)),
                                    applicationConfiguration.lookupServiceURI(
-                                           ApplicationConfiguration.TAP_SERVICE_URI_PROPERTY_KEY,
-                                           ApplicationConfiguration.DEFAULT_TAP_SERVICE_URI));
+                                           TAP_SERVICE_URI_PROPERTY_KEY,
+                                           DEFAULT_TAP_SERVICE_URI));
 
         runner.run();
         response.setStatus(HttpServletResponse.SC_OK);

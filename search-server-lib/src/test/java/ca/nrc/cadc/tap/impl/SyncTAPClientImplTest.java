@@ -69,7 +69,7 @@
 package ca.nrc.cadc.tap.impl;
 
 import ca.nrc.cadc.AbstractUnitTest;
-import ca.nrc.cadc.ApplicationConfiguration;
+import ca.nrc.cadc.config.ApplicationConfiguration;
 
 import static org.easymock.EasyMock.*;
 
@@ -103,8 +103,8 @@ public class SyncTAPClientImplTest extends AbstractUnitTest<SyncTAPClientImpl>
         final Job testJob = new Job();
 
         expect(mockConfiguration.lookup(
-                ApplicationConfiguration.TAP_SERVICE_HOST_PORT_PROPERTY_KEY,
-                ApplicationConfiguration.DEFAULT_TAP_SERVICE_HOST_PORT))
+                SyncTAPClientImpl.TAP_SERVICE_HOST_PORT_PROPERTY_KEY,
+                SyncTAPClientImpl.DEFAULT_TAP_SERVICE_HOST_PORT))
                 .andReturn(null).once();
 
         expect(mockRegistryClient.getServiceURL(

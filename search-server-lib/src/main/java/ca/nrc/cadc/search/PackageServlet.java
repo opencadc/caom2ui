@@ -68,7 +68,6 @@
 
 package ca.nrc.cadc.search;
 
-import ca.nrc.cadc.ApplicationConfiguration;
 import ca.nrc.cadc.auth.AuthMethod;
 import ca.nrc.cadc.reg.Standards;
 import ca.nrc.cadc.reg.client.RegistryClient;
@@ -83,7 +82,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLEncoder;
 
 
 /**
@@ -92,6 +90,15 @@ import java.net.URLEncoder;
  */
 public class PackageServlet extends ConfigurableServlet
 {
+    static final String CAOM2PKG_SERVICE_URI_PROPERTY_KEY =
+            "org.opencadc.search.caom2ops-service-id";
+    static final String CAOM2PKG_SERVICE_HOST_PORT_PROPERTY_KEY =
+            "org.opencadc.search.caom2ops-service-host-port";
+    static final URI DEFAULT_CAOM2PKG_SERVICE_URI =
+            URI.create("ivo://cadc.nrc.ca/caom2ops");
+    static final String DEFAULT_CAOM2PKG_SERVICE_HOST_PORT =
+            "http://caom2ops:8080";
+
     /**
      * Only supported method.  This will accept an ID parameter in the request
      * to query on.
@@ -134,15 +141,15 @@ public class PackageServlet extends ConfigurableServlet
     {
         final URL serviceURL = registryClient.getServiceURL(
                 getServiceID(
-                        ApplicationConfiguration.CAOM2PKG_SERVICE_URI_PROPERTY_KEY,
-                        ApplicationConfiguration.DEFAULT_CAOM2PKG_SERVICE_URI),
+                        CAOM2PKG_SERVICE_URI_PROPERTY_KEY,
+                        DEFAULT_CAOM2PKG_SERVICE_URI),
                 Standards.PKG_10, AuthMethod.COOKIE);
 
         final URIBuilder builder = new URIBuilder(serviceURL.toURI());
 
         final String pkgServiceHost =
-                lookup(ApplicationConfiguration.CAOM2PKG_SERVICE_HOST_PORT_PROPERTY_KEY,
-                       ApplicationConfiguration.DEFAULT_CAOM2PKG_SERVICE_HOST_PORT);
+                lookup(CAOM2PKG_SERVICE_HOST_PORT_PROPERTY_KEY,
+                       DEFAULT_CAOM2PKG_SERVICE_HOST_PORT);
 
         if (StringUtil.hasText(pkgServiceHost))
         {

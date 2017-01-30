@@ -21,8 +21,7 @@ dependencies {
     compile 'org.opencadc:cadc-access-control:1.+'
     compile 'org.opencadc:cadc-access-control-identity:1.+'
     compile 'org.opencadc:cadc-uws:1.+'
-    compile 'org.opencadc:cadc-uws-server:1.+'
-    compile 'org.opencadc:cadc-tap-server:1.+'
+    compile 'org.opencadc:cadc-web-util:1.+'
     compile 'org.opencadc:cadc-adql:1.+'
     compile 'org.opencadc:cadc-util:1.+'
     compile 'org.opencadc:cadc-dali:1.+'
@@ -30,11 +29,9 @@ dependencies {
     compile 'org.opencadc:cadc-registry:1.+'
     compile 'org.opencadc:cadc-vosi:1.+'
     compile 'org.apache.httpcomponents:httpclient:4.+'
-    compile 'org.apache.commons:commons-configuration2:2.+'
     compile 'commons-net:commons-net:3.+'
 
     compile 'javax.servlet:javax.servlet-api:3.0.+'
-
     runtime 'org.postgresql:postgresql:9.4.1209.jre7'
     runtime 'jstl:jstl:1.+'
 
@@ -47,4 +44,4 @@ sourceCompatibility = 1.7
 
 group = 'org.opencadc'
 
-version = '1.1.1'
+version = '1.1.2'

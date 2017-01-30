@@ -40,7 +40,6 @@ import java.net.URI;
 import java.util.*;
 
 import ca.nrc.cadc.AbstractUnitTest;
-import ca.nrc.cadc.ApplicationConfiguration;
 import ca.nrc.cadc.date.DateUtil;
 import ca.nrc.cadc.net.TransientException;
 import ca.nrc.cadc.search.Searcher;
@@ -94,11 +93,6 @@ public class AdvancedRunnerTest extends AbstractUnitTest<AdvancedRunner>
                 return mockSyncResponseWriter;
             }
         });
-
-//        expect(mockConfiguration.lookupServiceURI(
-//                ApplicationConfiguration.TAP_SERVICE_URI_PROPERTY_KEY,
-//                ApplicationConfiguration.DEFAULT_TAP_SERVICE_URI)).andReturn(
-//                        lookupURI).once();
 
         expect(getMockJob().getID()).andReturn("88").once();
         expect(getMockJobUpdater().setPhase("88", ExecutionPhase.QUEUED,
