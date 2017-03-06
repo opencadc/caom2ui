@@ -56,6 +56,9 @@ public class ObservationViewServlet extends HttpServlet
             "http://caom2ops:8080";
     static final URI DEFAULT_CAOM2META_SERVICE_URI =
             URI.create("ivo://cadc.nrc.ca/caom2ops");
+    static final String PROPERTIES_FILE_PATH =
+            System.getProperty("user.home")
+            + "/config/org.opencadc.caom2ui.properties";
 
 
     private final RegistryClient registryClient;
@@ -64,7 +67,8 @@ public class ObservationViewServlet extends HttpServlet
 
     public ObservationViewServlet()
     {
-        this(new RegistryClient(), new ApplicationConfiguration());
+        this(new RegistryClient(),
+             new ApplicationConfiguration(PROPERTIES_FILE_PATH));
     }
 
     ObservationViewServlet(final RegistryClient registryClient,
@@ -141,7 +145,7 @@ public class ObservationViewServlet extends HttpServlet
     }
 
     private void forward(final HttpServletRequest request,
-                 final HttpServletResponse response, final String path)
+                         final HttpServletResponse response, final String path)
             throws ServletException, IOException
     {
         final RequestDispatcher dispatcher = request.getRequestDispatcher(path);
