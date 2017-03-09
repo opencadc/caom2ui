@@ -23,11 +23,11 @@
 %>
 
 <%-- Request scope variables so they can be seen in the imported JSPs --%>
-<fmt:setLocale value="<%= requestHeaderLang %>" scope="request"/>
-<fmt:setBundle basename="AdvancedSearchBundle"
-               var="langBundle" scope="request"/>
+<fmt:setLocale value="<%= requestHeaderLang %>" scope="request" />
+<fmt:setBundle basename="AdvancedSearchBundle" var="langBundle"
+               scope="request"/>
 
-<c:import url="_page_header.html"/>
+<c:import url="_page_header.html" />
 
 <body>
 

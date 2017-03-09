@@ -75,13 +75,7 @@ clean {
     }
 }
 
-task copySQL(type: Copy) {
-    from 'sql/'
-    include '*.sql'
-    into 'docker/sql/'
-}
-
-task initDockerize(type: Copy, dependsOn: [build, copySQL]) {
+task initDockerize(type: Copy, dependsOn: [build]) {
     from 'Dockerfile'
     from 'org.opencadc.search.properties'
     into 'docker/'

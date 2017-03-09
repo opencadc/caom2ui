@@ -5,23 +5,23 @@
 
   <!-- Data source for UWS jobs on Postgres -->
   <!-- For containerized development only! -->
-  <!--<Resource name="jdbc/uws"-->
-            <!--auth="Container"-->
-            <!--type="javax.sql.DataSource"-->
-            <!--maxActive="1" maxIdle="1" maxWait="20000"-->
-            <!--username="uws" password="astr0query"-->
-            <!--driverClassName="org.postgresql.Driver"-->
-            <!--url="jdbc:postgresql://uwspg:5432/uws"-->
-            <!--removeAbandoned="true"-->
-            <!--removeAbandonedTimeout="300"-->
-            <!--logAbandoned="true"-->
-            <!--testOnBorrow="true"-->
-            <!--validationQuery="select 123"-->
-  <!--/>-->
+  <Resource name="jdbc/uws"
+            auth="Container"
+            type="javax.sql.DataSource"
+            maxActive="1" maxIdle="1" maxWait="20000"
+            username="uws" password="astr0query"
+            driverClassName="org.postgresql.Driver"
+            url="jdbc:postgresql://uwspg:5432/uws"
+            removeAbandoned="true"
+            removeAbandonedTimeout="300"
+            logAbandoned="true"
+            testOnBorrow="true"
+            validationQuery="select 123"
+  />
 
   <!-- CADC pre-defined server -->
-  <ResourceLink name="jdbc/uws"
-                global="jdbc/postgresql-uws"
-                type="javax.sql.DataSource"/>
+  <!--<ResourceLink name="jdbc/uws"-->
+                <!--global="jdbc/postgresql-uws"-->
+                <!--type="javax.sql.DataSource"/>-->
 
 </Context>
