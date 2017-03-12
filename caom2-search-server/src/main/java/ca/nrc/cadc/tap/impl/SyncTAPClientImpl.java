@@ -44,6 +44,7 @@ import ca.nrc.cadc.util.StringUtil;
 import ca.nrc.cadc.uws.Job;
 import ca.nrc.cadc.uws.JobAttribute;
 import ca.nrc.cadc.uws.Parameter;
+import ca.nrc.cadc.web.Configuration;
 
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.log4j.Logger;
@@ -77,7 +78,7 @@ public class SyncTAPClientImpl implements SyncTAPClient
     public SyncTAPClientImpl(final boolean followToResults,
                              final RegistryClient registryClient)
     {
-        this(new ApplicationConfiguration(), followToResults, registryClient);
+        this(new ApplicationConfiguration(Configuration.DEFAULT_CONFIG_FILE_PATH), followToResults, registryClient);
     }
 
     SyncTAPClientImpl(ApplicationConfiguration applicationConfiguration,

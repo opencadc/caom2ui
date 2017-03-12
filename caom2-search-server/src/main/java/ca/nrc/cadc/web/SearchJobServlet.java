@@ -120,7 +120,7 @@ public class SearchJobServlet extends SyncServlet
     {
         super.init(config);
         jobManager = createJobManager(config);
-        applicationConfiguration = new ApplicationConfiguration();
+        applicationConfiguration = new ApplicationConfiguration(Configuration.DEFAULT_CONFIG_FILE_PATH);
     }
 
     /**

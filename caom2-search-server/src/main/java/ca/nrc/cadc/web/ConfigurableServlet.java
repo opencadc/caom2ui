@@ -77,13 +77,13 @@ import java.net.URI;
 /**
  * Base servlet to allow configuration.
  */
-public abstract class ConfigurableServlet extends HttpServlet
+public abstract class ConfigurableServlet extends HttpServlet implements Configuration
 {
     private final ApplicationConfiguration configuration;
 
     public ConfigurableServlet()
     {
-        this(new ApplicationConfiguration());
+        this(new ApplicationConfiguration(DEFAULT_CONFIG_FILE_PATH));
     }
 
     protected ConfigurableServlet(final ApplicationConfiguration configuration)
