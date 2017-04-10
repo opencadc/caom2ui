@@ -34,7 +34,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * Class to represent a drop down or selection list. 
+ * Class to represent a drop down or selection list.
  * 
  * @author jburke
  *
@@ -44,8 +44,7 @@ public class Enumerated extends AbstractScalarFormConstraint implements Searchab
     // Constants used to construct name for form elements.
     public static final String NAME = "@Enumerated";
     public static final String UTYPE = "@Enumerated.utype";
-//    public static final String LABEL = "@Enumerated.label";
-    
+
     // Label for the list.
     private String label;
 

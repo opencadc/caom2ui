@@ -8,15 +8,13 @@
 
 (function ($)
 {
-  var currentURI = new cadc.web.util.currentURI();
-
   // register namespace
   $.extend(true, window, {
     "ca": {
       "nrc": {
         "cadc": {
           "search": {
-            "PREVIEW_URL_PREFIX": currentURI.getPath() + "preview",
+            "PREVIEW_URL_PREFIX": "/AdvancedSearch/preview",
             "Preview": Preview
           }
         }
@@ -268,7 +266,7 @@
              + "?logkey=preview&logvalue=Observation&runid=" + getRunID();
     }
 
-    /*
+    /**
      * Convert the given elements into a Preview URL, and make a HEAD request to the
      * Data Web Service to see if it exists.  If it does, then issue the provided
      * callback.
@@ -276,10 +274,11 @@
      * The callback function will be called with JSON containing the URL for the
      * Preview, or an error object and the status of the request.
      *
-     * @param callback        Callback rather than waiting for the return.
-     * @return {function}     Callback function
+     * @param _successCallback    Function for successful check.
+     * @param _failCallback    Function for failed check.
+     * @return  The preview url, or null if none exists.
      */
-    function getPreview(callback)
+    function getPreview(_successCallback, _failCallback)
     {
       var previewConverterFunction = getConverter();
 
@@ -288,33 +287,18 @@
         var previewURL = previewConverterFunction();
 
         $.ajax({
-                 type: "HEAD",
+                 method: "HEAD",
                  url: previewURL
                })
-          .done(function(data, textStatus, jqXHR)
+          .done(function()
                 {
-                  var returnJSON = "{";
-
-                  if (jqXHR.status === 200)
-                  {
-                    returnJSON += "\"previewURL\":\"" + previewURL + "\"";
-                  }
-                  else
-                  {
-                    returnJSON += "\"error\":\"NO_SUCH_PREVIEW\", \"status\":\""
-                                  + jqXHR.status + "\"";
-                  }
-
-                  returnJSON += "}";
-
-                  callback(JSON.parse(returnJSON));
+                  _successCallback(previewURL);
                 })
           .fail(function (jqXHR, textStatus, errorThrown)
                 {
-                  if (jqXHR.status !== 404)
+                  if (_failCallback)
                   {
-                    console.error("Error >> " + errorThrown + " ("
-                                  + jqXHR.status + ")");
+                    _failCallback(jqXHR.status, errorThrown);
                   }
                 });
       }

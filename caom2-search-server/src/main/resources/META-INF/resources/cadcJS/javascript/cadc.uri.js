@@ -248,7 +248,7 @@
     /**
      * Return a single value for a key.
      *
-     * @returns {{Object}}  value or null.
+     * @returns {{String}}  value or null.
      */
     function getQueryValue(_key)
     {
@@ -280,8 +280,6 @@
       {
         getQuery()[_key] = [_val];
       }
-
-      //reparse(toString());
     }
 
     /**

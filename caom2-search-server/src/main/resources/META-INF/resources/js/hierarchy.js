@@ -28,19 +28,20 @@
 
 (function ($)
 {
-  var currentURI = new cadc.web.util.currentURI();
-
   $.extend(true, window, {
-      "ca": {
-        "nrc": {
-          "cadc": {
-            "search": {
-              "datatrain": {
-                "SELECT_DISPLAY_OPTION_COUNT": 12,
-                "SPACER_CHAR": "&#9472;",
-                "SPACER": function()
+      'ca': {
+        'nrc': {
+          'cadc': {
+            'search': {
+              'datatrain': {
+                'SELECT_DISPLAY_OPTION_COUNT': 12,
+                'SPACER_CHAR': '&#9472;',
+                /**
+                 * @return {string}
+                 */
+                'SPACER': function()
                 {
-                  var val = "";
+                  var val = '';
                   for (var s = 0; s < 20; s++)
                   {
                     val += ca.nrc.cadc.search.datatrain.SPACER_CHAR;
@@ -48,56 +49,56 @@
 
                   return val;
                 },
-                "tap":
+                'tap':
                 {
-                  "INSTRUMENT_FRESH_MJD_FIELD_NAME": {
-                    "caom2": "max_time_bounds_cval1",
-                    "obscore": "max_t_min"
+                  'INSTRUMENT_FRESH_MJD_FIELD_NAME': {
+                    'caom2': 'max_time_bounds_cval1',
+                    'obscore': 'max_t_min'
                   },
-                  "TABLE": {
-                    "caom2": "caom2.enumfield",
-                    "obscore": "caom2.obscoreenumfield"
+                  'TABLE': {
+                    'caom2': 'caom2.enumfield',
+                    'obscore': 'caom2.obscoreenumfield'
                   },
-                  "UTYPE_COLUMN_NAMES":
+                  'hide':
                   {
-                    "caom2": {
-                      "Plane.energy.emBand": "energy_emband",
-                      "Observation.collection": "collection",
-                      "Observation.instrument.name": "instrument_name",
-                      "Plane.energy.bandpassName": "energy_bandpassname",
-                      "Plane.calibrationLevel": "calibrationlevel",
-                      "Plane.dataProductType": "dataproducttype",
-                      "Observation.type": "type"
+                    'caom2': {
+                      'Plane.energy.emBand': 'energy_emband',
+                      'Observation.collection': 'collection',
+                      'Observation.instrument.name': 'instrument_name',
+                      'Plane.energy.bandpassName': 'energy_bandpassname',
+                      'Plane.calibrationLevel': 'calibrationlevel',
+                      'Plane.dataProductType': 'dataproducttype',
+                      'Observation.type': 'type'
                     },
-                    "obscore": {
-                      "DataID.Collection": "obs_collection",
-                      "Provenance.ObsConfig.Facility.name": "facility_name",
-                      "Provenance.ObsConfig.Instrument.name": "instrument_name",
-                      "ObsDataset.calibLevel": "calib_level",
-                      "ObsDataset.dataProductType": "dataproduct_type"
+                    'obscore': {
+                      'DataID.Collection': 'obs_collection',
+                      'Provenance.ObsConfig.Facility.name': 'facility_name',
+                      'Provenance.ObsConfig.Instrument.name': 'instrument_name',
+                      'ObsDataset.calibLevel': 'calib_level',
+                      'ObsDataset.dataProductType': 'dataproduct_type'
                     }
                   }
                 },
-                "CALIBRATION_LEVEL_MAP": {
-                  0: "Raw Instrumental",
-                  1: "Raw Standard",
-                  2: "Calibrated",
-                  3: "Product"
+                'CALIBRATION_LEVEL_MAP': {
+                  0: 'Raw Instrumental',
+                  1: 'Raw Standard',
+                  2: 'Calibrated',
+                  3: 'Product'
                 },
-                "COLLECTION_ORDER": [
-                  "CFHT",
-                  "CFHTMEGAPIPE",
-                  "CFHTTERAPIX",
-                  "CFHTWIRWOLF",
-                  "HST",
-                  "HSTHLA",
-                  "GEMINI",
-                  "JCMT",
-                  "JCMTLS",
-                  "DAO",
-                  "DAOPLATES"
+                'COLLECTION_ORDER': [
+                  'CFHT',
+                  'CFHTMEGAPIPE',
+                  'CFHTTERAPIX',
+                  'CFHTWIRWOLF',
+                  'HST',
+                  'HSTHLA',
+                  'GEMINI',
+                  'JCMT',
+                  'JCMTLS',
+                  'DAO',
+                  'DAOPLATES'
                 ],
-                "sortCollections": function (val1, val2)
+                'sortCollections': function (val1, val2)
                 {
                   var val1Index = ca.nrc.cadc.search.datatrain.COLLECTION_ORDER.indexOf(val1);
                   var val2Index = ca.nrc.cadc.search.datatrain.COLLECTION_ORDER.indexOf(val2);
@@ -120,7 +121,7 @@
 
                   return placement;
                 },
-                "sortNumericDescending": function (val1, val2)
+                'sortNumericDescending': function (val1, val2)
                 {
                   var descVal;
 
@@ -140,25 +141,25 @@
 
                   return descVal;
                 },
-                "CUSTOM_SORT_UTYPES": {
-                  "Observation.collection": function(val1, val2) {
+                'CUSTOM_SORT_UTYPES': {
+                  'Observation.collection': function(val1, val2) {
                     return ca.nrc.cadc.search.datatrain.sortCollections(val1, val2);
                   },
-                  "DataID.Collection": function(val1, val2) {
+                  'DataID.Collection': function(val1, val2) {
                     return ca.nrc.cadc.search.datatrain.sortCollections(val1, val2);
                   },
-                  "Plane.calibrationLevel": function(val1, val2) {
+                  'Plane.calibrationLevel': function(val1, val2) {
                     return ca.nrc.cadc.search.datatrain.sortNumericDescending(val1, val2);
                   },
-                  "Obs.calibLevel": function(val1, val2) {
+                  'Obs.calibLevel': function(val1, val2) {
                     return ca.nrc.cadc.search.datatrain.sortNumericDescending(val1, val2);
                   }
                 },
-                "ENDPOINT": currentURI.getPath() + "tap",
-                "DataTrain": DataTrain,
-                "events": {
-                  "onDataTrainLoaded": new jQuery.Event("AdvancedSearch:onDataTrainLoaded"),
-                  "onDataTrainLoadFail": new jQuery.Event("AdvancedSearch:onDataTrainLoadFail")
+                'ENDPOINT': '/tap/sync',
+                'DataTrain': DataTrain,
+                'events': {
+                  'onDataTrainLoaded': new jQuery.Event('AdvancedSearch:onDataTrainLoaded'),
+                  'onDataTrainLoadFail': new jQuery.Event('AdvancedSearch:onDataTrainLoadFail')
                 }
               }
             }
@@ -174,9 +175,9 @@ function DataTrain(_modelDataSource, _autoInitFlag)
   var _self = this;
 
   this.modelDataSource = _modelDataSource;
-  this.pageLanguage = $("html").attr("lang");
-  this.$dataTrainDOM = $("div[id='" + _self.modelDataSource + "@Hierarchy']");
-  this.uType = _self.$dataTrainDOM.find(".hierarchy_utype").text();
+  this.pageLanguage = $('html').attr('lang');
+  this.$dataTrainDOM = $('div[id="' + _self.modelDataSource + '@Hierarchy"]');
+  this.uType = _self.$dataTrainDOM.find('.hierarchy_utype').text();
   this.groups = [];
   this.freshInstruments = [];
 
@@ -186,10 +187,9 @@ function DataTrain(_modelDataSource, _autoInitFlag)
     var tapQuery = createTAPQuery();
 
     $.get(ca.nrc.cadc.search.datatrain.ENDPOINT, {
-      REQUEST: "doQuery",
-      LANG: "ADQL",
-      FORMAT: "CSV",
-      QUERY: tapQuery
+      'LANG': 'ADQL',
+      'FORMAT': 'CSV',
+      'QUERY': tapQuery
     }).done(function (data)
             {
               load(data);
@@ -198,7 +198,7 @@ function DataTrain(_modelDataSource, _autoInitFlag)
             })
       .fail(function (jqXHR)
             {
-              alert("Error while querying TAP to initialize the page: "
+              alert('Error while querying TAP to initialize the page: '
                     + jqXHR.responseText);
               toggleLoading();
               trigger(ca.nrc.cadc.search.datatrain.events.onDataTrainLoadFail);
@@ -211,7 +211,7 @@ function DataTrain(_modelDataSource, _autoInitFlag)
    */
   function createTAPQuery()
   {
-    var uTypes = _self.uType.split("/");
+    var uTypes = _self.uType.split('/');
     var tapColumns = [];
 
     for (var i = 0, ul = uTypes.length; i < ul; i++)
@@ -227,13 +227,13 @@ function DataTrain(_modelDataSource, _autoInitFlag)
 
     var mjdConverter =
       new ca.nrc.cadc.search.unitconversion.MJDConverter(dateThreshold);
-    var mjdCondition = ", CASE WHEN "
+    var mjdCondition = ', CASE WHEN '
                        + ca.nrc.cadc.search.datatrain.tap.INSTRUMENT_FRESH_MJD_FIELD_NAME[_self.modelDataSource]
-                       + " >= " + mjdConverter.convert()
-                       + " THEN 1 ELSE 0 END ";
+                       + ' >= ' + mjdConverter.convert()
+                       + ' THEN 1 ELSE 0 END ';
 
-    return "SELECT " + tapColumns.join(",") + mjdCondition
-           + " FROM "
+    return 'SELECT ' + tapColumns.join(',') + mjdCondition
+           + ' FROM '
            + ca.nrc.cadc.search.datatrain.tap.TABLE[_modelDataSource];
   }
 
@@ -252,7 +252,7 @@ function DataTrain(_modelDataSource, _autoInitFlag)
     arrayOfRows = arrayOfRows.slice(1);
 
     // The instrument name is handled separately.
-    var instrumentNameIndex = firstRow.indexOf("instrument_name");
+    var instrumentNameIndex = firstRow.indexOf('instrument_name');
 
     // RegEx for '+' character.
     var plus = /\+/g;
@@ -261,7 +261,7 @@ function DataTrain(_modelDataSource, _autoInitFlag)
     var group = {};
 
     // Put an array of uType names into an array.
-    group.uTypes = _self.uType.split("/");
+    group.uTypes = _self.uType.split('/');
 
     // Put an array of uType values into an array.
     group.values = [];
@@ -277,16 +277,16 @@ function DataTrain(_modelDataSource, _autoInitFlag)
         var val = $.trim(groupValues[j]);
         var formattedVal;
 
-        if ((val == null) || (val === ''))
+        if ((val === null) || (val === ''))
         {
-          formattedVal = "null";
+          formattedVal = 'null';
         }
         else
         {
-          formattedVal = groupValues[j].replace(plus, " ");
+          formattedVal = groupValues[j].replace(plus, ' ');
         }
 
-        var freshFlag = (groupValues[gvl - 1] == 1);
+        var freshFlag = (groupValues[gvl - 1] === 1);
         var instrumentName = groupValues[instrumentNameIndex];
 
         if ((freshFlag === true) && (_self.freshInstruments.indexOf(instrumentName) < 0))
@@ -319,7 +319,7 @@ function DataTrain(_modelDataSource, _autoInitFlag)
       // Get the JSON text from hidden input and
       // eval into an enumerated object.
       var uType = _group.uTypes[i];
-      var input = document.getElementById(uType + ".json");
+      var input = document.getElementById(uType + '.json');
       var enumerated = JSON.parse(input.value);
       var row = _group.values[i];
 
@@ -331,23 +331,23 @@ function DataTrain(_modelDataSource, _autoInitFlag)
       }
       else
       {
-        var containerElement = document.createElement("div");
+        var containerElement = document.createElement('div');
         containerElement.className =
-          "align-left advanced_search_hierarchy_select_div";
+          'align-left advanced_search_hierarchy_select_div';
 
-        if (i == 0)
+        if (i === 0)
         {
-          containerElement.className += " row-start";
+          containerElement.className += ' row-start';
         }
         // Last item
-        else if (i == (groupUTypesLength - 1))
+        else if (i === (groupUTypesLength - 1))
         {
-          containerElement.className += " row-end";
+          containerElement.className += ' row-end';
         }
 
         select = buildSelect(enumerated, containerElement);
 
-        if (firstSelect == undefined)
+        if (!firstSelect)
         {
           firstSelect = select.childNodes[1];
         }
@@ -364,10 +364,10 @@ function DataTrain(_modelDataSource, _autoInitFlag)
   function toggleLoading()
   {
     // Remove temporary div.
-    var building = document.getElementById(_self.uType + ".building");
-    building.className = (building.className.indexOf("wb-invisible") >= 0)
-      ? ""
-      : "wb-invisible";
+    var building = document.getElementById(_self.uType + '.building');
+    building.className = (building.className.indexOf('wb-invisible') >= 0)
+      ? ''
+      : 'wb-invisible';
   }
 
 
@@ -380,24 +380,24 @@ function DataTrain(_modelDataSource, _autoInitFlag)
    */
   function buildSelect(enumerated, containerElement)
   {
-    var label = document.createElement("label");
-    if (_self.pageLanguage == "fr")
+    var label = document.createElement('label');
+    if (_self.pageLanguage === 'fr')
     {
-      label.className = "advanced_search_hierarchy_select_div_label";
+      label.className = 'advanced_search_hierarchy_select_div_label';
     }
 
-    var labelSpanFieldName = document.createElement("span");
+    var labelSpanFieldName = document.createElement('span');
 
-    var select = document.createElement("select");
+    var select = document.createElement('select');
     select.id = enumerated.utype;
     select.name = select.id;
     select.title = getDataTrainHeader(enumerated.label);
 
-    labelSpanFieldName.className = "indent-small field-name";
+    labelSpanFieldName.className = 'indent-small field-name';
     labelSpanFieldName.innerHTML = select.title;
 
     label.appendChild(labelSpanFieldName);
-    label.setAttribute("for", select.id);
+    label.setAttribute('for', select.id);
 
     select.label = label;
 
@@ -416,7 +416,7 @@ function DataTrain(_modelDataSource, _autoInitFlag)
       updateLists(this);
     };
 
-    select.className = "hierarchy_select";
+    select.className = 'hierarchy_select';
 
     containerElement.appendChild(label);
     containerElement.appendChild(select);
@@ -434,8 +434,8 @@ function DataTrain(_modelDataSource, _autoInitFlag)
    */
   function buildHidden(enumerated, values)
   {
-    var hidden = document.createElement("input");
-    hidden.type = "hidden";
+    var hidden = document.createElement('input');
+    hidden.type = 'hidden';
     hidden.name = enumerated.utype;
     hidden.value = values[0];
     return hidden;
@@ -443,7 +443,7 @@ function DataTrain(_modelDataSource, _autoInitFlag)
 
   function getDataTrainHeader(name)
   {
-    if (_self.pageLanguage == "fr")
+    if (_self.pageLanguage === 'fr')
     {
       return getFrenchDataTrainHeaderMap()[name];
     }
@@ -456,14 +456,14 @@ function DataTrain(_modelDataSource, _autoInitFlag)
   function getFrenchDataTrainHeaderMap()
   {
     return {
-      "All": "Tout",
-      "Band": "Domaine d'énergie",
-      "Collection": "Collection",
-      "Instrument": "Instrument",
-      "Filter": "Filtre",
-      "Calibration Level": "Niveau de calibration",
-      "Data Type": "Type de donnée",
-      "Observation Type": "Type d'observation"
+      'All': 'Tout',
+      'Band': 'Domaine d\'énergie',
+      'Collection': 'Collection',
+      'Instrument': 'Instrument',
+      'Filter': 'Filtre',
+      'Calibration Level': 'Niveau de calibration',
+      'Data Type': 'Type de donnée',
+      'Observation Type': 'Type d\'observation'
     }
   }
 
@@ -483,7 +483,7 @@ function DataTrain(_modelDataSource, _autoInitFlag)
       var groupUTypes = group.uTypes;
       for (var j = 0; j < groupUTypes.length; j++)
       {
-        if (groupUTypes[j] == _uType)
+        if (groupUTypes[j] === _uType)
         {
           return group;
         }
@@ -554,7 +554,7 @@ function DataTrain(_modelDataSource, _autoInitFlag)
     var selectIndex = -1;
     for (var i = 0, gutl = group.uTypes.length; i < gutl; i++)
     {
-      if (group.uTypes[i] == uType)
+      if (group.uTypes[i] === uType)
       {
         selectIndex = i;
         break;
@@ -562,9 +562,9 @@ function DataTrain(_modelDataSource, _autoInitFlag)
     }
 
     // If the attribute is not found in the group.utypes throw an error.
-    if (selectIndex == -1)
+    if (selectIndex === -1)
     {
-      throw new Error(uType + " not found in group names[" + group.uTypes + "]");
+      throw new Error(uType + ' not found in group names[' + group.uTypes + ']');
     }
 
     return selectIndex;
@@ -593,7 +593,7 @@ function DataTrain(_modelDataSource, _autoInitFlag)
     for (var i = 0; i < selectIndex; i++)
     {
       var select = document.getElementById(group.uTypes[i]);
-      if (select == null)
+      if (select === null)
       {
         // If select is null it must be a hidden attribute,
         // selected values are then the attribute group values.
@@ -629,7 +629,7 @@ function DataTrain(_modelDataSource, _autoInitFlag)
     var selected = [];
 
     // Check if multiple options can be selected.
-    var multiple = (select.type == "select-multiple");
+    var multiple = (select.type === 'select-multiple');
 
     // Read selected options into an array.
     if (multiple)
@@ -642,7 +642,7 @@ function DataTrain(_modelDataSource, _autoInitFlag)
           selected[selected.length] = option;
 
           // If top empty option is selected, don't allow
-          if ((option.length > 4) && option.substring(3, 0) == "All")
+          if ((option.length > 4) && (option.substring(3, 0) === 'All'))
           {
             break;
           }
@@ -651,16 +651,16 @@ function DataTrain(_modelDataSource, _autoInitFlag)
     }
     else
     {
-      if (select.selectedIndex != -1)
+      if (select.selectedIndex !== -1)
       {
         selected[selected.length] = select.options[select.selectedIndex].value;
       }
     }
 
     // If no option(s) are selected, select the top empty header option.
-    if (selected.length == 0)
+    if (selected.length === 0)
     {
-      selected[0] = "";
+      selected[0] = '';
     }
 
     return selected;
@@ -706,7 +706,7 @@ function DataTrain(_modelDataSource, _autoInitFlag)
   {
 
     // The first select should always show all of the select options.
-    if (selectIndex == 0)
+    if (selectIndex === 0)
     {
       for (var i = 0, gvl = group.values.length; i < gvl; i++)
       {
@@ -748,7 +748,7 @@ function DataTrain(_modelDataSource, _autoInitFlag)
 
             // If the header '' is selected, or if the value matches
             // the selected option, no need to check rest of selected options.
-            if (sel == "" || sel == value)
+            if ((sel === '') || (sel === value))
             {
               found = true;
               break;
@@ -820,7 +820,7 @@ function DataTrain(_modelDataSource, _autoInitFlag)
 
             // If the header '' is selected, or if the value matches
             // the selected option, no need to check rest of selected options.
-            if (sel == "" || sel == value)
+            if ((sel === '') || (sel === value))
             {
               found = true;
               break;
@@ -904,7 +904,7 @@ function DataTrain(_modelDataSource, _autoInitFlag)
       var selectItems = options[i];
 
       // If select is null, hidden attribute, can't update.
-      if (select != null)
+      if (select !== null)
       {
         var customSorter;
 
@@ -934,14 +934,14 @@ function DataTrain(_modelDataSource, _autoInitFlag)
           }
           selectItems = selectItems.concat(staleInstruments);
 
-          customSorter = "NONE";
+          customSorter = 'NONE';
         }
         else
         {
           customSorter = undefined;
         }
 
-        if (customSorter != "NONE")
+        if (customSorter !== 'NONE')
         {
           // Use the custom sorter if it's available.
           selectItems.sort(customSorter);
@@ -968,10 +968,10 @@ function DataTrain(_modelDataSource, _autoInitFlag)
    */
   function createOption(_label, _value, _selectedFlag)
   {
-    var $option = $("<option>");
+    var $option = $('<option>');
 
     $option.val(_value);
-    if (_label.indexOf("&") === 0)
+    if (_label.indexOf('&') === 0)
     {
       $option.html(_label);
     }
@@ -980,8 +980,8 @@ function DataTrain(_modelDataSource, _autoInitFlag)
       $option.text(_label);
     }
 
-    $option.prop("selected", _selectedFlag);
-    $option.attr("selected", _selectedFlag);
+    $option.prop('selected', _selectedFlag);
+    $option.attr('selected', _selectedFlag);
 
     return $option;
   }
@@ -999,19 +999,19 @@ function DataTrain(_modelDataSource, _autoInitFlag)
     var $select = $(select);
     $select.empty();
 
-    var title = getDataTrainHeader("All");
-    var name = title + "  (" + options.length + ")";
+    var title = getDataTrainHeader('All');
+    var name = title + '  (' + options.length + ')';
     var highlight = false;
     var isHighlighted = false;
 
-    if (ifArrayContains(selected, ""))
+    if (ifArrayContains(selected, ''))
     {
       highlight = true;
       isHighlighted = true;
     }
 
-    var selectName = $select.attr("name");
-    var $allOption = createOption(name, "", false);
+    var selectName = $select.attr('name');
+    var $allOption = createOption(name, '', false);
     $select.append($allOption);
 
     // Add the new options to the select.
@@ -1027,21 +1027,21 @@ function DataTrain(_modelDataSource, _autoInitFlag)
 
       var optionName;
 
-      if ((selectName.indexOf("dataProductType") >= 0)
-          && (optionValue == "null"))
+      if ((selectName.indexOf('dataProductType') >= 0)
+          && (optionValue === 'null'))
       {
-        optionName = "Other";
+        optionName = 'Other';
       }
-      else if ((selectName === "Plane.energy.emBand")
-               && (optionValue == "null"))
+      else if ((selectName === 'Plane.energy.emBand')
+               && (optionValue === 'null'))
       {
-        optionName = "Unknown";
+        optionName = 'Unknown';
       }
       else if (/calib.*Level/.test(selectName))
       {
-        if (optionValue == "null")
+        if (optionValue === 'null')
         {
-          optionName = "Unknown";
+          optionName = 'Unknown';
         }
         else
         {
@@ -1049,7 +1049,7 @@ function DataTrain(_modelDataSource, _autoInitFlag)
             ca.nrc.cadc.search.datatrain.CALIBRATION_LEVEL_MAP[optionValue];
           if (calLevelName)
           {
-            optionName = "(" + optionValue + ") " + calLevelName;
+            optionName = '(' + optionValue + ') ' + calLevelName;
           }
         }
       }
@@ -1060,12 +1060,12 @@ function DataTrain(_modelDataSource, _autoInitFlag)
 
       var $opt = createOption(optionName, optionValue, highlight);
 
-      if (ca.nrc.cadc.search.datatrain.SPACER() == optionValue)
+      if (ca.nrc.cadc.search.datatrain.SPACER() === optionValue)
       {
-        $opt.val("SPACER");
-        $opt.attr("id", selectName + "_SPACER");
-        $opt.prop("disabled", true);
-        $opt.attr("disabled", "disabled");
+        $opt.val('SPACER');
+        $opt.attr('id', selectName + '_SPACER');
+        $opt.prop('disabled', true);
+        $opt.attr('disabled', 'disabled');
       }
 
       $select.append($opt);
@@ -1073,8 +1073,8 @@ function DataTrain(_modelDataSource, _autoInitFlag)
 
     if (!isHighlighted)
     {
-      $allOption.prop("selected", true);
-      $allOption.attr("selected", true);
+      $allOption.prop('selected', true);
+      $allOption.attr('selected', true);
     }
   }
 
@@ -1088,16 +1088,14 @@ function DataTrain(_modelDataSource, _autoInitFlag)
    */
   function ifArrayContains(array, value)
   {
-    if (array == undefined)
+    if (array)
     {
-      return false;
-    }
-
-    for (var i = 0; i < array.length; i++)
-    {
-      if (array[i] == value)
+      for (var i = 0, al = array.length; i < al; i++)
       {
-        return true;
+        if (array[i] === value)
+        {
+          return true;
+        }
       }
     }
 
@@ -1136,14 +1134,14 @@ function DataTrain(_modelDataSource, _autoInitFlag)
   }
 
   $.extend(this, {
-    "init": init,
+    'init': init,
 
     // Exposed for sorting.
-    "setGroups": setGroups,
-    "load": load,
+    'setGroups': setGroups,
+    'load': load,
 
     // Event handling.
-    "subscribe": subscribe,
-    "updateLists": updateLists
+    'subscribe': subscribe,
+    'updateLists': updateLists
   });
 }

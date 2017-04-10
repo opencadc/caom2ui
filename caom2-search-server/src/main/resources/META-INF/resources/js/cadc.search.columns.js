@@ -5,19 +5,19 @@
       "nrc": {
         "cadc": {
           "search": {
-            "DETAILS_BASE_URL": "caom2ui/view/",
+            "DETAILS_BASE_URL": "/caom2ui/view/",
             "CAOM2_RESOLVER_VALUE_KEY": "Plane.position.bounds@Shape1Resolver.value",
             "OBSCORE_RESOLVER_VALUE_KEY": "Char.SpatialAxis.Coverage.Support.Area@Shape1Resolver.value",
             "CAOM2_TARGET_NAME_VALUE_KEY": "Plane.position.bounds@Shape1.value",
             "DETAILS_CSS": "details_tooltip_link",
+            "DATALINK_URL_PREFIX": " /caom2ops/datalink",
             "columns": {
               "OBSERVATION_URI_UTYPE": "caom2:Observation.uri",
               "OBSERVATION_ID_UTYPE": "caom2:Observation.observationID",
               "ColumnManager": ColumnManager
             },
             "events": {
-              "onQuickSearchLinkClicked":
-                  new jQuery.Event("onQuickSearchLinkClicked")
+              "onQuickSearchLinkClicked": new jQuery.Event("onQuickSearchLinkClicked")
             },
             "options": {
               "columnOptions": {
@@ -28,7 +28,7 @@
                                          dataContext)
                   {
                     var obsURI = dataContext[
-                        ca.nrc.cadc.search.columns.OBSERVATION_URI_UTYPE];
+                      ca.nrc.cadc.search.columns.OBSERVATION_URI_UTYPE];
 
                     return formatDetailsCell(value, obsURI, columnDef, row);
                   }
@@ -46,7 +46,104 @@
                   "asyncFormatter": function (cellNode, row, dataContext)
                   {
                     var $cell = $(cellNode);
+
                     var planeURIValue = dataContext["caom2:Plane.uri"];
+
+                    function createLink($cell, thumbnailURL)
+                    {
+                      // Clickable link to the preview page
+                      var $link = $("<a>Preview</a>");
+                      $link.addClass("preview_tooltip_link");
+                      $link.attr("id", observationID + "_preview");
+                      $link.attr("href", "#");
+
+                      var $cellSpan = $("<span></span>");
+                      $cellSpan.addClass("cellValue");
+                      $cellSpan.addClass("preview");
+                      $cellSpan.append($link);
+
+                      $cell.empty().append($cellSpan);
+
+                      // Create the thumbnail tooltip
+                      var $thunbnailImage = $("<img />");
+                      $thunbnailImage.attr("id", observationID +
+                                                 "_256_preview");
+                      $thunbnailImage.attr("src", thumbnailURL);
+                      $thunbnailImage.addClass("image-actual");
+
+                      $link.tooltipster({
+                                          interactive: true,
+                                          arrow: false,
+                                          content: $thunbnailImage,
+                                          theme: "tooltipster-preview-thumbnail",
+                                          position: "right",
+                                          onlyOne: true
+                                        });
+
+                      return $link;
+                    }
+
+                    function insertPreviewLink(previewUrls, thumbnailUrls,
+                                               collection, observationID,
+                                               productID)
+                    {
+                      // Create the preview link
+                      if ((thumbnailUrls.length > 0)
+                          || (previewUrls.length > 0))
+                      {
+                        var $link = createLink($cell, thumbnailUrls[0]);
+
+                        // Display the preview window
+                        $link.click(function ()
+                                    {
+                                      // Preview window content
+                                      var $col = $("<p style=\"text-align: center;\"></p>").text("collection: " +
+                                                                                                 collection);
+                                      var $obsId = $("<p style=\"text-align: center;\"></p>").text("ObservationID: " +
+                                                                                                   observationID);
+                                      var $pdctId = $("<p style=\"text-align: center;\"></p>").text("productID: " +
+                                                                                                    productID);
+
+                                      var $previews = $("<div></div>");
+                                      for (var i = 0; i < thumbnailUrls.length;
+                                           i++)
+                                      {
+                                        var $thumbnail =
+                                          $("<img style=\"display: block; margin: auto;\"/>");
+                                        $thumbnail.prop("id", observationID +
+                                                              "_thumbnail");
+                                        $thumbnail.prop("src", thumbnailUrls[i]);
+                                        $thumbnail.addClass("image-actual");
+                                        $previews.append($thumbnail, "<br>");
+                                      }
+
+                                      for (var j = 0; j < previewUrls.length;
+                                           j++)
+                                      {
+                                        var $preview = $("<img style=\"display: block; margin: auto;\"/>");
+                                        $preview.prop("id", observationID +
+                                                            "_preview_" + j);
+                                        $preview.prop("src", previewUrls[j]);
+                                        $preview.addClass("image-actual");
+                                        $previews.append($preview, "<br>");
+                                      }
+
+                                      var $title = $("<title></title>").text(collection +
+                                                                             " - " +
+                                                                             productID);
+                                      var $content = $("<div id=\"scoped-content\"></div>")
+                                        .append($title, $col, $obsId, $pdctId, $previews);
+
+                                      var w = window.open('', '_blank');
+                                      w.document.write($content.html());
+                                      w.focus();
+                                    });
+                      }
+                      else
+                      {
+                        $cell.empty();
+                      }
+                    }
 
                     if (planeURIValue)
                     {
@@ -54,19 +151,19 @@
                       var pathItems = previewURI.getPathItems();
                       var collection, observationID, productID;
 
-                      if (pathItems.length == 3)
+                      if (pathItems.length === 3)
                       {
                         collection = pathItems[0];
                         observationID = pathItems[1];
                         productID = pathItems[2];
                       }
-                      else if (pathItems.length == 2)
+                      else if (pathItems.length === 2)
                       {
                         collection = pathItems[0];
                         observationID = pathItems[1];
                         productID = "";
                       }
-                      else if (pathItems.length == 1)
+                      else if (pathItems.length === 1)
                       {
                         collection = pathItems[0];
                         observationID = "";
@@ -80,54 +177,144 @@
                       }
 
                       var runID = $("#downloadForm").find("input[name='fragment']").val().substring(6);
-                      var preview = new ca.nrc.cadc.search.Preview(collection, observationID,
-                                                                   productID, 1024, runID);
-                      preview.getPreview(function (jsonData)
-                                         {
-                                           var $link = $("<a>Preview</a>");
 
-                                           $link.addClass("preview_tooltip_link");
-                                           $link.prop("id", observationID + "_1024_preview");
-                                           $link.prop("target", "_preview");
-                                           $link.prop("href", jsonData.previewURL);
+                      // Get the thumbnails and previews from datalink
+                      $.ajax({
+                               url: ca.nrc.cadc.search.DATALINK_URL_PREFIX,
+                               dataType: "xml",
+                               data: {
+                                 id: planeURIValue,
+                                 request: "downloads-only",
+                                 runid: runID
+                               }
+                             })
+                        .done(function (data, textStatus, jqXHR)
+                              {
+                                if (jqXHR.status === 200)
+                                {
+                                  var evaluator = new cadc.vot.xml.VOTableXPathEvaluator(data, "votable");
 
-                                           var thumbnailPreview =
-                                               new ca.nrc.cadc.search.Preview(collection,
-                                                                              observationID,
-                                                                              productID, 256,
-                                                                              runID);
-                                           var $cellSpan = $("<span></span>");
-                                           $cellSpan.addClass("cellValue");
-                                           $cellSpan.addClass("preview");
+                                  // Check query status
+                                  var queryStatus = evaluator.evaluate("/VOTABLE/RESOURCE[@type='results']/INFO[@name='QUERY_STATUS' and @value='OK']");
+                                  if (queryStatus.length !== 0)
+                                  {
+                                    // Determine field indexes
+                                    var accessUrlIndex;
+                                    var errorMessageIndex;
+                                    var semanticsIndex;
+                                    var readableIndex = -1;
+                                    var fields = evaluator.evaluate("/VOTABLE/RESOURCE[@type='results']/TABLE/FIELD");
+                                    for (var fieldIndex = 0;
+                                         fieldIndex < fields.length;
+                                         fieldIndex++)
+                                    {
+                                      var field = fields[fieldIndex];
+                                      var name = field.getAttribute("name");
+                                      switch (name)
+                                      {
+                                        case "access_url":
+                                          accessUrlIndex = fieldIndex;
+                                          break;
+                                        case "error_message":
+                                          errorMessageIndex = fieldIndex;
+                                          break;
+                                        case "semantics":
+                                          semanticsIndex = fieldIndex;
+                                          break;
+                                        case "readable":
+                                          readableIndex = fieldIndex;
+                                          break;
+                                      }
+                                    }
 
-                                           $cellSpan.append($link);
+                                    // Loop through the table rows
+                                    var thumbnailUrls = [];
+                                    var previewUrls = [];
+                                    var tableRows = evaluator.evaluate("/VOTABLE/RESOURCE[@type='results']/TABLE/DATA/TABLEDATA/TR");
+                                    for (var trIndex = 0;
+                                         trIndex < tableRows.length; trIndex++)
+                                    {
+                                      var tableDatas = tableRows[trIndex].children;
+                                      var errorMessage = tableDatas[errorMessageIndex].textContent;
 
-                                           $cell.empty().append($cellSpan);
+                                      if (errorMessage.length > 0)
+                                      {
+                                        console.error("DataLink preview error: "
+                                                      + errorMessage);
+                                      }
+                                      else
+                                      {
+                                        var readable =
+                                          ((readableIndex >= 0)
+                                           && tableDatas[readableIndex]
+                                                .textContent === 'true');
+                                        if (readable === true)
+                                        {
+                                          var semantics = tableDatas[semanticsIndex].textContent;
+                                          if (semantics ===
+                                              'http://www.openadc.org/caom2#thumbnail')
+                                          {
+                                            thumbnailUrls.push(tableDatas[accessUrlIndex].textContent);
+                                          }
+                                          else if (semantics === '#preview')
+                                          {
+                                            previewUrls.push(tableDatas[accessUrlIndex].textContent);
+                                          }
+                                        }
+                                      }
+                                    }
 
-                                           thumbnailPreview.getPreview(
-                                               function (tooltipPreviewURL)
-                                               {
-                                                 if (tooltipPreviewURL.previewURL)
-                                                 {
-                                                   var $previewImage = $("<img />");
-                                                   $previewImage.prop("id", observationID + "_256_preview");
-                                                   $previewImage.prop("src", tooltipPreviewURL.previewURL);
-                                                   $previewImage.prop("width", "256");
-                                                   $previewImage.prop("height", "256");
-                                                   $previewImage.addClass("image-actual");
+                                    // If datalink didn't provide thumbnail and
+                                    // preview urls, create the urls and check
+                                    // if they exist.
+                                    if (thumbnailUrls.length === 0 ||
+                                        previewUrls.length === 0)
+                                    {
+                                      var thumbnailPreview = new ca.nrc.cadc.search.Preview(collection, observationID,
+                                        productID, 256, runID);
+                                      thumbnailPreview.getPreview(function (thumbnailURL)
+                                                         {
+                                                           var preview =
+                                                             new ca.nrc.cadc.search.Preview(collection,
+                                                               observationID,
+                                                               productID, 1024,
+                                                               runID);
 
-                                                   $link.tooltipster({
-                                                     interactive: true,
-                                                     arrow: false,
-                                                     content: $previewImage,
-                                                     theme: "tooltipster-preview-thumbnail",
-                                                     position: "right",
-                                                     onlyOne: true
-                                                   });
-                                                 }
-                                               });
+                                                           preview.getPreview(
+                                                             function (previewURL)
+                                                             {
+                                                               if (previewURL)
+                                                               {
+                                                                 var $link = createLink($cell, thumbnailURL);
+                                                                 $link.attr("href", previewURL);
 
-                                         });
+                                                                 var $previewImage = $("<img />");
+                                                                 $previewImage.prop("id", observationID +
+                                                                                          "_256_preview");
+                                                                 $previewImage.prop("src", previewURL);
+                                                                 $previewImage.addClass("image-actual");
+                                                               }
+                                                             });
+
+                                                         });
+                                    }
+                                    else
+                                    {
+                                      insertPreviewLink(previewUrls,
+                                                        thumbnailUrls, collection,
+                                                        observationID, productID);
+                                    }
+                                  }
+                                }
+                              })
+                        .fail(function (jqXHR, textStatus, errorThrown)
+                              {
+                                if (jqXHR.status !== 404)
+                                {
+                                  console.error("Error >> " + errorThrown +
+                                                " (" + jqXHR.status + ")");
+                                }
+                              });
                     }
                     else
                     {
@@ -151,7 +338,7 @@
                 },
                 "caom2:Observation.sequenceNumber": {
                   "label": "Sequence Number",
-                  "valueFormatter": function(value)
+                  "valueFormatter": function (value)
                   {
                     return formatNumeric(value, null);
                   },
@@ -163,7 +350,7 @@
                 },
                 "caom2:Observation.environment.tau": {
                   "label": "Tau",
-                  "valueFormatter": function(value)
+                  "valueFormatter": function (value)
                   {
                     return formatNumeric(value, 2);
                   },
@@ -243,7 +430,7 @@
                 },
                 "caom2:Observation.target.moving": {
                   "label": "Moving Target",
-                  "valueFormatter": function(value)
+                  "valueFormatter": function (value)
                   {
                     return formatNumeric(value, 2);
                   },
@@ -255,7 +442,7 @@
                 },
                 "caom2:Observation.target.standard": {
                   "label": "Target Standard",
-                  "valueFormatter": function(value)
+                  "valueFormatter": function (value)
                   {
                     return formatNumeric(value, 2);
                   },
@@ -292,7 +479,7 @@
                                          dataContext)
                   {
                     var obsURI = dataContext[
-                        ca.nrc.cadc.search.columns.OBSERVATION_URI_UTYPE];
+                      ca.nrc.cadc.search.columns.OBSERVATION_URI_UTYPE];
 
                     return formatDetailsCell(value, obsURI, columnDef, row);
                   }
@@ -315,7 +502,7 @@
                 },
                 "caom2:Plane.calibrationLevel": {
                   "label": "Cal. Lev.",
-                  "valueFormatter": function(value)
+                  "valueFormatter": function (value)
                   {
                     return formatNumeric(value, null);
                   },
@@ -362,7 +549,7 @@
                 "caom2:Plane.energy.resolvingPower": {
                   "label": "Resolving Power",
                   "width": 117,
-                  "valueFormatter": function(value)
+                  "valueFormatter": function (value)
                   {
                     return formatNumeric(value, 2);
                   },
@@ -380,7 +567,7 @@
                   "fitMax": false,
                   "width": 105,
                   "converter": "RAConverter",
-                  "valueFormatter": function(value, column)
+                  "valueFormatter": function (value, column)
                   {
                     return formatUnit(value, column, "hms");
                   },
@@ -412,7 +599,7 @@
                   "fitMax": false,
                   "width": 110,
                   "converter": "DECConverter",
-                  "valueFormatter": function(value, column)
+                  "valueFormatter": function (value, column)
                   {
                     return formatUnit(value, column, "dms");
                   },
@@ -564,13 +751,13 @@
                 "caom2:Plane.time.bounds.lower": {
                   "select": "Plane.time_bounds_lower",
                   "label": "Start Date",
-                  // Fit max would be nice, but the default values are in MJD, which is
-                  // smaller than the Calendar dates, so set it up for Calendar
-                  // instead.
+                  // Fit max would be nice, but the default values are in MJD,
+                  // which is smaller than the Calendar dates, so set it up for
+                  // Calendar instead.
                   "fitMax": false,
                   "width": 145,
                   "converter": "DateConverter",
-                  "valueFormatter": function(value, column)
+                  "valueFormatter": function (value, column)
                   {
                     return formatUnit(value, column, "IVOA");
                   },
@@ -606,13 +793,13 @@
                 "caom2:Plane.time.bounds.upper": {
                   "select": "Plane.time_bounds_upper",
                   "label": "End Date",
-                  // Fit max would be nice, but the default values are in MJD, which is
-                  // smaller than the Calendar dates, so set it up for Calendar
-                  // instead.
+                  // Fit max would be nice, but the default values are in MJD,
+                  // which is smaller than the Calendar dates, so set it up for
+                  // Calendar instead.
                   "fitMax": false,
                   "width": 145,
                   "converter": "DateConverter",
-                  "valueFormatter": function(value, column)
+                  "valueFormatter": function (value, column)
                   {
                     return formatUnit(value, column, "IVOA");
                   },
@@ -638,12 +825,12 @@
                 },
                 "caom2:Plane.time.exposure": {
                   "label": "Int. Time",
-                  // Fitmax would be nice, but the original value doesn't conform.
-                  // Use a width instead.
+                  // Fitmax would be nice, but the original value doesn't
+                  // conform. Use a width instead.
                   "fitMax": false,
                   "width": 80,
                   "converter": "TimeConverter",
-                  "valueFormatter": function(value, column)
+                  "valueFormatter": function (value, column)
                   {
                     return formatUnit(value, column, "SECONDS");
                   },
@@ -675,10 +862,6 @@
                       }
                     ]
                   }
-                },
-                "caom2:Plane.publisherID": {
-                  "label": "Publisher ID",
-                  "fitMax": true
                 },
                 "obscore:Char.SpatialAxis.Coverage.Bounds.Extent.diameter": {
                   "fitMax": true,
@@ -864,7 +1047,7 @@
     // smaller than the Calendar dates, so set it up for Calendar
     // instead.
     "fitMax": false,
-    "valueFormatter": function(value)
+    "valueFormatter": function (value)
     {
       return formatIVOAToW3CDateValue(value);
     },
@@ -940,7 +1123,7 @@
   var spectralProperties = {
     "fitMax": true,
     "converter": "WavelengthConverter",
-    "valueFormatter": function(value, column)
+    "valueFormatter": function (value, column)
     {
       return formatUnit(value, column, "m");
     },
@@ -960,11 +1143,11 @@
 
   var IVOAToW3CDateOptionsNarrow = {};
   $.extend(true, IVOAToW3CDateOptionsNarrow, IVOAToW3CDateOptions,
-      {width: 100});
+           {width: 100});
 
   var IVOAToW3CDateOptionsWide = {};
   $.extend(true, IVOAToW3CDateOptionsWide, IVOAToW3CDateOptions,
-      {width: 132});
+           {width: 132});
 
   $.extend(ca.nrc.cadc.search.options.columnOptions["caom2:Plane.metaRelease"], IVOAToW3CDateOptionsNarrow);
   $.extend(ca.nrc.cadc.search.options.columnOptions["caom2:Plane.dataRelease"], IVOAToW3CDateOptionsNarrow);
@@ -1062,21 +1245,16 @@
 
   function getCalibrationLevelName(numericKey)
   {
-    if (numericKey && ($.trim(numericKey).length > 0))
-    {
-      return ca.nrc.cadc.search.datatrain.CALIBRATION_LEVEL_MAP[numericKey];
-    }
-    else
-    {
-      return null;
-    }
+    return (numericKey && ($.trim(numericKey).length > 0))
+      ? ca.nrc.cadc.search.datatrain.CALIBRATION_LEVEL_MAP[numericKey]
+      : null;
   }
 
   function formatCalibrationName(value, utype)
   {
     var levelName = getCalibrationLevelName(value);
     var titleStringUtil =
-        new cadc.web.util.StringUtil("(" + value + ") " + levelName);
+      new cadc.web.util.StringUtil("(" + value + ") " + levelName);
     var title = levelName ? titleStringUtil.sanitize() : "";
 
     return formatOutputHTML(value, utype, title);
@@ -1100,13 +1278,13 @@
   function formatQuickSearchLink(value, _searchItems, columnUType, toUnit)
   {
     var $output = (toUnit ? $(format(value, columnUType, value, toUnit))
-        : $(formatOutputHTML(value, columnUType, value)));
+      : $(formatOutputHTML(value, columnUType, value)));
 
     if ($output.text())
     {
       var currentURI = cadc.web.util.currentURI();
 
-      $.each(_searchItems, function(name, value)
+      $.each(_searchItems, function (name, value)
       {
         currentURI.setQueryValue(name, encodeURIComponent(value));
       });
@@ -1125,17 +1303,7 @@
       // Date columns only.
       if (columnUType.indexOf("Plane.time.bounds") >= 0)
       {
-        var delimiter;
-
-        if (toUnit == "MJD")
-        {
-          delimiter = ".";
-        }
-        else
-        {
-          delimiter = " ";
-        }
-
+        var delimiter = (toUnit === "MJD") ? "." : " ";
         tipOutput = $link.text().split(delimiter)[0];
       }
       else
@@ -1171,8 +1339,8 @@
         var columnManager = new ColumnManager();
         var converter = columnManager.getConverter(columnUType, value, toUnit);
         var formatter =
-            new ca.nrc.cadc.search.UnitConversionFormat(converter, value,
-                                                        columnUType);
+          new ca.nrc.cadc.search.UnitConversionFormat(converter, value,
+            columnUType);
 
         formattedValue = formatter.format();
       }
@@ -1214,8 +1382,8 @@
       var converterType = getColumnOption(_id).converter;
 
       return (converterType
-          ? new ca.nrc.cadc.search.unitconversion[converterType](_value, _unit)
-          : null);
+        ? new ca.nrc.cadc.search.unitconversion[converterType](_value, _unit)
+        : null);
     }
 
     /**
@@ -1329,16 +1497,15 @@
 
 
     $.extend(this,
-        {
-          "getOptions": getOptions,
-          "getColumnOption": getColumnOption,
-          "getConverter": getConverter,
-          "getIDFromLabel": getIDFromLabel,
-          "getFilterPattern": getFilterPattern,
-          "isFilterSyntax": isFilterSyntax,
-          "format": format,
-          "formatDetailsCell": formatDetailsCell
-        });
+             {
+               "getOptions": getOptions,
+               "getConverter": getConverter,
+               "getIDFromLabel": getIDFromLabel,
+               "getFilterPattern": getFilterPattern,
+               "isFilterSyntax": isFilterSyntax,
+               "format": format,
+               "formatDetailsCell": formatDetailsCell
+             });
   }
 
 })(jQuery);

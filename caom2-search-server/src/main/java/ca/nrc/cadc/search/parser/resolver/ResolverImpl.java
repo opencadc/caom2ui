@@ -68,7 +68,7 @@
 
 package ca.nrc.cadc.search.parser.resolver;
 
-import ca.nrc.cadc.search.parser.AbstractPositionParser;
+
 import ca.nrc.cadc.search.parser.RadiusParser;
 import ca.nrc.cadc.search.parser.Resolver;
 import ca.nrc.cadc.search.parser.TargetData;
@@ -157,13 +157,17 @@ public class ResolverImpl implements Resolver
                     }
                     else
                     {
-                        final String targetValue =
-                                String.join(" ",
-                                            Arrays.copyOfRange(parts, 0,
-                                                               (parts.length
-                                                                - 1)));
+                        final StringBuilder targetValueBuilder =
+                                new StringBuilder();
 
-                        String name = targetValue.trim();
+                        for (final String targetVal
+                                : Arrays.copyOfRange(parts, 0,
+                                                     (parts.length - 1)))
+                        {
+                            targetValueBuilder.append(targetVal).append(" ");
+                        }
+
+                        String name = targetValueBuilder.toString().trim();
 
                         char c = name.charAt(name.length() - 1);
 

@@ -107,7 +107,7 @@
 
     function load()
     {
-      var relJobURL = new cadc.web.util.URI(getJobURL()).getRelativeURI();
+      var relJobURL = new cadc.web.util.URI(getJobURL());
 
       getRequestLoader().get(relJobURL, {},
             function (xmlData)

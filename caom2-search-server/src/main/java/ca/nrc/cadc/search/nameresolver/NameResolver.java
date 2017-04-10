@@ -77,8 +77,10 @@ public class NameResolver
     private static final String OTYPE = "otype=";
     private static final String MTYPE = "mtype=";
     private static final String TIME = "time(ms)=";
-    private static final String[] SERVICES = new String[]{"NED", "SIMBAD",
-                                                          "VIZIER", "ALL"};
+    private static final String[] SERVICES = new String[]
+            {
+                    "NED", "SIMBAD", "VIZIER", "ALL"
+            };
 
     /**
      * Constructs a new CADCResolver initialized with the default services and cached values.
@@ -318,22 +320,23 @@ public class NameResolver
         }
         catch (UnsupportedEncodingException uee)
         {
-            throw new ClientException("Unsupported url encoding: " + uee
-                    .getMessage());
+            throw new ClientException("Unsupported url encoding: "
+                                      + uee.getMessage());
         }
         catch (MalformedURLException mue)
         {
-            throw new ClientException("Malformed url: " + mue.getMessage());
+            throw new ClientException("Malformed url: "
+                                      + mue.getMessage());
         }
         catch (NumberFormatException nfe)
         {
-            throw new ClientException("Number format exception: " + nfe
-                    .getMessage());
+            throw new ClientException("Number format exception: "
+                                      + nfe.getMessage());
         }
         catch (IllegalArgumentException iae)
         {
-            throw new ClientException("Illegal argument exception: " + iae
-                    .getMessage());
+            throw new ClientException("Illegal argument exception: "
+                                      + iae.getMessage());
         }
         catch (IOException ioe)
         {
@@ -363,8 +366,8 @@ public class NameResolver
             // check for whitespace characters
             if (service.matches("[a-zA-Z,]*\\s+.*"))
             {
-                throw new ClientException("Invalid whitespace character in "
-                                          + "service argument");
+                throw new ClientException(
+                        "Invalid whitespace character in service argument");
             }
 
             final String[] services = service.split(",");

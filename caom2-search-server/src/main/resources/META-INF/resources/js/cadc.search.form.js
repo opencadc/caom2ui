@@ -1,7 +1,5 @@
 (function ($)
 {
-  var currentURI = new cadc.web.util.currentURI();
-
   $.extend(true, window, {
     "ca": {
       "nrc": {
@@ -12,14 +10,13 @@
             "FORM_LABEL_INPUT_LENGTH": 12,
             "TARGET_FORM_LABEL_INPUT_LENGTH": 24,
             "CHECKBOX_CHECKED_REGEX": /^true|on$/g,
-            "AUTOCOMPLETE_ENDPOINT": currentURI.getPath() + "unitconversion/",
-            "SEARCH_RUN": currentURI.getPath() + "find",
+            "AUTOCOMPLETE_ENDPOINT": "/AdvancedSearch/unitconversion/",
             "AUTOCOMPLETE_TAP_REQUEST_DATA": {
-              "endpoint": currentURI.getPath() + "tap",
+              "endpoint": "/tap/sync",
               "payload": {
                 "LANG": "ADQL",
                 "FORMAT": "CSV",
-                "QUERY": "select {1} from caom2.distinct_{1} where lower({1}) like '%{2}%' order by {1}"
+                "QUERY": "select {0} from caom2.distinct_{0} where lower({0}) like '%{1}%' order by {0}"
               },
               "fields": {
                 "Observation.proposal.pi": {
@@ -37,8 +34,7 @@
               "FormConfiguration": CAOM2FormConfiguration,
               "config": {
                 "id": "CAOM2",
-                "download_access_key": "caom2:Plane.publisherID",
-                "row_disabled_key": "caom2:Plane.uri.downloadable",
+                "download_access_key": "caom2:Plane.uri.downloadable",
                 "default_sort_column": "caom2:Plane.time.bounds.lower",
                 "collection_select_id": "Observation.collection",
                 "footprint_column_id": "caom2:Plane.position.bounds",
@@ -53,7 +49,28 @@
               "config": {
                 "id": "ObsCore",
                 "download_access_key": "obscore:Curation.PublisherDID.downloadable",
-                "row_disabled_key": "obscore:Curation.PublisherDID.downloadable",
+                "default_sort_column": "obscore:Char.TimeAxis.Coverage.Bounds.Limits.StartTime",
+                "collection_select_id": "DataID.Collection",
+                "footprint_column_id": "obscore:Char.SpatialAxis.Coverage.Support.Area",
+                "ra_column_id": "obscore:Char.SpatialAxis.Coverage.Location.Coord.Position2D.Value2.C1",
+                "dec_column_id": "obscore:Char.SpatialAxis.Coverage.Location.Coord.Position2D.Value2.C2",
+                "fov_column_id": "obscore:Char.SpatialAxis.Coverage.Bounds.Extent.diameter"
+              }
+            },
+            "types": {
+              "CAOM2": {
+                "id": "CAOM2",
+                "download_access_key": "caom2:Plane.uri.downloadable",
+                "default_sort_column": "caom2:Plane.time.bounds.lower",
+                "collection_select_id": "Observation.collection",
+                "footprint_column_id": "caom2:Plane.position.bounds",
+                "ra_column_id": "caom2:Plane.position.bounds.cval1",
+                "dec_column_id": "caom2:Plane.position.bounds.cval2",
+                "fov_column_id": "caom2:Plane.position.bounds.area"
+              },
+              "ObsCore": {
+                "id": "ObsCore",
+                "download_access_key": "obscore:Curation.PublisherDID.downloadable",
                 "default_sort_column": "obscore:Char.TimeAxis.Coverage.Bounds.Limits.StartTime",
                 "collection_select_id": "DataID.Collection",
                 "footprint_column_id": "obscore:Char.SpatialAxis.Coverage.Support.Area",
@@ -106,11 +123,6 @@
     function getDownloadAccessKey()
     {
       return _selfFormConfiguration._config.getConfig().download_access_key;
-    }
-
-    function getRowDisabledKey()
-    {
-      return _selfFormConfiguration._config.getConfig().row_disabled_key;
     }
 
     /**
@@ -254,9 +266,9 @@
           addFieldsForUType(decColumnID, ucd, unit, datatype, arraysize,
                             description, order);
 
-          var fovColumnID = getFOVColumnID();
-          order = allColumnIDs.indexOf(fovColumnID);
-          addFieldsForUType(fovColumnID, ucd, unit, datatype, arraysize,
+          var areaFOVColumnID = getFOVColumnID();
+          order = allColumnIDs.indexOf(areaFOVColumnID);
+          addFieldsForUType(areaFOVColumnID, ucd, unit, datatype, arraysize,
                             description, order);
         }
         else if (utype === "caom2:Plane.uri")
@@ -286,30 +298,31 @@
                                _description, _order)
     {
       var utypeFields = getColumnOptions()[_utype];
+      var tableMD = getTableMetadata();
 
-      if (!getTableMetadata().hasFieldWithID(_utype) && !utypeFields.extended)
+      if ((tableMD.hasFieldWithID(_utype) === false) && !utypeFields.extended)
       {
-        var strUtil = new org.opencadc.StringUtil();
+        var strUtil = new cadc.web.util.StringUtil();
 
-        getTableMetadata().insertField(_order,
-                                       new cadc.vot.Field(
-                                         utypeFields.label,
-                                         _utype,
-                                         _ucd,
-                                         _utype,
-                                         utypeFields.unit ? utypeFields.unit :
-                                         _unit,
-                                         strUtil.contains(_datatype,
-                                                          "INTERVAL", false)
-                                           ? "INTERVAL" : null,// xtype not
-                                         // normally
-                                         // available
-                                         new cadc.vot.Datatype(utypeFields.datatype ?
-                                                               utypeFields.datatype :
-                                                               _datatype),
-                                         _arraysize,
-                                         _description,
-                                         utypeFields.label));
+        tableMD.insertField(_order,
+                            new cadc.vot.Field(
+                              utypeFields.label,
+                              _utype,
+                              _ucd,
+                              _utype,
+                              utypeFields.unit ? utypeFields.unit :
+                              _unit,
+                              strUtil.contains(_datatype,
+                                               "INTERVAL")
+                                ? "INTERVAL" : null,// xtype not
+                              // normally
+                              // available
+                              new cadc.vot.Datatype(utypeFields.datatype ?
+                                                    utypeFields.datatype :
+                                                    _datatype),
+                              _arraysize,
+                              _description,
+                              utypeFields.label));
       }
     }
 
@@ -328,7 +341,7 @@
       for (var i = 0; i < selectColumnIDs.length; i++)
       {
         var columnID = selectColumnIDs[i];
-        if (columnID.indexOf(lowercaseName) == 0)
+        if (columnID.indexOf(lowercaseName) === 0)
         {
           var field = thisColumnOptions[columnID];
           if (field)
@@ -407,7 +420,6 @@
     $.extend(this,
              {
                "getDownloadAccessKey": getDownloadAccessKey,
-               "getRowDisabledKey": getRowDisabledKey,
                "getSelectListString": getSelectListString,
                "getColumnOptions": getColumnOptions,
                "getTableMetadata": getTableMetadata,
@@ -585,7 +597,7 @@
       $("input:file[id$='_targetList']").change(
         function ()
         {
-          if ($(this).val() != '')
+          if ($(this).val() !== '')
           {
             $(".targetList_clear").show();
             toggleDisabled($("input[id='" + _selfForm.targetNameFieldID +
@@ -608,7 +620,7 @@
         var thisValue = $thisElement.val();
 
         toggleDisabled($("[id='" + $thisElement.data("assoc-field") + "']"),
-                       ((thisValue != null) && ($.trim(thisValue) != '')));
+                       ((thisValue !== null) && ($.trim(thisValue) !== '')));
       }).change();
 
       $("input.ui-autocomplete-input").each(
@@ -631,7 +643,6 @@
                 // Reset each time as they type.
                 suggestionKeys.length = 0;
 
-                var stringUtil = new org.opencadc.StringUtil();
                 var field =
                   ca.nrc.cadc.search.AUTOCOMPLETE_TAP_REQUEST_DATA.fields[id];
                 var defaultData =
@@ -639,9 +650,9 @@
                 var payload =
                   $.extend({}, defaultData,
                            {
-                             "QUERY": stringUtil.format(defaultData.QUERY,
-                                                        [field.tap_column,
-                                                         req.term.toLowerCase()])
+                             "QUERY": new cadc.web.util.StringUtil(
+                               defaultData.QUERY).format(field.tap_column,
+                                                         req.term.toLowerCase())
                            });
 
                 $.get(ca.nrc.cadc.search.AUTOCOMPLETE_TAP_REQUEST_DATA.endpoint,
@@ -693,10 +704,9 @@
 
                                                    getForm().find("[id='"
                                                                   + dataItem
-                                                                  +
-                                                                  "']").prop("disabled",
-                                                                             $checkbox.is(
-                                                                               ":checked"));
+                                                                  + "']").prop(
+                                                                    "disabled",
+                                                                    $checkbox.is(":checked"));
                                                  });
 
       $("select.resolver_select").change(function ()
@@ -704,9 +714,9 @@
                                            var $resolverSelectName = $(this).prop("name");
                                            var $fieldID =
                                              $resolverSelectName.substring(0, $resolverSelectName.indexOf("@"));
-                                           searchCriteriaChanged($("input[id='" +
-                                                                   $fieldID +
-                                                                   "']"));
+                                           searchCriteriaChanged($("input[id='"
+                                                                   + $fieldID
+                                                                   + "']"));
                                          });
 
       getForm().find(".targetList_clear").click(function ()
@@ -1194,11 +1204,6 @@
       return getConfiguration().getDownloadAccessKey();
     }
 
-    function getRowDisabledKey()
-    {
-      return getConfiguration().getRowDisabledKey();
-    }
-
     function getConfiguration()
     {
       return _selfForm.configuration;
@@ -1495,9 +1500,10 @@
     /**
      * Action to perform before form serialization begins.
      */
-    function beforeSerialize(_form)
+//    function beforeSerialize(arr, $form, options)
+    function beforeSerialize()
     {
-      _form.find("#UPLOAD").remove();
+      $("#UPLOAD").remove();
 
       var inputFile = $("input:file[name='targetList']");
       if (inputFile && !inputFile.prop("disabled") && (inputFile.val() !== ""))
@@ -1508,7 +1514,7 @@
         upload.prop("id", "UPLOAD");
         upload.prop("value", "search_upload,param:targetList");
 
-        _form.append(upload);
+        getForm().append(upload);
 
         // Update the file input name with the value from the target list
         // select.
@@ -1519,7 +1525,9 @@
       }
 
       // Save the form to sessionStorage.
-      sessionStorage.setItem('form_data', _form.serialize());
+
+      // Observation.observationID=val1&Plane.position.bounds=m101
+      sessionStorage.setItem('form_data', getForm().serialize());
       sessionStorage.setItem('isReload', false);
     }
 
@@ -1546,7 +1554,8 @@
      */
     function closeAllTooltips()
     {
-      $("." + tooltipIconCSS).tooltipster("hide");
+      var cssSelector = '.' + tooltipIconCSS;
+      $(cssSelector).tooltipster('hide');
     }
 
     function formSubmit(event)
@@ -1563,21 +1572,22 @@
         subscribe(ca.nrc.cadc.search.events.onSubmitComplete,
                   function ()
                   {
-                    if (_selfForm.targetTooltipsters.length == 2)
+                    if (_selfForm.targetTooltipsters.length === 2)
                     {
                       _selfForm.targetTooltipsters[1].disable();
                       _selfForm.targetTooltipsters[1].enable();
                     }
                   });
 
+        var inputFile = $("input:file");
+        var isUpload = (inputFile && (inputFile.val() !== ""));
         toggleDisabled($("input[name='targetList']"), false);
 
         var netStart = (new Date()).getTime();
-        var currentForm = getForm();
 
         try
         {
-          currentForm.find("input." + getConfiguration().getName() + "_selectlist").val(
+          $("input." + getConfiguration().getName() + "_selectlist").val(
             getConfiguration().getSelectListString(false));
         }
         catch (e)
@@ -1586,67 +1596,63 @@
           alert("Error: " + e.message);
         }
 
-        beforeSerialize(currentForm);
-
-        var formData = new FormData(currentForm[0]);
-
-        $.post(
+        getForm().ajaxSubmit(
           {
-            url: ca.nrc.cadc.search.SEARCH_RUN,
-            contentType: false,
+            url: "/AdvancedSearch/find",
+            target: "#file_upload_response",
             dataType: "json",
-            data: formData,
-            processData: false,
+            beforeSubmit: beforeSerialize,
+            success: function (json, textStatus, request)
+            {
+              getForm().find("input:hidden#target").remove();
+              getForm().find("input:hidden#collection").remove();
+
+              _selfForm.currentRequest = null;
+
+              var args =
+              {
+                "data": json,
+                "success": true,
+                "startDate": netStart,
+                "cadcForm": _selfForm
+              };
+
+              trigger(ca.nrc.cadc.search.events.onSubmitComplete, args);
+            },
+            error: function (request, textStatus, data)
+            {
+              console.error("Error: " + request.responseText);
+
+              trigger(ca.nrc.cadc.search.events.onSubmitComplete,
+                      {
+                        "error_url": request.responseText,
+                        "success": false,
+                        "startDate": netStart,
+                        "cadcForm": _selfForm
+                      });
+            },
+            complete: function (request, textStatus, data)
+            {
+              if (textStatus === 'timeout')
+              {
+                alert("The search took too long to return.\n" +
+                      "Please refine your search or try again later.");
+
+                trigger(ca.nrc.cadc.search.events.onSubmitComplete,
+                        {
+                          "success": false,
+                          "startDate": netStart,
+                          "cadcForm": _selfForm,
+                          "error": {
+                            status: request.status,
+                            message: textStatus
+                          }
+                        });
+              }
+            },
+            iframe: isUpload,
             xhr: createRequest
-          })
-          .done(function(json)
-                {
-                  currentForm.find("input:hidden#target").remove();
-                  currentForm.find("input:hidden#collection").remove();
-
-                  _selfForm.currentRequest = null;
-
-                  var args =
-                  {
-                    "data": json,
-                    "success": true,
-                    "startDate": netStart,
-                    "cadcForm": _selfForm
-                  };
-
-                  trigger(ca.nrc.cadc.search.events.onSubmitComplete, args);
-                })
-          .fail(function (request)
-                {
-                  console.error("Error: " + request.responseText);
-
-                  trigger(ca.nrc.cadc.search.events.onSubmitComplete,
-                          {
-                            "error_url": request.responseText,
-                            "success": false,
-                            "startDate": netStart,
-                            "cadcForm": _selfForm
-                          });
-                })
-          .always(function(request, textStatus)
-                  {
-                    if (textStatus == "timeout")
-                    {
-                      alert("The search took too long to return.\n" +
-                            "Please refine your search or try again later.");
-
-                      trigger(ca.nrc.cadc.search.events.onSubmitComplete,
-                              {
-                                "success": false,
-                                "startDate": netStart,
-                                "cadcForm": _selfForm,
-                                "error": {
-                                  status: request.status,
-                                  message: textStatus
-                                }
-                              });
-                    }
-                  });
+          });
       }
     }
 
@@ -1883,7 +1889,6 @@
                "getID": getID,
                "getName": getName,
                "getDownloadAccessKey": getDownloadAccessKey,
-               "getRowDisabledKey": getRowDisabledKey,
                "getResultsTableMetadata": getResultsTableMetadata,
                "getConfiguration": getConfiguration,
                "isActive": isActive,
