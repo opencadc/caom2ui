@@ -48,19 +48,21 @@ import ca.nrc.cadc.util.StringUtil;
 import org.apache.log4j.Logger;
 
 /**
+ * <code>
  *       yyyy ∈ [1990, 2100]
  *         HH ∈ [0, 23]
  *        mjd ∈ [toMJD(1900), toMJD(2100)]
  *         jd ∈ [toJD(1900), toJD(2100)]
- *      <sep> ∈ (space, comma)
- *  <iso_sep> ∈ (space, T)
+ *      %sep% ∈ (space, comma)
+ *  %iso_sep% ∈ (space, T)
  *
- *     <date> ::= <yyyy>[-<MM>[-<dd>]]
- *     <time> ::= <HH>[:<mm>[:<ss>]]
- *  <iso8601> ::= <date>[<iso_sep><time>]
+ *     %date% ::= %yyyy%[-%MM%[-%dd%]]
+ *     %time% ::= %HH%[:%mm%[:%ss%]]
+ *  %iso8601% ::= %date%[%iso_sep%%time%]
  *
- * <timespec> ::= <timespec>[<sep><timespec>]
- * <timespec> ::= <jd>|<mjd>|<iso8601>
+ * %timespec% ::= %timespec%[%sep%%timespec%]
+ * %timespec% ::= %jd%|%mjd%|%iso8601%
+ * </code>
  *
  * @author jburke
  */

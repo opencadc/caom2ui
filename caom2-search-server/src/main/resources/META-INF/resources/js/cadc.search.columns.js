@@ -105,17 +105,6 @@
                                                                                                     productID);
 
                                       var $previews = $("<div></div>");
-                                      for (var i = 0; i < thumbnailUrls.length;
-                                           i++)
-                                      {
-                                        var $thumbnail =
-                                          $("<img style=\"display: block; margin: auto;\"/>");
-                                        $thumbnail.prop("id", observationID +
-                                                              "_thumbnail");
-                                        $thumbnail.prop("src", thumbnailUrls[i]);
-                                        $thumbnail.addClass("image-actual");
-                                        $previews.append($thumbnail, "<br>");
-                                      }
 
                                       for (var j = 0; j < previewUrls.length;
                                            j++)
@@ -128,14 +117,13 @@
                                         $previews.append($preview, "<br>");
                                       }
 
-                                      var $title = $("<title></title>").text(collection +
-                                                                             " - " +
-                                                                             productID);
                                       var $content = $("<div id=\"scoped-content\"></div>")
-                                        .append($title, $col, $obsId, $pdctId, $previews);
+                                        .append($col, $obsId, $pdctId, $previews);
 
-                                      var w = window.open('', '_blank');
+                                      var w = window.open("", "_PREVIEW");
+                                      w.document.body.innerHTML = '';
                                       w.document.write($content.html());
+                                      w.document.title = collection + " - " + productID;
                                       w.focus();
                                     });
                       }
@@ -246,8 +234,9 @@
                                       {
                                         var readable =
                                           ((readableIndex >= 0)
-                                           && tableDatas[readableIndex]
-                                                .textContent === 'true');
+                                           &&
+                                           tableDatas[readableIndex].textContent
+                                           === 'true');
                                         if (readable === true)
                                         {
                                           var semantics = tableDatas[semanticsIndex].textContent;
@@ -267,8 +256,8 @@
                                     // If datalink didn't provide thumbnail and
                                     // preview urls, create the urls and check
                                     // if they exist.
-                                    if (thumbnailUrls.length === 0 ||
-                                        previewUrls.length === 0)
+                                    if (thumbnailUrls.length === 0
+                                        || previewUrls.length === 0)
                                     {
                                       var thumbnailPreview = new ca.nrc.cadc.search.Preview(collection, observationID,
                                         productID, 256, runID);
@@ -287,6 +276,7 @@
                                                                {
                                                                  var $link = createLink($cell, thumbnailURL);
                                                                  $link.attr("href", previewURL);
+                                                                 $link.attr("target", "_PREVIEW");
 
                                                                  var $previewImage = $("<img />");
                                                                  $previewImage.prop("id", observationID +
@@ -1245,9 +1235,14 @@
 
   function getCalibrationLevelName(numericKey)
   {
-    return (numericKey && ($.trim(numericKey).length > 0))
-      ? ca.nrc.cadc.search.datatrain.CALIBRATION_LEVEL_MAP[numericKey]
-      : null;
+    if (numericKey && ($.trim(numericKey).length > 0))
+    {
+      return ca.nrc.cadc.search.datatrain.CALIBRATION_LEVEL_MAP[numericKey];
+    }
+    else
+    {
+      return null;
+    }
   }
 
   function formatCalibrationName(value, utype)

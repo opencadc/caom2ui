@@ -46,13 +46,15 @@ import org.apache.log4j.Logger;
 
 
 /**
- * <sep> ∈ (space, comma)
- * <energy> ::= <value>[[<space>]<unit>]
- * <energyspec> ::= <name>
- * ::= <energy>
- * ::= <energy><sep><tolerance>
- * ::= <energy><sep><energy>
- * ::= <energy><sep><energy><sep><tolerance>
+ * <code>
+ * %sep% ∈ (space, comma)
+ * %energy% ::= %value%[[%space%]%unit%]
+ * %energyspec% ::= %name%
+ * ::= %energy%
+ * ::= %energy%%sep%%tolerance%
+ * ::= %energy%%sep%%energy%
+ * ::= %energy%%sep%%energy%%sep%%tolerance%
+ * </code>
  *
  * @author jburke
  */

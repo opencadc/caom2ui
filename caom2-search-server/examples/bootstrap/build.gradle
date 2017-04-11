@@ -7,14 +7,14 @@ repositories {
     jcenter()
     mavenLocal()
 
-    // repo for jsky
-    maven {
-        url = 'http://java.freehep.org/maven2'
-    }
-
     // Used for web-test browser testing.
     maven {
         url = 'http://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/m2repo'
+    }
+
+    // Only here until caom2-compute is in jcenter.
+    maven {
+        url  "http://dl.bintray.com/opencadc/software"
     }
 }
 
@@ -47,7 +47,7 @@ group = 'org.opencadc'
 version = '1002'
 
 // Modify this to your liking!
-def docker_image_name = 'opencadc/archive-search'
+def docker_image_name = 'opencadc/archive-search:bootstrap-3.3.7'
 
 war {
     archiveName = 'search##' + project.version + '.war'

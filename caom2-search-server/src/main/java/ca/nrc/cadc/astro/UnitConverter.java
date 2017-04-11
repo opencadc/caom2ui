@@ -11,15 +11,15 @@ public interface UnitConverter
 {
 	/**
 	 * Get the list of units known to this converter. 
-	 * @return
+	 * @return		String array of supported units.
 	 */
 	String[] getSupportedUnits();
 	
 	/**
 	 * Convert a value expressed in one of the known units to the core unit.
 	 * 
-	 * @param value
-	 * @param units
+	 * @param value		The value to convert.
+	 * @param units		The unit to convert to.
 	 * @return value expressed in core units
 	 * @throws IllegalArgumentException if the units are unknown
 	 */

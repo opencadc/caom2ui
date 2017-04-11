@@ -124,7 +124,7 @@ public class StubServletOutputStream extends ServletOutputStream
      * to the output stream. The byte to be written is the eight
      * low-order bits of the argument <code>b</code>. The 24
      * high-order bits of <code>b</code> are ignored.
-     * <p>
+     *
      * Subclasses of <code>OutputStream</code> must provide an
      * implementation for this method.
      *

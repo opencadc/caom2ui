@@ -40,15 +40,15 @@ import ca.nrc.cadc.util.StringUtil;
 
 /**
  * ra [sep] dec [sep] [radius[unit]] [sep] [coordsys]
- * <p/>
+ *
  * Class takes a String target value and attempts to parse
  * the target into R.A., Dec., and radius values. If it is
  * unable to parse the target into coordinates, it passes
  * the target to a name resolver to retrieve the coordinates.
- * <p/>
+ *
  * If the name is simply an Object Name rather than a name that can be parsed,
  * then attempt all resolution, then give up.
- * <p/>
+ *
  * 1 token is resolved to coordinates.
  * 2 tokens are a RA and DEC.
  * 3 tokens are a RA, DEC, and radius or coordinate system.
@@ -77,7 +77,7 @@ public class TargetParser
     /**
      * Complete target constructor.
      *
-     * @param resolver     The resolver to use when resolving is needed.
+     * @param resolver The resolver to use when resolving is needed.
      */
     public TargetParser(final Resolver resolver)
     {
@@ -88,9 +88,8 @@ public class TargetParser
     /**
      * Attempts to determine the coordinates of the query.
      *
-     * @param target        The String target.
-     * @param resolver      The resolver to use.
-     *
+     * @param target   The String target.
+     * @param resolver The resolver to use.
      * @return Target Data for this parser's information.
      * @throws TargetParserException If the query is null or cannot be parsed.
      */
@@ -161,9 +160,8 @@ public class TargetParser
      * Attempts to parse the target string into R.A., Dec., and radius. If that fails
      * then try to resolve the target into coordinates using a name resolver.
      *
-     * @param target            The String target.
-     * @param resolverName      The resolver to use.
-     *
+     * @param target       The String target.
+     * @param resolverName The resolver to use.
      * @throws TargetParserException If the query is null or empty, or an
      *                               error in parsing occurs.
      */

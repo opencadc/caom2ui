@@ -53,10 +53,10 @@ import ca.nrc.cadc.util.StringUtil;
 
 /**
  * ra [sep] dec [sep] [radius[unit]] [sep] [coordsys]
- * <p/>
+ *
  * Class takes a String target value and attempts to parse
  * the target into R.A., Dec., and radius values.
- * <p/>
+ *
  * 1 token is resolved to coordinates.
  * 2 tokens are a RA and DEC.
  * 3 tokens are a RA, DEC, and radius or coordinate system.

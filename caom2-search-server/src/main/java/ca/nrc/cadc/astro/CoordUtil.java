@@ -58,9 +58,6 @@ public class CoordUtil
             val -= 360.0;
         }
 
-        //if (val < 0.0 || val >= 360.0)
-        //	throw new IllegalArgumentException("value "+val+" out of bounds: [0.0, 360.0)");
-
         // 24 hours/360 degrees = 15 deg/hour
         int h = (int) (val / 15.0);
         val -= h * 15.0;
@@ -135,11 +132,11 @@ public class CoordUtil
      * Valid formats include 15h30m45.6s = 15:30:45.6 = 15 30 45.6 ~ 232.69 (degrees).
      * If there is only one component after splitting, it is assumed to be the degrees
      * component (ie. 15 != 15:0:0) unless followed by the character 'h' (ie. 15h = 15:0:0).
-     * <p/>
+     *
      * TODO - This is obscure and can be simplified!
      * TODO - 2007.01.05
      *
-     * @param ra
+     * @param ra        RA Value.
      * @return right ascension in degrees
      * @throws NumberFormatException    if arg cannot be parsed
      * @throws IllegalArgumentException if the resulting value is not in [0,360]
@@ -191,9 +188,8 @@ public class CoordUtil
         {
             ret -= 360.0;
         }
-        //if (0.0 <= ret && ret < 360.0)
+
         return ret;
-        //throw new IllegalArgumentException("RA must be in [0,360]: " + ret);
     }
 
     /**
@@ -240,6 +236,7 @@ public class CoordUtil
         double d = Double.NaN;
         double m = 0;
         double s = 0;
+
         if (st.hasMoreTokens())
         {
             d = Double.parseDouble(st.nextToken());

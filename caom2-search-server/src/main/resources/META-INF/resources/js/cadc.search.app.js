@@ -6,7 +6,7 @@
       'nrc': {
         'cadc': {
           'search': {
-            'TAP_SYNC': '/tap/sync',
+            'TAP_SYNC': '/search/tap/sync',
             'i18n': {
               'en': {
                 'ONE_CLICK_DOWNLOAD_TIP': 'Single file or .tar if multiple files',
@@ -19,8 +19,8 @@
                 'CROSS_DOMAIN_ERROR': 'French version of Server error retrieving data'
               }
             },
-            'PACKAGE_SERVICE_ENDPOINT': '/AdvancedSearch/package',
-            'UNIT_CONVERSION_ENDPOINT': '/AdvancedSearch/unitconversion/',
+            'PACKAGE_SERVICE_ENDPOINT': '/search/package',
+            'UNIT_CONVERSION_ENDPOINT': '/search/unitconversion/',
             'QUICKSEARCH_SELECTOR': '.quicksearch_link',
             'GRID_SELECTOR': '#resultTable',
             'RESULTS_PAGE_SIZE': 500,
@@ -606,7 +606,7 @@
       getCAOMSearchForm().disable();
       getObsCoreSearchForm().disable();
 
-      var tooltipURL = "json/tooltips.json";
+      var tooltipURL = "json/tooltips_" + getPageLanguage() + ".json";
 
       $.getJSON(tooltipURL, function (jsonData)
       {

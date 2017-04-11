@@ -215,7 +215,7 @@ public class FormData
 
     /**
      * Story 888.  Handle special frequency searches.
-     * <p>
+     *
      * TODO - This method is ridiculously ugly.  Will try to improve.
      * TODO - jenkinsd 2012.01.27
      *
@@ -540,7 +540,7 @@ public class FormData
     /**
      * Creates a List of all the forms with data that can
      * be used to generate the search templates.
-     * <p>
+     *
      * TODO - This is really weird.  We iterate over FormConstraint instances,
      * TODO - but assume that they are all SearchableFormConstraint instances.
      * TODO -

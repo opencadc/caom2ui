@@ -66,8 +66,8 @@ public class TargetData
      * @param service        the service that resolved the target.
      * @param time           the time to resolve the target.
      * @param objectName     long-form name of target from service.
-     * @param objectType
-     * @param morphologyType
+     * @param objectType        Object type.
+     * @param morphologyType    Morph type from resolver
      */
     public TargetData(final String target,
                       final Double ra,
@@ -104,13 +104,7 @@ public class TargetData
      */
     public String getCoordinates()
     {
-        final StringBuilder sb = new StringBuilder();
-        sb.append(ra);
-        sb.append(" ");
-        sb.append(dec);
-        sb.append(" ");
-        sb.append(radius);
-        return sb.toString();
+        return String.valueOf(ra) + " " + dec + " " + radius;
     }
 
     /**
@@ -119,33 +113,31 @@ public class TargetData
     @Override
     public String toString()
     {
-        final StringBuilder sb = new StringBuilder();
-        sb.append("TargetResult[target=");
-        sb.append(target);
-        sb.append(",ra=");
-        sb.append(ra == null ? "" : ra);
-        sb.append(",raRange=");
-        sb.append(raRange == null ? "" : raRange.getRange());
-        sb.append(",dec=");
-        sb.append(dec == null ? "" : dec);
-        sb.append(",decRange=");
-        sb.append(decRange == null ? "" : decRange.getRange());
-        sb.append(",radius=");
-        sb.append(radius);
-        sb.append(",coordsys=");
-        sb.append(coordsys);
-        sb.append(",service=");
-        sb.append(service);
-        sb.append(",time=");
-        sb.append(time);
-        sb.append(",objectName=");
-        sb.append(objectName);
-        sb.append(",objectType=");
-        sb.append(objectType);
-        sb.append(",morphologyType=");
-        sb.append(morphologyType);
-        sb.append("]");
-        return sb.toString();
+        return "TargetResult[target=" +
+               target +
+               ",ra=" +
+               (ra == null ? "" : ra) +
+               ",raRange=" +
+               (raRange == null ? "" : raRange.getRange()) +
+               ",dec=" +
+               (dec == null ? "" : dec) +
+               ",decRange=" +
+               (decRange == null ? "" : decRange.getRange()) +
+               ",radius=" +
+               radius +
+               ",coordsys=" +
+               coordsys +
+               ",service=" +
+               service +
+               ",time=" +
+               time +
+               ",objectName=" +
+               objectName +
+               ",objectType=" +
+               objectType +
+               ",morphologyType=" +
+               morphologyType +
+               "]";
     }
 
     public String getTarget()

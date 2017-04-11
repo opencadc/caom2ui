@@ -47,15 +47,15 @@ import ca.nrc.cadc.util.StringUtil;
 /**
  * Client Class to query the Name Resolver servlet using an HTTP GET request. The Name Resolver servlet
  * attempts to resolve a target name to RA and DEC coordinates in degrees.
- * <p/>
+ *
  * Four methods are provided to resolve a target name. Each method takes the target name,
  * then optionally either a service argument, or cached argument , or both.
- * <p/>
+ *
  * By default Name Resolver concurrently queries NED at CalTech, Simbad at CDS, and VizieR at CDS and CADC,
  * returning the first positive result. The service argument can specify any combination of NED, SIMBAD,
  * or VIZIER, comma delimited if more than one is specified, no spaces allowed. The service argument
  * is not case sensitive.
- * <p/>
+ *
  * The cached argument is true to return results from the Name Resolver cache (the default), or false
  * to force the Name Resolver to query the services for the target without checking it's cached results.
  *

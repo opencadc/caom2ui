@@ -126,39 +126,39 @@ public class SearchJobServlet extends SyncServlet
     /**
      * Called by the server (via the <code>service</code> method)
      * to allow a servlet to handle a POST request.
-     * <p>
+     *
      * The HTTP POST method allows the client to send
      * data of unlimited length to the Web server a single time
      * and is useful when posting information such as
      * credit card numbers.
-     * <p>
-     * <p>When overriding this method, read the request data,
+     *
+     *When overriding this method, read the request data,
      * write the response headers, get the response's writer or output
      * stream object, and finally, write the response data. It's best
      * to include content type and encoding. When using a
      * <code>PrintWriter</code> object to return the response, set the
      * content type before accessing the <code>PrintWriter</code> object.
-     * <p>
-     * <p>The servlet container must write the headers before committing the
+     *
+     *The servlet container must write the headers before committing the
      * response, because in HTTP the headers must be sent before the
      * response body.
-     * <p>
-     * <p>Where possible, set the Content-Length header (with the
+     *
+     *Where possible, set the Content-Length header (with the
      * {@link ServletResponse#setContentLength} method),
      * to allow the servlet container to use a persistent connection
      * to return its response to the client, improving performance.
      * The content length is automatically set if the entire response fits
      * inside the response buffer.
-     * <p>
-     * <p>When using HTTP 1.1 chunked encoding (which means that the response
+     *
+     *When using HTTP 1.1 chunked encoding (which means that the response
      * has a Transfer-Encoding header), do not set the Content-Length header.
-     * <p>
-     * <p>This method does not need to be either safe or idempotent.
+     *
+     *This method does not need to be either safe or idempotent.
      * Operations requested through POST can have side effects for
      * which the user can be held accountable, for example,
      * updating stored data or buying items online.
-     * <p>
-     * <p>If the HTTP POST request is incorrectly formatted,
+     *
+     *If the HTTP POST request is incorrectly formatted,
      * <code>doPost</code> returns an HTTP "Bad Request" message.
      *
      * @param request  an {@link HttpServletRequest} object that

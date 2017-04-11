@@ -47,6 +47,7 @@ public class TimeParser extends AbstractNumericParser
      * Complete constructor.
      *
      * @param val The String value to parse.
+     * @throws  NumericParserException      For number parsing errors.
      */
     public TimeParser(final String val) throws NumericParserException
     {

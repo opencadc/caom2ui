@@ -61,11 +61,11 @@ public class Templates
      * thrown creating the template are stored in a Map with the
      * Form attribute as the Map key and the exception message as
      * the Map value.
-     * <p/>
+     *
      * If a ScalarTemplate is not created for an Enumerated Form
      * with a Collection attribute, then a ScalarTemplate is created
      * using the default Collections in the List cadcList.
-     * <p/>
+     *
      * It is expected that the forms in the list have been validated.
      *
      * @param formConstraints List of forms.
@@ -134,7 +134,7 @@ public class Templates
     public <T extends SearchTemplate> List<T> getSearchTemplates(
             final Class<T> searchTemplateClass)
     {
-        final List<T> searchTemplateClasses = new ArrayList<T>();
+        final List<T> searchTemplateClasses = new ArrayList<>();
 
         for (final SearchTemplate searchTemplate : getSearchTemplates())
         {

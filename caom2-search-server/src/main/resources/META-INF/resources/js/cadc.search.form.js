@@ -10,9 +10,9 @@
             "FORM_LABEL_INPUT_LENGTH": 12,
             "TARGET_FORM_LABEL_INPUT_LENGTH": 24,
             "CHECKBOX_CHECKED_REGEX": /^true|on$/g,
-            "AUTOCOMPLETE_ENDPOINT": "/AdvancedSearch/unitconversion/",
+            "AUTOCOMPLETE_ENDPOINT": "/search/unitconversion/",
             "AUTOCOMPLETE_TAP_REQUEST_DATA": {
-              "endpoint": "/tap/sync",
+              "endpoint": "/search/tap/sync",
               "payload": {
                 "LANG": "ADQL",
                 "FORMAT": "CSV",
@@ -1598,7 +1598,7 @@
 
         getForm().ajaxSubmit(
           {
-            url: "/AdvancedSearch/find",
+            url: "/search/find",
             target: "#file_upload_response",
             dataType: "json",
             beforeSubmit: beforeSerialize,

@@ -30,6 +30,7 @@ package ca.nrc.cadc.search.form;
 
 import ca.nrc.cadc.caom2.IntervalSearch;
 import ca.nrc.cadc.caom2.SearchTemplate;
+
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -45,7 +46,8 @@ import ca.nrc.cadc.uws.Parameter;
  *
  * @author jburke
  */
-public class Energy extends AbstractNumericFormConstraint implements SearchableFormConstraint
+public class Energy extends AbstractNumericFormConstraint
+        implements SearchableFormConstraint
 {
     private static Logger log = Logger.getLogger(Energy.class);
 
@@ -80,17 +82,19 @@ public class Energy extends AbstractNumericFormConstraint implements SearchableF
     public SearchTemplate buildSearch(List<FormError> errorList)
     {
         SearchTemplate template = null;
-        
+
         try
         {
             template = new IntervalSearch(this.getUType(),
-                                      ((this.getLowerNumber() == null)
-                                       ? null
-                                       : this.getLowerNumber().doubleValue()),
-                                      ((this.getUpperNumber() == null)
-                                       ? null
-                                       : this.getUpperNumber().doubleValue()),
-                                      this.getUnit());
+                                          ((this.getLowerNumber() == null)
+                                           ? null
+                                           :
+                                           this.getLowerNumber().doubleValue()),
+                                          ((this.getUpperNumber() == null)
+                                           ? null
+                                           :
+                                           this.getUpperNumber().doubleValue()),
+                                          this.getUnit());
         }
         catch (IllegalArgumentException e)
         {
@@ -98,7 +102,7 @@ public class Energy extends AbstractNumericFormConstraint implements SearchableF
             log.debug("Invalid Energy parameters: " + e.getMessage() + " " +
                       this.toString());
         }
-        
+
         return template;
     }
 
@@ -119,6 +123,9 @@ public class Energy extends AbstractNumericFormConstraint implements SearchableF
 
     /**
      * Determines whether meter should be used as the unit based on the utype.
+     *
+     * @param utype     The UType to check.
+     * @return true if we should use metric, false otherwise.
      */
     public static boolean useMeter(final String utype)
     {
@@ -130,11 +137,11 @@ public class Energy extends AbstractNumericFormConstraint implements SearchableF
         // Update
         // Story 1502
         // Adding Rest Frequency follows the same logic.
-        return utype.equals("Plane.energy.bounds") || 
+        return utype.equals("Plane.energy.bounds") ||
                utype.equals("Plane.energy.restwav") ||
                utype.equals("Char.SpectralAxis.Coverage.Bounds.Limits");
     }
-    
+
     /**
      * Text is valid if the Energy valueFrom and valueTo have been successfully validated.
      *

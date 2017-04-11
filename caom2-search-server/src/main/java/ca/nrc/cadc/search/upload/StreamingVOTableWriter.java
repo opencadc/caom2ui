@@ -56,6 +56,7 @@ import org.jdom2.Namespace;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 
+
 public class StreamingVOTableWriter extends VOTableWriter
 {
     // Counts of table rows and processing errors.
@@ -72,7 +73,7 @@ public class StreamingVOTableWriter extends VOTableWriter
 
 
     public void write(final InputStream in, final OutputStream out)
-        throws IOException
+            throws IOException
     {
         Document document = createDocument();
         Element root = document.getRootElement();
@@ -122,9 +123,9 @@ public class StreamingVOTableWriter extends VOTableWriter
      * Write out the Document to the given OutputStream.  Useful to overwrite
      * when testing.
      *
-     * @param document          The JDOM2 Document.
-     * @param out               The OutputStream to write to.
-     * @throws IOException      For any unforeseen error(s).
+     * @param document The JDOM2 Document.
+     * @param out      The OutputStream to write to.
+     * @throws IOException For any unforeseen error(s).
      */
     protected void write(final Document document, final OutputStream out)
             throws IOException

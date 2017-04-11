@@ -155,7 +155,7 @@
                     return ca.nrc.cadc.search.datatrain.sortNumericDescending(val1, val2);
                   }
                 },
-                'ENDPOINT': '/tap/sync',
+                'ENDPOINT': '/search/tap/sync',
                 'DataTrain': DataTrain,
                 'events': {
                   'onDataTrainLoaded': new jQuery.Event('AdvancedSearch:onDataTrainLoaded'),

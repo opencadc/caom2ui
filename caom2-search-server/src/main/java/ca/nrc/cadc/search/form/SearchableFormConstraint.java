@@ -46,6 +46,7 @@ public interface SearchableFormConstraint extends FormConstraint
      *
      * @param errorList     The current errorList.  This can be appended to in
      *                      this method.
+     * @return SearchTemplate instance.  Never null.
      */
     SearchTemplate buildSearch(final List<FormError> errorList);
 }
