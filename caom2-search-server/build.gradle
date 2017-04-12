@@ -6,11 +6,6 @@ plugins {
 repositories {
     jcenter()
     mavenLocal()
-
-    // Only here until caom2-compute is in jcenter.
-    maven {
-        url  "http://dl.bintray.com/opencadc/software"
-    }
 }
 
 dependencies {
