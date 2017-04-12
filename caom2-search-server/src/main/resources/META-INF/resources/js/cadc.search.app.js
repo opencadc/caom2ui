@@ -700,7 +700,7 @@
 
       var onFormValid = function (eventData, args)
       {
-        if (resultsVOTV !== null)
+        if (resultsVOTV)
         {
           resultsVOTV.destroy();
         }

@@ -86,7 +86,7 @@ public class IntervalSearch extends AbstractTemplate
      *
      *
      * <code>i.lower &le; upper and lower &le; i.upper</code>
-     * 
+     *
      *
      * @param name      This search's name.
      * @param lower     The lower value of the range (inclusive).

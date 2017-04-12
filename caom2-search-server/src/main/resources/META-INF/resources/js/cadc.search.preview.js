@@ -14,7 +14,7 @@
       "nrc": {
         "cadc": {
           "search": {
-            "PREVIEW_URL_PREFIX": "/AdvancedSearch/preview",
+            "PREVIEW_URL_PREFIX": "/search/preview",
             "Preview": Preview
           }
         }
