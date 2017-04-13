@@ -242,7 +242,6 @@
   <servlet-mapping>
     <servlet-name>TAPServlet</servlet-name>
     <url-pattern>/tap/*</url-pattern>
-    <url-pattern>/tap</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>

@@ -221,8 +221,10 @@
     {
       var tapQuery = 'select * from TAP_SCHEMA.columns where '
                      + '((table_name=\'caom2.Observation\' or '
-                     + 'table_name=\'caom2.Plane\') and utype like \'caom2:%\') or '
-                     + '(table_name=\'ivoa.ObsCore\' and utype like \'obscore:%\')';
+                     +
+                     'table_name=\'caom2.Plane\') and utype like \'caom2:%\') or '
+                     +
+                     '(table_name=\'ivoa.ObsCore\' and utype like \'obscore:%\')';
 
       var caomFormConfig =
         new ca.nrc.cadc.search.FormConfiguration(
@@ -306,7 +308,7 @@
     /**
      * Initialize all things pertinent to the application.
      */
-    function init()
+    this.init = function ()
     {
       // Internet Explorer compatibility.
       //
@@ -315,7 +317,7 @@
       //
       wgxpath.install();
 
-      subscribe(ca.nrc.cadc.search.events.onAdvancedSearchInit, function ()
+      this.subscribe(ca.nrc.cadc.search.events.onAdvancedSearchInit, function ()
       {
         /*
          * Story 1644
@@ -357,10 +359,10 @@
                              var errorMessage = "Metadata field failed to initialize: " +
                                                 error;
                              console.error(errorMessage);
-                             trigger(ca.nrc.cadc.search.events.onAdvancedSearchInit,
-                                     {
-                                       error: errorMessage
-                                     });
+                             this._trigger(ca.nrc.cadc.search.events.onAdvancedSearchInit,
+                                           {
+                                             error: errorMessage
+                                           });
                            }
                            else
                            {
@@ -368,9 +370,9 @@
                              cleanMetadata(obsCoreConfiguration);
 
                              initForms(caomConfiguration, obsCoreConfiguration);
-                             trigger(ca.nrc.cadc.search.events.onAdvancedSearchInit, {});
+                             this._trigger(ca.nrc.cadc.search.events.onAdvancedSearchInit, {});
                            }
-                         });
+                         }.bind(this));
 
       /*
        * Story 1644
@@ -389,7 +391,7 @@
                           window.location.hash =
                             $(this).find("a").first().attr("href");
                         });
-    }
+    };
 
     /**
      * Remove empty or non-existent fields from the metadata.
@@ -937,7 +939,8 @@
 
                                      // Story 1566, when all 'Product Types'
                                      // checkboxes are checked, do not send any
-                                     var allChecked = downloadForm.find("input.product_type_option_flag").not(":checked").length === 0;
+                                     var allChecked = downloadForm.find("input.product_type_option_flag").not(":checked").length ===
+                                                      0;
                                      if (allChecked)
                                      {
                                        // disable all 'Product Types' checkboxes
@@ -1177,7 +1180,8 @@
 
             var activeTabID = window.location.hash || getActiveTabID();
             var isNoExecFlag = ((currentURI.getQueryValue('noexec') !== null)
-                                && (currentURI.getQueryValue('noexec') === 'true'));
+                                && (currentURI.getQueryValue('noexec') ===
+                                    'true'));
             var destinationTabID;
 
             if (((activeTabID !== "#queryFormTab")
@@ -1469,7 +1473,8 @@
               panel: $('div#error-grid-header'),
               options: {
                 buttonText: ((getPageLanguage() === 'fr') ?
-                             'Gérer l\'affichage des colonnes' : 'Change Columns')
+                             'Gérer l\'affichage des colonnes' :
+                             'Change Columns')
               },
               tooltipOptions: {
                 targetSelector: $('#errorTooltipColumnPickerHolder').find('.tooltip_content').first(),
@@ -1524,7 +1529,8 @@
                           errorVOTV.render();
 
                           $('#errorTable').find('.grid-header-label')
-                            .text(getPageLanguage() === 'fr' ? 'Erreur.' : 'Error');
+                            .text(getPageLanguage() === 'fr' ? 'Erreur.' :
+                                  'Error');
 
                           // Necessary at the end!
                           errorVOTV.refreshGrid();
@@ -1721,13 +1727,13 @@
      * @param _args        Arguments to the event.
      * @returns {*}       The event notification result.
      */
-    function trigger(_event, _args)
+    this._trigger = function (_event, _args)
     {
       var args = _args || {};
-      args.application = _self;
+      args.application = this;
 
-      return $(_self).trigger(_event, _args);
-    }
+      return $(this).trigger(_event, _args);
+    };
 
     /**
      * Subscribe to one of this form's events.
@@ -1735,10 +1741,10 @@
      * @param _event      Event object.
      * @param __handler   Handler function.
      */
-    function subscribe(_event, __handler)
+    this.subscribe = function (_event, __handler)
     {
-      $(_self).on(_event.type, __handler);
-    }
+      $(this).on(_event.type, __handler);
+    };
 
     if (_autoInitFlag)
     {
@@ -1748,16 +1754,12 @@
     $.extend(this,
              {
                'start': start,
-               'init': init,
                'getADQL': getADQL,
                'getActiveForm': getActiveForm,
                'getDownloadForm': getDownloadForm,
                'deserializeFormData': deserializeFormData,
                'selectTab': selectTab,
                'getActiveTabID': getActiveTabID,
-
-               // Event handling.
-               'subscribe': subscribe,
 
                // Exposed for testing
                'processFilterValue': processFilterValue,

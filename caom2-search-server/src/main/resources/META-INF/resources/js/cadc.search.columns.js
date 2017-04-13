@@ -121,8 +121,16 @@
                                         .append($col, $obsId, $pdctId, $previews);
 
                                       var w = window.open("", "_PREVIEW");
-                                      w.document.body.innerHTML = '';
+                                      w.document.body.innerHTML = "";
+
+                                      // Open and close are here to stop browsers
+                                      // expecting more data.
+                                      // jenkinsd 2017.04.12
+                                      //
+                                      w.document.open();
                                       w.document.write($content.html());
+                                      w.document.close();
+
                                       w.document.title = collection + " - " + productID;
                                       w.focus();
                                     });

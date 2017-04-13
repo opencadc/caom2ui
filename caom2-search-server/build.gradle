@@ -14,7 +14,6 @@ dependencies {
     compile 'org.jdom:jdom2:2.+'
     compile 'org.json:json:20160810'
     compile 'org.opencadc:cadc-access-control:1.+'
-    compile 'org.opencadc:cadc-access-control-identity:1.+'
     compile 'org.opencadc:cadc-uws:1.+'
     compile 'org.opencadc:cadc-web-util:1.+'
     compile 'org.opencadc:cadc-adql:1.+'

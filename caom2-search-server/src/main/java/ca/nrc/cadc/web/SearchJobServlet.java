@@ -68,8 +68,9 @@
 
 package ca.nrc.cadc.web;
 
+import ca.nrc.cadc.auth.HTTPIdentityManager;
 import ca.nrc.cadc.config.ApplicationConfiguration;
-import ca.nrc.cadc.auth.ACIdentityManager;
+import ca.nrc.cadc.auth.IdentityManager;
 import ca.nrc.cadc.auth.AuthenticationUtil;
 import ca.nrc.cadc.caom2.CAOMQueryGeneratorImpl;
 import ca.nrc.cadc.caom2.ObsCoreQueryGeneratorImpl;
@@ -101,6 +102,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URI;
 import java.security.PrivilegedExceptionAction;
+import java.sql.PreparedStatement;
+import java.sql.Types;
 import java.util.*;
 
 
@@ -112,6 +115,7 @@ public class SearchJobServlet extends SyncServlet
             URI.create("ivo://cadc.nrc.ca/tap");
 
     private JobManager jobManager;
+    private JobUpdater jobUpdater;
     private ApplicationConfiguration applicationConfiguration;
 
 
@@ -119,8 +123,17 @@ public class SearchJobServlet extends SyncServlet
     public void init(final ServletConfig config) throws ServletException
     {
         super.init(config);
+
+        final DatabaseJobPersistence jobPersistence =
+                new PostgresJobPersistence(new HTTPIdentityManager());
+
         jobManager = createJobManager(config);
-        applicationConfiguration = new ApplicationConfiguration(Configuration.DEFAULT_CONFIG_FILE_PATH);
+        jobManager.setJobPersistence(jobPersistence);
+
+        jobUpdater = jobPersistence;
+
+        applicationConfiguration =
+                new ApplicationConfiguration(Configuration.DEFAULT_CONFIG_FILE_PATH);
     }
 
     /**
@@ -254,8 +267,8 @@ public class SearchJobServlet extends SyncServlet
         final Map<String, Object> uploadPayload = new HashMap<>();
         final List<Parameter> extraJobParameters = new ArrayList<>();
 
-        final JobUpdater jobUpdater =
-                new PostgresJobPersistence(new ACIdentityManager());
+//        final JobUpdater jobUpdater =
+//                new PostgresJobPersistence(new ACIdentityManager());
 
         final JobCreator jobCreator = new JobCreator(getInlineContentHandler())
         {

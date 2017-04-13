@@ -1,11 +1,7 @@
 
 package ca.nrc.cadc.uws;
 
-import ca.nrc.cadc.auth.ACIdentityManager;
-
-import ca.nrc.cadc.uws.server.DatabaseJobPersistence;
 import ca.nrc.cadc.uws.server.SimpleJobManager;
-import ca.nrc.cadc.uws.server.impl.PostgresJobPersistence;
 
 
 /**
@@ -23,13 +19,6 @@ public class SearchJobManager extends SimpleJobManager
     {
         super();
 
-        // Persist UWS jobs to PostgreSQL: HACK: hard-coded runtime config now
-        // that PostgresJobPersistence is used in multiple back-end servers
-        // with different config.
-        final DatabaseJobPersistence jobPersist =
-                new PostgresJobPersistence(new ACIdentityManager());
-
-        super.setJobPersistence(jobPersist);
         super.setMaxExecDuration(MAX_EXEC_DURATION);
         super.setMaxDestruction(MAX_DESTRUCTION);
         super.setMaxQuote(MAX_QUOTE);
