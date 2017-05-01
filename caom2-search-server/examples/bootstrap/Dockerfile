@@ -1,12 +1,7 @@
 # Base Tomcat 8 JRE 8 image from CANFAR running on Alpine.
 FROM tomcat:8.5-alpine
 
-ENV CATALINA_OPTS "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5555 -Djava.security.egd=file:/dev/./urandom -Djsse.enableSNIExtension=false"
-
-# Working environment.  This will be set to the WORKDIR, which is the
-# current working directory in this context.
-ENV CATALINA_HOME "/usr/local/tomcat"
-WORKDIR ${CATALINA_HOME}
+ENV JAVA_OPTS "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5555 -Djava.security.egd=file:/dev/./urandom -Djsse.enableSNIExtension=false"
 
 # Clear out the webapps directory.
 RUN rm -rf webapps \
@@ -23,3 +18,4 @@ COPY *.war webapps/
 VOLUME /root/config
 
 COPY org.opencadc.search.properties /root/config/
+

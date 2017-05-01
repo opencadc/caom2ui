@@ -85,7 +85,7 @@ import java.net.URI;
 import java.net.URL;
 
 
-public class SyncTAPClientImplTest extends AbstractUnitTest<SyncTAPClientImpl>
+public class DefaultSyncTAPClientTest extends AbstractUnitTest<DefaultSyncTAPClient>
 {
     @Test
     public void execute() throws Exception
@@ -95,16 +95,16 @@ public class SyncTAPClientImplTest extends AbstractUnitTest<SyncTAPClientImpl>
         final RegistryClient mockRegistryClient = createMock(
                 RegistryClient.class);
 
-        testSubject = new SyncTAPClientImpl(mockConfiguration, false,
-                                            mockRegistryClient);
+        testSubject = new DefaultSyncTAPClient(mockConfiguration, false,
+                                               mockRegistryClient);
 
         final URI testServiceURI = URI.create("ivo://mydomain.com/tap/service");
         final OutputStream outputStream = new ByteArrayOutputStream();
         final Job testJob = new Job();
 
         expect(mockConfiguration.lookup(
-                SyncTAPClientImpl.TAP_SERVICE_HOST_PORT_PROPERTY_KEY,
-                SyncTAPClientImpl.DEFAULT_TAP_SERVICE_HOST_PORT))
+                DefaultSyncTAPClient.TAP_SERVICE_HOST_PORT_PROPERTY_KEY,
+                DefaultSyncTAPClient.DEFAULT_TAP_SERVICE_HOST_PORT))
                 .andReturn(null).once();
 
         expect(mockRegistryClient.getServiceURL(

@@ -57,7 +57,7 @@ import static org.easymock.EasyMock.*;
 
 
 
-public class TAPSearcherImplTest extends AbstractUnitTest<TAPSearcherImpl>
+public class TAPSearcherTest extends AbstractUnitTest<TAPSearcher>
 {
     private final SyncResponseWriter mockSyncResponseWriter =
             createMock(SyncResponseWriter.class);
@@ -73,9 +73,9 @@ public class TAPSearcherImplTest extends AbstractUnitTest<TAPSearcherImpl>
         final Job mockJob = createMock(Job.class);
         replay(mockJob, mockSyncResponseWriter, mockSyncTAPClient);
 
-        setTestSubject(new TAPSearcherImpl(mockSyncResponseWriter, null,
-                                           mockSyncTAPClient,
-                                           mockQueryGenerator));
+        setTestSubject(new TAPSearcher(mockSyncResponseWriter, null,
+                                       mockSyncTAPClient,
+                                       mockQueryGenerator));
         verify(mockJob, mockSyncResponseWriter, mockSyncTAPClient);
     }
 
@@ -106,9 +106,9 @@ public class TAPSearcherImplTest extends AbstractUnitTest<TAPSearcherImpl>
 
         stringBuilder.append("SELECT * FROM TABLE WHERE UTYPE1 = VAL1");
 
-        setTestSubject(new TAPSearcherImpl(mockSyncResponseWriter, null,
-                                           mockSyncTAPClient,
-                                           mockQueryGenerator)
+        setTestSubject(new TAPSearcher(mockSyncResponseWriter, null,
+                                       mockSyncTAPClient,
+                                       mockQueryGenerator)
         {
             /**
              * Issue a TAP query.

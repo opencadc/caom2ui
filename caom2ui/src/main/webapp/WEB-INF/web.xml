@@ -8,7 +8,12 @@
 
   <filter>
     <filter-name>AccessControlFilter</filter-name>
-    <filter-class>ca.nrc.cadc.caom2.ui.WebAccessControlFilter</filter-class>
+    <filter-class>ca.nrc.cadc.web.WebAccessControlFilter</filter-class>
+
+    <init-param>
+      <param-name>alwaysAugmentWithCredentials</param-name>
+      <param-value>false</param-value>
+    </init-param>
   </filter>
 
   <filter-mapping>

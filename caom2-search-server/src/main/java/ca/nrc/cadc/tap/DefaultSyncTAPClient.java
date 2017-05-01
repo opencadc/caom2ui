@@ -61,10 +61,10 @@ import java.util.Map;
 /**
  * Extension of the TapClient to handle Synchronous access and job creation.
  */
-public class SyncTAPClientImpl implements SyncTAPClient
+public class DefaultSyncTAPClient implements SyncTAPClient
 {
     private static final Logger LOGGER =
-            Logger.getLogger(SyncTAPClientImpl.class);
+            Logger.getLogger(DefaultSyncTAPClient.class);
     static final String TAP_SERVICE_HOST_PORT_PROPERTY_KEY =
             "org.opencadc.search.tap-service-host-port";
     static final String DEFAULT_TAP_SERVICE_HOST_PORT = "http://tap:8080";
@@ -75,14 +75,14 @@ public class SyncTAPClientImpl implements SyncTAPClient
     private final RegistryClient registryClient;
 
 
-    public SyncTAPClientImpl(final boolean followToResults,
-                             final RegistryClient registryClient)
+    public DefaultSyncTAPClient(final boolean followToResults,
+                                final RegistryClient registryClient)
     {
         this(new ApplicationConfiguration(Configuration.DEFAULT_CONFIG_FILE_PATH), followToResults, registryClient);
     }
 
-    SyncTAPClientImpl(ApplicationConfiguration applicationConfiguration,
-                      boolean followToResults, RegistryClient registryClient)
+    DefaultSyncTAPClient(ApplicationConfiguration applicationConfiguration,
+                         boolean followToResults, RegistryClient registryClient)
     {
         this.applicationConfiguration = applicationConfiguration;
         this.followToResults = followToResults;

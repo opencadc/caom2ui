@@ -78,10 +78,10 @@ import java.util.Map;
 /**
  * Searcher implementation for TAP queries.
  */
-public class TAPSearcherImpl implements Searcher
+public class TAPSearcher implements Searcher
 {
     private static final Logger LOGGER =
-            Logger.getLogger(TAPSearcherImpl.class);
+            Logger.getLogger(TAPSearcher.class);
 
     private static final String CAOM2_RESOLVER_VALUE_KEY =
             "Plane.position.bounds@Shape1Resolver.value";
@@ -102,10 +102,10 @@ public class TAPSearcherImpl implements Searcher
      * @param jobUpdater     The UWS Job Updater.
      * @param queryGenerator The generator to use to handle queries
      */
-    public TAPSearcherImpl(final SyncResponseWriter writer,
-                           final JobUpdater jobUpdater,
-                           final SyncTAPClient tapClient,
-                           final QueryGenerator queryGenerator)
+    public TAPSearcher(final SyncResponseWriter writer,
+                       final JobUpdater jobUpdater,
+                       final SyncTAPClient tapClient,
+                       final QueryGenerator queryGenerator)
             throws PositionParserException
     {
         this.syncResponseWriter = writer;
@@ -343,7 +343,7 @@ public class TAPSearcherImpl implements Searcher
             {
                 final String targetValue = targetName.trim();
                 final Resolver resolver =
-                        new ResolverImpl(new TargetNameResolverClientImpl());
+                        new ResolverImpl(new DefaultNameResolverClient());
                 final TargetParser targetParser = new TargetParser(resolver);
                 final TargetData targetData = targetParser.parse(targetValue,
                                                                  resolverName);
