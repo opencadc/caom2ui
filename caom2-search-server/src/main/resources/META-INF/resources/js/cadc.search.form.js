@@ -10,9 +10,9 @@
             "FORM_LABEL_INPUT_LENGTH": 12,
             "TARGET_FORM_LABEL_INPUT_LENGTH": 24,
             "CHECKBOX_CHECKED_REGEX": /^true|on$/g,
-            "AUTOCOMPLETE_ENDPOINT": "/search/unitconversion/",
+            "AUTOCOMPLETE_ENDPOINT": "/AdvancedSearch/unitconversion/",
             "AUTOCOMPLETE_TAP_REQUEST_DATA": {
-              "endpoint": "/search/tap/sync",
+              "endpoint": "/tap/sync",
               "payload": {
                 "LANG": "ADQL",
                 "FORMAT": "CSV",
@@ -108,13 +108,14 @@
    */
   function FormConfiguration(_config)
   {
+    var stringUtil = new org.opencadc.StringUtil();
     var _selfFormConfiguration = this;
 
     this._config = _config;
 
     // Full metadata set.
     this.tableMetadata = new cadc.vot.Metadata(null, null, null, null, null,
-      null);
+                                               null);
 
     this.columnManager = new ca.nrc.cadc.search.columns.ColumnManager();
     this.columnOptions = getColumnManager().getOptions().columnOptions;
@@ -146,8 +147,7 @@
     {
       // Current order of column IDs.
       var columnIDs = _selfFormConfiguration._config.getAllColumnIDs();
-      var currentMetadata =
-        new cadc.vot.Metadata(null, null, null, null, null, null);
+      var currentMetadata = new cadc.vot.Metadata(null, null, null, null, null, null);
 
       for (var ci = 0; ci < columnIDs.length; ci++)
       {
@@ -250,8 +250,7 @@
         var allColumnIDs = _selfFormConfiguration._config.getAllColumnIDs();
         order = allColumnIDs.indexOf(utype);
 
-        addFieldsForUType(utype, ucd, unit, datatype, arraysize, description,
-                          order);
+        addFieldsForUType(utype, ucd, unit, datatype, arraysize, description, order);
 
         // Hack to include non-standard UTypes into the mix.
         if (utype === getFootprintColumnID())
@@ -294,35 +293,27 @@
      * @param _description
      * @param _order
      */
-    function addFieldsForUType(_utype, _ucd, _unit, _datatype, _arraysize,
-                               _description, _order)
+    function addFieldsForUType(_utype, _ucd, _unit, _datatype, _arraysize, _description, _order)
     {
       var utypeFields = getColumnOptions()[_utype];
       var tableMD = getTableMetadata();
 
       if ((tableMD.hasFieldWithID(_utype) === false) && !utypeFields.extended)
       {
-        var strUtil = new cadc.web.util.StringUtil();
-
         tableMD.insertField(_order,
                             new cadc.vot.Field(
-                              utypeFields.label,
-                              _utype,
-                              _ucd,
-                              _utype,
-                              utypeFields.unit ? utypeFields.unit :
-                              _unit,
-                              strUtil.contains(_datatype,
-                                               "INTERVAL")
-                                ? "INTERVAL" : null,// xtype not
-                              // normally
-                              // available
-                              new cadc.vot.Datatype(utypeFields.datatype ?
-                                                    utypeFields.datatype :
-                                                    _datatype),
-                              _arraysize,
-                              _description,
-                              utypeFields.label));
+                                utypeFields.label,
+                                _utype,
+                                _ucd,
+                                _utype,
+                                utypeFields.unit ? utypeFields.unit :
+                                _unit,
+                                stringUtil.contains(_datatype, "INTERVAL", false) ? "INTERVAL" : null,
+                                // xtype not normally available
+                                new cadc.vot.Datatype(utypeFields.datatype ? utypeFields.datatype : _datatype),
+                                _arraysize,
+                                _description,
+                                utypeFields.label));
       }
     }
 
@@ -365,7 +356,7 @@
               }
 
               selectListString +=
-                selectorValue + " AS \"" + field.label + "\", ";
+                  selectorValue + " AS \"" + field.label + "\", ";
             }
           }
           else
@@ -557,6 +548,8 @@
    */
   function SearchForm(_id, _autoInitFlag, _configuration)
   {
+    var stringUtil = new org.opencadc.StringUtil();
+
     var _selfForm = this;
     this.id = _id;
     this.configuration = _configuration;
@@ -564,8 +557,7 @@
     this.currentRequest = null;
     this.currentTimeoutID = null;
     this.targetNameFieldID = null;
-    this.dataTrain = new ca.nrc.cadc.search.datatrain.DataTrain(
-      getConfiguration().getName().toLowerCase(), false);
+    this.dataTrain = new ca.nrc.cadc.search.datatrain.DataTrain(getConfiguration().getName().toLowerCase(), false);
 
     var VALIDATOR_ENDPOINT = "validate";
     var VALIDATOR_TIMER_DELAY = 500;
@@ -574,8 +566,7 @@
     var initialTooltipIconCSS = "wb-icon-question";
     var hoverTooltipIconCSS = "wb-icon-question-alt";
 
-    this.validator = new ca.nrc.cadc.search.Validator(VALIDATOR_ENDPOINT,
-      VALIDATOR_TIMER_DELAY);
+    this.validator = new ca.nrc.cadc.search.Validator(VALIDATOR_ENDPOINT, VALIDATOR_TIMER_DELAY);
 
     // Tooltip objects to keep track of.
     this.targetTooltipsters = [];
@@ -585,8 +576,7 @@
      */
     function init()
     {
-      _selfForm.targetNameFieldID =
-        getForm().find("input[name$='@Shape1.value']").prop("id");
+      _selfForm.targetNameFieldID = getForm().find("input[name$='@Shape1.value']").prop("id");
 
       getForm().find(".search_criteria_input").on("change keyup",
                                                   function ()
@@ -595,20 +585,18 @@
                                                   });
 
       $("input:file[id$='_targetList']").change(
-        function ()
-        {
-          if ($(this).val() !== '')
+          function ()
           {
-            $(".targetList_clear").show();
-            toggleDisabled($("input[id='" + _selfForm.targetNameFieldID +
-                             "']"), true);
-          }
-          else
-          {
-            toggleDisabled($("input[id='" + _selfForm.targetNameFieldID +
-                             "']"), false);
-          }
-        }).change();
+            if ($(this).val() !== "")
+            {
+              $(".targetList_clear").show();
+              toggleDisabled($("input[id='" + _selfForm.targetNameFieldID + "']"), true);
+            }
+            else
+            {
+              toggleDisabled($("input[id='" + _selfForm.targetNameFieldID + "']"), false);
+            }
+          }).change();
 
       // Those items with associated fields that will be disabled as an 'OR'
       // field.
@@ -619,61 +607,57 @@
         var $thisElement = $(this);
         var thisValue = $thisElement.val();
 
-        toggleDisabled($("[id='" + $thisElement.data("assoc-field") + "']"),
-                       ((thisValue !== null) && ($.trim(thisValue) !== '')));
+        toggleDisabled($("[id='" + $thisElement.data("assoc-field") + "']"), stringUtil.hasText(thisValue));
       }).change();
 
       $("input.ui-autocomplete-input").each(
-        function ()
-        {
-          var id = $(this).prop("id");
+          function ()
+          {
+            var id = $(this).prop("id");
 
-          // Create arrays for response objects.
-          var suggestionKeys = [];
+            // Create arrays for response objects.
+            var suggestionKeys = [];
 
-          $(this).autocomplete(
-            {
-              // Define the minimum search string length
-              // before the suggested values are shown.
-              minLength: 2,
+            $(this).autocomplete(
+                {
+                  // Define the minimum search string length
+                  // before the suggested values are shown.
+                  minLength: 2,
 
-              // Define callback to format results
-              source: function (req, callback)
-              {
-                // Reset each time as they type.
-                suggestionKeys.length = 0;
+                  // Define callback to format results
+                  source: function (req, callback)
+                  {
+                    // Reset each time as they type.
+                    suggestionKeys.length = 0;
 
-                var field =
-                  ca.nrc.cadc.search.AUTOCOMPLETE_TAP_REQUEST_DATA.fields[id];
-                var defaultData =
-                  ca.nrc.cadc.search.AUTOCOMPLETE_TAP_REQUEST_DATA.payload;
-                var payload =
-                  $.extend({}, defaultData,
-                           {
-                             "QUERY": new cadc.web.util.StringUtil(
-                               defaultData.QUERY).format(field.tap_column,
-                                                         req.term.toLowerCase())
-                           });
+                    var field = ca.nrc.cadc.search.AUTOCOMPLETE_TAP_REQUEST_DATA.fields[id];
+                    var defaultData = ca.nrc.cadc.search.AUTOCOMPLETE_TAP_REQUEST_DATA.payload;
+                    var payload =
+                        $.extend({}, defaultData,
+                                 {
+                                   "QUERY": stringUtil.format(defaultData.QUERY, [field.tap_column,
+                                                                                  req.term.toLowerCase()])
+                                 });
 
-                $.get(ca.nrc.cadc.search.AUTOCOMPLETE_TAP_REQUEST_DATA.endpoint,
-                      payload).done(function (csvData)
-                                    {
-                                      var csvArray = csvData.split('\n');
-                                      if (csvArray.length > 1)
-                                      {
-                                        suggestionKeys = csvArray.slice(1);
-                                        callback(suggestionKeys);
-                                      }
-                                    });
-              },
-              select: function (event, ui)
-              {
-                var val = ui.item.value;
-                var index = $.inArray(val, suggestionKeys);
-                ui.item.value = suggestionKeys[index];
-              }
-            });
-        });
+                    $.get(ca.nrc.cadc.search.AUTOCOMPLETE_TAP_REQUEST_DATA.endpoint,
+                          payload).done(function (csvData)
+                                        {
+                                          var csvArray = csvData.split('\n');
+                                          if (csvArray.length > 1)
+                                          {
+                                            suggestionKeys = csvArray.slice(1);
+                                            callback(suggestionKeys);
+                                          }
+                                        });
+                  },
+                  select: function (event, ui)
+                  {
+                    var val = ui.item.value;
+                    var index = $.inArray(val, suggestionKeys);
+                    ui.item.value = suggestionKeys[index];
+                  }
+                });
+          });
 
       // Click on the tooltip example, and update the representative field.
       $(document).on("click", "a.advanced_search_tooltip_example", function ()
@@ -700,23 +684,22 @@
                                                  {
                                                    var $checkbox = $(this);
                                                    var dataItem =
-                                                     $checkbox.data("disable-to");
+                                                       $checkbox.data("disable-to");
 
                                                    getForm().find("[id='"
                                                                   + dataItem
-                                                                  + "']").prop(
-                                                                    "disabled",
-                                                                    $checkbox.is(":checked"));
+                                                                  +
+                                                                  "']").prop("disabled",
+                                                                             $checkbox.is(
+                                                                                 ":checked"));
                                                  });
 
       $("select.resolver_select").change(function ()
                                          {
                                            var $resolverSelectName = $(this).prop("name");
                                            var $fieldID =
-                                             $resolverSelectName.substring(0, $resolverSelectName.indexOf("@"));
-                                           searchCriteriaChanged($("input[id='"
-                                                                   + $fieldID
-                                                                   + "']"));
+                                               $resolverSelectName.substring(0, $resolverSelectName.indexOf("@"));
+                                           searchCriteriaChanged($("input[id='" + $fieldID + "']"));
                                          });
 
       getForm().find(".targetList_clear").click(function ()
@@ -727,13 +710,9 @@
       // Prevent closing details when a value is present.
       $("details[id$='_details'] summary").click(function (event)
                                                  {
-                                                   var $detailsElement =
-                                                     $(this).parent("details");
-                                                   var $inputElements =
-                                                     $detailsElement.find(
-                                                       "input.search_criteria_input");
-                                                   var isOpen =
-                                                     $detailsElement.prop("open");
+                                                   var $detailsElement = $(this).parent("details");
+                                                   var $inputElements = $detailsElement.find("input.search_criteria_input");
+                                                   var isOpen = $detailsElement.prop("open");
 
                                                    if (isOpen)
                                                    {
@@ -743,22 +722,17 @@
                                                             function (inputElementKey, inputElement)
                                                             {
                                                               var $inputElement =
-                                                                $(inputElement);
+                                                                  $(inputElement);
 
-                                                              if ($inputElement
-                                                                  &&
-                                                                  $inputElement.val()
-                                                                  &&
-                                                                  ($inputElement.val() !=
-                                                                   ""))
+                                                              if ($inputElement && $inputElement.val()
+                                                                  && ($inputElement.val() !== ""))
                                                               {
                                                                 // Disallow
                                                                 // closure when
                                                                 // value
                                                                 // present.
                                                                 event.preventDefault();
-                                                                canProceed =
-                                                                  false;
+                                                                canProceed = false;
 
                                                                 // Break out of
                                                                 // the loop.
@@ -797,62 +771,53 @@
       getForm().submit(formSubmit);
 
       getTargetNameResolutionStatusObject().tooltipster(
-        {
-          arrow: false,
-          theme: "tooltipster-advanced-search-resolver",
-          position: "left",
-          maxWidth: 170,
-          offsetX: 230,
-          trigger: "click",
-          interactive: true,
-          repositionOnResize: false,
-          repositionOnScroll: false,
-          onlyOne: false
-        });
+          {
+            arrow: false,
+            theme: "tooltipster-advanced-search-resolver",
+            position: "left",
+            maxWidth: 170,
+            offsetX: 230,
+            trigger: "click",
+            interactive: true,
+            repositionOnResize: false,
+            repositionOnScroll: false,
+            onlyOne: false
+          });
 
       subscribe(ca.nrc.cadc.search.events.onTargetNameResolved,
                 function (event, args)
                 {
-                  var $targetNameResolutionStatus =
-                    getTargetNameResolutionStatusObject();
+                  var $targetNameResolutionStatus = getTargetNameResolutionStatusObject();
                   var data = args.data;
                   $targetNameResolutionStatus.addClass("target_ok");
-                  var tooltipCreator =
-                    new ca.nrc.cadc.search.TooltipCreator();
+                  var tooltipCreator = new ca.nrc.cadc.search.TooltipCreator();
                   tooltipCreator.extractResolverValue(data.resolveValue);
-                  var $resolverTooltip =
-                    getForm().find(".resolver-result-tooltip");
-                  var $tooltipContainer =
-                    tooltipCreator.getContent($resolverTooltip.html(),
-                                              "", // title blank
-                                              "resolver-result-tooltip-text",
-                                              $targetNameResolutionStatus);
+                  var $resolverTooltip = getForm().find(".resolver-result-tooltip");
+                  var $tooltipContainer = tooltipCreator.getContent($resolverTooltip.html(),
+                                                                    "", // title blank
+                                                                    "resolver-result-tooltip-text",
+                                                                    $targetNameResolutionStatus);
 
-                  $targetNameResolutionStatus.tooltipster("content",
-                                                          $tooltipContainer);
-
+                  $targetNameResolutionStatus.tooltipster("content", $tooltipContainer);
                   $targetNameResolutionStatus.tooltipster("show");
 
                   // Make them draggable.
                   $(".tooltipster-advanced-search-resolver").draggable(
-                    {
-                      handle: ".tooltip_header",
-                      snap: true,
-                      revert: false
-                    });
+                      {
+                        handle: ".tooltip_header",
+                        snap: true,
+                        revert: false
+                      });
                 });
 
       subscribe(ca.nrc.cadc.search.events.onTargetNameUnresolved,
                 function (event, args)
                 {
-                  var $targetNameResolutionStatus =
-                    getTargetNameResolutionStatusObject();
+                  var $targetNameResolutionStatus = getTargetNameResolutionStatusObject();
                   var data = args.data;
 
                   $targetNameResolutionStatus.addClass("target_not_found");
-                  decorate($targetNameResolutionStatus,
-                           $.parseJSON('{"status":"' + data.resolveStatus
-                                       + '"}'));
+                  decorate($targetNameResolutionStatus, $.parseJSON('{"status":"' + data.resolveStatus + '"}'));
                 });
 
       getDataTrain().init();
@@ -878,12 +843,12 @@
                                                       {
                                                         var $liItem = $(liElement);
                                                         var $tooltipHeader =
-                                                          $liItem.find("summary.search_criteria_label_container");
+                                                            $liItem.find("summary.search_criteria_label_container");
                                                         var tooltipHeaderText = $tooltipHeader.text();
                                                         var $searchInputItem =
-                                                          $liItem.find(".search_criteria_input:first");
+                                                            $liItem.find(".search_criteria_input:first");
                                                         var $inputID =
-                                                          $searchInputItem.prop("id");
+                                                            $searchInputItem.prop("id");
                                                         var tipJSON = jsonData[$inputID];
 
                                                         if (tipJSON &&
@@ -896,13 +861,13 @@
                                                           if ($liItem.hasClass("label_tooltip_right"))
                                                           {
                                                             tipsterPlacement =
-                                                              "right";
+                                                                "right";
                                                             offsetX = -12;
                                                           }
                                                           else
                                                           {
                                                             tipsterPlacement =
-                                                              "left";
+                                                                "left";
                                                             offsetX = 240;
                                                           }
 
@@ -951,10 +916,10 @@
                                                               "Plane.position.bounds")
                                                           {
                                                             _selfForm.targetTooltipsters =
-                                                              _selfForm.targetTooltipsters.concat(tipster);
+                                                                _selfForm.targetTooltipsters.concat(tipster);
                                                           }
 
-                                                          $ttIconImg.hover(function (e)
+                                                          $ttIconImg.hover(function ()
                                                                            {
                                                                              var $thisSpan = $(this);
 
@@ -963,7 +928,7 @@
 
                                                                              return false;
                                                                            },
-                                                                           function (e)
+                                                                           function ()
                                                                            {
                                                                              var $thisSpan = $(this);
 
@@ -981,11 +946,11 @@
                                                             // Make them
                                                             // draggable.
                                                             $(".tooltipster-advanced-search").draggable(
-                                                              {
-                                                                handle: ".tooltip_header",
-                                                                snap: true,
-                                                                revert: false
-                                                              });
+                                                                {
+                                                                  handle: ".tooltip_header",
+                                                                  snap: true,
+                                                                  revert: false
+                                                                });
 
                                                             return false;
                                                           });
@@ -1004,7 +969,7 @@
       var autocompleteURL = ca.nrc.cadc.search.AUTOCOMPLETE_ENDPOINT + id;
       var hasValue = ((value !== "") && (value !== null));
 
-      if (id == _selfForm.targetNameFieldID)
+      if (id === _selfForm.targetNameFieldID)
       {
         // input text field disabled implies file has been chosen
         if (!$("input[id='" + id + "']").prop("disabled"))
@@ -1015,7 +980,7 @@
         toggleDisabled($("input[id='" + id + "_targetList']"), hasValue);
 
         var resolver = getForm().find(
-          "select.resolver_select option:selected").val();
+            "select.resolver_select option:selected").val();
 
         if (hasValue && (resolver !== "NONE"))
         {
@@ -1023,45 +988,43 @@
 
           // Give the user a little more time to type stuff in.
           _selfForm.currentTimeoutID = window.setTimeout(
-            function ()
-            {
-              clearTargetNameResolutionStatusOnly();
+              function ()
+              {
+                clearTargetNameResolutionStatusOnly();
 
-              var $targetNameResolutionStatus =
-                getTargetNameResolutionStatusObject();
+                var $targetNameResolutionStatus =
+                    getTargetNameResolutionStatusObject();
 
-              $targetNameResolutionStatus.addClass("busy");
+                $targetNameResolutionStatus.addClass("busy");
 
-              $.getJSON(autocompleteURL, {term: value, resolver: resolver},
-                        function (data)
-                        {
-                          $targetNameResolutionStatus.removeClass("busy");
-                          clearTargetNameResolutionTooltip();
-
-                          // Was input text cleared before the event arrived?
-                          if ($.trim($("input[id='" + id + "']").val()).length >
-                              0)
+                $.getJSON(autocompleteURL, {term: value, resolver: resolver},
+                          function (data)
                           {
-                            var arg =
-                            {
-                              "data": data,
-                              "id": id
-                            };
+                            $targetNameResolutionStatus.removeClass("busy");
+                            clearTargetNameResolutionTooltip();
 
-                            // no, check resolve status
-                            if (data.resolveStatus === "GOOD")
+                            // Was input text cleared before the event arrived?
+                            if ($.trim($("input[id='" + id + "']").val()).length >
+                                0)
                             {
-                              trigger(ca.nrc.cadc.search.events.onTargetNameResolved,
-                                      arg);
+                              var arg =
+                                  {
+                                    "data": data,
+                                    "id": id
+                                  };
+
+                              // no, check resolve status
+                              if (data.resolveStatus === "GOOD")
+                              {
+                                trigger(ca.nrc.cadc.search.events.onTargetNameResolved, arg);
+                              }
+                              else
+                              {
+                                trigger(ca.nrc.cadc.search.events.onTargetNameUnresolved, arg);
+                              }
                             }
-                            else
-                            {
-                              trigger(ca.nrc.cadc.search.events.onTargetNameUnresolved,
-                                      arg);
-                            }
-                          }
-                        });
-            }, 700);
+                          });
+              }, 700);
         }
         else
         {
@@ -1125,7 +1088,7 @@
         // Just use the file name instead.
         var mPos = value.lastIndexOf('\\');
 
-        if (mPos == -1)
+        if (mPos === -1)
         {
           mPos = value.lastIndexOf('/');
         }
@@ -1161,12 +1124,12 @@
                                 ca.nrc.cadc.search.OBSCORE_TARGET_NAME_FIELD_ID))
                         {
                           maxLength =
-                            ca.nrc.cadc.search.TARGET_FORM_LABEL_INPUT_LENGTH;
+                              ca.nrc.cadc.search.TARGET_FORM_LABEL_INPUT_LENGTH;
                         }
                         else
                         {
                           maxLength =
-                            ca.nrc.cadc.search.FORM_LABEL_INPUT_LENGTH;
+                              ca.nrc.cadc.search.FORM_LABEL_INPUT_LENGTH;
                         }
 
                         if (elementValue.length > maxLength)
@@ -1221,7 +1184,7 @@
 
     function isActive(_formID)
     {
-      return _formID == getID();
+      return _formID === getID();
     }
 
     function getValidator()
@@ -1272,7 +1235,7 @@
 
       $thisForm.find("input:text").each(function ()
                                         {
-                                          if ($(this).val() != '')
+                                          if ($(this).val() !== "")
                                           {
                                             valid = true;
                                           }
@@ -1280,12 +1243,22 @@
 
       if (!valid)
       {
+        $thisForm.find("input.form-extra").each(function ()
+                                                {
+                                                  if ($(this).val() !== "")
+                                                  {
+                                                    valid = true;
+                                                  }
+                                                });
+      }
+
+      if (!valid)
+      {
         $thisForm.find("select.hierarchy_select :selected").each(function ()
                                                                  {
                                                                    if (!$(this).text().match(/^All/))
                                                                    {
-                                                                     valid =
-                                                                       true;
+                                                                     valid = true;
                                                                    }
                                                                  });
       }
@@ -1294,7 +1267,7 @@
       {
         $thisForm.find("input:hidden#target").each(function ()
                                                    {
-                                                     if ($(this).val() != '')
+                                                     if ($(this).val() !== "")
                                                      {
                                                        valid = true;
                                                      }
@@ -1305,8 +1278,7 @@
       {
         $thisForm.find("input:hidden#collection").each(function ()
                                                        {
-                                                         if ($(this).val() !=
-                                                             '')
+                                                         if ($(this).val() !== "")
                                                          {
                                                            valid = true;
                                                          }
@@ -1317,7 +1289,7 @@
       {
         $thisForm.find("select.preset-date").each(function ()
                                                   {
-                                                    if ($(this).val() != '')
+                                                    if ($(this).val() !== "")
                                                     {
                                                       valid = true;
                                                     }
@@ -1326,7 +1298,7 @@
 
       $thisForm.find("input:file").each(function ()
                                         {
-                                          if ($(this).val() != '')
+                                          if ($(this).val() !== "")
                                           {
                                             valid = true;
                                           }
@@ -1385,7 +1357,7 @@
 
       var targetListID = $targetList.attr("id");
       var utypeValue =
-        targetListID.substring(0, targetListID.indexOf("_targetList"));
+          targetListID.substring(0, targetListID.indexOf("_targetList"));
 
       toggleDisabled($("input[id='" + utypeValue + "']"), false);
       toggleDisabled($targetList, false);
@@ -1498,9 +1470,17 @@
     }
 
     /**
+     * Hide all of the tooltips.  This is used when the form is submitted.
+     */
+    function closeAllTooltips()
+    {
+      var selector = "." + tooltipIconCSS;
+      $(selector).tooltipster("hide");
+    }
+
+    /**
      * Action to perform before form serialization begins.
      */
-//    function beforeSerialize(arr, $form, options)
     function beforeSerialize()
     {
       $("#UPLOAD").remove();
@@ -1516,17 +1496,14 @@
 
         getForm().append(upload);
 
-        // Update the file input name with the value from the target list
-        // select.
-        var resolver =
-          $("select[id='Plane.position.bounds@Shape1Resolver.value']").val();
+        // Update the file input name with the value from the target list select.
+        var resolver = $("select[id='Plane.position.bounds@Shape1Resolver.value']").val();
 
         inputFile.prop('name', 'targetList.' + resolver);
       }
 
       // Save the form to sessionStorage.
 
-      // Observation.observationID=val1&Plane.position.bounds=m101
       sessionStorage.setItem('form_data', getForm().serialize());
       sessionStorage.setItem('isReload', false);
     }
@@ -1535,8 +1512,7 @@
                     {
                       // if time between unload and ready is short (1 second or
                       // less), page is reloaded
-                      if (($.now() - sessionStorage.getItem('unloadTime')) <
-                          1000)
+                      if (($.now() - sessionStorage.getItem('unloadTime')) < 1000)
                       {
                         sessionStorage.setItem('isReload', true);
                       }
@@ -1548,15 +1524,6 @@
                        sessionStorage.setItem('unloadTime', $.now());
                        sessionStorage.setItem('isReload', false);
                      });
-
-    /**
-     * Hide all of the tooltips.  This is used when the form is submitted.
-     */
-    function closeAllTooltips()
-    {
-      var cssSelector = '.' + tooltipIconCSS;
-      $(cssSelector).tooltipster('hide');
-    }
 
     function formSubmit(event)
     {
@@ -1578,7 +1545,6 @@
                       _selfForm.targetTooltipsters[1].enable();
                     }
                   });
-
         var inputFile = $("input:file");
         var isUpload = (inputFile && (inputFile.val() !== ""));
         toggleDisabled($("input[name='targetList']"), false);
@@ -1587,8 +1553,7 @@
 
         try
         {
-          $("input." + getConfiguration().getName() + "_selectlist").val(
-            getConfiguration().getSelectListString(false));
+          $("input." + getConfiguration().getName() + "_selectlist").val(getConfiguration().getSelectListString(false));
         }
         catch (e)
         {
@@ -1597,62 +1562,65 @@
         }
 
         getForm().ajaxSubmit(
-          {
-            url: "/search/find",
-            target: "#file_upload_response",
-            dataType: "json",
-            beforeSubmit: beforeSerialize,
-            success: function (json, textStatus, request)
             {
-              getForm().find("input:hidden#target").remove();
-              getForm().find("input:hidden#collection").remove();
-
-              _selfForm.currentRequest = null;
-
-              var args =
+              url: "/AdvancedSearch/find",
+              target: "#file_upload_response",
+              dataType: "json",
+              beforeSubmit: beforeSerialize,
+              success: function (json)
               {
-                "data": json,
-                "success": true,
-                "startDate": netStart,
-                "cadcForm": _selfForm
-              };
+                getForm().find("input:hidden#target").remove();
+                getForm().find("input:hidden#collection").remove();
 
-              trigger(ca.nrc.cadc.search.events.onSubmitComplete, args);
-            },
-            error: function (request, textStatus, data)
-            {
-              console.error("Error: " + request.responseText);
+                _selfForm.currentRequest = null;
 
-              trigger(ca.nrc.cadc.search.events.onSubmitComplete,
-                      {
-                        "error_url": request.responseText,
-                        "success": false,
-                        "startDate": netStart,
-                        "cadcForm": _selfForm
-                      });
-            },
-            complete: function (request, textStatus, data)
-            {
-              if (textStatus === 'timeout')
+                var args =
+                    {
+                      "data": json,
+                      "success": true,
+                      "startDate": netStart,
+                      "cadcForm": _selfForm
+                    };
+
+                trigger(ca.nrc.cadc.search.events.onSubmitComplete, args);
+              },
+              error: function (request)
               {
-                alert("The search took too long to return.\n" +
-                      "Please refine your search or try again later.");
+                console.error("Error: " + request.responseText);
 
                 trigger(ca.nrc.cadc.search.events.onSubmitComplete,
                         {
+                          "error_url": request.responseText,
                           "success": false,
                           "startDate": netStart,
-                          "cadcForm": _selfForm,
-                          "error": {
-                            status: request.status,
-                            message: textStatus
-                          }
+                          "cadcForm": _selfForm
                         });
-              }
-            },
-            iframe: isUpload,
-            xhr: createRequest
-          });
+              },
+              complete: function (request, textStatus)
+              {
+                // Remove non-form inputs to prevent confusion with further queries.
+                getForm().find("input.form-extra").remove();
+
+                if (textStatus === "timeout")
+                {
+                  alert("The search took too long to return.\n" +
+                        "Please refine your search or try again later.");
+
+                  trigger(ca.nrc.cadc.search.events.onSubmitComplete,
+                          {
+                            "success": false,
+                            "startDate": netStart,
+                            "cadcForm": _selfForm,
+                            "error": {
+                              status: request.status,
+                              message: textStatus
+                            }
+                          });
+                }
+              },
+              iframe: isUpload,
+              xhr: createRequest
+            });
       }
     }
 
@@ -1668,22 +1636,22 @@
       clearTargetList();
 
       getForm().find("select.search_criteria_input").each(
-        function ()
-        {
-          var $selectCriteria = $(this);
-          $selectCriteria.val("");
-          toggleDisabled($selectCriteria, false);
-        });
+          function ()
+          {
+            var $selectCriteria = $(this);
+            $selectCriteria.val("");
+            toggleDisabled($selectCriteria, false);
+          });
 
       getForm().find('input.search_criteria_input').each(
-        function ()
-        {
-          var $formItem = $(this);
-          $("label[for='" + $formItem.attr("id") +
-            "']").prev("summary").children("span.search_criteria_label_contents").text("");
-          toggleDisabled($formItem, false);
-          closeDetailsItem($formItem.parents("details"));
-        });
+          function ()
+          {
+            var $formItem = $(this);
+            $("label[for='" + $formItem.attr("id") +
+              "']").prev("summary").children("span.search_criteria_label_contents").text("");
+            toggleDisabled($formItem, false);
+            closeDetailsItem($formItem.parents("details"));
+          });
 
       clearTargetNameResolutionStatus();
       clearDisablingCheckboxes();
@@ -1712,8 +1680,7 @@
 
     function setSelectValue(_uTypeID, _selectID, _optionValue)
     {
-      var $detailsItem =
-        getForm().find("details[id='" + _uTypeID + "_details']");
+      var $detailsItem = getForm().find("details[id='" + _uTypeID + "_details']");
 
       // Only proceed if a valid input ID was passed in.
       if ($detailsItem)
@@ -1742,17 +1709,15 @@
     function setInputValue(_inputID, _inputValue)
     {
       var $inputItem = getForm().find("input[id='" + _inputID + "']");
+      var $formItem = getForm().find("[id='" + _inputID + "']");
 
-      // Only proceed if a valid input ID was passed in.
-      if ($inputItem)
+      if ($inputItem.length > 0)
       {
         if ($inputItem.is(":checkbox"))
         {
           // Default value is checked.
           var checkedFlag = ((_inputValue === true)
-                             ||
-                             ca.nrc.cadc.search.CHECKBOX_CHECKED_REGEX.test($.trim(_inputValue))
-                             || !_inputValue);
+                             || ca.nrc.cadc.search.CHECKBOX_CHECKED_REGEX.test($.trim(_inputValue)) || !_inputValue);
           $inputItem.prop("checked", checkedFlag);
         }
         else
@@ -1760,8 +1725,7 @@
           $inputItem.val(_inputValue).change();
         }
 
-        var $detailsItem =
-          getForm().find("details[id='" + _inputID + "_details']");
+        var $detailsItem = getForm().find("details[id='" + _inputID + "_details']");
 
         if (_inputValue)
         {
@@ -1771,6 +1735,18 @@
         {
           closeDetailsItem($detailsItem);
         }
+      }
+      // The "collection" word is grandfathered in, so ignore it...
+      else if (($formItem.length === 0) && (_inputID !== "collection"))
+      {
+        // If there is no input, then create one and assume the user knows what they're doing.
+        var $newHidden = $("<input>").attr("type", "hidden").attr("name", _inputID).val(_inputValue)
+            .addClass("form-extra");
+        var $newHiddenFormName = $("<input>").attr("type", "hidden").attr("name", "Form.name").val(_inputID + "@Text")
+            .addClass("form-extra");
+
+        getForm().append($newHidden);
+        getForm().append($newHiddenFormName);
       }
     }
 
@@ -1786,8 +1762,7 @@
     {
       var $options = _$select.find("option").filter(function ()
                                                     {
-                                                      return _selectValues.indexOf($(this).val()) >=
-                                                             0;
+                                                      return _selectValues.indexOf($(this).val()) >= 0;
                                                     }).prop("selected", true);
 
       _$select.val(_selectValues);

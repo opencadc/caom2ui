@@ -248,7 +248,7 @@
     /**
      * Return a single value for a key.
      *
-     * @returns {{String}}  value or null.
+     * @returns {String|null}  value or null.
      */
     function getQueryValue(_key)
     {

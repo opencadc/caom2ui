@@ -14,16 +14,16 @@ import java.util.List;
  */
 public class ObsCoreListQueryGenerator implements SearchTemplateQueryGenerator
 {
-    private ADQLImpl adqlImpl;
+    private ADQLGenerator adqlGenerator;
 
     ObsCoreListQueryGenerator(final String upload,
                               final String uploadResolver,
                               final String targetNameField,
                               final String targetCoordField)
     {
-        this.adqlImpl = new ADQLImpl("ivoa.obscore", upload,
-                                     uploadResolver, targetNameField,
-                                     targetCoordField);
+        this.adqlGenerator = new ADQLGenerator("ivoa.obscore", upload,
+                                               uploadResolver, targetNameField,
+                                               targetCoordField);
     }
 
     /**
@@ -40,12 +40,12 @@ public class ObsCoreListQueryGenerator implements SearchTemplateQueryGenerator
         final StringBuilder sb = new StringBuilder();
 
         sb.append("SELECT ");
-        sb.append(adqlImpl.getSelectList(selectClause));
+        sb.append(adqlGenerator.getSelectList(selectClause));
         sb.append(" FROM ");
-        sb.append(adqlImpl.getSchema());
+        sb.append(adqlGenerator.getSchema());
         sb.append(" ");
 
-        final String where = adqlImpl.getWhere(templates);
+        final String where = adqlGenerator.getWhere(templates);
 
         if (where != null)
         {

@@ -17,4 +17,4 @@ COPY *.war webapps/
 
 VOLUME /root/config
 
-COPY org.opencadc.caom2ui.properties /root/config/
+COPY org.opencadc.search.properties /root/config/

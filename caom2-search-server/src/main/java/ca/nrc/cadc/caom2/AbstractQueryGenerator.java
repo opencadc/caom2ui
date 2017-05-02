@@ -41,12 +41,12 @@ import ca.nrc.cadc.uws.ParameterUtil;
 import java.util.List;
 
 
-public abstract class AbstractQueryGeneratorImpl implements QueryGenerator
+public abstract class AbstractQueryGenerator implements QueryGenerator
 {
     private final Job job;
 
 
-    AbstractQueryGeneratorImpl(final Job job)
+    AbstractQueryGenerator(final Job job)
     {
         this.job = job;
     }
@@ -69,8 +69,7 @@ public abstract class AbstractQueryGeneratorImpl implements QueryGenerator
 
     private String getParameterValue(final String key)
     {
-        return ParameterUtil.findParameterValue(key,
-                                                getJob().getParameterList());
+        return ParameterUtil.findParameterValue(key, getJob().getParameterList());
     }
 
     StringBuilder generate(final SearchTemplateQueryGenerator queryGenerator,

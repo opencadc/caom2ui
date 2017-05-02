@@ -37,14 +37,17 @@ import ca.nrc.cadc.search.Templates;
 import ca.nrc.cadc.uws.Job;
 
 
-public class ObsCoreQueryGeneratorImpl extends AbstractQueryGeneratorImpl
+/**
+ * Query generator for ObsCore fields.
+ */
+public class ObsCoreQueryGenerator extends AbstractQueryGenerator
 {
     /**
      * Only available constructor.
      *
      * @param job       The job being submitted.
      */
-    public ObsCoreQueryGeneratorImpl(final Job job)
+    public ObsCoreQueryGenerator(final Job job)
     {
         super(job);
     }
@@ -60,8 +63,7 @@ public class ObsCoreQueryGeneratorImpl extends AbstractQueryGeneratorImpl
     public StringBuilder generate(final Templates templates)
     {
         final ObsCoreListQueryGenerator queryGenerator =
-                new ObsCoreListQueryGenerator(getUpload(), getUploadResolver(),
-                                              "target_name",
+                new ObsCoreListQueryGenerator(getUpload(), getUploadResolver(), "target_name",
                                               "s_fov");
 
         return generate(queryGenerator, templates.getSearchTemplates());

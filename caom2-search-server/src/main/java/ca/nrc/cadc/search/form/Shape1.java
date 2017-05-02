@@ -28,6 +28,7 @@
 package ca.nrc.cadc.search.form;
 
 import ca.nrc.cadc.caom2.RangeSearch;
+
 import java.util.List;
 
 import ca.nrc.cadc.search.parser.resolver.ResolverImpl;
@@ -51,54 +52,54 @@ import ca.nrc.cadc.search.parser.Resolver;
 import ca.nrc.cadc.search.parser.TargetParser;
 import ca.nrc.cadc.search.parser.TargetData;
 import ca.nrc.cadc.search.parser.exception.TargetParserException;
-import ca.nrc.cadc.search.TargetNameResolverClientImpl;
+import ca.nrc.cadc.search.DefaultNameResolverClient;
 import ca.nrc.cadc.util.CaseInsensitiveStringComparator;
 import ca.nrc.cadc.uws.Job;
 import ca.nrc.cadc.uws.Parameter;
+
 import java.awt.geom.Point2D;
+
 import jsky.coords.wcscon;
 
 
 /**
- * Class to represent a Shape1 form component. 
- * 
- * @author jburke
+ * Class to represent a Shape1 form component.
  *
+ * @author jburke
  */
-public class Shape1 extends AbstractFormConstraint
-        implements SearchableFormConstraint
+public class Shape1 extends AbstractFormConstraint implements SearchableFormConstraint
 {
     private static Logger log = Logger.getLogger(Shape1.class);
 
     // Constants used to construct name for form elements
     public static final String NAME = "@Shape1";
     public static final String VALUE = "@Shape1.value";
-//    public static final String RESOLVER_NAME = "@Shape1Resolver";
+    //    public static final String RESOLVER_NAME = "@Shape1Resolver";
     public static final String RESOLVER_VALUE = "@Shape1Resolver.value";
 
     // Shape1 ra
     private Double ra;
     private Range<Double> raRange;
-    
+
     // Shape1 dec
     private Double dec;
     private Range<Double> decRange;
-    
+
     // Shape1 radius
     private Double radius;
-    
+
     // Shape1 coordsys
     private String coordsys;
-    
+
     // Shape1 resolver
     private String resolverName;
 
-    
+
     /**
      * Shape1 constructor instantiates a new instance with the request parameter.
-     * 
-     * @param job       The servlet request.
-     * @param utype     The utype of the form.
+     *
+     * @param job   The servlet request.
+     * @param utype The utype of the form.
      */
     public Shape1(final Job job, final String utype)
     {
@@ -139,7 +140,7 @@ public class Shape1 extends AbstractFormConstraint
             if (hasShapeData())
             {
                 final Shape s;
-    
+
                 if ((getRadius() != null) && (getRadius() > 0))
                 {
                     s = new Circle(new Point(getRA(), getDec()), getRadius());
@@ -148,7 +149,7 @@ public class Shape1 extends AbstractFormConstraint
                 {
                     s = new Location(new Point(getRA(), getDec()));
                 }
-    
+
                 searchTemplate = new SpatialSearch(getUType(), s);
             }
             else if (hasRangeData())
@@ -157,14 +158,14 @@ public class Shape1 extends AbstractFormConstraint
                 final Double raUpper = normalizeRA(getRARange().getUpperValue());
                 final Double decLower = normalizeDec(getDecRange().getLowerValue());
                 final Double decUpper = normalizeDec(getDecRange().getUpperValue());
-                    
+
                 final CaseInsensitiveStringComparator comparator =
-                                        new CaseInsensitiveStringComparator();
+                        new CaseInsensitiveStringComparator();
                 if ((getCoordsys() != null) &&
                     ((comparator.compare(getCoordsys(), CoordSys.FK4.getValue()) == 0) ||
-                    (comparator.compare(getCoordsys(), CoordSys.B1950.getValue()) == 0) ||
-                    (comparator.compare(getCoordsys(), CoordSys.B1950_0.getValue()) == 0) ||
-                    (comparator.compare(getCoordsys(), CoordSys.GAL.getValue()) == 0)))
+                     (comparator.compare(getCoordsys(), CoordSys.B1950.getValue()) == 0) ||
+                     (comparator.compare(getCoordsys(), CoordSys.B1950_0.getValue()) == 0) ||
+                     (comparator.compare(getCoordsys(), CoordSys.GAL.getValue()) == 0)))
                 {
                     Polygon polygon = new Polygon();
                     polygon.getVertices().add(new Vertex(raLower, decLower, SegmentType.MOVE));
@@ -172,12 +173,12 @@ public class Shape1 extends AbstractFormConstraint
                     polygon.getVertices().add(new Vertex(raUpper, decUpper, SegmentType.LINE));
                     polygon.getVertices().add(new Vertex(raLower, decUpper, SegmentType.LINE));
                     polygon.getVertices().add(new Vertex(0.0, 0.0, SegmentType.CLOSE));
-            
+
                     Point2D point;
                     for (int i = 0; i < polygon.getVertices().size(); i++)
                     {
                         final Vertex vertex = polygon.getVertices().get(i);
-                        if ( !SegmentType.CLOSE.equals(vertex.getType()) )
+                        if (!SegmentType.CLOSE.equals(vertex.getType()))
                         {
                             if (comparator.compare(getCoordsys(), CoordSys.GAL.getValue()) == 0)
                             {
@@ -200,62 +201,62 @@ public class Shape1 extends AbstractFormConstraint
                     {
                         final Double value = normalizeRA(getRARange().getValue());
                         setRARange(new Range<>(getRARange().getRange(),
-                                                     getRARange().getValue(), 
-                                                     value, value, raOperand));
+                                               getRARange().getValue(),
+                                               value, value, raOperand));
                     }
                     else if (raOperand == Operand.GREATER_THAN ||
                              raOperand == Operand.GREATER_THAN_EQUALS)
                     {
                         setRARange(new Range<>(getRARange().getRange(),
-                                                     getRARange().getValue(), 
-                                                     raLower, 360d, raOperand));
+                                               getRARange().getValue(),
+                                               raLower, 360d, raOperand));
                     }
                     else if (raOperand == Operand.LESS_THAN ||
                              raOperand == Operand.LESS_THAN_EQUALS)
                     {
                         setRARange(new Range<>(getRARange().getRange(),
-                                                     getRARange().getValue(), 
-                                                     0d, raUpper, raOperand));
+                                               getRARange().getValue(),
+                                               0d, raUpper, raOperand));
                     }
                     else if (raOperand == Operand.RANGE)
                     {
                         setRARange(new Range<>(getRARange().getRange(),
-                                                     getRARange().getValue(), 
-                                                     raLower, raUpper, raOperand));
+                                               getRARange().getValue(),
+                                               raLower, raUpper, raOperand));
                     }
-                    
+
                     final Operand decOperand = getDecRange().getOperand();
                     if (decOperand == Operand.EQUALS)
                     {
                         final Double value = normalizeDec(getDecRange().getValue());
                         setDecRange(new Range<>(getDecRange().getRange(),
-                                                      getDecRange().getValue(), 
-                                                      value, value, decOperand));
+                                                getDecRange().getValue(),
+                                                value, value, decOperand));
                     }
                     else if (decOperand == Operand.GREATER_THAN ||
                              decOperand == Operand.GREATER_THAN_EQUALS)
                     {
                         setDecRange(new Range<>(getDecRange().getRange(),
-                                                      getDecRange().getValue(), 
-                                                      decLower, 90d, decOperand));
+                                                getDecRange().getValue(),
+                                                decLower, 90d, decOperand));
                     }
                     else if (decOperand == Operand.LESS_THAN ||
                              decOperand == Operand.LESS_THAN_EQUALS)
                     {
                         setDecRange(new Range<>(getDecRange().getRange(),
-                                                      getDecRange().getValue(), 
-                                                      -90d, decUpper, decOperand));
+                                                getDecRange().getValue(),
+                                                -90d, decUpper, decOperand));
                     }
                     else if (decOperand == Operand.RANGE)
                     {
                         setDecRange(new Range<>(getDecRange().getRange(),
-                                                      getDecRange().getValue(), 
-                                                      decLower, decUpper, decOperand));
+                                                getDecRange().getValue(),
+                                                decLower, decUpper, decOperand));
                     }
 
                     searchTemplate = new RangeSearch<>(getUType(),
-                                                             getRARange(),
-                                                             getDecRange());
+                                                       getRARange(),
+                                                       getDecRange());
                 }
             }
             else
@@ -273,19 +274,19 @@ public class Shape1 extends AbstractFormConstraint
             log.debug("Invalid Shape1 parameters: " + e.getMessage() + " "
                       + this.toString());
         }
-        
+
         return searchTemplate;
     }
-    
+
     /**
      * Shape1 is valid if the ra, dec, and radius have been
      * successfully parsed or resolved from the form value.
-     * 
+     *
      * @return boolean true if form values are valid, false otherwise.
      */
     @Override
     public boolean isValid(final FormErrors formErrors)
-    {        
+    {
         if (getFormValue().equals(""))
         {
             return false;
@@ -299,14 +300,14 @@ public class Shape1 extends AbstractFormConstraint
             {
                 final String target = getFormValue();
                 final Resolver resolver =
-                        new ResolverImpl(new TargetNameResolverClientImpl());
+                        new ResolverImpl(new DefaultNameResolverClient());
                 final TargetParser parser = new TargetParser(resolver);
                 final TargetData targetData = parser.parse(target,
                                                            resolverName);
-                
+
                 // A range creates a polygon which cannot have a radius.
                 // Assumes default radius from TargetParser is 0.0d
-                if (targetData.getRaRange() != null && 
+                if (targetData.getRaRange() != null &&
                     targetData.getDecRange() != null &&
                     targetData.getRadius() != 0.0d)
                 {
@@ -318,7 +319,7 @@ public class Shape1 extends AbstractFormConstraint
 
                 // For ranges, both RA and Dec must be a range.
                 if ((targetData.getRaRange() != null &&
-                    targetData.getDec() != null) ||
+                     targetData.getDec() != null) ||
                     (targetData.getDecRange() != null &&
                      targetData.getRA() != null))
                 {
@@ -341,13 +342,13 @@ public class Shape1 extends AbstractFormConstraint
                 }
                 else
                 {
-                    setRadius(targetData.getRadius());  
+                    setRadius(targetData.getRadius());
                 }
                 setRA(targetData.getRA());
                 setDec(targetData.getDec());
                 setRARange(targetData.getRaRange());
                 setDecRange(targetData.getDecRange());
-                setCoordsys(targetData.getCoordsys());     
+                setCoordsys(targetData.getCoordsys());
             }
             return true;
         }
@@ -369,19 +370,18 @@ public class Shape1 extends AbstractFormConstraint
         formErrors.set(getUType() + NAME, getErrorList());
         return false;
     }
-    
+
     /**
      * If the value is positive and greater than max, subtract max until the
      * value is less than max. If the value is negative, add max until the
      * value is greater than a negated max.
      *
-     * @param value         The actual value.
-     * @param min           The minimum (low) value.
-     * @param max           The maximum (hi) value.
-     * @return              The normalized value.
+     * @param value The actual value.
+     * @param min   The minimum (low) value.
+     * @param max   The maximum (hi) value.
+     * @return The normalized value.
      */
-    protected static Double normalize(final Double value, final Double min,
-                                      final Double max)
+    protected static Double normalize(final Double value, final Double min, final Double max)
     {
         if (value == null)
         {
@@ -417,12 +417,12 @@ public class Shape1 extends AbstractFormConstraint
     {
         return normalize(value, -90.0, 90.0);
     }
-    
+
     public boolean hasShapeData()
     {
         return (ra != null) && (dec != null) && (radius != null);
     }
-    
+
     public boolean hasRangeData()
     {
         return (raRange != null) && (decRange != null);
@@ -432,7 +432,7 @@ public class Shape1 extends AbstractFormConstraint
     {
         return ra;
     }
-    
+
     protected void setRA(final Double ra)
     {
         this.ra = ra;
@@ -442,7 +442,7 @@ public class Shape1 extends AbstractFormConstraint
     {
         return dec;
     }
-    
+
     protected void setDec(final Double dec)
     {
         this.dec = dec;
@@ -452,12 +452,12 @@ public class Shape1 extends AbstractFormConstraint
     {
         return radius;
     }
-    
+
     protected void setRadius(final Double radius)
     {
         this.radius = radius;
     }
-    
+
     public Range<Double> getRARange()
     {
         return raRange;
@@ -477,17 +477,17 @@ public class Shape1 extends AbstractFormConstraint
     {
         this.decRange = decRange;
     }
-    
+
     protected void setCoordsys(final String coordsys)
     {
         this.coordsys = coordsys;
     }
-    
+
     public String getCoordsys()
     {
         return coordsys;
     }
-    
+
     public String getResolverName()
     {
         return resolverName;
@@ -499,6 +499,6 @@ public class Shape1 extends AbstractFormConstraint
     @Override
     public String toString()
     {
-        return("Shape1[" + getFormValue() + "]");
+        return ("Shape1[" + getFormValue() + "]");
     }
 }

@@ -286,7 +286,7 @@ function DataTrain(_modelDataSource, _autoInitFlag)
           formattedVal = groupValues[j].replace(plus, ' ');
         }
 
-        var freshFlag = (groupValues[gvl - 1] === 1);
+        var freshFlag = (groupValues[gvl - 1] === "1");
         var instrumentName = groupValues[instrumentNameIndex];
 
         if ((freshFlag === true) && (_self.freshInstruments.indexOf(instrumentName) < 0))

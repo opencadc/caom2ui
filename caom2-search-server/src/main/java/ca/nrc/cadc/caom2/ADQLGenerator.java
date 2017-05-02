@@ -15,17 +15,15 @@ import java.util.TreeMap;
  *
  * @author pdowler
  */
-public class ADQLImpl extends AbstractPersistenceService
+public class ADQLGenerator extends AbstractPersistenceService
 {
     private static final String CAOM2_ENERGY_UTYPE = "Plane.energy.bounds";
     private static final String CAOM2_TIME_UTYPE = "Plane.time.bounds";
-    private static final String OBSCORE_ENERGY_UTYPE =
-            "Char.SpectralAxis.Coverage.Bounds.Limits";
-    private static final String OBSCORE_TIME_UTYPE =
-            "Char.TemporalAxis.Coverage.Bounds.Limits";
+    private static final String OBSCORE_ENERGY_UTYPE = "Char.SpectralAxis.Coverage.Bounds.Limits";
+    private static final String OBSCORE_TIME_UTYPE = "Char.TemporalAxis.Coverage.Bounds.Limits";
 
 
-    private static Logger LOGGER = Logger.getLogger(ADQLImpl.class);
+    private static Logger LOGGER = Logger.getLogger(ADQLGenerator.class);
 
     private final String upload;
     private final String uploadResolver;
@@ -33,9 +31,8 @@ public class ADQLImpl extends AbstractPersistenceService
     private final String targetCoordField;
 
 
-    ADQLImpl(final String schema, final String _upload,
-             final String _uploadResolver, final String _targetNameField,
-             final String _targetCoordField)
+    ADQLGenerator(final String schema, final String _upload, final String _uploadResolver,
+                  final String _targetNameField, final String _targetCoordField)
     {
         super(null, schema, null);
 
@@ -242,15 +239,12 @@ public class ADQLImpl extends AbstractPersistenceService
         }
         else if (OBSCORE_TIME_UTYPE.equals(s.getName()))
         {
-            sql = toIntervalSQL(s,
-                                getColumnName(OBSCORE_TIME_UTYPE + ".StopTime"),
-                                getColumnName(OBSCORE_TIME_UTYPE
-                                              + ".StartTime"));
+            sql = toIntervalSQL(s, getColumnName(OBSCORE_TIME_UTYPE + ".StopTime"),
+                                getColumnName(OBSCORE_TIME_UTYPE + ".StartTime"));
         }
         else
         {
-            throw new IllegalArgumentException(
-                    "cannot use IntervalSearch with utype=" + s.getName());
+            throw new IllegalArgumentException("cannot use IntervalSearch with utype=" + s.getName());
         }
 
         return sql;
@@ -261,8 +255,7 @@ public class ADQLImpl extends AbstractPersistenceService
                         final boolean carefulWithNULL)
     {
         final String CAOM2_POSITION_UTYPE = "Plane.position.bounds";
-        final String OBSCORE_POSITION_UTYPE =
-                "Char.SpatialAxis.Coverage.Support.Area";
+        final String OBSCORE_POSITION_UTYPE = "Char.SpatialAxis.Coverage.Support.Area";
 
         if (s.getName() == null ||
             (!CAOM2_POSITION_UTYPE.equals(s.getName()) &&
@@ -273,8 +266,7 @@ public class ADQLImpl extends AbstractPersistenceService
         }
         else if (s.getLowerRange() == null || s.getUpperRange() == null)
         {
-            throw new IllegalArgumentException(
-                    "cannot use RangeSearch with null RA or Dec range");
+            throw new IllegalArgumentException("cannot use RangeSearch with null RA or Dec range");
         }
 
         String position = CAOM2_POSITION_UTYPE;

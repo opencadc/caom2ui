@@ -37,26 +37,26 @@ dependencies {
 
 ext {
     // Change this value to test other locations, such as Production or RC.
-    intTest_web_app_url = 'http://jenkinsd.cadc.dao.nrc.ca/caom2ui/'
+    intTest_web_app_url = 'http://localhost/caom2ui/'
 }
 
 sourceCompatibility = '1.7'
 
 group = 'ca.nrc.cadc'
-version = '1000'
+version = '1001'
 
 // Modify this to your liking!
-def docker_image_name = 'opencadc/caom2ui'
+def docker_image_name = 'opencadc/caom2-meta-ui'
 
 war {
-    archiveName = project.name + '##' + project.version + '.war'
+    archiveName = 'caom2ui##' + project.version + '.war'
 }
 
 clean {
     doFirst {
         exec {
             executable 'rm'
-            args('-rf', './docker')
+            args = ['-rf', './docker']
         }
     }
 }

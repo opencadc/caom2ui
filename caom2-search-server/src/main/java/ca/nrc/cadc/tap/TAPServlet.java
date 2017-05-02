@@ -72,7 +72,6 @@ import ca.nrc.cadc.config.ApplicationConfiguration;
 import ca.nrc.cadc.net.HttpDownload;
 import ca.nrc.cadc.reg.client.RegistryClient;
 import ca.nrc.cadc.search.util.ParameterUtil;
-import ca.nrc.cadc.tap.impl.SyncTAPClientImpl;
 import ca.nrc.cadc.util.StringUtil;
 import ca.nrc.cadc.uws.ExecutionPhase;
 import ca.nrc.cadc.uws.Job;
@@ -250,7 +249,7 @@ public class TAPServlet extends ConfigurableServlet
         {
             final Job job = createJob(req);
             final SyncTAPClient syncTAPClient =
-                    new SyncTAPClientImpl(true, registryClient);
+                    new DefaultSyncTAPClient(true, registryClient);
 
             execute(syncTAPClient, job, outputStream);
         }

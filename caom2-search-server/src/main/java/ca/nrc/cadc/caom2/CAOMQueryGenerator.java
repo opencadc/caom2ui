@@ -38,14 +38,17 @@ import ca.nrc.cadc.search.Templates;
 import ca.nrc.cadc.uws.Job;
 
 
-public class CAOMQueryGeneratorImpl extends AbstractQueryGeneratorImpl
+/**
+ * Query generator for CAOM related fields.
+ */
+public class CAOMQueryGenerator extends AbstractQueryGenerator
 {
     /**
      * Only available constructor.
      *
      * @param job       The job being submitted.
      */
-    public CAOMQueryGeneratorImpl(final Job job)
+    public CAOMQueryGenerator(final Job job)
     {
         super(job);
     }
@@ -62,9 +65,7 @@ public class CAOMQueryGeneratorImpl extends AbstractQueryGeneratorImpl
     public StringBuilder generate(final Templates templates)
     {
         final ObservationListQueryGenerator queryGenerator =
-                new ObservationListQueryGenerator(getUpload(),
-                                                  getUploadResolver(),
-                                                  "target_name",
+                new ObservationListQueryGenerator(getUpload(), getUploadResolver(), "target_name",
                                                   "position_bounds");
 
         return generate(queryGenerator, templates.getSearchTemplates());

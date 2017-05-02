@@ -1,10 +1,7 @@
 
-package ca.nrc.cadc.orm;
+package ca.nrc.cadc.caom2;
 
 import ca.nrc.cadc.AbstractUnitTest;
-import ca.nrc.cadc.caom2.NumericSearch;
-import ca.nrc.cadc.caom2.ObservationListQueryGenerator;
-import ca.nrc.cadc.caom2.SearchTemplate;
 import ca.nrc.cadc.util.Log4jInit;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -15,14 +12,11 @@ import java.util.List;
 
 
 /**
- *
  * @author pdowler
  */
-public class ObservationListQueryGeneratorTest
-        extends AbstractUnitTest<ObservationListQueryGenerator>
+public class ObservationListQueryGeneratorTest extends AbstractUnitTest<ObservationListQueryGenerator>
 {
-    private static final Logger log =
-            Logger.getLogger(ObservationListQueryGeneratorTest.class);
+    private static final Logger log = Logger.getLogger(ObservationListQueryGeneratorTest.class);
 
     static
     {
@@ -34,15 +28,12 @@ public class ObservationListQueryGeneratorTest
     @Test
     public void detail1() throws Exception
     {
-        setTestSubject(
-                new ObservationListQueryGenerator(null, null, null, null));
+        setTestSubject(new ObservationListQueryGenerator(null, null, null, null));
 
         String sql;
 
         log.debug(" IN: Observation");
-        sql = getTestSubject().getSelectSQL(
-                new ArrayList<SearchTemplate>(), "A, B")
-                .toString();
+        sql = getTestSubject().getSelectSQL(new ArrayList<SearchTemplate>(), "A, B").toString();
         log.debug("OUT: " + sql);
 
         Assert.assertNotNull(sql);

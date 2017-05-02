@@ -92,18 +92,17 @@
      */
     function hasLength(_str)
     {
-      return ((_str != null) && (_str.length > 0));
+      return ((_str !== null) && (_str.length > 0));
     }
 
     /**
      * Obtain whether the given string has any text (i.e. !== '').
-     * @param _str          The string to check.
+     * @param {String|Number|Boolean} _str          The string to check.
      * @returns {boolean}
      */
     function hasText(_str)
     {
-      var wrapper = String(_str);
-      return hasLength(wrapper) && ($.trim(wrapper) !== "");
+      return hasLength(_str) && ($.trim(String(_str)) !== "");
     }
 
     /**
@@ -144,8 +143,7 @@
      */
     function markupForHTML(_str)
     {
-      return _str ? _str.toString().replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;").replace(/>/g, "&gt;") : "";
+      return hasLength(_str) ? _str.toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") : "";
     }
 
     /**
@@ -171,8 +169,7 @@
     function contains(_string, _match, _matchCase)
     {
       var expression = ".*" + _match + ".*";
-      var regExp = (_matchCase === true) ? new RegExp(expression)
-        : new RegExp(expression, "gi");
+      var regExp = (_matchCase === true) ? new RegExp(expression) : new RegExp(expression, "gi");
 
       return regExp.test(_string);
     }

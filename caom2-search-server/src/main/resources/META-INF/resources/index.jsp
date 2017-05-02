@@ -460,7 +460,9 @@
         <!-- The Visualize button to enable AladinLite. -->
         <span class='slick-visualize-holder'>
           <a href="#" id="slick-visualize" name='slick-visualize'
-             class="button slick-visualize-label ui-link button-add" data-close="<fmt:message key="CLOSE_BUTTON_LABEL" bundle="${langBundle}" />"><fmt:message key="RESULTS_VISUALIZE_BUTTON_LABEL" bundle="${langBundle}" /></a>
+             class="button slick-visualize-label ui-link button-add"
+             data-open="<fmt:message key="RESULTS_VISUALIZE_BUTTON_LABEL" bundle="${langBundle}"/>"
+             data-close="<fmt:message key="CLOSE_BUTTON_LABEL" bundle="${langBundle}" />"><fmt:message key="RESULTS_VISUALIZE_BUTTON_LABEL" bundle="${langBundle}" /></a>
         </span>
       </form>
     </div>
@@ -604,7 +606,7 @@
   <script type="text/javascript"
           src="cadcVOTV/javascript/cadc.votv.comparer.js?version=@version@"></script>
   <script type="text/javascript"
-          src="cadcJS/javascript/cadc.uri.js?version=@version@"></script>
+          src="cadcJS/javascript/opencadc.uri.js?version=@version@"></script>
   <script type="text/javascript"
           src="cadcVOTV/javascript/cadc.resultstate.js?version=@version@"></script>
   <script type="text/javascript"

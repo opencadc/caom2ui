@@ -39,15 +39,15 @@ import static org.junit.Assert.*;
 import ca.nrc.cadc.AbstractUnitTest;
 
 
-public class TAPUploadRandomAlphanumericFilenameGeneratorImplTest
-        extends AbstractUnitTest<TAPUploadRandomAlphanumericFilenameGeneratorImpl>
+public class TAPUploadRandomAlphanumericFilenameGeneratorTest
+        extends AbstractUnitTest<TAPUploadRandomAlphanumericFilenameGenerator>
 {
     @Test
     public void generate()
     {
         setTestSubject(
-                new TAPUploadRandomAlphanumericFilenameGeneratorImpl(null,
-                                                                     null));
+                new TAPUploadRandomAlphanumericFilenameGenerator(null,
+                                                                 null));
 
         final String generated1 = getTestSubject().generate();
         assertEquals("Should only be 16 characters long.", 16,
@@ -57,8 +57,8 @@ public class TAPUploadRandomAlphanumericFilenameGeneratorImplTest
         //
 
         setTestSubject(
-                new TAPUploadRandomAlphanumericFilenameGeneratorImpl("PREF--",
-                                                                     null));
+                new TAPUploadRandomAlphanumericFilenameGenerator("PREF--",
+                                                                 null));
 
         final String generated2 = getTestSubject().generate();
         assertEquals("Should only be 22 characters long.", 22,
@@ -70,8 +70,8 @@ public class TAPUploadRandomAlphanumericFilenameGeneratorImplTest
         //
 
         setTestSubject(
-                new TAPUploadRandomAlphanumericFilenameGeneratorImpl("",
-                                                                     ".SUF"));
+                new TAPUploadRandomAlphanumericFilenameGenerator("",
+                                                                 ".SUF"));
 
         final String generated3 = getTestSubject().generate();
         assertEquals("Should only be 20 characters long.", 20,
@@ -83,8 +83,8 @@ public class TAPUploadRandomAlphanumericFilenameGeneratorImplTest
         //
 
         setTestSubject(
-                new TAPUploadRandomAlphanumericFilenameGeneratorImpl("MYPREF",
-                                                                     ".file"));
+                new TAPUploadRandomAlphanumericFilenameGenerator("MYPREF",
+                                                                 ".file"));
 
         final String generated4 = getTestSubject().generate();
         assertEquals("Should only be 27 characters long.", 27,

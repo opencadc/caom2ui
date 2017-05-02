@@ -16,7 +16,7 @@ repositories {
 dependencies {
     compile 'log4j:log4j:1.2.+'
 
-    compile 'org.opencadc:caom2-search-server:1.+'
+    compile 'org.opencadc:caom2-search-server:[1.2.3, )'
 
     providedCompile 'javax.servlet:javax.servlet-api:3.1.+'
     providedCompile 'javax.servlet:javax.servlet-api:3.0.+'
@@ -38,21 +38,22 @@ ext {
 sourceCompatibility = 1.7
 
 group = 'org.opencadc'
-
 version = '1002'
 
 // Modify this to your liking!
 def docker_image_name = 'opencadc/archive-search'
 
 war {
-    archiveName = 'search##' + project.version + '.war'
+    doFirst {
+        archiveName = 'search##' + project.version + '.war'
+    }
 }
 
 clean {
     doFirst {
         exec {
             executable 'rm'
-            args('-rf', './docker')
+            args = ['-rf', './docker']
         }
     }
 }

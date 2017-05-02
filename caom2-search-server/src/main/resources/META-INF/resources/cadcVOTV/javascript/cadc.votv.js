@@ -56,17 +56,17 @@
   {
     var _self = this;
     var $_lengthFinder =
-      $("#lengthFinder")
-      || $("<div id='lengthFinder'></div>").appendTo($(document.body));
+        $("#lengthFinder")
+        || $("<div id='lengthFinder'></div>").appendTo($(document.body));
     this.grid = null;
     this.columnManager = options.columnManager ? options.columnManager : {};
     this.rowManager = options.rowManager ? options.rowManager : {};
 
     this.$emptyResultsMessage =
-      $(options.emptyResultsMessageSelector)
-      ||
-      $("<div class=\"cadcvotv-empty-results-message\">No results returned.</div>")
-        .appendTo($(".grid-container"));
+        $(options.emptyResultsMessageSelector)
+        ||
+        $("<div class=\"cadcvotv-empty-results-message\">No results returned.</div>")
+            .appendTo($(".grid-container"));
 
     this.columns = [];
     // displayColumns: columns that are actually in the Grid.
@@ -79,8 +79,8 @@
     this.columnOptions = options.columnOptions ? options.columnOptions : {};
     this.options = options;
     this.options.forceFitColumns = options.columnManager
-      ? options.columnManager.forceFitColumns
-      : false;
+        ? options.columnManager.forceFitColumns
+        : false;
     this.options.asyncPostRenderDelay = options.asyncPostRenderDelay || 0;
 
     // This is the TableData for a VOTable.  Will be set on load.
@@ -91,17 +91,17 @@
 
     // story 1584 - variable viewport height
     this.variableViewportHeight = options.variableViewportHeight
-      ? options.variableViewportHeight
-      : false;
+        ? options.variableViewportHeight
+        : false;
     this.viewportOffset = 0;
 
     this.rowCountMessage = options.rowCountMessage ? options.rowCountMessage :
                            defaultRowCountMessage;
 
     this.atDataLoadComplete = options.atDataLoadComplete
-      ? options.atDataLoadComplete : defaultDataLoadComplete;
+        ? options.atDataLoadComplete : defaultDataLoadComplete;
     this.atPageInfoChanged = options.atPageInfoChanged
-      ? options.atPageInfoChanged : defaultPageChanging;
+        ? options.atPageInfoChanged : defaultPageChanging;
     this.plugins = [];
 
     /**
@@ -124,155 +124,147 @@
       $(getTargetNodeSelector()).removeClass("cadcvotv-empty-results-overlay");
       _self.$emptyResultsMessage.hide();
 
-      new cadc.vot.Builder(getOptions().maxRowLimit,
-        input,
-        function (voTableBuilder)
-        {
-          voTableBuilder.subscribe(cadc.vot.onDataLoadComplete,
-                                   function (event, args)
+      new cadc.vot.Builder(getOptions().maxRowLimit, input, function (voTableBuilder)
+      {
+        voTableBuilder.subscribe(cadc.vot.onDataLoadComplete,
+                                 function (event, args)
+                                 {
+                                   if (args && args.longestValues)
                                    {
-                                     if (args && args.longestValues)
+                                     setLongestValues(args.longestValues);
+                                   }
+
+                                   if (input.xmlDOM)
+                                   {
+                                     var voTable = args.builder.getVOTable();
+
+                                     if (!hasDisplayColumns)
                                      {
-                                       setLongestValues(args.longestValues);
+                                       refreshColumns(voTable.getMetadata().getFields());
                                      }
 
-                                     if (input.xmlDOM)
-                                     {
-                                       var voTable = args.builder.getVOTable();
+                                     // Setup the Grid and DataView to be
+                                     // loaded.
+                                     _self.init();
 
-                                       if (!hasDisplayColumns)
-                                       {
-                                         refreshColumns(
-                                           voTable.getMetadata().getFields());
-                                       }
+                                     load(args.builder.getVOTable(),
+                                          false, true);
+                                   }
 
-                                       // Setup the Grid and DataView to be
-                                       // loaded.
-                                       _self.init();
+                                   resetColumnWidths();
 
-                                       load(args.builder.getVOTable(),
-                                            false, true);
-                                     }
+                                   // Display spinner only
+                                   // if paging is off
+                                   if (!usePager())
+                                   {
+                                     _self.atDataLoadComplete(getTotalRows(), getCurrentRows(), getHeaderLabel());
+                                   }
 
-                                     resetColumnWidths();
+                                   var $gridHeaderIcon = getHeader().find("img.grid-header-icon");
 
-                                     // Display spinner only
-                                     // if paging is off
-                                     if (!usePager())
-                                     {
-                                       _self.atDataLoadComplete(getTotalRows(),
-                                                                getCurrentRows(),
-                                                                getHeaderLabel());
-                                     }
+                                   // clear the wait icon
+                                   $gridHeaderIcon.attr("src", "/cadcVOTV/images/transparent-20.png");
 
-                                     var $gridHeaderIcon =
-                                       getHeader().find("img.grid-header-icon");
+                                   if (getRows().length === 0)
+                                   {
+                                     $(getTargetNodeSelector()).addClass("cadcvotv-empty-results-overlay");
+                                     _self.$emptyResultsMessage.show();
+                                   }
 
-                                     // clear the wait icon
-                                     $gridHeaderIcon.attr("src", "cadcVOTV/images/transparent-20.png");
+                                   sort();
 
-                                     if (getRows().length === 0)
-                                     {
-                                       $(getTargetNodeSelector()).addClass("cadcvotv-empty-results-overlay");
-                                       _self.$emptyResultsMessage.show();
-                                     }
+                                   trigger(cadc.vot.events.onDataLoaded, args);
+                                 });
 
-                                     sort();
+        var hasDisplayColumns = (_self.displayColumns && (_self.displayColumns.length > 0));
 
-                                     trigger(cadc.vot.events.onDataLoaded,
-                                             args);
-                                   });
-
-          var hasDisplayColumns = (_self.displayColumns
-                                   && (_self.displayColumns.length > 0));
-
-          // Set up to stream.
-          if (input.url || input.csv)
-          {
-            var inputFields =
+        // Set up to stream.
+        if (input.url || input.csv)
+        {
+          var inputFields =
               input.tableMetadata.getFields();
-            var $resultsGridHeader = getHeader();
-            var $gridHeaderIcon = getHeader().find("img.grid-header-icon");
+          var $resultsGridHeader = getHeader();
+          var $gridHeaderIcon = getHeader().find("img.grid-header-icon");
 
-            // Display spinner only if paging is off
-            if (!usePager())
+          // Display spinner only if paging is off
+          if (!usePager())
+          {
+            var $gridHeaderStyle = $resultsGridHeader.prop("style");
+
+            // remove any background color resulting from
+            // previous warning message
+            if ($gridHeaderStyle)
             {
-              var $gridHeaderStyle = $resultsGridHeader.prop("style");
-
-              // remove any background color resulting from
-              // previous warning message
-              if ($gridHeaderStyle)
-              {
-                $gridHeaderStyle.backgroundColor = "";
-              }
-
-              // add a spinner to the header bar to indicate
-              // streaming has begun
-              if ($gridHeaderIcon)
-              {
-                $gridHeaderIcon.attr("src",
-                                     "cadcVOTV/images/PleaseWait-small.gif");
-              }
+              $gridHeaderStyle.backgroundColor = "";
             }
 
-            /*
-             * We need to refresh columns twice; once to
-             * display something while the data is streaming,
-             * and again to update the column widths based
-             * on data.
-             *
-             * jenkinsd 2013.12.20
-             */
-            if (!hasDisplayColumns)
+            // add a spinner to the header bar to indicate
+            // streaming has begun
+            if ($gridHeaderIcon)
             {
-              refreshColumns(inputFields);
+              $gridHeaderIcon.attr("src",
+                                   "/cadcVOTV/images/PleaseWait-small.gif");
             }
+          }
 
-            // Setup the Grid and DataView to be loaded.
-            _self.init();
+          /*
+           * We need to refresh columns twice; once to
+           * display something while the data is streaming,
+           * and again to update the column widths based
+           * on data.
+           *
+           * jenkinsd 2013.12.20
+           */
+          if (!hasDisplayColumns)
+          {
+            refreshColumns(inputFields);
+          }
 
-            voTableBuilder.subscribe(cadc.vot.onPageAddStart,
-                                     function ()
-                                     {
-                                       getDataView().beginUpdate();
+          // Setup the Grid and DataView to be loaded.
+          _self.init();
 
-                                       // Notify that data is loading.
-                                       _self.atPageInfoChanged(
+          voTableBuilder.subscribe(cadc.vot.onPageAddStart,
+                                   function ()
+                                   {
+                                     getDataView().beginUpdate();
+
+                                     // Notify that data is loading.
+                                     _self.atPageInfoChanged(
                                          getTotalRows(),
                                          getCurrentRows(),
                                          getHeaderLabel());
-                                     });
+                                   });
 
-            voTableBuilder.subscribe(cadc.vot.onPageAddEnd,
-                                     function ()
-                                     {
-                                       getDataView().endUpdate();
+          voTableBuilder.subscribe(cadc.vot.onPageAddEnd,
+                                   function ()
+                                   {
+                                     getDataView().endUpdate();
 
-                                       // Sorting as data
-                                       // loads.  Not sure
-                                       // if this is a good
-                                       // idea or not.
-                                       // jenkinsd
-                                       // 2014.05.09 WebRT
-                                       // 53730
-                                       //sort();
-                                     });
+                                     // Sorting as data
+                                     // loads.  Not sure
+                                     // if this is a good
+                                     // idea or not.
+                                     // jenkinsd
+                                     // 2014.05.09 WebRT
+                                     // 53730
+                                     //sort();
+                                   });
 
-            voTableBuilder.subscribe(cadc.vot.onRowAdd,
-                                     function (event, row)
-                                     {
-                                       addRow(row, null);
-                                     });
-          }
+          voTableBuilder.subscribe(cadc.vot.onRowAdd,
+                                   function (event, row)
+                                   {
+                                     addRow(row, null);
+                                   });
+        }
 
-          voTableBuilder.build(
+        voTableBuilder.build(
             voTableBuilder.buildRowData);
 
-          if (completeCallback)
-          {
-            completeCallback(voTableBuilder);
-          }
-        }, errorCallBack);
+        if (completeCallback)
+        {
+          completeCallback(voTableBuilder);
+        }
+      }, errorCallBack);
     }
 
     function defaultRowCountMessage(totalRows, rowCount)
@@ -339,7 +331,7 @@
     function getOptionsForColumn(columnLabel)
     {
       return getColumnOptions()[columnLabel]
-        ? getColumnOptions()[columnLabel] : {};
+          ? getColumnOptions()[columnLabel] : {};
     }
 
     function getResizedColumns()
@@ -534,7 +526,7 @@
       if (getRowManager().isRowDisabled)
       {
         dataRow[cadc.vot.ROW_SELECT_DISABLED_KEY] =
-          getRowManager().isRowDisabled(row);
+            getRowManager().isRowDisabled(row);
       }
 
       // Add items directly to prevent unnecessary refreshes.
@@ -578,6 +570,11 @@
       return getDataView().getItems();
     }
 
+    /**
+     * Obtain the current grid.
+     *
+     * @returns {Slick.Grid}
+     */
     function getGrid()
     {
       return _self.grid;
@@ -798,7 +795,7 @@
         var filterRegexStartsWith = /^\s?(>=|<=|=|>|<)?\s?(.*)/;
         var matches = filterRegexStartsWith.exec(filter);
         var match = ((matches != null) && (matches.length > 1))
-          ? $.trim(matches[1]) : null;
+            ? $.trim(matches[1]) : null;
 
         var operator = (match == null) ? '' : cadc.vot.filters[match];
 
@@ -947,7 +944,7 @@
       var minWidth = columnName.length;
       var longestCalculatedWidth = getLongestValue(_column.id);
       var textWidthToUse = (longestCalculatedWidth > minWidth)
-        ? longestCalculatedWidth : minWidth;
+          ? longestCalculatedWidth : minWidth;
 
       var lengthStr = "";
       var userColumnWidth = colOpts.width;
@@ -1084,7 +1081,7 @@
         if (datatype.isNumeric())
         {
           tooltipTitle =
-            "Number: 10 or >=10 or 10..20 for a range , ! to negate";
+              "Number: 10 or >=10 or 10..20 for a range , ! to negate";
         }
         else
         {
@@ -1092,13 +1089,13 @@
         }
 
         var $filterInput =
-          $("<input type='text'>")
-            .data("columnId", args.column.id)
-            .val(getColumnFilters()[args.column.id])
-            .attr("title", tooltipTitle)
-            .attr("id", args.column.id + "_filter")
-            .addClass("cadcvotv-filter-input")
-            .appendTo(args.node);
+            $("<input type='text'>")
+                .data("columnId", args.column.id)
+                .val(getColumnFilters()[args.column.id])
+                .attr("title", tooltipTitle)
+                .attr("id", args.column.id + "_filter")
+                .addClass("cadcvotv-filter-input")
+                .appendTo(args.node);
 
         // Story 1647
         //
@@ -1163,25 +1160,25 @@
       if ((typeof CADC !== 'undefined') && CADC.CheckboxSelectColumn)
       {
         checkboxSelector = new CADC.CheckboxSelectColumn({
-          cssClass: "slick-cell-checkboxsel",
-          width: 55,
-          headerCssClass: "slick-header-column-checkboxsel",
-          headerCheckboxLabel: getOptions().headerCheckboxLabel,
-          enableOneClickDownload: getOptions().enableOneClickDownload,
-          oneClickDownloadURL: getOptions().oneClickDownloadURL,
-          oneClickDownloadTitle: getOptions().oneClickDownloadTitle,
+                                                           cssClass: "slick-cell-checkboxsel",
+                                                           width: 55,
+                                                           headerCssClass: "slick-header-column-checkboxsel",
+                                                           headerCheckboxLabel: getOptions().headerCheckboxLabel,
+                                                           enableOneClickDownload: getOptions().enableOneClickDownload,
+                                                           oneClickDownloadURL: getOptions().oneClickDownloadURL,
+                                                           oneClickDownloadTitle: getOptions().oneClickDownloadTitle,
 
-          // The ID of the column to pull the unique link from.
-          oneClickDownloadURLColumnID: getOptions().oneClickDownloadURLColumnID
-        });
+                                                           // The ID of the column to pull the unique link from.
+                                                           oneClickDownloadURLColumnID: getOptions().oneClickDownloadURLColumnID
+                                                         });
       }
       else if (Slick.CheckboxSelectColumn)
       {
         checkboxSelector = new Slick.CheckboxSelectColumn({
-          cssClass: "slick-cell-checkboxsel",
-          width: 55,
-          headerCssClass: "slick-header-column-checkboxsel"
-        });
+                                                            cssClass: "slick-cell-checkboxsel",
+                                                            width: 55,
+                                                            headerCssClass: "slick-header-column-checkboxsel"
+                                                          });
       }
       else
       {
@@ -1192,7 +1189,7 @@
       {
         var checkboxColumn = checkboxSelector.getColumnDefinition();
         var colsToCheck = (getDisplayColumns().length == 0)
-          ? getColumns() : getDisplayColumns();
+            ? getColumns() : getDisplayColumns();
 
         var checkboxColumnIndex = -1;
 
@@ -1228,7 +1225,7 @@
         else
         {
           returnValue =
-            value.toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+              value.toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
         }
 
         return "<span class='cellValue " + columnDef.id
@@ -1237,7 +1234,7 @@
 
       var dataView = new Slick.Data.DataView({inlineFilters: true});
       _self.grid = new Slick.Grid(getTargetNodeSelector(), dataView,
-        getDisplayColumns(), getOptions());
+                                  getDisplayColumns(), getOptions());
       var rowSelectionModel;
 
       if (checkboxSelector)
@@ -1246,18 +1243,18 @@
             && (typeof CADC.RowSelectionModel !== 'undefined'))
         {
           rowSelectionModel =
-            new CADC.RowSelectionModel({
-              selectActiveRow: getOptions().selectActiveRow,
-              selectClickedRow: getOptions().selectClickedRow,
-              propagateEvents: getOptions().propagateEvents
-            });
+              new CADC.RowSelectionModel({
+                                           selectActiveRow: getOptions().selectActiveRow,
+                                           selectClickedRow: getOptions().selectClickedRow,
+                                           propagateEvents: getOptions().propagateEvents
+                                         });
         }
         else if (Slick.RowSelectionModel)
         {
           rowSelectionModel =
-            new Slick.RowSelectionModel({
-              selectActiveRow: getOptions().selectActiveRow
-            });
+              new Slick.RowSelectionModel({
+                                            selectActiveRow: getOptions().selectActiveRow
+                                          });
         }
         else
         {
@@ -1279,16 +1276,16 @@
       if (usePager())
       {
         new Slick.Controls.Pager(dataView, _self.grid,
-          $(getPagerNodeSelector()));
+                                 $(getPagerNodeSelector()));
       }
       else
       {
         dataView.onPagingInfoChanged.subscribe(function ()
                                                {
                                                  _self.atDataLoadComplete(
-                                                   getTotalRows(),
-                                                   getCurrentRows(),
-                                                   getHeaderLabel());
+                                                     getTotalRows(),
+                                                     getCurrentRows(),
+                                                     getHeaderLabel());
                                                });
       }
 
@@ -1308,8 +1305,8 @@
         if (pickerStyle == "dialog")
         {
           columnPicker =
-            new cadc.vot.picker.DialogColumnPicker(getColumns(), _self.grid,
-              columnPickerConfig.options);
+              new cadc.vot.picker.DialogColumnPicker(getColumns(), _self.grid,
+                                                     columnPickerConfig.options);
 
           if (forceFitMax)
           {
@@ -1333,14 +1330,14 @@
                                                                 // Clear the
                                                                 // hash.
                                                                 parent.location.hash =
-                                                                  '';
+                                                                    '';
                                                                 trigger(cadc.vot.events.onColumnOrderReset, null);
                                                               });
         }
         else if (pickerStyle == "header")
         {
           columnPicker = new Slick.Controls.ColumnPicker(getColumns(),
-            _self.grid, getOptions());
+                                                         _self.grid, getOptions());
           if (forceFitMax)
           {
             columnPicker.onColumnAddOrRemove.subscribe(resetColumnWidths);
@@ -1356,11 +1353,11 @@
         else if (pickerStyle == "tooltip")
         {
           columnPicker =
-            new Slick.Controls.PanelTooltipColumnPicker(getColumns(),
-              _self.grid,
-              columnPickerConfig.panel,
-              columnPickerConfig.tooltipOptions,
-              columnPickerConfig.options);
+              new Slick.Controls.PanelTooltipColumnPicker(getColumns(),
+                                                          _self.grid,
+                                                          columnPickerConfig.panel,
+                                                          columnPickerConfig.tooltipOptions,
+                                                          columnPickerConfig.options);
 
           if (forceFitMax)
           {
@@ -1418,25 +1415,25 @@
       $("#inlineFilterPanel").appendTo(_self.grid.getTopPanel()).show();
 
       _self.grid.onKeyDown.subscribe(function (e)
-                               {
-                                 // select all rows on ctrl-a
-                                 if ((e.which != 65) || !e.ctrlKey)
-                                 {
-                                   return false;
-                                 }
+                                     {
+                                       // select all rows on ctrl-a
+                                       if ((e.which != 65) || !e.ctrlKey)
+                                       {
+                                         return false;
+                                       }
 
-                                 var rows = [];
-                                 for (var i = 0; i < _self.grid.getDataLength();
-                                      i++)
-                                 {
-                                   rows.push(i);
-                                 }
+                                       var rows = [];
+                                       for (var i = 0; i < _self.grid.getDataLength();
+                                            i++)
+                                       {
+                                         rows.push(i);
+                                       }
 
-                                 _self.grid.setSelectedRows(rows);
-                                 e.preventDefault();
+                                       _self.grid.setSelectedRows(rows);
+                                       e.preventDefault();
 
-                                 return true;
-                               });
+                                       return true;
+                                     });
 
       /**
        * Tell the dataview to do the comparison.
@@ -1486,37 +1483,37 @@
        * Handle the Grid sorts.
        */
       _self.grid.onSort.subscribe(function (e, args)
-                            {
-                              _self.sortAsc = args.sortAsc;
-                              _self.sortcol = args.sortCol.field;
+                                  {
+                                    _self.sortAsc = args.sortAsc;
+                                    _self.sortcol = args.sortCol.field;
 
-                              doGridSort();
-                            });
+                                    doGridSort();
+                                  });
 
       if (getRowManager().onRowRendered)
       {
         _self.grid.onRenderComplete.subscribe(function (e, args)
-                                        {
-                                          var renderedRange = args.grid.getRenderedRange();
-                                          for (var i = renderedRange.top,
-                                                 ii = renderedRange.bottom;
-                                               i <= ii; i++)
-                                          {
-                                            var $nextRow =
-                                              _self.grid.getData().getItem(i);
-                                            getRowManager().onRowRendered($nextRow, i);
-                                          }
-                                        });
+                                              {
+                                                var renderedRange = args.grid.getRenderedRange();
+                                                for (var i = renderedRange.top,
+                                                         ii = renderedRange.bottom;
+                                                     i <= ii; i++)
+                                                {
+                                                  var $nextRow =
+                                                      _self.grid.getData().getItem(i);
+                                                  getRowManager().onRowRendered($nextRow, i);
+                                                }
+                                              });
       }
 
       dataView.onPagingInfoChanged.subscribe(function (e, pagingInfo)
                                              {
                                                var isLastPage =
-                                                 (pagingInfo.pageNum ==
-                                                  pagingInfo.totalPages - 1);
+                                                   (pagingInfo.pageNum ==
+                                                    pagingInfo.totalPages - 1);
                                                var enableAddRow =
-                                                 (isLastPage ||
-                                                  pagingInfo.pageSize == 0);
+                                                   (isLastPage ||
+                                                    pagingInfo.pageSize == 0);
                                                var options = _self.grid.getOptions();
 
                                                if (options.enableAddRow !=
@@ -1535,10 +1532,10 @@
                        });
 
       _self.grid.onHeaderRowCellRendered.subscribe(function (e, args)
-                                             {
-                                               setupHeader(checkboxSelector,
-                                                           args);
-                                             });
+                                                   {
+                                                     setupHeader(checkboxSelector,
+                                                                 args);
+                                                   });
 
       if (Slick.Plugins && Slick.Plugins.UnitSelection)
       {
@@ -1550,14 +1547,14 @@
                                                      if (columnPicker.updateColumnData)
                                                      {
                                                        columnPicker.updateColumnData(
-                                                         args.column.id,
-                                                         "unitValue",
-                                                         args.unitValue);
+                                                           args.column.id,
+                                                           "unitValue",
+                                                           args.unitValue);
                                                      }
 
                                                      // track select changes.
                                                      _self.updatedColumnSelects[args.column.id] =
-                                                       args.unitValue;
+                                                         args.unitValue;
 
                                                      // Invalidate to force
                                                      // column reformatting.
@@ -1576,29 +1573,29 @@
       for (var enabledPluginName in enabledPlugins)
       {
         registerPlugin(new cadc.vot.plugin[enabledPluginName](
-          enabledPlugins[enabledPluginName]));
+            enabledPlugins[enabledPluginName]));
       }
       // End VOTable Viewer plugins.
 
       // Track the width of resized columns.
       _self.grid.onColumnsResized.subscribe(function (e, args)
-                                      {
-                                        var columns = args.grid.getColumns();
+                                            {
+                                              var columns = args.grid.getColumns();
 
-                                        for (var i = 0, ci = columns.length;
-                                             i < ci; i++)
-                                        {
-                                          var column = columns[i];
+                                              for (var i = 0, ci = columns.length;
+                                                   i < ci; i++)
+                                              {
+                                                var column = columns[i];
 
-                                          if (column.width !==
-                                              column.previousWidth)
-                                          {
-                                            getResizedColumns[column.id] =
-                                              column.width;
-                                            return false;
-                                          }
-                                        }
-                                      });
+                                                if (column.width !==
+                                                    column.previousWidth)
+                                                {
+                                                  getResizedColumns[column.id] =
+                                                      column.width;
+                                                  return false;
+                                                }
+                                              }
+                                            });
 
       if (forceFitMax)
       {
@@ -1683,31 +1680,34 @@
 
         // We're extending the column properties a little here.
         var columnObject =
-        {
-          id: fieldKey,
-          name: field.getName(),
-          field: fieldKey,
-          formatter: colOpts.formatter,
-          valueFormatter: colOpts.valueFormatter
-                          || function(value){return value;},
-          asyncPostRender: colOpts.asyncFormatter,
-          cssClass: cssClass,
-          description: field.getDescription(),
-          resizable: getColumnManager().resizable,
-          sortable: colOpts.sortable ? colOpts.sortable : true,
+            {
+              id: fieldKey,
+              name: field.getName(),
+              field: fieldKey,
+              formatter: colOpts.formatter,
+              valueFormatter: colOpts.valueFormatter
+                              || function (value)
+                              {
+                                return value;
+                              },
+              asyncPostRender: colOpts.asyncFormatter,
+              cssClass: cssClass,
+              description: field.getDescription(),
+              resizable: getColumnManager().resizable,
+              sortable: colOpts.sortable ? colOpts.sortable : true,
 
-          // VOTable attributes.
-          unit: field.getUnit(),
-          utype: field.getUType(),
-          filterable: filterable,
-          comparer: colOpts.comparer ? colOpts.comparer :
-                    new cadc.vot.Comparer()
-        };
+              // VOTable attributes.
+              unit: field.getUnit(),
+              utype: field.getUType(),
+              filterable: filterable,
+              comparer: colOpts.comparer ? colOpts.comparer :
+                        new cadc.vot.Comparer()
+            };
 
         // Default is to be sortable.
         columnObject.sortable =
-          ((colOpts.sortable != null) && (colOpts.sortable != undefined))
-            ? colOpts.sortable : true;
+            ((colOpts.sortable != null) && (colOpts.sortable != undefined))
+                ? colOpts.sortable : true;
 
         if (datatype)
         {

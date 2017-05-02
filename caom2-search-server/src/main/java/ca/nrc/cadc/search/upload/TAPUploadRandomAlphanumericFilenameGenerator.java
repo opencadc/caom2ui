@@ -41,8 +41,7 @@ import ca.nrc.cadc.uws.server.StringIDGenerator;
 /**
  * Implementation to use a random alphanumeric filename generator.
  */
-public class TAPUploadRandomAlphanumericFilenameGeneratorImpl
-        implements TAPUploadFilenameGenerator
+public class TAPUploadRandomAlphanumericFilenameGenerator implements TAPUploadFilenameGenerator
 {
     private final static StringIDGenerator RANDOM_ALPHA_GENERATOR =
             new RandomStringGenerator(16);
@@ -57,8 +56,7 @@ public class TAPUploadRandomAlphanumericFilenameGeneratorImpl
      * @param prefix        String to prepend to the generated filename.
      * @param suffix        String to append to the generated filename.
      */
-    public TAPUploadRandomAlphanumericFilenameGeneratorImpl(
-            final String prefix, final String suffix)
+    public TAPUploadRandomAlphanumericFilenameGenerator(final String prefix, final String suffix)
     {
         this.prefix = prefix;
         this.suffix = suffix;

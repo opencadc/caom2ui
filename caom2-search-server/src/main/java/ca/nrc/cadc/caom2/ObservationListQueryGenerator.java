@@ -15,7 +15,7 @@ import ca.nrc.cadc.util.StringUtil;
 public class ObservationListQueryGenerator
         implements SearchTemplateQueryGenerator
 {
-    private ADQLImpl adqlImpl;
+    private ADQLGenerator adqlGenerator;
 
 
     public ObservationListQueryGenerator(final String upload,
@@ -23,8 +23,8 @@ public class ObservationListQueryGenerator
                                          final String targetNameField,
                                          final String targetCoordField)
     {
-        this.adqlImpl = new ADQLImpl("caom2", upload, uploadResolver,
-                                     targetNameField, targetCoordField);
+        this.adqlGenerator = new ADQLGenerator("caom2", upload, uploadResolver,
+                                               targetNameField, targetCoordField);
     }
 
     /**
@@ -41,15 +41,15 @@ public class ObservationListQueryGenerator
         final StringBuilder sb = new StringBuilder();
 
         sb.append("SELECT ");
-        sb.append(adqlImpl.getSelectList(selectClauseItems));
+        sb.append(adqlGenerator.getSelectList(selectClauseItems));
 
-        if (adqlImpl.hasUpload())
+        if (adqlGenerator.hasUpload())
         {
             sb.append(",f.target,f.ra,f.dec,f.radius");
         }
 
         sb.append(" FROM ");
-        sb.append(adqlImpl.getFrom(Plane.class, 2));
+        sb.append(adqlGenerator.getFrom(Plane.class, 2));
 
         final List<SearchTemplate> ammendedTemplates =
                 new ArrayList<>(templates);
@@ -62,7 +62,7 @@ public class ObservationListQueryGenerator
 
         ammendedTemplates.add(new Or(junkFlagTemplates));
 
-        final String where = adqlImpl.getWhere(ammendedTemplates);
+        final String where = adqlGenerator.getWhere(ammendedTemplates);
 
         if (StringUtil.hasText(where))
         {

@@ -31,7 +31,7 @@
  ****  C A N A D I A N   A S T R O N O M Y   D A T A   C E N T R E  *****
  ************************************************************************
  */
-package ca.nrc.cadc.tap.impl;
+package ca.nrc.cadc.tap;
 
 
 import ca.nrc.cadc.caom2.IntervalSearch;
@@ -47,7 +47,6 @@ import ca.nrc.cadc.search.parser.exception.PositionParserException;
 import ca.nrc.cadc.search.parser.exception.TargetParserException;
 import ca.nrc.cadc.search.parser.resolver.ResolverImpl;
 import ca.nrc.cadc.search.upload.UploadResults;
-import ca.nrc.cadc.tap.SyncTAPClient;
 import ca.nrc.cadc.util.StringUtil;
 import ca.nrc.cadc.uws.ErrorSummary;
 import ca.nrc.cadc.uws.ErrorType;

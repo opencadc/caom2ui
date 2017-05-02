@@ -16,6 +16,12 @@
               "OBSERVATION_ID_UTYPE": "caom2:Observation.observationID",
               "ColumnManager": ColumnManager
             },
+            "preview": {
+              "unauthorized_message": {
+                "en": "You do not have permission to view this Preview image.",
+                "fr": "Vous n'avez pas la permission de visualiser cette image"
+              }
+            },
             "events": {
               "onQuickSearchLinkClicked": new jQuery.Event("onQuickSearchLinkClicked")
             },
@@ -24,12 +30,9 @@
                 "caom2:Observation.observationID": {
                   "label": "Obs. ID",
                   "fitMax": true,
-                  "formatter": function (row, cell, value, columnDef,
-                                         dataContext)
+                  "formatter": function (row, cell, value, columnDef, dataContext)
                   {
-                    var obsURI = dataContext[
-                      ca.nrc.cadc.search.columns.OBSERVATION_URI_UTYPE];
-
+                    var obsURI = dataContext[ca.nrc.cadc.search.columns.OBSERVATION_URI_UTYPE];
                     return formatDetailsCell(value, obsURI, columnDef, row);
                   }
                 },
@@ -83,45 +86,50 @@
                       return $link;
                     }
 
-                    function insertPreviewLink(previewUrls, thumbnailUrls,
-                                               collection, observationID,
-                                               productID)
+                    function insertPreviewLink(previewUrls, thumbnailUrls, collection, observationID, productID)
                     {
                       // Create the preview link
-                      if ((thumbnailUrls.length > 0)
-                          || (previewUrls.length > 0))
+                      if (thumbnailUrls.length > 0)
                       {
                         var $link = createLink($cell, thumbnailUrls[0]);
 
                         // Display the preview window
                         $link.click(function ()
                                     {
+                                      var $content = $("<div id=\"scoped-content\"></div>");
+
                                       // Preview window content
-                                      var $col = $("<p style=\"text-align: center;\"></p>").text("collection: " +
-                                                                                                 collection);
-                                      var $obsId = $("<p style=\"text-align: center;\"></p>").text("ObservationID: " +
-                                                                                                   observationID);
-                                      var $pdctId = $("<p style=\"text-align: center;\"></p>").text("productID: " +
-                                                                                                    productID);
-
-                                      var $previews = $("<div></div>");
-
-                                      for (var j = 0; j < previewUrls.length;
-                                           j++)
+                                      if (previewUrls.length > 0)
                                       {
-                                        var $preview = $("<img style=\"display: block; margin: auto;\"/>");
-                                        $preview.prop("id", observationID +
-                                                            "_preview_" + j);
-                                        $preview.prop("src", previewUrls[j]);
-                                        $preview.addClass("image-actual");
-                                        $previews.append($preview, "<br>");
+                                        var $col = $("<p style=\"text-align: center;\"></p>").text("collection: "
+                                                                                                   + collection);
+                                        var $obsId = $("<p style=\"text-align: center;\"></p>").text("ObservationID: "
+                                                                                                     + observationID);
+                                        var $pdctId = $("<p style=\"text-align: center;\"></p>").text("productID: "
+                                                                                                      + productID);
+
+                                        var $previews = $("<div></div>");
+
+                                        for (var j = 0; j < previewUrls.length; j++)
+                                        {
+                                          var $preview = $("<img style=\"display: block; margin: auto;\"/>");
+                                          $preview.prop("id", observationID + "_preview_" + j);
+                                          $preview.prop("src", previewUrls[j]);
+                                          $preview.addClass("image-actual");
+                                          $previews.append($preview, "<br>");
+                                        }
+
+                                        $content.append($col, $obsId, $pdctId, $previews);
+                                      }
+                                      else
+                                      {
+                                        var lang = $("html").attr("lang");
+                                        $content.append($("<p style=\"text-align: center;\"></p>")
+                                                            .text(ca.nrc.cadc.search.preview.unauthorized_message[lang]));
                                       }
 
-                                      var $content = $("<div id=\"scoped-content\"></div>")
-                                        .append($col, $obsId, $pdctId, $previews);
-
                                       var w = window.open("", "_PREVIEW");
-                                      w.document.body.innerHTML = "";
+                                      w.document.body.innerHTML = '';
 
                                       // Open and close are here to stop browsers
                                       // expecting more data.
@@ -184,135 +192,124 @@
                                  runid: runID
                                }
                              })
-                        .done(function (data, textStatus, jqXHR)
-                              {
-                                if (jqXHR.status === 200)
+                          .done(function (data, textStatus, jqXHR)
                                 {
-                                  var evaluator = new cadc.vot.xml.VOTableXPathEvaluator(data, "votable");
-
-                                  // Check query status
-                                  var queryStatus = evaluator.evaluate("/VOTABLE/RESOURCE[@type='results']/INFO[@name='QUERY_STATUS' and @value='OK']");
-                                  if (queryStatus.length !== 0)
+                                  if (jqXHR.status === 200)
                                   {
-                                    // Determine field indexes
-                                    var accessUrlIndex;
-                                    var errorMessageIndex;
-                                    var semanticsIndex;
-                                    var readableIndex = -1;
-                                    var fields = evaluator.evaluate("/VOTABLE/RESOURCE[@type='results']/TABLE/FIELD");
-                                    for (var fieldIndex = 0;
-                                         fieldIndex < fields.length;
-                                         fieldIndex++)
-                                    {
-                                      var field = fields[fieldIndex];
-                                      var name = field.getAttribute("name");
-                                      switch (name)
-                                      {
-                                        case "access_url":
-                                          accessUrlIndex = fieldIndex;
-                                          break;
-                                        case "error_message":
-                                          errorMessageIndex = fieldIndex;
-                                          break;
-                                        case "semantics":
-                                          semanticsIndex = fieldIndex;
-                                          break;
-                                        case "readable":
-                                          readableIndex = fieldIndex;
-                                          break;
-                                      }
-                                    }
+                                    var evaluator = new cadc.vot.xml.VOTableXPathEvaluator(data, "votable");
 
-                                    // Loop through the table rows
-                                    var thumbnailUrls = [];
-                                    var previewUrls = [];
-                                    var tableRows = evaluator.evaluate("/VOTABLE/RESOURCE[@type='results']/TABLE/DATA/TABLEDATA/TR");
-                                    for (var trIndex = 0;
-                                         trIndex < tableRows.length; trIndex++)
+                                    // Check query status
+                                    var queryStatus = evaluator.evaluate("/VOTABLE/RESOURCE[@type='results']/INFO[@name='QUERY_STATUS' and @value='OK']");
+                                    if (queryStatus.length !== 0)
                                     {
-                                      var tableDatas = tableRows[trIndex].children;
-                                      var errorMessage = tableDatas[errorMessageIndex].textContent;
-
-                                      if (errorMessage.length > 0)
+                                      // Determine field indexes
+                                      var accessUrlIndex;
+                                      var errorMessageIndex;
+                                      var semanticsIndex;
+                                      var readableIndex = -1;
+                                      var fields = evaluator.evaluate("/VOTABLE/RESOURCE[@type='results']/TABLE/FIELD");
+                                      for (var fieldIndex = 0;
+                                           fieldIndex < fields.length;
+                                           fieldIndex++)
                                       {
-                                        console.error("DataLink preview error: "
-                                                      + errorMessage);
-                                      }
-                                      else
-                                      {
-                                        var readable =
-                                          ((readableIndex >= 0)
-                                           &&
-                                           tableDatas[readableIndex].textContent
-                                           === 'true');
-                                        if (readable === true)
+                                        var field = fields[fieldIndex];
+                                        var name = field.getAttribute("name");
+                                        switch (name)
                                         {
-                                          var semantics = tableDatas[semanticsIndex].textContent;
-                                          if (semantics ===
-                                              'http://www.openadc.org/caom2#thumbnail')
+                                          case "access_url":
+                                            accessUrlIndex = fieldIndex;
+                                            break;
+                                          case "error_message":
+                                            errorMessageIndex = fieldIndex;
+                                            break;
+                                          case "semantics":
+                                            semanticsIndex = fieldIndex;
+                                            break;
+                                          case "readable":
+                                            readableIndex = fieldIndex;
+                                            break;
+                                        }
+                                      }
+
+                                      // Loop through the table rows
+                                      var thumbnailUrls = [];
+                                      var previewUrls = [];
+                                      var tableRows = evaluator.evaluate(
+                                          "/VOTABLE/RESOURCE[@type='results']/TABLE/DATA/TABLEDATA/TR");
+                                      for (var trIndex = 0; trIndex < tableRows.length; trIndex++)
+                                      {
+                                        var tableDatas = tableRows[trIndex].children;
+                                        var errorMessage = tableDatas[errorMessageIndex].textContent;
+
+                                        if (errorMessage.length > 0)
+                                        {
+                                          console.error("DataLink preview error: " + errorMessage);
+                                        }
+                                        else
+                                        {
+                                          var readable = ((readableIndex >= 0)
+                                                          && tableDatas[readableIndex].textContent === 'true');
+                                          if (readable === true)
                                           {
-                                            thumbnailUrls.push(tableDatas[accessUrlIndex].textContent);
-                                          }
-                                          else if (semantics === '#preview')
-                                          {
-                                            previewUrls.push(tableDatas[accessUrlIndex].textContent);
+                                            var semantics = tableDatas[semanticsIndex].textContent;
+                                            if (semantics === 'http://www.openadc.org/caom2#thumbnail')
+                                            {
+                                              thumbnailUrls.push(tableDatas[accessUrlIndex].textContent);
+                                            }
+                                            else if (semantics === '#preview')
+                                            {
+                                              previewUrls.push(tableDatas[accessUrlIndex].textContent);
+                                            }
                                           }
                                         }
                                       }
-                                    }
 
-                                    // If datalink didn't provide thumbnail and
-                                    // preview urls, create the urls and check
-                                    // if they exist.
-                                    if (thumbnailUrls.length === 0
-                                        || previewUrls.length === 0)
-                                    {
-                                      var thumbnailPreview = new ca.nrc.cadc.search.Preview(collection, observationID,
-                                        productID, 256, runID);
-                                      thumbnailPreview.getPreview(function (thumbnailURL)
-                                                         {
-                                                           var preview =
-                                                             new ca.nrc.cadc.search.Preview(collection,
-                                                               observationID,
-                                                               productID, 1024,
-                                                               runID);
+                                      // If datalink didn't provide thumbnail and preview URLs, create the urls and
+                                      // check if they exist.
+                                      if (thumbnailUrls.length === 0)
+                                      {
+                                        var thumbnailPreview = new ca.nrc.cadc.search.Preview(collection, observationID,
+                                                                                              productID, 256, runID);
+                                        thumbnailPreview.getPreview(function (thumbnailURL)
+                                                                    {
+                                                                      var preview =
+                                                                          new ca.nrc.cadc.search.Preview(collection, observationID,
+                                                                                                         productID, 1024, runID);
 
-                                                           preview.getPreview(
-                                                             function (previewURL)
-                                                             {
-                                                               if (previewURL)
-                                                               {
-                                                                 var $link = createLink($cell, thumbnailURL);
-                                                                 $link.attr("href", previewURL);
-                                                                 $link.attr("target", "_PREVIEW");
+                                                                      preview.getPreview(
+                                                                          function (previewURL)
+                                                                          {
+                                                                            if (previewURL)
+                                                                            {
+                                                                              var $link = createLink($cell, thumbnailURL);
+                                                                              $link.attr("href", previewURL);
+                                                                              $link.attr("target", "_PREVIEW");
 
-                                                                 var $previewImage = $("<img />");
-                                                                 $previewImage.prop("id", observationID +
-                                                                                          "_256_preview");
-                                                                 $previewImage.prop("src", previewURL);
-                                                                 $previewImage.addClass("image-actual");
-                                                               }
-                                                             });
+                                                                              var $previewImage = $("<img />");
+                                                                              $previewImage.prop("id", observationID +
+                                                                                                       "_256_preview");
+                                                                              $previewImage.prop("src", previewURL);
+                                                                              $previewImage.addClass("image-actual");
+                                                                            }
+                                                                          });
 
-                                                         });
-                                    }
-                                    else
-                                    {
-                                      insertPreviewLink(previewUrls,
-                                                        thumbnailUrls, collection,
-                                                        observationID, productID);
+                                                                    });
+                                      }
+                                      else
+                                      {
+                                        insertPreviewLink(previewUrls, thumbnailUrls, collection, observationID,
+                                                          productID);
+                                      }
                                     }
                                   }
-                                }
-                              })
-                        .fail(function (jqXHR, textStatus, errorThrown)
-                              {
-                                if (jqXHR.status !== 404)
+                                })
+                          .fail(function (jqXHR, textStatus, errorThrown)
                                 {
-                                  console.error("Error >> " + errorThrown +
-                                                " (" + jqXHR.status + ")");
-                                }
-                              });
+                                  if (jqXHR.status !== 404)
+                                  {
+                                    console.error("Error >> " + errorThrown + " (" + jqXHR.status + ")");
+                                  }
+                                });
                     }
                     else
                     {
@@ -397,10 +394,9 @@
                 },
                 // This is a typo in the database!  PLEASE make sure this is the
                 // only reference to 'proprosal' instead of proposal.
-                "caom2:Observation.proprosal.project": {
+                "caom2:Observation.proposal.project": {
                   "label": "Proposal Project",
-                  "select": "Observation.proposal_project",
-                  "extended": true
+                  "select": "Observation.proposal_project"
                 },
                 "caom2:Observation.proposal.keywords": {
                   "label": "Proposal Keywords"
@@ -416,11 +412,10 @@
                     {
                       valueObject["Plane.position.bounds"] = value;
                       valueObject[ca.nrc.cadc.search.CAOM2_RESOLVER_VALUE_KEY]
-                        = "NONE";
+                          = "NONE";
                     }
 
-                    return formatQuickSearchLink(value, valueObject, utype,
-                                                 null);
+                    return formatQuickSearchLink(value, valueObject, utype, null);
                   }
                 },
                 "caom2:Observation.target.type": {
@@ -477,7 +472,7 @@
                                          dataContext)
                   {
                     var obsURI = dataContext[
-                      ca.nrc.cadc.search.columns.OBSERVATION_URI_UTYPE];
+                        ca.nrc.cadc.search.columns.OBSERVATION_URI_UTYPE];
 
                     return formatDetailsCell(value, obsURI, columnDef, row);
                   }
@@ -767,7 +762,7 @@
                     {
                       var intValue = parseInt(value);
                       searchValue["Plane.time.bounds"] =
-                        (intValue + ".." + (intValue + 1));
+                          (intValue + ".." + (intValue + 1));
                     }
 
                     return formatQuickSearchLink(value, searchValue,
@@ -1025,11 +1020,11 @@
     if (value)
     {
       var date =
-        moment(value, ca.nrc.cadc.search.formats.date.ISO_MS).toDate();
+          moment(value, ca.nrc.cadc.search.formats.date.ISO_MS).toDate();
 
       var dateFormat =
-        new ca.nrc.cadc.search.DateFormat(date,
-          ca.nrc.cadc.search.formats.date.W3C);
+          new ca.nrc.cadc.search.DateFormat(date,
+                                            ca.nrc.cadc.search.formats.date.W3C);
       val = dateFormat.format();
     }
     else
@@ -1164,7 +1159,7 @@
   function formatNumeric(_value, _sigDigits)
   {
     return isNaN(_value) ? ""
-      : (new cadc.web.util.NumberFormat(_value, _sigDigits)).format();
+        : (new cadc.web.util.NumberFormat(_value, _sigDigits)).format();
   }
 
   /**
@@ -1193,7 +1188,7 @@
         var columnManager = new ColumnManager();
         var converter = columnManager.getConverter(uType, _value, toUnit);
         var formatter =
-          new ca.nrc.cadc.search.UnitConversionFormat(converter, _value, uType);
+            new ca.nrc.cadc.search.UnitConversionFormat(converter, _value, uType);
 
         formattedValue = formatter.formatValue();
       }
@@ -1256,9 +1251,8 @@
   function formatCalibrationName(value, utype)
   {
     var levelName = getCalibrationLevelName(value);
-    var titleStringUtil =
-      new cadc.web.util.StringUtil("(" + value + ") " + levelName);
-    var title = levelName ? titleStringUtil.sanitize() : "";
+    var titleStringUtil = new org.opencadc.StringUtil();
+    var title = levelName ? titleStringUtil.sanitize("(" + value + ") " + levelName) : "";
 
     return formatOutputHTML(value, utype, title);
   }
@@ -1281,7 +1275,7 @@
   function formatQuickSearchLink(value, _searchItems, columnUType, toUnit)
   {
     var $output = (toUnit ? $(format(value, columnUType, value, toUnit))
-      : $(formatOutputHTML(value, columnUType, value)));
+        : $(formatOutputHTML(value, columnUType, value)));
 
     if ($output.text())
     {
@@ -1342,8 +1336,8 @@
         var columnManager = new ColumnManager();
         var converter = columnManager.getConverter(columnUType, value, toUnit);
         var formatter =
-          new ca.nrc.cadc.search.UnitConversionFormat(converter, value,
-            columnUType);
+            new ca.nrc.cadc.search.UnitConversionFormat(converter, value,
+                                                        columnUType);
 
         formattedValue = formatter.format();
       }
@@ -1385,8 +1379,8 @@
       var converterType = getColumnOption(_id).converter;
 
       return (converterType
-        ? new ca.nrc.cadc.search.unitconversion[converterType](_value, _unit)
-        : null);
+          ? new ca.nrc.cadc.search.unitconversion[converterType](_value, _unit)
+          : null);
     }
 
     /**

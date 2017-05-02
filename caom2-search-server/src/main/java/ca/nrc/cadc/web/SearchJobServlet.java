@@ -70,22 +70,21 @@ package ca.nrc.cadc.web;
 
 import ca.nrc.cadc.auth.HTTPIdentityManager;
 import ca.nrc.cadc.config.ApplicationConfiguration;
-import ca.nrc.cadc.auth.IdentityManager;
 import ca.nrc.cadc.auth.AuthenticationUtil;
-import ca.nrc.cadc.caom2.CAOMQueryGeneratorImpl;
-import ca.nrc.cadc.caom2.ObsCoreQueryGeneratorImpl;
+import ca.nrc.cadc.caom2.CAOMQueryGenerator;
+import ca.nrc.cadc.caom2.ObsCoreQueryGenerator;
 import ca.nrc.cadc.date.DateUtil;
 import ca.nrc.cadc.net.TransientException;
 import ca.nrc.cadc.reg.client.RegistryClient;
 import ca.nrc.cadc.search.ObsModel;
 import ca.nrc.cadc.search.QueryGenerator;
-import ca.nrc.cadc.search.TargetNameResolverClientImpl;
+import ca.nrc.cadc.search.DefaultNameResolverClient;
 import ca.nrc.cadc.search.parser.exception.PositionParserException;
 import ca.nrc.cadc.search.upload.StreamingVOTableWriter;
 import ca.nrc.cadc.search.upload.UploadResults;
 import ca.nrc.cadc.tap.SyncTAPClient;
-import ca.nrc.cadc.tap.impl.SyncTAPClientImpl;
-import ca.nrc.cadc.tap.impl.TAPSearcherImpl;
+import ca.nrc.cadc.tap.DefaultSyncTAPClient;
+import ca.nrc.cadc.tap.TAPSearcher;
 import ca.nrc.cadc.uws.*;
 import ca.nrc.cadc.uws.server.*;
 import ca.nrc.cadc.uws.server.impl.PostgresJobPersistence;
@@ -102,17 +101,13 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URI;
 import java.security.PrivilegedExceptionAction;
-import java.sql.PreparedStatement;
-import java.sql.Types;
 import java.util.*;
 
 
 public class SearchJobServlet extends SyncServlet
 {
-    static final String TAP_SERVICE_URI_PROPERTY_KEY =
-            "org.opencadc.search.tap-service-id";
-    static final URI DEFAULT_TAP_SERVICE_URI =
-            URI.create("ivo://cadc.nrc.ca/tap");
+    private static final String TAP_SERVICE_URI_PROPERTY_KEY = "org.opencadc.search.tap-service-id";
+    private static final URI DEFAULT_TAP_SERVICE_URI = URI.create("ivo://cadc.nrc.ca/tap");
 
     private JobManager jobManager;
     private JobUpdater jobUpdater;
@@ -124,54 +119,52 @@ public class SearchJobServlet extends SyncServlet
     {
         super.init(config);
 
-        final DatabaseJobPersistence jobPersistence =
-                new PostgresJobPersistence(new HTTPIdentityManager());
+        final DatabaseJobPersistence jobPersistence = new PostgresJobPersistence(new HTTPIdentityManager());
 
         jobManager = createJobManager(config);
         jobManager.setJobPersistence(jobPersistence);
 
         jobUpdater = jobPersistence;
 
-        applicationConfiguration =
-                new ApplicationConfiguration(Configuration.DEFAULT_CONFIG_FILE_PATH);
+        applicationConfiguration = new ApplicationConfiguration(Configuration.DEFAULT_CONFIG_FILE_PATH);
     }
 
     /**
      * Called by the server (via the <code>service</code> method)
      * to allow a servlet to handle a POST request.
-     *
+     * <p>
      * The HTTP POST method allows the client to send
      * data of unlimited length to the Web server a single time
      * and is useful when posting information such as
      * credit card numbers.
-     *
-     *When overriding this method, read the request data,
+     * <p>
+     * When overriding this method, read the request data,
      * write the response headers, get the response's writer or output
      * stream object, and finally, write the response data. It's best
      * to include content type and encoding. When using a
      * <code>PrintWriter</code> object to return the response, set the
      * content type before accessing the <code>PrintWriter</code> object.
-     *
-     *The servlet container must write the headers before committing the
+     * <p>
+     * The servlet container must write the headers before committing the
      * response, because in HTTP the headers must be sent before the
      * response body.
-     *
-     *Where possible, set the Content-Length header (with the
+     * <p>
+     * Where possible, set the Content-Length header (with the
      * {@link ServletResponse#setContentLength} method),
      * to allow the servlet container to use a persistent connection
      * to return its response to the client, improving performance.
      * The content length is automatically set if the entire response fits
      * inside the response buffer.
-     *
-     *When using HTTP 1.1 chunked encoding (which means that the response
+     * <p>
+     * When using HTTP 1.1 chunked encoding (which means that the response
      * has a Transfer-Encoding header), do not set the Content-Length header.
-     *
-     *This method does not need to be either safe or idempotent.
+     * <p>
+     * This method does not need to be either safe or idempotent.
      * Operations requested through POST can have side effects for
      * which the user can be held accountable, for example,
      * updating stored data or buying items online.
-     *
-     *If the HTTP POST request is incorrectly formatted,
+     * <p>
+     * If the HTTP POST request is incorrectly formatted,
      * <code>doPost</code> returns an HTTP "Bad Request" message.
      *
      * @param request  an {@link HttpServletRequest} object that
@@ -250,7 +243,7 @@ public class SearchJobServlet extends SyncServlet
     /**
      * Obtain the current date in UTC.
      *
-     * @return      The current Date in UTC.
+     * @return The current Date in UTC.
      */
     private Date currentDateUTC()
     {
@@ -291,7 +284,7 @@ public class SearchJobServlet extends SyncServlet
                             new UploadResults(resolver, 0, 0);
                     final StreamingVOTableWriter tableWriter =
                             new StreamingVOTableWriter(uploadResults,
-                                                       new TargetNameResolverClientImpl());
+                                                       new DefaultNameResolverClient());
 
                     tableWriter.write(inputStream, fos);
                     extraJobParameters.add(
@@ -319,7 +312,7 @@ public class SearchJobServlet extends SyncServlet
 
         final SyncOutput syncOutput = new HTTPResponseSyncOutput(response);
         final SyncTAPClient tapClient =
-                new SyncTAPClientImpl(false, new RegistryClient())
+                new DefaultSyncTAPClient(false, new RegistryClient())
                 {
                     /**
                      * Build the payload to POST.
@@ -344,7 +337,7 @@ public class SearchJobServlet extends SyncServlet
         // Create the TAP job to prepare to be executed.
         final JobRunner runner =
                 new AdvancedRunner(auditJob, jobUpdater, syncOutput,
-                                   new TAPSearcherImpl(
+                                   new TAPSearcher(
                                            new SyncResponseWriterImpl(
                                                    syncOutput),
                                            jobUpdater, tapClient,
@@ -370,10 +363,10 @@ public class SearchJobServlet extends SyncServlet
         {
             if (ObsModel.isObsCore(parameter.getName()))
             {
-                return new ObsCoreQueryGeneratorImpl(job);
+                return new ObsCoreQueryGenerator(job);
             }
         }
 
-        return new CAOMQueryGeneratorImpl(job);
+        return new CAOMQueryGenerator(job);
     }
 }

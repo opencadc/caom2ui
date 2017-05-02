@@ -66,7 +66,7 @@
  ************************************************************************
  */
 
-package ca.nrc.cadc.tap.impl;
+package ca.nrc.cadc.tap;
 
 import ca.nrc.cadc.AbstractUnitTest;
 import ca.nrc.cadc.config.ApplicationConfiguration;
@@ -76,6 +76,7 @@ import static org.easymock.EasyMock.*;
 import ca.nrc.cadc.auth.AuthMethod;
 import ca.nrc.cadc.reg.Standards;
 import ca.nrc.cadc.reg.client.RegistryClient;
+import ca.nrc.cadc.tap.DefaultSyncTAPClient;
 import ca.nrc.cadc.uws.Job;
 import org.junit.Test;
 

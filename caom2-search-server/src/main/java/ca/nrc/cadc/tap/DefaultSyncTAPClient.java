@@ -31,7 +31,7 @@
  ****  C A N A D I A N   A S T R O N O M Y   D A T A   C E N T R E  *****
  ************************************************************************
  */
-package ca.nrc.cadc.tap.impl;
+package ca.nrc.cadc.tap;
 
 
 import ca.nrc.cadc.auth.AuthMethod;
@@ -39,7 +39,6 @@ import ca.nrc.cadc.config.ApplicationConfiguration;
 import ca.nrc.cadc.net.HttpPost;
 import ca.nrc.cadc.reg.Standards;
 import ca.nrc.cadc.reg.client.RegistryClient;
-import ca.nrc.cadc.tap.SyncTAPClient;
 import ca.nrc.cadc.util.StringUtil;
 import ca.nrc.cadc.uws.Job;
 import ca.nrc.cadc.uws.JobAttribute;

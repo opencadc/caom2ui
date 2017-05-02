@@ -48,6 +48,5 @@ public interface SyncTAPClient
      * @param job                   The Job to execute.
      * @param outputStream          The OutputStream to write out results.
      */
-    void execute(final URI serviceURI, final Job job,
-                 final OutputStream outputStream);
+    void execute(final URI serviceURI, final Job job, final OutputStream outputStream);
 }

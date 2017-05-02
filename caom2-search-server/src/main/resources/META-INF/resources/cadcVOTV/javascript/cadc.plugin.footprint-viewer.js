@@ -1,4 +1,4 @@
-(function ($)
+(function ($, A)
 {
   if (typeof A === "undefined")
   {
@@ -18,8 +18,6 @@
   });
 
 
-
-
   /**
    * AladinLite footprint viewer.  This is incorporated as a Plugin to allow
    *
@@ -34,15 +32,14 @@
     var _self = this;
     var _defaults = {
       targetSelector: "#aladin-lite",
-      toggleSwitchSelector: null,     // Always show by default.
+      toggleSwitchSelector: null,
+      hidden: false,    // Always show by default.
       toggleClose: function ($toggleSelector)
       {
-        $toggleSelector.data("close", $toggleSelector.html());
         $toggleSelector.html($toggleSelector.data("open"));
       },
       toggleOpen: function ($toggleSelector)
       {
-        $toggleSelector.data("open", $toggleSelector.html());
         $toggleSelector.html($toggleSelector.data("close"));
       },
       aladin_options: {},  // Specific options for AladinLite.
@@ -66,6 +63,9 @@
       afterFOVCalculation: function (fovValue)
       {
         return fovValue * DEFAULT_FOV_BUFFER;
+      },
+      resizeCalculation: function ()
+      {
       },
       onHover: true,
       onClick: false
@@ -116,18 +116,22 @@
 
     /**
      * Initialize with the Slick Grid instance.
-     * @param _viewer{cadc.vot.Viewer}      The CADC VOTable Viewer instance.
+     * @param {cadc.vot.Viewer} _viewer      The CADC VOTable Viewer instance.
      */
     function init(_viewer)
     {
       destroy();
 
-      if (inputs.toggleSwitchSelector != null)
+      if (inputs.hidden === true)
       {
         _self.$target.hide();
+      }
+
+      if (inputs.toggleSwitchSelector !== null)
+      {
         var $toggleSwitchSelector = $(inputs.toggleSwitchSelector);
 
-        if ($toggleSwitchSelector.data("open") != null)
+        if ((inputs.hidden === true) && ($toggleSwitchSelector.data("open") !== null))
         {
           $toggleSwitchSelector.html($toggleSwitchSelector.data("open"));
         }
@@ -135,27 +139,28 @@
         $toggleSwitchSelector.on("click", function (e)
         {
           e.preventDefault();
-
           _self.$target.toggle();
-
-          if (_self.$target.is(":visible"))
-          {
-            inputs.toggleOpen($(this), _self.$target);
-          }
-          else
-          {
-            inputs.toggleClose($(this), _self.$target);
-          }
+          _toggleView();
+          _toggleViewButton();
 
           return false;
         });
       }
 
+      /**
+       * @property _self.viewer
+       * @type {cadc.vot.Viewer}
+       */
       _self.viewer = _viewer;
+
+      /**
+       * @property _self.grid
+       * @type {Slick.Grid}
+       */
       _self.grid = _viewer.getGrid();
+
       _self.aladin = A.aladin(inputs.targetSelector, inputs.aladin_options);
-      _self.aladinOverlay =
-        A.graphicOverlay({color: inputs.colour, lineWidth: 3});
+      _self.aladinOverlay = A.graphicOverlay({color: inputs.colour, lineWidth: 3});
       _self.aladin.addOverlay(_self.aladinOverlay);
       _self.currentFootprint = A.graphicOverlay({
                                                   name: "current",
@@ -167,7 +172,7 @@
       _self.viewAladinStatus = $("#slick-visualize-status");
       _self.rowCount = 0;
 
-      if (inputs.fov != null)
+      if (inputs.fov !== null)
       {
         _self.aladin.setFoV(inputs.fov);
       }
@@ -176,13 +181,12 @@
       {
         if (inputs.renderedRowsOnly === true)
         {
-          _self.handler.subscribe(_self.grid.onRenderComplete,
-                                  handleRenderComplete);
+          _self.handler.subscribe(_self.grid.onRenderComplete, handleRenderComplete);
         }
         else
         {
           _self.viewer.subscribe(cadc.vot.events.onRowAdded,
-                                 function(e, args)
+                                 function (e, args)
                                  {
                                    handleAddFootprint(e, args);
 
@@ -190,20 +194,15 @@
                                    {
                                      if (_self.rowCount === 0)
                                      {
-                                       // _self.viewAladinButton.removeClass("button-disabled");
-                                       _self.viewAladinButton.removeClass("ui-disabled");
-                                       _self.viewAladinStatus.addClass("wb-invisible");
+                                       _enableButton();
                                      }
 
                                      _self.rowCount++;
 
                                      if ((_self.rowCount > inputs.maxRowCount)
-                                         && (_self.viewAladinButton.hasClass(
-                                         "ui-disabled") === false))
+                                         && (_self.viewAladinButton.hasClass("ui-disabled") === false))
                                      {
-                                       // _self.viewAladinButton.addClass("button-disabled");
-                                       _self.viewAladinButton.addClass("ui-disabled");
-                                       _self.viewAladinStatus.removeClass("wb-invisible");
+                                       _disableButton();
                                      }
                                    }
                                  });
@@ -222,16 +221,25 @@
                                    var v = args.application;
                                    var data = v.getGrid().getData();
                                    var currentRows = data.getRows();
+                                   var cdl = currentRows.length;
 
-                                   for (var cdi = 0, cdl = currentRows.length;
-                                        cdi < cdl; cdi++)
+                                   if (inputs.maxRowCount && (cdl <= inputs.maxRowCount))
                                    {
-                                     handleAddFootprint(event, {
-                                       rowData: data.getItemByIdx(cdi)
-                                     });
-                                   }
+                                     _enableButton();
 
-                                   _setFieldOfView();
+                                     for (var cdi = 0; cdi < cdl; cdi++)
+                                     {
+                                       handleAddFootprint(event, {
+                                         rowData: currentRows[cdi]
+                                       });
+                                     }
+
+                                     _setFieldOfView();
+                                   }
+                                   else
+                                   {
+                                     _disableButton();
+                                   }
                                  });
         }
       }
@@ -288,16 +296,18 @@
         decBottom: null
       };
 
-      if (inputs.toggleSwitchSelector != null)
+      if (inputs.toggleSwitchSelector !== null)
       {
         $(inputs.toggleSwitchSelector).off("click");
       }
 
-      if (_self.viewer != null)
+      if (_self.viewer !== null)
       {
         _self.viewer.unsubscribe(cadc.vot.events.onRowAdded);
         _self.viewer.unsubscribe(cadc.vot.events.onDataLoaded);
       }
+
+      _toggleViewButton();
     }
 
     /**
@@ -350,22 +360,22 @@
       var maxDec = rowFOVBox.maxDec;
       var minDec = rowFOVBox.minDec;
 
-      if ((_self.fovBox.raLeft == null) || (_self.fovBox.raLeft < maxRA))
+      if ((_self.fovBox.raLeft === null) || (_self.fovBox.raLeft < maxRA))
       {
         _self.fovBox.raLeft = maxRA;
       }
 
-      if ((_self.fovBox.raRight == null) || (_self.fovBox.raRight > minRA))
+      if ((_self.fovBox.raRight === null) || (_self.fovBox.raRight > minRA))
       {
         _self.fovBox.raRight = minRA;
       }
 
-      if ((_self.fovBox.decTop == null) || (_self.fovBox.decTop < maxDec))
+      if ((_self.fovBox.decTop === null) || (_self.fovBox.decTop < maxDec))
       {
         _self.fovBox.decTop = maxDec;
       }
 
-      if ((_self.fovBox.decBottom == null) || (_self.fovBox.decBottom > minDec))
+      if ((_self.fovBox.decBottom === null) || (_self.fovBox.decBottom > minDec))
       {
         _self.fovBox.decBottom = minDec;
       }
@@ -375,12 +385,11 @@
     {
       var sanitizedFootprint;
 
-      if ((nextFootprint != null) && ($.trim(nextFootprint).length > 0))
+      if ((nextFootprint !== null) && ($.trim(nextFootprint).length > 0))
       {
         var footprintElements = nextFootprint.split(/\s/);
 
-        for (var fei = 0, fel = footprintElements.length; fei < fel;
-             fei++)
+        for (var fei = 0, fel = footprintElements.length; fei < fel; fei++)
         {
           var footprintElement = footprintElements[fei];
 
@@ -390,8 +399,7 @@
           }
         }
 
-        sanitizedFootprint = (footprintElements.length > 0)
-          ? (POLYGON_SPLIT + footprintElements.join(" ")) : null;
+        sanitizedFootprint = (footprintElements.length > 0) ? (POLYGON_SPLIT + footprintElements.join(" ")) : null;
       }
       else
       {
@@ -406,35 +414,27 @@
       var raValue = _dataRow[_self.raFieldID];
       var decValue = _dataRow[_self.decFieldID];
 
-      if ((raValue != null) && ($.trim(raValue) != "") && (decValue != null)
-          && ($.trim(decValue) != ""))
+      if ((raValue !== null) && ($.trim(raValue) !== "") && (decValue !== null) && ($.trim(decValue) !== ""))
       {
-        var selectedFootprint =
-          sanitizeFootprint(_dataRow[_self.footprintFieldID]);
+        var selectedFootprint = sanitizeFootprint(_dataRow[_self.footprintFieldID]);
 
-        if (selectedFootprint != null)
+        if (selectedFootprint !== null)
         {
-          _self.currentFootprint.addFootprints(
-            _self.aladin.createFootprintsFromSTCS(selectedFootprint));
+          _self.currentFootprint.addFootprints(_self.aladin.createFootprintsFromSTCS(selectedFootprint));
 
           if (inputs.navigateToSelected === true)
           {
             _self.aladin.gotoRaDec(raValue, decValue);
 
-            var selectedRowFOVBox =
-              _calculateFootprintFOV(selectedFootprint.substr(
-                POLYGON_SPLIT.length));
-            var fieldOfView =
-              Math.max((selectedRowFOVBox.maxRA - selectedRowFOVBox.minRA),
-                       (selectedRowFOVBox.maxDec - selectedRowFOVBox.minDec));
-            _self.aladin.setFoV(Math.min(DEFAULT_FOV_DEGREES,
-                                         inputs.afterFOVCalculation(fieldOfView)));
+            var selectedRowFOVBox = _calculateFootprintFOV(selectedFootprint.substr(POLYGON_SPLIT.length));
+            var fieldOfView = Math.max((selectedRowFOVBox.maxRA - selectedRowFOVBox.minRA),
+                                       (selectedRowFOVBox.maxDec - selectedRowFOVBox.minDec));
+            _self.aladin.setFoV(Math.min(DEFAULT_FOV_DEGREES, inputs.afterFOVCalculation(fieldOfView)));
           }
         }
         else
         {
-          console.warn("Unable to add footprint for (" + raValue + ", "
-                       + decValue + ")");
+          console.warn("Unable to add footprint for (" + raValue + ", " + decValue + ")");
         }
       }
       else
@@ -472,19 +472,17 @@
       var decValue = $.trim(_row[_self.decFieldID]);
 
       // Set the default location to the first item we see.
-      if ((_self.defaultRA == null) && (raValue != null) && (raValue != ""))
+      if ((_self.defaultRA === null) && (raValue !== null) && (raValue !== ""))
       {
         _self.defaultRA = raValue;
       }
 
-      if ((_self.defaultDec == null) && (decValue != null) && (decValue != ""))
+      if ((_self.defaultDec === null) && (decValue !== null) && (decValue !== ""))
       {
         _self.defaultDec = decValue;
       }
 
-      // var halfFOV = 0.5 * DEG_PER_ARC_SEC * _row[_self.fovFieldID];
-
-      if (polygonValue != null)
+      if (polygonValue !== null)
       {
         var footprintValues = polygonValue.split(POLYGON_SPLIT);
         var footprintValuesLength = footprintValues.length;
@@ -493,12 +491,11 @@
         {
           var nextFootprint = sanitizeFootprint(footprintValues[fpvi]);
 
-          if (nextFootprint != null)
+          if (nextFootprint !== null)
           {
-            _self.aladinOverlay.addFootprints(
-              _self.aladin.createFootprintsFromSTCS(nextFootprint));
+            _self.aladinOverlay.addFootprints(_self.aladin.createFootprintsFromSTCS(nextFootprint));
 
-            if (inputs.fov == null)
+            if (!inputs.fov || (inputs.fov === null))
             {
               _updateFOV(nextFootprint.substr(POLYGON_SPLIT.length));
             }
@@ -508,21 +505,20 @@
     }
 
     /**
-     * Set the Field of View.  This is used when the data is done loading
-     * completely, or the data has filtered down.
+     * Set the Field of View.  This is used when the data is done loading completely, or the data has filtered down.
+     *
+     * This assumes the fovBox has been built up using the _updateFOV method.
      *
      * @private
      */
     function _setFieldOfView()
     {
-      var fieldOfView =
-        Math.max((_self.fovBox.raLeft - _self.fovBox.raRight),
-                 (_self.fovBox.decTop - _self.fovBox.decBottom));
-      _self.aladin.setFoV(Math.min(DEFAULT_FOV_DEGREES,
-                                   inputs.afterFOVCalculation(fieldOfView)));
+      var fieldOfView = Math.max((_self.fovBox.raLeft - _self.fovBox.raRight),
+                                 (_self.fovBox.decTop - _self.fovBox.decBottom));
+      _self.aladin.setFoV(Math.min(DEFAULT_FOV_DEGREES, inputs.afterFOVCalculation(fieldOfView)));
       _self.fieldOfViewSetFlag = true;
 
-      if ((_self.defaultRA != null) && (_self.defaultDec != null))
+      if ((_self.defaultRA !== null) && (_self.defaultDec !== null))
       {
         _self.aladin.gotoRaDec(_self.defaultRA, _self.defaultDec);
       }
@@ -548,9 +544,46 @@
       }
     }
 
+    function _enableButton()
+    {
+      _self.viewAladinButton.removeClass("ui-disabled");
+      _self.viewAladinStatus.addClass("wb-invisible");
+    }
+
+    function _disableButton()
+    {
+      _self.viewAladinButton.addClass("ui-disabled");
+      _self.viewAladinStatus.removeClass("wb-invisible");
+      inputs.toggleClose($(inputs.toggleSwitchSelector));
+      _self.$target.hide();
+    }
+
+    function _toggleViewButton()
+    {
+      if (inputs.toggleSwitchSelector !== null)
+      {
+        if (_self.$target.is(":visible"))
+        {
+          inputs.toggleOpen($(inputs.toggleSwitchSelector));
+        }
+        else
+        {
+          inputs.toggleClose($(inputs.toggleSwitchSelector));
+        }
+      }
+    }
+
+    function _toggleView()
+    {
+      if (_self.viewer && _self.grid && inputs.resizeCalculation)
+      {
+        inputs.resizeCalculation();
+      }
+    }
+
     $.extend(this, {
       "init": init,
       "destroy": destroy
     });
   }
-})(jQuery);
+})(jQuery, A);

@@ -654,7 +654,7 @@ public class UnitConversionServlet extends HttpServlet
             throws TargetParserException
     {
         final TargetNameResolverClient nameResolverClient =
-                new TargetNameResolverClientImpl();
+                new DefaultNameResolverClient();
 
         final TargetParser targetParser =
                 new TargetParser(new ResolverImpl(nameResolverClient));

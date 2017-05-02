@@ -31,7 +31,7 @@
  ****  C A N A D I A N   A S T R O N O M Y   D A T A   C E N T R E  *****
  ************************************************************************
  */
-package ca.nrc.cadc.tap.impl;
+package ca.nrc.cadc.tap;
 
 import java.io.*;
 import java.net.URI;
@@ -43,7 +43,6 @@ import ca.nrc.cadc.search.FormData;
 import ca.nrc.cadc.search.Templates;
 import ca.nrc.cadc.search.form.SearchableFormConstraint;
 import ca.nrc.cadc.search.form.Text;
-import ca.nrc.cadc.tap.SyncTAPClient;
 
 import ca.nrc.cadc.AbstractUnitTest;
 import ca.nrc.cadc.search.QueryGenerator;
@@ -53,18 +52,15 @@ import ca.nrc.cadc.uws.SyncResponseWriter;
 
 import org.json.JSONWriter;
 import org.junit.Test;
-import static org.easymock.EasyMock.*;
 
+import static org.easymock.EasyMock.*;
 
 
 public class TAPSearcherTest extends AbstractUnitTest<TAPSearcher>
 {
-    private final SyncResponseWriter mockSyncResponseWriter =
-            createMock(SyncResponseWriter.class);
-    private final QueryGenerator mockQueryGenerator =
-            createMock(QueryGenerator.class);
-    private final SyncTAPClient mockSyncTAPClient =
-            createMock(SyncTAPClient.class);
+    private final SyncResponseWriter mockSyncResponseWriter = createMock(SyncResponseWriter.class);
+    private final QueryGenerator mockQueryGenerator = createMock(QueryGenerator.class);
+    private final SyncTAPClient mockSyncTAPClient = createMock(SyncTAPClient.class);
 
 
     @Test
@@ -88,8 +84,7 @@ public class TAPSearcherTest extends AbstractUnitTest<TAPSearcher>
 
         parameters.add(new Parameter("LANG", "ADQL"));
         parameters.add(new Parameter("FORMAT", "votable"));
-        parameters.add(new Parameter("QUERY",
-                                     "SELECT * FROM TABLE WHERE UTYPE1 = VAL1"));
+        parameters.add(new Parameter("QUERY", "SELECT * FROM TABLE WHERE UTYPE1 = VAL1"));
         parameters.add(new Parameter("REQUEST", "doQuery"));
         parameters.add(new Parameter("MAXREC", "11000"));
 
@@ -121,8 +116,7 @@ public class TAPSearcherTest extends AbstractUnitTest<TAPSearcher>
             void queryTAP(final URI serviceURI, Job tapJob,
                           OutputStream outputStream) throws IOException
             {
-                outputStream.write("http://mysite.com/tap/jobs/88/run"
-                                           .getBytes());
+                outputStream.write("http://mysite.com/tap/jobs/88/run".getBytes());
             }
         });
 
@@ -131,15 +125,12 @@ public class TAPSearcherTest extends AbstractUnitTest<TAPSearcher>
             /**
              * Why must I override equals here?  Why does the Job class not
              * already have one?
-             *
-             * @param obj
-             * @return
              */
             @Override
             public boolean equals(Object obj)
             {
-                return dummyJob.getParameterList().equals(((Job) obj).
-                        getParameterList());
+                return (obj instanceof Job)
+                       && dummyJob.getParameterList().equals(((Job) obj).getParameterList());
             }
         };
         tapJob.setResultsList(null);
@@ -150,14 +141,12 @@ public class TAPSearcherTest extends AbstractUnitTest<TAPSearcher>
         final JSONWriter jsonWriter = new JSONWriter(writer);
 
         expect(mockFormData.getFormConstraints()).andReturn(constraints).once();
-        expect(mockFormData.getFormValueUnits()).andReturn(
-                new HashMap<String, String>());
+        expect(mockFormData.getFormValueUnits()).andReturn(new HashMap<String, String>());
 
         replay(mockFormData, mockQueryGenerator, mockSyncTAPClient);
 
         jsonWriter.object();
-        getTestSubject().runSearch(URI.create("ivo://mysite.com/service"),
-                                   jsonWriter, dummyJob, mockFormData);
+        getTestSubject().runSearch(URI.create("ivo://mysite.com/service"), jsonWriter, dummyJob, mockFormData);
         jsonWriter.endObject();
 
         verify(mockFormData, mockQueryGenerator, mockSyncTAPClient);

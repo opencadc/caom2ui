@@ -39,8 +39,8 @@
 
 package ca.nrc.cadc.uws;
 
-import ca.nrc.cadc.caom2.CAOMQueryGeneratorImpl;
-import ca.nrc.cadc.caom2.ObsCoreQueryGeneratorImpl;
+import ca.nrc.cadc.caom2.CAOMQueryGenerator;
+import ca.nrc.cadc.caom2.ObsCoreQueryGenerator;
 import ca.nrc.cadc.net.TransientException;
 import ca.nrc.cadc.reg.client.RegistryClient;
 import ca.nrc.cadc.search.ObsModel;
@@ -51,8 +51,9 @@ import ca.nrc.cadc.search.form.Shape1;
 import ca.nrc.cadc.search.form.Text;
 import ca.nrc.cadc.search.parser.exception.PositionParserException;
 import ca.nrc.cadc.search.upload.UploadResults;
+import ca.nrc.cadc.tap.DefaultSyncTAPClient;
 import ca.nrc.cadc.tap.SyncTAPClient;
-import ca.nrc.cadc.tap.impl.*;
+import ca.nrc.cadc.tap.TAPSearcher;
 import ca.nrc.cadc.util.StringUtil;
 import ca.nrc.cadc.uws.server.*;
 
@@ -244,10 +245,10 @@ public class AdvancedRunner implements JobRunner
     private void createSearcher() throws IOException, PositionParserException
     {
         final RegistryClient registryClient = new RegistryClient();
-        final SyncTAPClient tapClient = new SyncTAPClientImpl(false,
-                                                              registryClient);
+        final SyncTAPClient tapClient = new DefaultSyncTAPClient(false,
+                                                                 registryClient);
 
-        this.searcher = new TAPSearcherImpl(
+        this.searcher = new TAPSearcher(
                 new SyncResponseWriterImpl(syncOutput),
                 jobUpdater, tapClient, getQueryGenerator());
     }
@@ -267,11 +268,11 @@ public class AdvancedRunner implements JobRunner
         {
             if (ObsModel.isObsCore(parameter.getName()))
             {
-                return new ObsCoreQueryGeneratorImpl(j);
+                return new ObsCoreQueryGenerator(j);
             }
         }
 
-        return new CAOMQueryGeneratorImpl(j);
+        return new CAOMQueryGenerator(j);
     }
 
     /**

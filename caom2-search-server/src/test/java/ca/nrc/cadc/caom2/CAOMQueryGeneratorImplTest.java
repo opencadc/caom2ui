@@ -39,7 +39,7 @@ import ca.nrc.cadc.AbstractUnitTest;
 
 
 public class CAOMQueryGeneratorImplTest
-        extends AbstractUnitTest<CAOMQueryGeneratorImpl>
+        extends AbstractUnitTest<CAOMQueryGenerator>
 {
     @Test
     public void generate() throws Exception

@@ -1,7 +1,3 @@
-package ca.nrc.cadc.caom2;
-
-import java.util.List;
-
 /*
  ************************************************************************
  *******************  CANADIAN ASTRONOMY DATA CENTRE  *******************
@@ -69,6 +65,11 @@ import java.util.List;
  *
  ************************************************************************
  */
+package ca.nrc.cadc.caom2;
+
+import java.util.List;
+
+
 public interface SearchTemplateQueryGenerator
 {
     /**
@@ -78,6 +79,5 @@ public interface SearchTemplateQueryGenerator
      * @param selectClause The Select list.
      * @return StringBuilder complete ADQL query on CAOM Observation(s)
      */
-    StringBuilder getSelectSQL(final List<SearchTemplate> templates,
-                               final String selectClause);
+    StringBuilder getSelectSQL(final List<SearchTemplate> templates, final String selectClause);
 }

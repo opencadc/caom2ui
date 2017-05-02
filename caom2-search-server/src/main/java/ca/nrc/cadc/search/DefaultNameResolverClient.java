@@ -46,7 +46,7 @@ import java.io.IOException;
 /**
  * Default implementation of the resolver client.
  */
-public class TargetNameResolverClientImpl implements TargetNameResolverClient
+public class DefaultNameResolverClient implements TargetNameResolverClient
 {
     private static final NameResolver DEFAULT_NAME_RESOLVER_IMPL =
             new NameResolver();
@@ -54,7 +54,7 @@ public class TargetNameResolverClientImpl implements TargetNameResolverClient
     private final NameResolver nameResolver;
 
 
-    public TargetNameResolverClientImpl()
+    public DefaultNameResolverClient()
     {
         this(DEFAULT_NAME_RESOLVER_IMPL);
     }
@@ -64,7 +64,7 @@ public class TargetNameResolverClientImpl implements TargetNameResolverClient
      *
      * @param nameResolver      The NameResolver base to resolve.
      */
-    public TargetNameResolverClientImpl(final NameResolver nameResolver)
+    public DefaultNameResolverClient(final NameResolver nameResolver)
     {
         this.nameResolver = nameResolver;
     }
@@ -80,15 +80,13 @@ public class TargetNameResolverClientImpl implements TargetNameResolverClient
      * @throws java.io.IOException   For any resolution errors.
      */
     @Override
-    public TargetData resolve(final String target, final String resolverName)
-            throws IOException
+    public TargetData resolve(final String target, final String resolverName) throws IOException
     {
         try
         {
-            final NameResolverData data =
-                    nameResolver.resolve(target, resolverName,
-                                         false, // cached
-                                         true); // maxDetail
+            final NameResolverData data = nameResolver.resolve(target, resolverName,
+                                                               false, // cached
+                                                               true); // maxDetail
 
             return new TargetData(data.target, //target
                                   data.ra, null, // raRange

@@ -39,7 +39,7 @@ import ca.nrc.cadc.AbstractUnitTest;
 
 
 public class ObsCoreQueryGeneratorImplTest
-        extends AbstractUnitTest<ObsCoreQueryGeneratorImpl>
+        extends AbstractUnitTest<ObsCoreQueryGenerator>
 {
     @Test
     public void generate() throws Exception

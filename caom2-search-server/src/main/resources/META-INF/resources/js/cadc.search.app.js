@@ -2,33 +2,33 @@
 {
   // register namespace
   $.extend(true, window, {
-    'ca': {
-      'nrc': {
-        'cadc': {
-          'search': {
-            'TAP_SYNC': '/search/tap/sync',
-            'i18n': {
-              'en': {
-                'ONE_CLICK_DOWNLOAD_TIP': 'Single file or .tar if multiple files',
-                'ROW_COUNT_MESSAGE': 'Showing {0} rows ({1} before filtering).',
-                'CROSS_DOMAIN_ERROR': 'Server error retrieving data'
+    "ca": {
+      "nrc": {
+        "cadc": {
+          "search": {
+            "TAP_SYNC": "/search/tap/sync",
+            "i18n": {
+              "en": {
+                "ONE_CLICK_DOWNLOAD_TIP": "Single file or .tar if multiple files",
+                "ROW_COUNT_MESSAGE": "Showing {0} rows ({1} before filtering).",
+                "CROSS_DOMAIN_ERROR": "Server error retrieving data"
               },
-              'fr': {
-                'ONE_CLICK_DOWNLOAD_TIP': 'Seul fichier ou .tar si plusieurs',
-                'ROW_COUNT_MESSAGE': 'Affichage de {0} résultats ({1} avant l\'application du filtre).',
-                'CROSS_DOMAIN_ERROR': 'French version of Server error retrieving data'
+              "fr": {
+                "ONE_CLICK_DOWNLOAD_TIP": "Seul fichier ou .tar si plusieurs",
+                "ROW_COUNT_MESSAGE": "Affichage de {0} résultats ({1} avant l\"application du filtre).",
+                "CROSS_DOMAIN_ERROR": "French version of Server error retrieving data"
               }
             },
-            'PACKAGE_SERVICE_ENDPOINT': '/search/package',
-            'UNIT_CONVERSION_ENDPOINT': '/search/unitconversion/',
-            'QUICKSEARCH_SELECTOR': '.quicksearch_link',
-            'GRID_SELECTOR': '#resultTable',
-            'RESULTS_PAGE_SIZE': 500,
-            'AdvancedSearchApp': AdvancedSearchApp,
-            'events': {
-              'onAdvancedSearchInit': new jQuery.Event('onAdvancedSearchInit')
+            "PACKAGE_SERVICE_ENDPOINT": "/search/package",
+            "UNIT_CONVERSION_ENDPOINT": "/search/unitconversion/",
+            "QUICKSEARCH_SELECTOR": ".quicksearch_link",
+            "GRID_SELECTOR": "#resultTable",
+            "RESULTS_PAGE_SIZE": 500,
+            "AdvancedSearchApp": AdvancedSearchApp,
+            "events": {
+              "onAdvancedSearchInit": new jQuery.Event("onAdvancedSearchInit")
             },
-            'downloadTypes': ['votable', 'csv', 'tsv']
+            "downloadTypes": ["votable", "csv", "tsv"]
           }
         }
       }
@@ -49,7 +49,13 @@
     // Stat fields to show on result table.
     var netEnd, loadStart, loadEnd;
 
-    this.pageLanguage = _pageLanguage || 'en';
+    this.pageLanguage = _pageLanguage || "en";
+
+    /**
+     * @property
+     * @type {StringUtil}
+     */
+    var stringUtil = new org.opencadc.StringUtil();
 
     var downloadFormSubmit = $('#downloadFormSubmit');
     var downloadForm = $('#downloadForm');
@@ -103,24 +109,14 @@
      */
     function getActiveForm()
     {
-      var $activeForm;
-
       if (!activeFormID)
       {
         activeFormID = (getActiveTabID().toLowerCase().indexOf('obscore') > 0)
-          ? getObsCoreSearchForm().getID() : getCAOMSearchForm().getID();
+            ? getObsCoreSearchForm().getID() : getCAOMSearchForm().getID();
       }
 
-      if (!activeFormID || getCAOMSearchForm().isActive(activeFormID))
-      {
-        $activeForm = getCAOMSearchForm();
-      }
-      else
-      {
-        $activeForm = getObsCoreSearchForm();
-      }
-
-      return $activeForm;
+      return (!activeFormID || getCAOMSearchForm().isActive(activeFormID))
+          ? getCAOMSearchForm() : getObsCoreSearchForm();
     }
 
     /**
@@ -164,11 +160,8 @@
       {
         var jobLoader = new ca.nrc.cadc.search.uws.UWSJobLoader(jobURL);
 
-        jobLoader.subscribe(ca.nrc.cadc.search.uws.events.onJobLoaded,
-                            successCallback);
-
-        jobLoader.subscribe(ca.nrc.cadc.search.uws.events.onJobLoadFailed,
-                            failCallback);
+        jobLoader.subscribe(ca.nrc.cadc.search.uws.events.onJobLoaded, successCallback);
+        jobLoader.subscribe(ca.nrc.cadc.search.uws.events.onJobLoadFailed, failCallback);
 
         jobLoader.load();
       }
@@ -193,16 +186,12 @@
       if (jobString)
       {
         var jobJSON = JSON.parse(jobString);
-        var uwsJobParser =
-          new ca.nrc.cadc.search.uws.json.UWSJobParser(jobJSON);
+        var uwsJobParser = new ca.nrc.cadc.search.uws.json.UWSJobParser(jobJSON);
         adqlText = uwsJobParser.getJob().getParameterValue('QUERY');
 
-        var selectListString =
-          getActiveForm().getConfiguration().getSelectListString(
-            _includeExtendedColumns);
+        var selectListString = getActiveForm().getConfiguration().getSelectListString(_includeExtendedColumns);
 
-        adqlText = 'SELECT ' + selectListString + ' '
-                   + adqlText.substring(adqlText.indexOf('FROM'));
+        adqlText = 'SELECT ' + selectListString + ' ' + adqlText.substring(adqlText.indexOf('FROM'));
       }
       else
       {
@@ -221,16 +210,11 @@
     {
       var tapQuery = 'select * from TAP_SCHEMA.columns where '
                      + '((table_name=\'caom2.Observation\' or '
-                     +
-                     'table_name=\'caom2.Plane\') and utype like \'caom2:%\') or '
-                     +
-                     '(table_name=\'ivoa.ObsCore\' and utype like \'obscore:%\')';
+                     + 'table_name=\'caom2.Plane\') and utype like \'caom2:%\') or '
+                     + '(table_name=\'ivoa.ObsCore\' and utype like \'obscore:%\')';
 
-      var caomFormConfig =
-        new ca.nrc.cadc.search.FormConfiguration(
-          new ca.nrc.cadc.search.CAOM2.FormConfiguration());
-      var obsCoreFormConfig =
-        new ca.nrc.cadc.search.FormConfiguration(
+      var caomFormConfig = new ca.nrc.cadc.search.FormConfiguration(new ca.nrc.cadc.search.CAOM2.FormConfiguration());
+      var obsCoreFormConfig = new ca.nrc.cadc.search.FormConfiguration(
           new ca.nrc.cadc.search.ObsCore.FormConfiguration());
 
       $.get(ca.nrc.cadc.search.TAP_SYNC,
@@ -243,65 +227,56 @@
             function (data)
             {
               new cadc.vot.Builder(
-                1000,
-                {
-                  xmlDOM: data
-                },
-                function (voTableBuilder)
-                {
-                  voTableBuilder.build(voTableBuilder.buildRowData);
-
-                  var voTable = voTableBuilder.getVOTable();
-                  var resources = voTable.getResources();
-                  var tables = resources[0].getTables();
-                  var tableData = tables[0].getTableData();
-                  var rows = tableData.getRows();
-
-                  for (var ri = 0, rl = rows.length; ri < rl; ri++)
+                  1000,
                   {
-                    var nextRow = rows[ri];
-                    var cells = nextRow.getCells();
+                    xmlDOM: data
+                  },
+                  function (voTableBuilder)
+                  {
+                    voTableBuilder.build(voTableBuilder.buildRowData);
 
-                    var tableName;
+                    var voTable = voTableBuilder.getVOTable();
+                    var resources = voTable.getResources();
+                    var tables = resources[0].getTables();
+                    var tableData = tables[0].getTableData();
+                    var rows = tableData.getRows();
 
-                    for (var ci = 0, cl = cells.length; ci < cl; ci++)
+                    for (var ri = 0, rl = rows.length; ri < rl; ri++)
                     {
-                      var nextCell = cells[ci];
-                      var nextFieldName = nextCell.getField().getName();
+                      var nextRow = rows[ri];
+                      var cells = nextRow.getCells();
 
-                      if (nextFieldName === 'table_name')
+                      var tableName;
+
+                      for (var ci = 0, cl = cells.length; ci < cl; ci++)
                       {
-                        tableName = nextCell.getValue();
-                        break;
+                        var nextCell = cells[ci];
+                        var nextFieldName = nextCell.getField().getName();
+
+                        if (nextFieldName === 'table_name')
+                        {
+                          tableName = nextCell.getValue();
+                          break;
+                        }
+                      }
+
+                      if (tableName.indexOf("caom2") >= 0)
+                      {
+                        caomFormConfig.addField(nextRow);
+                      }
+                      else if (tableName.indexOf("ivoa") >= 0)
+                      {
+                        obsCoreFormConfig.addField(nextRow);
                       }
                     }
 
-                    if (tableName.indexOf("caom2") >= 0)
-                    {
-                      caomFormConfig.addField(nextRow);
-                    }
-                    else if (tableName.indexOf("ivoa") >= 0)
-                    {
-                      obsCoreFormConfig.addField(nextRow);
-                    }
-                  }
-
-                  callback(null, caomFormConfig, obsCoreFormConfig);
-                });
+                    callback(null, caomFormConfig, obsCoreFormConfig);
+                  });
             }, "xml").fail(function ($xhr, textStatus)
                            {
-                             if ($xhr.responseXML)
-                             {
-                               callback("ERROR: TAP query failed: "
-                                        + $xhr.responseXML + "( "
-                                        + textStatus + " )", null, null);
-                             }
-                             else
-                             {
-                               callback("ERROR: TAP query failed: "
-                                        + $xhr.responseText + "( "
-                                        + textStatus + " )", null, null);
-                             }
+                             callback("ERROR: TAP query failed: "
+                                      + ($xhr.responseXML ? $xhr.responseXML : $xhr.responseText)
+                                      + "( " + textStatus + " )", null, null);
                            });
     }
 
@@ -335,11 +310,10 @@
                          {
                            var slashIndex = event.value.indexOf("/");
                            var eventHash = ((slashIndex >= 0)
-                             ? event.value.substring(slashIndex + 1)
-                             : event.value);
+                               ? event.value.substring(slashIndex + 1)
+                               : event.value);
 
-                           var tabID = eventHash
-                                       || getActiveTabID().split("#")[1];
+                           var tabID = eventHash || getActiveTabID().split("#")[1];
 
                            if (!eventHash)
                            {
@@ -388,8 +362,7 @@
        */
       $('li.tab').click(function ()
                         {
-                          window.location.hash =
-                            $(this).find("a").first().attr("href");
+                          window.location.hash = $(this).find("a").first().attr("href");
                         });
     };
 
@@ -478,8 +451,7 @@
                   if (values[0].length > 0)
                   {
                     // repopulate text input
-                    getActiveForm().setInputValue(currentEl.prop("id"),
-                                                  decodeURIComponent(values[0]));
+                    getActiveForm().setInputValue(currentEl.prop("id"), decodeURIComponent(values[0]));
                   }
                 }
                 else if (currentEl.prop("type").toLowerCase() === "checkbox")
@@ -495,16 +467,14 @@
                 var sourceValues = values;
 
                 // repopulate either a dropdown list or a hierarchy select
-                if ((k === "Observation.collection") &&
-                    (mCollections !== null) && (mCollections.length > 0))
+                if ((k === "Observation.collection") && (mCollections !== null) && (mCollections.length > 0))
                 {
                   sourceValues = mCollections;
                 }
 
                 for (var i = 0; i < sourceValues.length; i++)
                 {
-                  currentEl.find("option[value='" + sourceValues[i] + "']")
-                    .prop("selected", true);
+                  currentEl.find("option[value='" + sourceValues[i] + "']").prop("selected", true);
                 }
               }
             }
@@ -576,8 +546,7 @@
         {
           if (currLink.indexOf("#") >= 0)
           {
-            $languageLink.attr("href", currLink.slice(0, currLink.indexOf("#"))
-                                       + "#" + tabID);
+            $languageLink.attr("href", currLink.slice(0, currLink.indexOf("#")) + "#" + tabID);
           }
           else
           {
@@ -589,12 +558,8 @@
 
     function initForms(caomConfiguration, obsCoreConfiguration)
     {
-      setCAOMSearchForm(
-        new ca.nrc.cadc.search.SearchForm("queryForm", false,
-                                          caomConfiguration));
-      setObsCoreSearchForm(
-        new ca.nrc.cadc.search.SearchForm("obscoreQueryForm", false,
-                                          obsCoreConfiguration));
+      setCAOMSearchForm(new ca.nrc.cadc.search.SearchForm("queryForm", false, caomConfiguration));
+      setObsCoreSearchForm(new ca.nrc.cadc.search.SearchForm("obscoreQueryForm", false, obsCoreConfiguration));
 
       jQuery.fn.exists = function ()
       {
@@ -627,8 +592,7 @@
                           {
                             var currentFocus = $('*:focus');
 
-                            if (!currentFocus.is("input")
-                                && !currentFocus.is("textarea"))
+                            if (!currentFocus.is("input") && !currentFocus.is("textarea"))
                             {
                               event.preventDefault();
                             }
@@ -655,9 +619,8 @@
               field.name !== "format" &&
               field.name !== "Form.name")
           {
-            parameters.push($activeFormObject.find("[name='" + field.name +
-                            "']").attr("id") + "=" +
-                            encodeURIComponent(field.value.replace(/\%/g, '*')));
+            parameters.push($activeFormObject.find("[name='" + field.name + "']").attr("id") + "="
+                            + encodeURIComponent(field.value.replace(/\%/g, '*')));
           }
         });
 
@@ -718,18 +681,13 @@
 
         var formatCheckbox = function ($rowItem)
         {
-          var stringUtil =
-            new cadc.web.util.StringUtil(
-              $rowItem[getActiveForm().getDownloadAccessKey()]);
-
-          if (!stringUtil.hasText())
+          if (!stringUtil.hasText($rowItem[getActiveForm().getDownloadAccessKey()]))
           {
             var $checkboxSelect = $("input:checkbox._select_" + $rowItem.id);
             var $parentContainer = $checkboxSelect.parent("div");
 
             $parentContainer.empty();
-            $("<span class=\"_select_" + $rowItem.id +
-              "\">N/A</span>").appendTo($parentContainer);
+            $("<span class=\"_select_" + $rowItem.id + "\">N/A</span>").appendTo($parentContainer);
           }
         };
 
@@ -747,15 +705,15 @@
         {
           var downloadableColumnName = getActiveForm().getDownloadAccessKey();
           var downloadableColumnValue =
-            row.getCellValue(downloadableColumnName);
+              row.getCellValue(downloadableColumnName);
 
           return (downloadableColumnValue === null);
         };
 
         var rowCountMessage = function (totalRows, rowCount)
         {
-          return new cadc.web.util.StringUtil(
-            ca.nrc.cadc.search.i18n[getPageLanguage()]["ROW_COUNT_MESSAGE"]).format(totalRows, rowCount);
+          return stringUtil.format(ca.nrc.cadc.search.i18n[getPageLanguage()]["ROW_COUNT_MESSAGE"],
+                                   [totalRows, rowCount]);
         };
 
         var oneClickDownloadTitle = function ()
@@ -765,87 +723,88 @@
 
         // Options for the CADC VOTV instance
         var cadcVOTVOptions =
-          {
-            editable: false,
-            enableAddRow: false,
-            showHeaderRow: true,
-            showTopPanel: false,
-            enableCellNavigation: true,
-            asyncEditorLoading: true,
-            defaultColumnWidth: 100,
-            explicitInitialization: false,
-            enableAsyncPostRender: true,
-            fullWidthRows: false,
-            pager: false,
-            headerRowHeight: 50,
-            multiSelect: true,
-            propagateEvents: true,
-            leaveSpaceForNewRows: false,
-            // ID of the sort column (Start Date).
-            sortColumn: getActiveForm().getConfiguration().getDefaultSortColumnID(),
-            sortDir: "desc",
-            topPanelHeight: 5,
-            enableTextSelectionOnCells: true,
-            gridResizable: true,
-            rerenderOnResize: false,
-            emptyResultsMessageSelector: "#cadcvotv-empty-results-message",
-            frozenColumn: 0,
-            frozenBottom: false,
-            enableSelection: true,
-            suggest_maxRowCount: 7,
-            targetNodeSelector: "#resultTable",    // Shouldn't really be an
-                                                   // option as it's mandatory!
-            columnFilterPluginName: "suggest",
-            enableOneClickDownload: true,
-            oneClickDownloadTitle: oneClickDownloadTitle(),
-            oneClickDownloadURL: ca.nrc.cadc.search.PACKAGE_SERVICE_ENDPOINT,
-            oneClickDownloadURLColumnID: getActiveForm().getConfiguration().getDownloadAccessKey(),
-            headerCheckboxLabel: "Mark",
-            rowManager: {
-              onRowRendered: onRowRendered,
-              isRowDisabled: isRowDisabled
-            },
-            columnManager: {
-              filterable: true,
-              forceFitColumns: false,
-              resizable: true,
+            {
+              editable: false,
+              enableAddRow: false,
+              showHeaderRow: true,
+              showTopPanel: false,
+              enableCellNavigation: true,
+              asyncEditorLoading: true,
+              defaultColumnWidth: 100,
+              explicitInitialization: false,
+              enableAsyncPostRender: true,
+              fullWidthRows: false,
+              pager: false,
+              headerRowHeight: 50,
+              multiSelect: true,
+              propagateEvents: true,
+              leaveSpaceForNewRows: false,
+              // ID of the sort column (Start Date).
+              sortColumn: getActiveForm().getConfiguration().getDefaultSortColumnID(),
+              sortDir: "desc",
+              topPanelHeight: 5,
+              enableTextSelectionOnCells: true,
+              gridResizable: false,
+              rerenderOnResize: false,
+              emptyResultsMessageSelector: "#cadcvotv-empty-results-message",
+              frozenColumn: 0,
+              frozenBottom: false,
+              enableSelection: true,
+              suggest_maxRowCount: 7,
+              targetNodeSelector: "#resultTable",    // Shouldn't really be an
+                                                     // option as it's mandatory!
+              columnFilterPluginName: "suggest",
+              enableOneClickDownload: true,
+              oneClickDownloadTitle: oneClickDownloadTitle(),
+              oneClickDownloadURL: ca.nrc.cadc.search.PACKAGE_SERVICE_ENDPOINT,
+              oneClickDownloadURLColumnID: getActiveForm().getConfiguration().getDownloadAccessKey(),
+              headerCheckboxLabel: "Mark",
+              rowManager: {
+                onRowRendered: onRowRendered,
+                isRowDisabled: isRowDisabled
+              },
+              columnManager: {
+                filterable: true,
+                forceFitColumns: false,
+                resizable: true,
 
-              // Story 1647
-              // Generic formatter.  Needs to have a format(column, value)
-              // method.
-              formatter: columnManager,
-              picker: {
-                style: "dialog",
-                options: {
-                  showAllButtonText: $('#COLUMN_MANAGER_SHOW_ALL_BUTTON_TEXT').text(),
-                  resetButtonText: $('#COLUMN_MANAGER_DEFAULT_COLUMNS_BUTTON_TEXT').text(),
-                  orderAlphaButtonText: $('#COLUMN_MANAGER_ORDER_ALPHABETICALLY_BUTTON_TEXT').text(),
-                  dialogTriggerID: "slick-columnpicker-panel-change-column",
-                  targetSelector: $('#column_manager_container').find('.column_manager_columns').first(),
-                  position: {my: "right", at: "right bottom"},
-                  closeDialogSelector: ".dialog-close",
-                  refreshPositions: true
+                // Story 1647
+                // Generic formatter.  Needs to have a format(column, value)
+                // method.
+                formatter: columnManager,
+                picker: {
+                  style: "dialog",
+                  options: {
+                    showAllButtonText: $('#COLUMN_MANAGER_SHOW_ALL_BUTTON_TEXT').text(),
+                    resetButtonText: $('#COLUMN_MANAGER_DEFAULT_COLUMNS_BUTTON_TEXT').text(),
+                    orderAlphaButtonText: $('#COLUMN_MANAGER_ORDER_ALPHABETICALLY_BUTTON_TEXT').text(),
+                    dialogTriggerID: "slick-columnpicker-panel-change-column",
+                    targetSelector: $('#column_manager_container').find('.column_manager_columns').first(),
+                    position: {my: "right", at: "right bottom"},
+                    closeDialogSelector: ".dialog-close",
+                    refreshPositions: true
+                  }
+                }
+              },
+              maxRowLimit: getMaxRecordCount(),
+              maxRowLimitWarning: $('#max_row_limit_warning').val(),
+              rowCountMessage: rowCountMessage,
+              plugins: {
+                footprint: {
+                  hidden: true,
+                  enabled: true,
+                  onHover: false,
+                  onClick: true,
+                  maxRowCount: 10000,
+                  renderedRowsOnly: false,
+                  toggleSwitchSelector: "#slick-visualize",
+                  footprintFieldID: getActiveForm().getConfiguration().getFootprintColumnID(),
+                  fovFieldID: getActiveForm().getConfiguration().getFOVColumnID(),
+                  raFieldID: getActiveForm().getConfiguration().getRAColumnID(),
+                  decFieldID: getActiveForm().getConfiguration().getDecColumnID()
                 }
               }
-            },
-            maxRowLimit: getMaxRecordCount(),
-            maxRowLimitWarning: $('#max_row_limit_warning').val(),
-            rowCountMessage: rowCountMessage,
-            plugins: {
-              footprint: {
-                enabled: true,
-                onHover: false,
-                onClick: true,
-                maxRowCount: 10000,
-                renderedRowsOnly: false,
-                toggleSwitchSelector: "#slick-visualize",
-                footprintFieldID: getActiveForm().getConfiguration().getFootprintColumnID(),
-                fovFieldID: getActiveForm().getConfiguration().getFOVColumnID(),
-                raFieldID: getActiveForm().getConfiguration().getRAColumnID(),
-                decFieldID: getActiveForm().getConfiguration().getDecColumnID()
-              }
-            }
-          };
+            };
 
         var options = columnManager.getOptions();
         var opts = $.extend(true, {}, cadcVOTVOptions, options);
@@ -873,13 +832,13 @@
                          }
 
                          var serializer = new cadc.vot.ResultStateSerializer(
-                           href,
-                           resultsVOTV.sortcol,
-                           resultsVOTV.sortDir ? "asc" : "dsc",
-                           resultsVOTV.getDisplayedColumns(),
-                           resultsVOTV.getResizedColumns(),
-                           resultsVOTV.getColumnFilters(),
-                           resultsVOTV.getUpdatedColumnSelects());
+                             href,
+                             resultsVOTV.sortcol,
+                             resultsVOTV.sortDir ? "asc" : "dsc",
+                             resultsVOTV.getDisplayedColumns(),
+                             resultsVOTV.getResizedColumns(),
+                             resultsVOTV.getColumnFilters(),
+                             resultsVOTV.getUpdatedColumnSelects());
 
                          var windowName = "_" + $(event.target).text();
 
@@ -894,7 +853,7 @@
                               {
                                 var columnID = args.column.id;
                                 var filterValue =
-                                  resultsVOTV.getColumnFilters()[columnID];
+                                    resultsVOTV.getColumnFilters()[columnID];
 
                                 processFilterValue(filterValue, args,
                                                    function (breakdownPureFilterValue,
@@ -906,7 +865,7 @@
                                                      resultsVOTV.setColumnFilter(columnID,
                                                                                  breakdownDisplayFilterValue);
                                                      resultsVOTV.getColumnFilters()[columnID] =
-                                                       breakdownDisplayFilterValue;
+                                                         breakdownDisplayFilterValue;
                                                    });
                               });
 
@@ -983,13 +942,13 @@
                                        }
 
                                        var serializer = new cadc.vot.ResultStateSerializer(
-                                         href + getFormQueryString(),
-                                         resultsVOTV.sortcol,
-                                         resultsVOTV.sortDir ? "asc" : "dsc",
-                                         resultsVOTV.getDisplayedColumns(),
-                                         resultsVOTV.getResizedColumns(),
-                                         resultsVOTV.getColumnFilters(),
-                                         resultsVOTV.getUpdatedColumnSelects());
+                                           href + getFormQueryString(),
+                                           resultsVOTV.sortcol,
+                                           resultsVOTV.sortDir ? "asc" : "dsc",
+                                           resultsVOTV.getDisplayedColumns(),
+                                           resultsVOTV.getResizedColumns(),
+                                           resultsVOTV.getColumnFilters(),
+                                           resultsVOTV.getUpdatedColumnSelects());
                                        alert(serializer.getResultStateUrl());
                                      });
 
@@ -1012,8 +971,7 @@
       };
 
       caomform.subscribe(ca.nrc.cadc.search.events.onInvalid, onFormInvalid);
-      obscoreform.subscribe(ca.nrc.cadc.search.events.onInvalid,
-                            onFormInvalid);
+      obscoreform.subscribe(ca.nrc.cadc.search.events.onInvalid, onFormInvalid);
 
       $(':reset').click(function ()
                         {
@@ -1040,10 +998,9 @@
     {
       var activeTab = $('ul#tabList li.active');
       var defaultTab = $('ul#tabList li.default');
-      var langURLPath = $("span[lang='" + getPageLanguage() +
-                          "'].lang-link-target").text();
+      var langURLPath = $("span[lang='" + getPageLanguage() + "'].lang-link-target").text();
       var cachedTabID =
-        sessionStorage.getItem("activePanel-" + langURLPath + "0");
+          sessionStorage.getItem("activePanel-" + langURLPath + "0");
       var targetTabID;
 
       if (cachedTabID)
@@ -1072,8 +1029,7 @@
       {
         if (_continue)
         {
-          var currentURI = new cadc.web.util.URI(window.location.href);
-          var queryObject = currentURI.getQuery();
+          var queryObject = currentURI().getQuery();
 
           // Work directly with the form object.
           var $submitForm = getActiveForm().getForm();
@@ -1090,14 +1046,12 @@
                     || (qKey === ca.nrc.cadc.search.OBSCORE_RESOLVER_VALUE_KEY))
                 {
                   getActiveForm().clearTimeout();
-                  getActiveForm().setSelectValue(
-                    ca.nrc.cadc.search.CAOM2_TARGET_NAME_FIELD_ID, qKey,
-                    decodeURIComponent(qValue.join()));
+                  getActiveForm().setSelectValue(ca.nrc.cadc.search.CAOM2_TARGET_NAME_FIELD_ID, qKey,
+                                                 decodeURIComponent(qValue.join()));
                 }
                 else
                 {
-                  getActiveForm().setInputValue(
-                    qKey, decodeURIComponent(qValue.join()));
+                  getActiveForm().setInputValue(qKey, decodeURIComponent(qValue.join()));
                 }
 
                 doSubmit = true;
@@ -1120,7 +1074,7 @@
               if (dtSelectValues && (dtSelectValues.length > 0))
               {
                 dtSelectUtypeValues =
-                  dtSelectUtypeValues.concat(dtSelectValues);
+                    dtSelectUtypeValues.concat(dtSelectValues);
               }
 
               // The "collection" keyword is grandfathered in, but actually
@@ -1131,13 +1085,13 @@
               if (dtSelectUtype === 'Observation.collection')
               {
                 var grandfatheredCollectionValues =
-                  currentURI.getQueryValues("collection");
+                    currentURI.getQueryValues("collection");
 
                 if (grandfatheredCollectionValues
                     && (grandfatheredCollectionValues.length > 0))
                 {
                   dtSelectUtypeValues =
-                    dtSelectUtypeValues.concat(grandfatheredCollectionValues);
+                      dtSelectUtypeValues.concat(grandfatheredCollectionValues);
                 }
               }
 
@@ -1163,9 +1117,8 @@
             }
           }
 
-          if (doSubmit
-              && ((currentURI.getQueryValue('noexec') === null)
-                  || currentURI.getQueryValue('noexec') === 'false'))
+          if (doSubmit && (!stringUtil.hasText(currentURI.getQueryValue("noexec"))
+                           || (currentURI.getQueryValue("noexec") === "false")))
           {
             // Initialize popup.
             $('#queryOverlay').popup();
@@ -1180,13 +1133,11 @@
 
             var activeTabID = window.location.hash || getActiveTabID();
             var isNoExecFlag = ((currentURI.getQueryValue('noexec') !== null)
-                                && (currentURI.getQueryValue('noexec') ===
-                                    'true'));
+                                && (currentURI.getQueryValue('noexec') === "true"));
             var destinationTabID;
 
-            if (((activeTabID !== "#queryFormTab")
-                 && (sessionStorage.getItem("isReload") === false))
-                || isNoExecFlag || !activeTabID)
+            if (((activeTabID !== "#queryFormTab") && (sessionStorage.getItem("isReload") === false)) || isNoExecFlag
+                || !activeTabID)
             {
               // go to query tab
               destinationTabID = "queryFormTab";
@@ -1209,8 +1160,8 @@
                                       if (args && args.error)
                                       {
                                         console.error(
-                                          'Error reading TAP schema >> '
-                                          + args.error);
+                                            'Error reading TAP schema >> '
+                                            + args.error);
                                       }
                                       else
                                       {
@@ -1258,22 +1209,18 @@
       // Clear the existing ones first.
       _viewer.getOptions().defaultColumnIDs = [];
 
-      var deserializer =
-        new cadc.vot.ResultStateDeserializer(window.location.href);
+      var deserializer = new cadc.vot.ResultStateDeserializer(window.location.href);
       var viewerOptions = deserializer.getViewerOptions();
 
       if (!$.isEmptyObject(viewerOptions))
       {
-        $.extend(true, _viewer.getOptions(),
-                 sanitizeColumnOptions(viewerOptions));
+        $.extend(true, _viewer.getOptions(), sanitizeColumnOptions(viewerOptions));
       }
 
-      if (!_viewer.getOptions().defaultColumnIDs ||
-          _viewer.getOptions().defaultColumnIDs.length === 0)
+      if (!_viewer.getOptions().defaultColumnIDs || _viewer.getOptions().defaultColumnIDs.length === 0)
       {
         var $activeFormConfiguration = getActiveForm().getConfiguration();
-        _viewer.getOptions().defaultColumnIDs =
-          $activeFormConfiguration.getDefaultColumnIDs();
+        _viewer.getOptions().defaultColumnIDs = $activeFormConfiguration.getDefaultColumnIDs();
       }
     }
 
@@ -1281,8 +1228,7 @@
     {
       var sanitizedObject = {};
 
-      sanitizedObject.sortColumn =
-        columnManager.getIDFromLabel(_columnOptions.sortColumn);
+      sanitizedObject.sortColumn = columnManager.getIDFromLabel(_columnOptions.sortColumn);
       sanitizedObject.sortDir = _columnOptions.sortDir;
 
       if (_columnOptions.columnOptions)
@@ -1290,8 +1236,7 @@
         sanitizedObject.columnOptions = {};
         $.each(_columnOptions.columnOptions, function (key, obj)
         {
-          sanitizedObject.columnOptions[columnManager.getIDFromLabel(key)] =
-            obj;
+          sanitizedObject.columnOptions[columnManager.getIDFromLabel(key)] = obj;
         });
       }
 
@@ -1301,7 +1246,7 @@
         $.each(_columnOptions.columnFilters, function (key, obj)
         {
           sanitizedObject.columnFilters[columnManager.getIDFromLabel(key)] =
-            obj;
+              obj;
         });
       }
 
@@ -1312,7 +1257,7 @@
         for (var i = 0; i < _columnOptions.defaultColumnIDs.length; i++)
         {
           sanitizedObject.defaultColumnIDs.push(
-            columnManager.getIDFromLabel(_columnOptions.defaultColumnIDs[i]));
+              columnManager.getIDFromLabel(_columnOptions.defaultColumnIDs[i]));
         }
       }
 
@@ -1343,18 +1288,13 @@
             var unit = units[i];
             if (defaultUnitType === unit['value'])
             {
-              if (!unit['default'])
+              if (unit['default'])
               {
-                unit['default'] = true;
-              }
-              else
-              {
-                unit['default'] = true;
-
                 // no need to remove default unit type
                 oldDefaultRemoved = true;
               }
 
+              unit['default'] = true;
               newDefaultAdded = true;
             }
             else
@@ -1382,26 +1322,20 @@
     // Called when the results are in and the UWS Job is complete.
     function setJobParameters(jobParams, callback)
     {
-      var queryParam = 'QUERY=' + encodeURIComponent(getADQL(true));
-      var votableURL = ca.nrc.cadc.search.TAP_SYNC
-                       + '?LANG=ADQL&REQUEST=doQuery&' + queryParam;
+      var queryParam = "QUERY=" + encodeURIComponent(getADQL(true));
+      var votableURL = ca.nrc.cadc.search.TAP_SYNC + "?LANG=ADQL&REQUEST=doQuery&" + queryParam;
 
       if (jobParams.upload_url && (jobParams.upload_url !== null))
       {
-        votableURL += '&UPLOAD=' + encodeURIComponent(jobParams.upload_url);
+        votableURL += "&UPLOAD=" + encodeURIComponent(jobParams.upload_url);
       }
 
-      for (var downloadTypesIndex = 0;
-           downloadTypesIndex < ca.nrc.cadc.search.downloadTypes.length;
-           downloadTypesIndex++)
+      for (var dti = 0, dtl = ca.nrc.cadc.search.downloadTypes.length; dti < dtl; dti++)
       {
-        var nextDownloadType =
-          ca.nrc.cadc.search.downloadTypes[downloadTypesIndex];
+        var nextDownloadType = ca.nrc.cadc.search.downloadTypes[dti];
 
-        var nextVOTableURI = new cadc.web.util.URI(votableURL + '&FORMAT='
-                                                   + nextDownloadType);
-        $('a.votable_link_' +
-          nextDownloadType).prop('href', nextVOTableURI.getRelativeURI());
+        var nextVOTableURI = new cadc.web.util.URI(votableURL + "&FORMAT=" + nextDownloadType);
+        $("a.votable_link_" + nextDownloadType).prop("href", nextVOTableURI.getRelativeURI());
       }
 
       if (callback)
@@ -1412,24 +1346,24 @@
 
     function postQuerySubmission(jobParams)
     {
-      queryOverlay.popup('close');
+      queryOverlay.popup("close");
 
-      var selectAllCheckbox = $('input[name="selectAllCheckbox"]');
-      selectAllCheckbox.prop('title', 'Mark/Unmark all');
+      var selectAllCheckbox = $("input[name='selectAllCheckbox']");
+      selectAllCheckbox.prop("title", "Mark/Unmark all");
 
-      $('select#download_option_product_type').focus();
+      $("select#download_option_product_type").focus();
 
-      $('.cellValue.preview').tooltip({
-                                        position: 'bottom right',
+      $(".cellValue.preview").tooltip({
+                                        position: "bottom right",
                                         offset: [-10, -10],
-                                        effect: 'toggle',
+                                        effect: "toggle",
                                         delay: 0,
                                         relative: true,
                                         events: {
-                                          def: 'mouseover,mouseout',
-                                          input: 'focus,blur',
-                                          widget: 'focus mouseenter,blur mouseleave',
-                                          tooltip: 'mouseover,mouseout'
+                                          def: "mouseover,mouseout",
+                                          input: "focus,blur",
+                                          widget: "focus mouseenter,blur mouseleave",
+                                          tooltip: "mouseover,mouseout"
                                         }
                                       });
       setJobParameters(jobParams);
@@ -1437,85 +1371,87 @@
 
     function processErrorResults(error_url)
     {
+      var $errorTooltipColumnPickerHolder = $('#errorTooltipColumnPickerHolder');
+
       // Options for the Error CADC VOTV instance
       var errorVOTVOptions =
-        {
-          editable: false,
-          enableAddRow: false,
-          showHeaderRow: true,
-          showTopPanel: true,
-          enableCellNavigation: false,
-          asyncEditorLoading: true,
-          defaultColumnWidth: 100,
-          explicitInitialization: false,
-          enableAsyncPostRender: true,
-          fullWidthRows: true,
-          pager: false,
-          headerRowHeight: 50,
-          multiSelect: false,
-          leaveSpaceForNewRows: false,
-          sortColumn: 'LineNumber',  // ID of the sort column.
-          sortDir: 'asc',
-          topPanelHeight: 5,
-          enableTextSelectionOnCells: true,
-          gridResizable: true,
-          rerenderOnResize: false,
-          enableSelection: false,
-          targetNodeSelector: '#errorTable',    // Shouldn't really be an option
-                                                // as it's mandatory!
-          columnManager: {
-            filterable: true,
-            forceFitColumns: false,
-            //          forceFitColumnMode: 'max',
-            resizable: true,
-            picker: {
-              style: 'tooltip',
-              panel: $('div#error-grid-header'),
-              options: {
-                buttonText: ((getPageLanguage() === 'fr') ?
-                             'Gérer l\'affichage des colonnes' :
-                             'Change Columns')
-              },
-              tooltipOptions: {
-                targetSelector: $('#errorTooltipColumnPickerHolder').find('.tooltip_content').first(),
-                appendTooltipContent: true,
-                tooltipContent: $('#errorTooltipColumnPickerHolder').find('.tooltip').first(),
-                position: 'center right',
-                // The horizontal spacing is 0 so that when hovering from the
-                // input field to the tooltip, the parent div is not left (and
-                // the tooltip stays open
-                offset: [150, 0],
-                relative: true,
-                delay: 50,
-                effect: 'toggle',
-                events: {
-                  def: ',',
-                  widget: 'click,mouseleave'
+          {
+            editable: false,
+            enableAddRow: false,
+            showHeaderRow: true,
+            showTopPanel: true,
+            enableCellNavigation: false,
+            asyncEditorLoading: true,
+            defaultColumnWidth: 100,
+            explicitInitialization: false,
+            enableAsyncPostRender: true,
+            fullWidthRows: true,
+            pager: false,
+            headerRowHeight: 50,
+            multiSelect: false,
+            leaveSpaceForNewRows: false,
+            sortColumn: 'LineNumber',  // ID of the sort column.
+            sortDir: 'asc',
+            topPanelHeight: 5,
+            enableTextSelectionOnCells: true,
+            gridResizable: true,
+            rerenderOnResize: false,
+            enableSelection: false,
+            targetNodeSelector: '#errorTable',    // Shouldn't really be an option
+                                                  // as it's mandatory!
+            columnManager: {
+              filterable: true,
+              forceFitColumns: false,
+              //          forceFitColumnMode: 'max',
+              resizable: true,
+              picker: {
+                style: 'tooltip',
+                panel: $('div#error-grid-header'),
+                options: {
+                  buttonText: ((getPageLanguage() === 'fr') ?
+                               'Gérer l\'affichage des colonnes' :
+                               'Change Columns')
+                },
+                tooltipOptions: {
+                  targetSelector: $errorTooltipColumnPickerHolder.find('.tooltip_content').first(),
+                  appendTooltipContent: true,
+                  tooltipContent: $errorTooltipColumnPickerHolder.find('.tooltip').first(),
+                  position: 'center right',
+                  // The horizontal spacing is 0 so that when hovering from the
+                  // input field to the tooltip, the parent div is not left (and
+                  // the tooltip stays open
+                  offset: [150, 0],
+                  relative: true,
+                  delay: 50,
+                  effect: 'toggle',
+                  events: {
+                    def: ',',
+                    widget: 'click,mouseleave'
+                  }
                 }
               }
-            }
-          },
-          columnOptions: {
-            'TargetError': {
-              width: 400
             },
-            'LineNumber': {
-              width: 100
-            },
-            'Target': {
-              width: 100
-            },
-            'RA': {
-              width: 100
-            },
-            'DEC': {
-              width: 100
-            },
-            'radius': {
-              width: 80
-            }
-          }  // Done by column ID.
-        };
+            columnOptions: {
+              'TargetError': {
+                width: 400
+              },
+              'LineNumber': {
+                width: 100
+              },
+              'Target': {
+                width: 100
+              },
+              'RA': {
+                width: 100
+              },
+              'DEC': {
+                width: 100
+              },
+              'radius': {
+                width: 80
+              }
+            }  // Done by column ID.
+          };
 
       var errorVOTV = new cadc.vot.Viewer('#errorTable', errorVOTVOptions);
 
@@ -1529,8 +1465,7 @@
                           errorVOTV.render();
 
                           $('#errorTable').find('.grid-header-label')
-                            .text(getPageLanguage() === 'fr' ? 'Erreur.' :
-                                  'Error');
+                              .text(getPageLanguage() === 'fr' ? 'Erreur.' : 'Error');
 
                           // Necessary at the end!
                           errorVOTV.refreshGrid();
@@ -1541,8 +1476,7 @@
                         {
                           console.error('Error status: ' + status);
                           console.error('Error message: ' + message);
-                          console.error('Error from response: '
-                                        + jqXHR.responseText);
+                          console.error('Error from response: ' + jqXHR.responseText);
                         });
 
         $('#errorTableTab-link').click();
@@ -1611,58 +1545,54 @@
         var localHost = (new cadc.web.util.URI(window.location.href)).getHost();
         if (jobHost !== localHost)
         {
-          console.error('cross domain error - local host: ' + localHost +
-                        ', requested job host: ' + jobHost);
-          searchError(ca.nrc.cadc.search.i18n[getPageLanguage()]['CROSS_DOMAIN_ERROR']);
+          console.error("cross domain error - local host: " + localHost + ", requested job host: " + jobHost);
+          searchError(ca.nrc.cadc.search.i18n[getPageLanguage()]["CROSS_DOMAIN_ERROR"]);
         }
         else
         {
           var runID = json.run_id;
 
-          var buildPanelMessage = function (queryTimeStart, queryTimeEnd,
-                                            loadTimeStart, loadTimeEnd)
+          var buildPanelMessage = function (queryTimeStart, queryTimeEnd, loadTimeStart, loadTimeEnd)
           {
-            var isFR = getPageLanguage() === 'fr';
+            var isFR = getPageLanguage() === "fr";
             var totalQueryTime = ((queryTimeEnd - queryTimeStart) / 1000.0);
             var totalLoadTime = ((loadTimeEnd - loadTimeStart) / 1000.0);
-            var secondsString = isFR ? ' secondes' : ' seconds';
-            return (isFR ? 'Recherche et transfert: '
-                : 'Query and transfer: ') + totalQueryTime
-                   + secondsString + ' - '
-                   + (isFR ? 'Lecture et affichage: '
-                : 'Load and render: ')
+            var secondsString = isFR ? " secondes" : " seconds";
+            return (isFR ? "Recherche et transfert: "
+                    : "Query and transfer: ") + totalQueryTime
+                   + secondsString + " - " + (isFR ? "Lecture et affichage: " : "Load and render: ")
                    + totalLoadTime + secondsString;
           };
 
           loadUWSJob(json.job_url, function (event, args)
           {
-            sessionStorage.setItem('uws_job', JSON.stringify(args.job));
+            sessionStorage.setItem("uws_job", JSON.stringify(args.job));
 
             loadStart = (new Date()).getTime();
 
           }, function (event, args)
                      {
-                       console.error('Status error when loading job: '
+                       console.error("Status error when loading job: "
                                      + args.errorStatusCode);
                      });
 
           if (json.display_units)
           {
-            $(document).data('displayUnits', json.display_units);
+            $(document).data("displayUnits", json.display_units);
           }
 
-          downloadForm.find('input[name="fragment"]').val('RUNID=' + runID);
+          downloadForm.find("input[name='fragment']").val("RUNID=" + runID);
 
           // Clean and prepare the download form.
-          downloadForm.find('input[name="uri"]').remove();
-          downloadForm.find('input[name="cutout"]').remove();
+          downloadForm.find("input[name='uri']").remove();
+          downloadForm.find("input[name='cutout']").remove();
 
           if (json.cutout)
           {
             var input = $('<input>');
 
-            input.prop('type', 'hidden');
-            input.prop('name', 'cutout');
+            input.prop("type", "hidden");
+            input.prop("name", "cutout");
             input.val(json.cutout);
 
             downloadForm.append(input);
@@ -1673,7 +1603,7 @@
           resultsVOTV.build({
                               url: json.results_url,
                               // useRelativeURL: true,
-                              type: $('input[name="format"]').val(),
+                              type: $("input[name='format']").val(),
                               tableMetadata: getActiveForm().getResultsTableMetadata(),
                               pageSize: ca.nrc.cadc.search.RESULTS_PAGE_SIZE
                             },
@@ -1693,18 +1623,16 @@
                               var message = buildPanelMessage(startDate, netEnd,
                                                               loadStart, loadEnd);
 
-                              $('#results-grid-footer')
-                                .find('.grid-footer-label').text(message);
+                              $("#results-grid-footer").find(".grid-footer-label").text(message);
 
                               // Necessary at the end!
                               resultsVOTV.refreshGrid();
                             },
                             function (jqXHR, status, message)
                             {
-                              console.error('Error status: ' + status);
-                              console.error('Error message: ' + message);
-                              console.error('Error from response: '
-                                            + jqXHR.responseText);
+                              console.error("Error status: " + status);
+                              console.error("Error message: " + message);
+                              console.error("Error from response: " + jqXHR.responseText);
                               getActiveForm().cancel();
                               alert(message);
                             });

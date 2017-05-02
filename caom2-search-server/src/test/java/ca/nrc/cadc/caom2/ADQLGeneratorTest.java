@@ -48,12 +48,12 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 
-public class ADQLImplTest extends AbstractUnitTest<ADQLImpl>
+public class ADQLGeneratorTest extends AbstractUnitTest<ADQLGenerator>
 {
     @Test
     public void getCAOM2SelectList() throws Exception
     {
-        setTestSubject(new ADQLImpl("caom2", null, null, null, null));
+        setTestSubject(new ADQLGenerator("caom2", null, null, null, null));
 
         final String selectList2 =
                 getTestSubject().getSelectList(
@@ -100,7 +100,7 @@ public class ADQLImplTest extends AbstractUnitTest<ADQLImpl>
     @Test
     public void getObsCoreSelectList() throws Exception
     {
-        setTestSubject(new ADQLImpl("ivoa.obscore", null, null, null, null));
+        setTestSubject(new ADQLGenerator("ivoa.obscore", null, null, null, null));
 
         final String selectList =
                 getTestSubject().getSelectList(
@@ -115,7 +115,7 @@ public class ADQLImplTest extends AbstractUnitTest<ADQLImpl>
     @Test
     public void toSQLIntervalEnergySearch() throws Exception
     {
-        setTestSubject(new ADQLImpl("caom2", null, null, null, null));
+        setTestSubject(new ADQLGenerator("caom2", null, null, null, null));
 
         final IntervalSearch intervalSearch1 = new IntervalSearch("TESTIS",
                                                                   88.0d,
@@ -151,7 +151,7 @@ public class ADQLImplTest extends AbstractUnitTest<ADQLImpl>
     @Test
     public void toSQLIntervalTimeSearch() throws Exception
     {
-        setTestSubject(new ADQLImpl("caom2", null, null, null, null));
+        setTestSubject(new ADQLGenerator("caom2", null, null, null, null));
 
         final IntervalSearch intervalSearch1 = new IntervalSearch("TESTIS",
                                                                   88.0d,
@@ -188,7 +188,7 @@ public class ADQLImplTest extends AbstractUnitTest<ADQLImpl>
     @Test
     public void toSQLSpatialSearch() throws Exception
     {
-        setTestSubject(new ADQLImpl("caom2", null, null, null, null));
+        setTestSubject(new ADQLGenerator("caom2", null, null, null, null));
 
         final SpatialSearch spatialSearch1 =
                 new SpatialSearch("TESTSS", new Shape()
@@ -278,7 +278,7 @@ public class ADQLImplTest extends AbstractUnitTest<ADQLImpl>
 
         final java.util.Date upperDate = calendar.getTime();
 
-        setTestSubject(new ADQLImpl("caom2", null, null, null, null));
+        setTestSubject(new ADQLGenerator("caom2", null, null, null, null));
 
         final SearchTemplate timestampSearchTemplate =
                 new TimestampSearch("Plane.dataRelease", lowerDate,
@@ -316,7 +316,7 @@ public class ADQLImplTest extends AbstractUnitTest<ADQLImpl>
     @Test
     public void toSQLRangeSearch() throws Exception
     {
-        setTestSubject(new ADQLImpl("caom2", null, null, null, null));
+        setTestSubject(new ADQLGenerator("caom2", null, null, null, null));
 
         final Range<Double> raRange = new Range<>("110..115", null, 110d, 115d,
                                                         Operand.RANGE);
@@ -356,8 +356,8 @@ public class ADQLImplTest extends AbstractUnitTest<ADQLImpl>
     @Test
     public void getFromWithUploadCAOM() throws Exception
     {
-        setTestSubject(new ADQLImpl("caom2", "search_upload,param:targetList",
-                                    "ALL", "target_name", "position_bounds"));
+        setTestSubject(new ADQLGenerator("caom2", "search_upload,param:targetList",
+                                         "ALL", "target_name", "position_bounds"));
 
         final String fromClause = getTestSubject().getFrom(Plane.class, 2);
 
@@ -371,9 +371,9 @@ public class ADQLImplTest extends AbstractUnitTest<ADQLImpl>
     @Test
     public void getFromWithUploadObsCore() throws Exception
     {
-        setTestSubject(new ADQLImpl("ivoa.obscore",
-                                    "search_upload,param:targetList",
-                                    "ALL", "target_name", "s_fov"));
+        setTestSubject(new ADQLGenerator("ivoa.obscore",
+                                         "search_upload,param:targetList",
+                                         "ALL", "target_name", "s_fov"));
 
         final String fromClause = getTestSubject().getFrom(Plane.class, 2);
 
@@ -387,8 +387,8 @@ public class ADQLImplTest extends AbstractUnitTest<ADQLImpl>
     @Test
     public void getWhere() throws Exception
     {
-        setTestSubject(new ADQLImpl("caom2", "search_upload,param:targetList",
-                                    "ALL", "target_name", "position_bounds"));
+        setTestSubject(new ADQLGenerator("caom2", "search_upload,param:targetList",
+                                         "ALL", "target_name", "position_bounds"));
 
         final Calendar calendar = Calendar.getInstance(DateUtil.UTC);
         calendar.set(1977, Calendar.NOVEMBER, 25, 3, 21, 0);
