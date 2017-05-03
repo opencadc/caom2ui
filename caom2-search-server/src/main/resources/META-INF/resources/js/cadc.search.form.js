@@ -5,6 +5,9 @@
       "nrc": {
         "cadc": {
           "search": {
+            "ignore_fields": [
+                "collection", "noexec"
+            ],
             "CAOM2_TARGET_NAME_FIELD_ID": "Plane.position.bounds",
             "OBSCORE_TARGET_NAME_FIELD_ID": "Char.SpatialAxis.Coverage.Support.Area",
             "FORM_LABEL_INPUT_LENGTH": 12,
@@ -1737,7 +1740,7 @@
         }
       }
       // The "collection" word is grandfathered in, so ignore it...
-      else if (($formItem.length === 0) && (_inputID !== "collection"))
+      else if (($formItem.length === 0) && (ca.nrc.cadc.search.ignore_fields.indexOf(_inputID) < 0))
       {
         // If there is no input, then create one and assume the user knows what they're doing.
         var $newHidden = $("<input>").attr("type", "hidden").attr("name", _inputID).val(_inputValue)
