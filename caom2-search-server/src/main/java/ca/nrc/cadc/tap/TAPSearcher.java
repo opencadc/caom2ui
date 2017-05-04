@@ -302,8 +302,7 @@ public class TAPSearcher implements Searcher
 
         jsonWriter.key("display_units").object();
 
-        for (final Map.Entry<String, String> entry
-                : formValueUnits.entrySet())
+        for (final Map.Entry<String, String> entry : formValueUnits.entrySet())
         {
             jsonWriter.key(entry.getKey()).value(entry.getValue());
         }

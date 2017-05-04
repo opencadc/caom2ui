@@ -82,7 +82,7 @@ $.fn.ajaxSubmit = function(options) {
 	}
 
 	// provide opportunity to alter form data before it is serialized
-	if (options.beforeSerialize && options.beforeSerialize(this, options) === false) {
+	if (options._beforeSerialize && options._beforeSerialize(this, options) === false) {
 		log('ajaxSubmit: submit aborted via beforeSerialize callback');
 		return this;
 	}

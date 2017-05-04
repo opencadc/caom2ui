@@ -1,4 +1,4 @@
-(function ($)
+(function ($, window)
 {
   // register namespace
   $.extend(true, window, {
@@ -6,21 +6,28 @@
       "nrc": {
         "cadc": {
           "search": {
-            "TAP_SYNC": "/search/tap/sync",
+            "defaults": {
+              "pageLanguage": "en",
+              "autoInitFlag": true,
+              "tapSyncEndpoint": "/search/tap/sync",
+              "packageEndpoint": "/search/package",
+              "autocompleteEndpoint": "/search/unitconversion"
+            },
+            "field_ignore": [
+              "sort_column", "sort_order", "formName", "SelectList", "MaxRecords", "format", "Form.name"
+            ],
             "i18n": {
               "en": {
                 "ONE_CLICK_DOWNLOAD_TIP": "Single file or .tar if multiple files",
-                "ROW_COUNT_MESSAGE": "Showing {0} rows ({1} before filtering).",
+                "ROW_COUNT_MESSAGE": "Showing {1} rows ({2} before filtering).",
                 "CROSS_DOMAIN_ERROR": "Server error retrieving data"
               },
               "fr": {
                 "ONE_CLICK_DOWNLOAD_TIP": "Seul fichier ou .tar si plusieurs",
-                "ROW_COUNT_MESSAGE": "Affichage de {0} résultats ({1} avant l\"application du filtre).",
+                "ROW_COUNT_MESSAGE": "Affichage de {1} résultats ({2} avant l'application du filtre).",
                 "CROSS_DOMAIN_ERROR": "French version of Server error retrieving data"
               }
             },
-            "PACKAGE_SERVICE_ENDPOINT": "/search/package",
-            "UNIT_CONVERSION_ENDPOINT": "/search/unitconversion/",
             "QUICKSEARCH_SELECTOR": ".quicksearch_link",
             "GRID_SELECTOR": "#resultTable",
             "RESULTS_PAGE_SIZE": 500,
@@ -38,123 +45,159 @@
   /**
    * The main AdvancedSearch application.
    *
-   * @param _pageLanguage   The language from the page.
-   * @param _autoInitFlag   Whether to auto-initialize this application.
+   * @param {Object} _options   Options to this Application.
+   * @param {String} [_options.pageLanguage="en"]   The language from the page.
+   * @param {Boolean} [_options.autoInitFlag=true]   Whether to auto-initialize this application.
+   * @param {String} [_options.tapSyncEndpoint="/search/tap/sync"]   Relative URI endpoint to the TAP service.
+   * @param {String} [_options.packageEndpoint="/search/package"]   Relative URI endpoint to the CAOM2 package service.
+   * @param {String} [_options.autocompleteEndpoint="/search/unitconversion"]   Relative URI endpoint to the unit
+   *     conversion service.
    * @constructor
    */
-  function AdvancedSearchApp(_pageLanguage, _autoInitFlag)
+  function AdvancedSearchApp(_options)
   {
-    var _self = this;
-
     // Stat fields to show on result table.
     var netEnd, loadStart, loadEnd;
-
-    this.pageLanguage = _pageLanguage || "en";
 
     /**
      * @property
      * @type {StringUtil}
      */
     var stringUtil = new org.opencadc.StringUtil();
-
-    var downloadFormSubmit = $('#downloadFormSubmit');
-    var downloadForm = $('#downloadForm');
-    var queryOverlay = $('#queryOverlay');
-    var queryTab = $('#queryTab');
-    var $tabContainer = $('#tabContainer');
+    var downloadFormSubmit = $("#downloadFormSubmit");
+    var downloadForm = $("#downloadForm");
+    var queryOverlay = $("#queryOverlay");
+    var queryTab = $("#queryTab");
+    var $tabContainer = $("#tabContainer");
 
     // Text area containing the ADQL query.
-    var $queryCode = $('#query');
+    var $queryCode = $("#query");
     var columnManager = new ca.nrc.cadc.search.columns.ColumnManager();
     var resultsVOTV;
 
+    this.options = $.extend({}, ca.nrc.cadc.search.defaults, _options);
+
+    /**
+     * @type {ca.nrc.cadc.search.SearchForm|SearchForm}
+     */
     this.caomSearchForm = null;
+
+    /**
+     * @type {ca.nrc.cadc.search.SearchForm|SearchForm}
+     */
     this.obsCoreSearchForm = null;
 
     // The active Form's ID being used to submit the last query.
     var activeFormID;
 
-    function getPageLanguage()
+    /**
+     * @return {String}
+     */
+    this.getPageLanguage = function ()
     {
-      return _self.pageLanguage;
-    }
+      return this.options.pageLanguage;
+    };
 
-    function getCAOMSearchForm()
+    /**
+     *
+     * @return {ca.nrc.cadc.search.SearchForm|SearchForm}
+     */
+    this.getCAOMSearchForm = function ()
     {
-      return _self.caomSearchForm;
-    }
+      return this.caomSearchForm;
+    };
 
-    function getObsCoreSearchForm()
+    /**
+     *
+     * @return {ca.nrc.cadc.search.SearchForm|SearchForm}
+     */
+    this.getObsCoreSearchForm = function ()
     {
-      return _self.obsCoreSearchForm;
-    }
+      return this.obsCoreSearchForm;
+    };
 
-    function getDownloadForm()
+    /**
+     * Set the new form for CAOM-2.
+     *
+     * @param {ca.nrc.cadc.search.SearchForm|SearchForm} form  New CAOM2 form instance.
+     * @private
+     */
+    this._setCAOMSearchForm = function (form)
     {
-      return _self.downloadForm;
-    }
+      this.caomSearchForm = form;
+    };
 
-    function setCAOMSearchForm(form)
+    /**
+     * Set the new form for ObsCore.
+     *
+     * @param {ca.nrc.cadc.search.SearchForm|SearchForm} form  New ObsCore form instance.
+     * @private
+     */
+    this._setObsCoreSearchForm = function (form)
     {
-      _self.caomSearchForm = form;
-    }
-
-    function setObsCoreSearchForm(form)
-    {
-      _self.obsCoreSearchForm = form;
-    }
+      this.obsCoreSearchForm = form;
+    };
 
     /**
      * Obtain the currently active form object.
+     *
+     * return {ca.nrc.cadc.search.SearchForm|SearchForm}    Form instance.
+     * @private
      */
-    function getActiveForm()
+    this._getActiveForm = function ()
     {
       if (!activeFormID)
       {
-        activeFormID = (getActiveTabID().toLowerCase().indexOf('obscore') > 0)
-            ? getObsCoreSearchForm().getID() : getCAOMSearchForm().getID();
+        activeFormID = (this._getActiveTabID().toLowerCase().indexOf("obscore") > 0)
+            ? this.getObsCoreSearchForm().getID() : this.getCAOMSearchForm().getID();
       }
 
-      return (!activeFormID || getCAOMSearchForm().isActive(activeFormID))
-          ? getCAOMSearchForm() : getObsCoreSearchForm();
-    }
+      return (!activeFormID || this.getCAOMSearchForm().isActive(activeFormID))
+          ? this.getCAOMSearchForm() : this.getObsCoreSearchForm();
+    };
 
     /**
      * Obtain the currently set maximum record return count.
      * @returns {Number}
      */
-    function getMaxRecordCount()
+    this.getMaxRecordCount = function ()
     {
-      return getActiveForm().getForm().find('input[name="MaxRecords"]').val();
-    }
+      return this._getActiveForm().getForm().find('input[name="MaxRecords"]').val();
+    };
 
     /**
      * Pretty print the ADQL in the text area.
      *
-     * @param adqlText
-     * @returns {XML|string}
+     * @param {String}  adqlText    The ADQL to set.
+     * @returns {String}
+     * @private
      */
-    function adqlPrint(adqlText)
+    this._adqlPrint = function (adqlText)
     {
       return adqlText.replace(/(FROM|WHERE|AND)/g,
                               function (match)
                               {
-                                return '\n' + match;
+                                return "\n" + match;
                               }).replace(/JOIN/g,
                                          function (match)
                                          {
-                                           return '\n\t' + match;
+                                           return "\n\t" + match;
                                          }).replace(/,/g,
                                                     function (match)
                                                     {
-                                                      return match + '\n\t';
+                                                      return match + "\n\t";
                                                     });
-    }
+    };
 
     /**
      * Post-query load of the ADQL results.
+     *
+     * @param {String} jobURL   The Job URL to load from.  Warning: Could be CORS.
+     * @param {function} successCallback   Call back to call on successful job load.
+     * @param {function} failCallback      Call back to call on unsuccessful job load.
+     * @private
      */
-    function loadUWSJob(jobURL, successCallback, failCallback)
+    this._loadUWSJob = function (jobURL, successCallback, failCallback)
     {
       if (jobURL)
       {
@@ -167,62 +210,67 @@
       }
       else
       {
-        console.error('Unable to obtain Job ADQL.');
+        console.error("Unable to obtain Job ADQL.");
       }
-    }
+    };
 
     /**
      * Set the ADQL data from the current job, if any.
      *
-     * @param _includeExtendedColumns   Whether to include the 'invisible' set
-     *                                  of columns in the SELECT clause.
+     * @param {boolean} _includeExtendedColumns   Whether to include the 'invisible' set of columns in the SELECT
+     *     clause.
      * @returns {String} text of ADQL.
+     * @private
      */
-    function getADQL(_includeExtendedColumns)
+    this._getADQL = function (_includeExtendedColumns)
     {
-      var jobString = sessionStorage.getItem('uws_job');
+      var jobString = sessionStorage.getItem("uws_job");
       var adqlText;
 
       if (jobString)
       {
         var jobJSON = JSON.parse(jobString);
         var uwsJobParser = new ca.nrc.cadc.search.uws.json.UWSJobParser(jobJSON);
-        adqlText = uwsJobParser.getJob().getParameterValue('QUERY');
+        adqlText = uwsJobParser.getJob().getParameterValue("QUERY");
 
-        var selectListString = getActiveForm().getConfiguration().getSelectListString(_includeExtendedColumns);
+        var selectListString = this._getActiveForm().getConfiguration().getSelectListString(_includeExtendedColumns);
 
-        adqlText = 'SELECT ' + selectListString + ' ' + adqlText.substring(adqlText.indexOf('FROM'));
+        adqlText = "SELECT " + selectListString + " " + adqlText.substring(adqlText.indexOf("FROM"));
       }
       else
       {
-        adqlText = ''
+        adqlText = ""
       }
 
       return adqlText;
-    }
+    };
+
 
     /**
-     * Get the metadata for all columns
+     * Initialize the form configurations.
      *
-     * @param callback    Function to indicate completion.
+     * @param {Function} callback   Callback on successful build.
+     * @private
      */
-    function initConfigurations(callback)
+    this._initFormConfigurations = function (callback)
     {
-      var tapQuery = 'select * from TAP_SCHEMA.columns where '
-                     + '((table_name=\'caom2.Observation\' or '
-                     + 'table_name=\'caom2.Plane\') and utype like \'caom2:%\') or '
-                     + '(table_name=\'ivoa.ObsCore\' and utype like \'obscore:%\')';
+      var tapQuery = "select * from TAP_SCHEMA.columns where "
+                     + "((table_name='caom2.Observation' or "
+                     + "table_name='caom2.Plane') and utype like 'caom2:%') or "
+                     + "(table_name='ivoa.ObsCore' and utype like 'obscore:%')";
 
-      var caomFormConfig = new ca.nrc.cadc.search.FormConfiguration(new ca.nrc.cadc.search.CAOM2.FormConfiguration());
+      var caomFormConfig = new ca.nrc.cadc.search.FormConfiguration(new ca.nrc.cadc.search.CAOM2.FormConfiguration(),
+                                                                    this.options);
       var obsCoreFormConfig = new ca.nrc.cadc.search.FormConfiguration(
-          new ca.nrc.cadc.search.ObsCore.FormConfiguration());
+          new ca.nrc.cadc.search.ObsCore.FormConfiguration(),
+          this.options);
 
-      $.get(ca.nrc.cadc.search.TAP_SYNC,
+      $.get(this.options.tapSyncEndpoint,
             {
-              REQUEST: 'doQuery',
-              LANG: 'ADQL',
+              REQUEST: "doQuery",
+              LANG: "ADQL",
               QUERY: tapQuery,
-              FORMAT: 'votable'
+              FORMAT: "votable"
             },
             function (data)
             {
@@ -253,7 +301,7 @@
                         var nextCell = cells[ci];
                         var nextFieldName = nextCell.getField().getName();
 
-                        if (nextFieldName === 'table_name')
+                        if (nextFieldName === "table_name")
                         {
                           tableName = nextCell.getValue();
                           break;
@@ -278,7 +326,7 @@
                                       + ($xhr.responseXML ? $xhr.responseXML : $xhr.responseText)
                                       + "( " + textStatus + " )", null, null);
                            });
-    }
+    };
 
     /**
      * Initialize all things pertinent to the application.
@@ -309,11 +357,8 @@
         $.address.change(function (event)
                          {
                            var slashIndex = event.value.indexOf("/");
-                           var eventHash = ((slashIndex >= 0)
-                               ? event.value.substring(slashIndex + 1)
-                               : event.value);
-
-                           var tabID = eventHash || getActiveTabID().split("#")[1];
+                           var eventHash = ((slashIndex >= 0) ? event.value.substring(slashIndex + 1) : event.value);
+                           var tabID = eventHash || this._getActiveTabID().split("#")[1];
 
                            if (!eventHash)
                            {
@@ -321,32 +366,31 @@
                            }
                            else
                            {
-                             selectTab(tabID);
-                           }
-                         });
-      });
-
-      initConfigurations(function (error, caomConfiguration, obsCoreConfiguration)
-                         {
-                           if (error)
-                           {
-                             var errorMessage = "Metadata field failed to initialize: " +
-                                                error;
-                             console.error(errorMessage);
-                             this._trigger(ca.nrc.cadc.search.events.onAdvancedSearchInit,
-                                           {
-                                             error: errorMessage
-                                           });
-                           }
-                           else
-                           {
-                             cleanMetadata(caomConfiguration);
-                             cleanMetadata(obsCoreConfiguration);
-
-                             initForms(caomConfiguration, obsCoreConfiguration);
-                             this._trigger(ca.nrc.cadc.search.events.onAdvancedSearchInit, {});
+                             this._selectTab(tabID);
                            }
                          }.bind(this));
+      });
+
+      this._initFormConfigurations(function (error, caomConfiguration, obsCoreConfiguration)
+                                   {
+                                     if (error)
+                                     {
+                                       var errorMessage = "Metadata field failed to initialize: " + error;
+                                       console.error(errorMessage);
+                                       this._trigger(ca.nrc.cadc.search.events.onAdvancedSearchInit,
+                                                     {
+                                                       error: errorMessage
+                                                     });
+                                     }
+                                     else
+                                     {
+                                       this._cleanMetadata(caomConfiguration);
+                                       this._cleanMetadata(obsCoreConfiguration);
+
+                                       this._initializeForms(caomConfiguration, obsCoreConfiguration);
+                                       this._trigger(ca.nrc.cadc.search.events.onAdvancedSearchInit, {});
+                                     }
+                                   }.bind(this));
 
       /*
        * Story 1644
@@ -356,9 +400,13 @@
        * This should be automatic from the easy tabs library, but I have a
        * feeling the WET 3.1 library is getting in the way.
        *
-       * TODO - Re-evaluate when WET 4.0 is implemented!
+       * TODO - Re-evaluate when Bootstrap is implemented!
        *
        * jenkinsd 11.10.2014
+       *
+       * TODO: Amended to expect Bootstrap.
+       * jenkinsd 05.03.2017
+       *
        */
       $('li.tab').click(function ()
                         {
@@ -368,14 +416,18 @@
 
     /**
      * Remove empty or non-existent fields from the metadata.
-     * @param _formConfig   The form configuration to modify.
+     *
+     * @param {ca.nrc.cadc.search.FormConfiguration|FormConfiguration} _formConfig   The form configuration to modify.
+     *
+     * @private
      */
-    function cleanMetadata(_formConfig)
+    this._cleanMetadata = function (_formConfig)
     {
-      var metadataFields = _formConfig.getTableMetadata().getFields();
+      var tableMetaData = _formConfig.getTableMetadata();
+      var metadataFields = tableMetaData.getFields();
       var cleanFields = [];
 
-      for (var i = 0; i < metadataFields.length; i++)
+      for (var i = 0, mfl = metadataFields.length; i < mfl; i++)
       {
         var f = metadataFields[i];
         if (f)
@@ -384,13 +436,18 @@
         }
       }
 
-      _formConfig.getTableMetadata().setFields(cleanFields);
-    }
+      tableMetaData.setFields(cleanFields);
+    };
 
     /**
      * Deserialize the form data in the search results.
+     *
+     * This is only made public to allow testing.
+     *
+     * @param {String}  formData    The String serialized form data.
+     * @returns {{}}
      */
-    function deserializeFormData(formData)
+    this.deserializeFormData = function (formData)
     {
       // RegEx for '+' character.
       var plus = /\+/g;
@@ -422,12 +479,15 @@
       }
 
       return map;
-    }
+    };
 
     /**
      * Repopulates the form using the form data passed in.
+     *
+     * @param {{}}  formDataMap   The map (hash) object containing form information.
+     * @private
      */
-    function repopulateForm(formDataMap)
+    this._repopulateForm = function (formDataMap)
     {
       var mCollections = $('#Observation\\.collection').val();
       for (var k in formDataMap)
@@ -451,7 +511,7 @@
                   if (values[0].length > 0)
                   {
                     // repopulate text input
-                    getActiveForm().setInputValue(currentEl.prop("id"), decodeURIComponent(values[0]));
+                    this._getActiveForm().setInputValue(currentEl.prop("id"), decodeURIComponent(values[0]));
                   }
                 }
                 else if (currentEl.prop("type").toLowerCase() === "checkbox")
@@ -481,13 +541,15 @@
           }
         }
       }
-    }
+    };
 
     /**
-     * If the table viewer isn't displayed, check for cached form data,
-     * and re-post the query displaying the search results.
+     * If the table viewer isn't displayed, check for cached form data, and re-post the query displaying the search
+     * results.
+     *
+     * @private
      */
-    function updateResults()
+    this._updateResults = function ()
     {
       if (!$('div.slick-viewport').length)
       {
@@ -495,34 +557,39 @@
         if (formData)
         {
           // Deserialize and repopulate form.
-          var formDataMap = deserializeFormData(formData);
-          repopulateForm(formDataMap);
-          getActiveForm().submit();
+          var formDataMap = this.deserializeFormData(formData);
+          this._repopulateForm(formDataMap);
+          this._getActiveForm().submit();
         }
       }
-    }
+    };
 
     /**
      * Update the existing tab content.
-     * @param tabID   The ID of the current tab.
+     *
+     * @param {String} tabID   The ID of the current tab.
+     *
+     * @private
      */
-    function updateCurrentTabContent(tabID)
+    this._updateCurrentTabContent = function (tabID)
     {
-      if (tabID === 'resultTableTab')
+      if (tabID === "resultTableTab")
       {
-        updateResults();
+        this._updateResults();
       }
-      else if (tabID === 'queryTab')
+      else if (tabID === "queryTab")
       {
-        $queryCode.text(adqlPrint(getADQL(false)));
+        $queryCode.text(this._adqlPrint(this._getADQL(false)));
       }
-    }
+    };
 
     /**
      * On address change, select that tab.
-     * @param tabID   The TabID from the hash.
+     *
+     * @param {String} tabID   The TabID from the hash to select (move to).
+     * @private
      */
-    function selectTab(tabID)
+    this._selectTab = function (tabID)
     {
       // If it's been initialized.
       if ($tabContainer.easytabs)
@@ -533,7 +600,7 @@
       // Scroll to top.
       window.scrollTo(0, 0);
 
-      updateCurrentTabContent(tabID);
+      this._updateCurrentTabContent(tabID);
 
       // Update the language selector link.
       var $languageLink = $('a.lang-link');
@@ -554,12 +621,43 @@
           }
         }
       }
-    }
+    };
 
-    function initForms(caomConfiguration, obsCoreConfiguration)
+    /**
+     *
+     * @returns {string}
+     */
+    this._getFormQueryString = function ()
     {
-      setCAOMSearchForm(new ca.nrc.cadc.search.SearchForm("queryForm", false, caomConfiguration));
-      setObsCoreSearchForm(new ca.nrc.cadc.search.SearchForm("obscoreQueryForm", false, obsCoreConfiguration));
+      var parameters = [];
+      var $activeFormObject = this._getActiveForm().getForm();
+      var fields = $activeFormObject.serializeArray();
+      $.each(fields, function (index, field)
+      {
+        if (field.value && (ca.nrc.cadc.search.field_ignore.indexOf(field.name) < 0))
+        {
+          parameters.push($activeFormObject.find("[name='" + field.name + "']").attr("id") + "="
+                          + encodeURIComponent(field.value.replace(/\%/g, '*')));
+        }
+      });
+
+      return (parameters.length > 0) ? ("?" + parameters.join("&")) : "";
+    };
+
+    /**
+     * Initialize the form instances.
+     *
+     * @param {ca.nrc.cadc.search.CAOM2.FormConfiguration}  caomConfiguration CAOM2 form configuration.
+     * @param {ca.nrc.cadc.search.ObsCore.FormConfiguration}  obsCoreConfiguration  ObsCore form configuration.
+     * @private
+     */
+    this._initializeForms = function (caomConfiguration, obsCoreConfiguration)
+    {
+      var caomSearchForm = new ca.nrc.cadc.search.SearchForm("queryForm", false, caomConfiguration);
+      var obsCoreSearchForm = new ca.nrc.cadc.search.SearchForm("obscoreQueryForm", false, obsCoreConfiguration);
+
+      this._setCAOMSearchForm(caomSearchForm);
+      this._setObsCoreSearchForm(obsCoreSearchForm);
 
       jQuery.fn.exists = function ()
       {
@@ -570,15 +668,15 @@
       jQuery.ajaxSettings.traditional = true;
 
       // Disable the forms to begin with.
-      getCAOMSearchForm().disable();
-      getObsCoreSearchForm().disable();
+      caomSearchForm.disable();
+      obsCoreSearchForm.disable();
 
-      var tooltipURL = "json/tooltips_" + getPageLanguage() + ".json";
+      var tooltipURL = "json/tooltips_" + this.getPageLanguage() + ".json";
 
       $.getJSON(tooltipURL, function (jsonData)
       {
-        getCAOMSearchForm().loadTooltips(jsonData);
-        getObsCoreSearchForm().loadTooltips(jsonData);
+        caomSearchForm.loadTooltips(jsonData);
+        obsCoreSearchForm.loadTooltips(jsonData);
       });
 
       // Trap the backspace key to prevent it going 'Back' when not using it to
@@ -599,52 +697,20 @@
                           }
                         });
 
-      /**
-       *
-       * @returns {string}
-       */
-      var getFormQueryString = function ()
-      {
-        var parameters = [];
-        var $activeFormObject = getActiveForm().getForm();
-        var fields = $activeFormObject.serializeArray();
-        $.each(fields, function (index, field)
-        {
-          if (field.value &&
-              field.name !== "sort_column" &&
-              field.name !== "sort_order" &&
-              field.name !== "formName" &&
-              field.name !== "SelectList" &&
-              field.name !== "MaxRecords" &&
-              field.name !== "format" &&
-              field.name !== "Form.name")
-          {
-            parameters.push($activeFormObject.find("[name='" + field.name + "']").attr("id") + "="
-                            + encodeURIComponent(field.value.replace(/\%/g, '*')));
-          }
-        });
-
-        return (parameters.length > 0) ? ("?" + parameters.join("&")) : "";
-      };
-
-      // Form setup and binding of events.
-      var caomform = getCAOMSearchForm();
-      var obscoreform = getObsCoreSearchForm();
-
       var onFormCancel = function ()
       {
         console.warn("Cancelling search.");
         queryOverlay.popup("close");
       };
 
-      caomform.subscribe(ca.nrc.cadc.search.events.onCancel, onFormCancel);
-      obscoreform.subscribe(ca.nrc.cadc.search.events.onCancel, onFormCancel);
+      caomSearchForm.subscribe(ca.nrc.cadc.search.events.onCancel, onFormCancel);
+      obsCoreSearchForm.subscribe(ca.nrc.cadc.search.events.onCancel, onFormCancel);
 
       var onFormSubmitComplete = function (eventData, args)
       {
         if (args.success)
         {
-          processResults(args.data, args.startDate, function ()
+          this._processResults(args.data, args.startDate, function ()
           {
             // Perform a results tab link click here to simulate moving to the
             // results tab.
@@ -653,16 +719,16 @@
         }
         else
         {
-          processErrorResults(args.error_url, args.startDate,
-                              args.cadcForm.getForm());
+          this._processErrorResults(args.error_url);
         }
-      };
+      }.bind(this);
 
-      caomform.subscribe(ca.nrc.cadc.search.events.onSubmitComplete,
-                         onFormSubmitComplete);
-      obscoreform.subscribe(ca.nrc.cadc.search.events.onSubmitComplete,
-                            onFormSubmitComplete);
+      caomSearchForm.subscribe(ca.nrc.cadc.search.events.onSubmitComplete, onFormSubmitComplete);
+      obsCoreSearchForm.subscribe(ca.nrc.cadc.search.events.onSubmitComplete, onFormSubmitComplete);
 
+      /**
+       * Form validation succeeded.
+       */
       var onFormValid = function (eventData, args)
       {
         if (resultsVOTV)
@@ -681,7 +747,7 @@
 
         var formatCheckbox = function ($rowItem)
         {
-          if (!stringUtil.hasText($rowItem[getActiveForm().getDownloadAccessKey()]))
+          if (!stringUtil.hasText($rowItem[this._getActiveForm().getDownloadAccessKey()]))
           {
             var $checkboxSelect = $("input:checkbox._select_" + $rowItem.id);
             var $parentContainer = $checkboxSelect.parent("div");
@@ -689,7 +755,7 @@
             $parentContainer.empty();
             $("<span class=\"_select_" + $rowItem.id + "\">N/A</span>").appendTo($parentContainer);
           }
-        };
+        }.bind(this);
 
         // To be used when the grid.onRenderedRows event is
         // fired.
@@ -703,23 +769,24 @@
 
         var isRowDisabled = function (row)
         {
-          var downloadableColumnName = getActiveForm().getDownloadAccessKey();
-          var downloadableColumnValue =
-              row.getCellValue(downloadableColumnName);
+          var downloadableColumnName = this._getActiveForm().getDownloadAccessKey();
+          var downloadableColumnValue = row.getCellValue(downloadableColumnName);
 
           return (downloadableColumnValue === null);
-        };
+        }.bind(this);
 
         var rowCountMessage = function (totalRows, rowCount)
         {
-          return stringUtil.format(ca.nrc.cadc.search.i18n[getPageLanguage()]["ROW_COUNT_MESSAGE"],
+          return stringUtil.format(ca.nrc.cadc.search.i18n[this.getPageLanguage()]["ROW_COUNT_MESSAGE"],
                                    [totalRows, rowCount]);
-        };
+        }.bind(this);
 
         var oneClickDownloadTitle = function ()
         {
-          return ca.nrc.cadc.search.i18n[getPageLanguage()]["ONE_CLICK_DOWNLOAD_TIP"];
-        };
+          return ca.nrc.cadc.search.i18n[this.getPageLanguage()]["ONE_CLICK_DOWNLOAD_TIP"];
+        }.bind(this);
+
+        var activeForm = this._getActiveForm();
 
         // Options for the CADC VOTV instance
         var cadcVOTVOptions =
@@ -740,7 +807,7 @@
               propagateEvents: true,
               leaveSpaceForNewRows: false,
               // ID of the sort column (Start Date).
-              sortColumn: getActiveForm().getConfiguration().getDefaultSortColumnID(),
+              sortColumn: activeForm.getConfiguration().getDefaultSortColumnID(),
               sortDir: "desc",
               topPanelHeight: 5,
               enableTextSelectionOnCells: true,
@@ -756,8 +823,8 @@
               columnFilterPluginName: "suggest",
               enableOneClickDownload: true,
               oneClickDownloadTitle: oneClickDownloadTitle(),
-              oneClickDownloadURL: ca.nrc.cadc.search.PACKAGE_SERVICE_ENDPOINT,
-              oneClickDownloadURLColumnID: getActiveForm().getConfiguration().getDownloadAccessKey(),
+              oneClickDownloadURL: this.options.packageEndpoint,
+              oneClickDownloadURLColumnID: activeForm.getConfiguration().getDownloadAccessKey(),
               headerCheckboxLabel: "Mark",
               rowManager: {
                 onRowRendered: onRowRendered,
@@ -786,7 +853,7 @@
                   }
                 }
               },
-              maxRowLimit: getMaxRecordCount(),
+              maxRowLimit: this.getMaxRecordCount(),
               maxRowLimitWarning: $('#max_row_limit_warning').val(),
               rowCountMessage: rowCountMessage,
               plugins: {
@@ -798,10 +865,10 @@
                   maxRowCount: 10000,
                   renderedRowsOnly: false,
                   toggleSwitchSelector: "#slick-visualize",
-                  footprintFieldID: getActiveForm().getConfiguration().getFootprintColumnID(),
-                  fovFieldID: getActiveForm().getConfiguration().getFOVColumnID(),
-                  raFieldID: getActiveForm().getConfiguration().getRAColumnID(),
-                  decFieldID: getActiveForm().getConfiguration().getDecColumnID()
+                  footprintFieldID: activeForm.getConfiguration().getFootprintColumnID(),
+                  fovFieldID: activeForm.getConfiguration().getFOVColumnID(),
+                  raFieldID: activeForm.getConfiguration().getRAColumnID(),
+                  decFieldID: activeForm.getConfiguration().getDecColumnID()
                 }
               }
             };
@@ -809,14 +876,12 @@
         var options = columnManager.getOptions();
         var opts = $.extend(true, {}, cadcVOTVOptions, options);
 
-        resultsVOTV = new cadc.vot.Viewer(ca.nrc.cadc.search.GRID_SELECTOR,
-                                          opts);
+        resultsVOTV = new cadc.vot.Viewer(ca.nrc.cadc.search.GRID_SELECTOR, opts);
 
-        // Unfortunately this has to be selected at the Document level since
-        // the
-        // items in question (located by
-        // ca.nrc.cadc.search.QUICKSEARCH_SELECTOR) aren't actually created
-        // yet.  jenkinsd 2015.05.08
+        // Unfortunately this has to be selected at the Document level since the items in question (located by
+        // ca.nrc.cadc.search.QUICKSEARCH_SELECTOR) aren't actually created yet.
+        // jenkinsd 2015.05.08
+        //
         $(document).on("click", ca.nrc.cadc.search.QUICKSEARCH_SELECTOR,
                        function (event)
                        {
@@ -842,8 +907,7 @@
 
                          var windowName = "_" + $(event.target).text();
 
-                         window.open(serializer.getResultStateUrl(), windowName,
-                                     '');
+                         window.open(serializer.getResultStateUrl(), windowName, "");
 
                          return false;
                        });
@@ -851,23 +915,21 @@
         resultsVOTV.subscribe(cadc.vot.events.onUnitChanged,
                               function (event, args)
                               {
+                                var viewer = args.application;
                                 var columnID = args.column.id;
-                                var filterValue =
-                                    resultsVOTV.getColumnFilters()[columnID];
+                                var filterValue = viewer.getColumnFilters()[columnID];
 
-                                processFilterValue(filterValue, args,
-                                                   function (breakdownPureFilterValue,
-                                                             breakdownDisplayFilterValue)
-                                                   {
-                                                     $(args.column).data("pureFilterValue",
-                                                                         breakdownPureFilterValue);
+                                this.processFilterValue(filterValue, args,
+                                                        function (breakdownPureFilterValue, breakdownDisplayFilterValue)
+                                                        {
+                                                          $(args.column).data("pureFilterValue",
+                                                                              breakdownPureFilterValue);
 
-                                                     resultsVOTV.setColumnFilter(columnID,
-                                                                                 breakdownDisplayFilterValue);
-                                                     resultsVOTV.getColumnFilters()[columnID] =
-                                                         breakdownDisplayFilterValue;
-                                                   });
-                              });
+                                                          viewer.setColumnFilter(columnID, breakdownDisplayFilterValue);
+                                                          viewer.getColumnFilters()[columnID] =
+                                                              breakdownDisplayFilterValue;
+                                                        });
+                              }.bind(this));
 
         downloadFormSubmit.click(function (event)
                                  {
@@ -875,16 +937,16 @@
 
                                    downloadForm.find("input[name='uri']").remove();
 
-                                   if (resultsVOTV.getSelectedRows().length <=
-                                       0)
+                                   if (resultsVOTV.getSelectedRows().length <= 0)
                                    {
                                      alert(downloadForm.find("span#NO_OBSERVATIONS_SELECTED_MESSAGE").text());
                                    }
                                    else
                                    {
-                                     $.each(resultsVOTV.getSelectedRows(), function (arrayIndex, selectedRowIndex)
+                                     var selectedRows = resultsVOTV.getSelectedRows();
+                                     for (var arrIndex = 0, srl = selectedRows.length; arrIndex < srl; arrIndex++)
                                      {
-                                       var $nextRow = resultsVOTV.getRow(selectedRowIndex);
+                                       var $nextRow = resultsVOTV.getRow(selectedRows[arrIndex]);
                                        var $nextPlaneURI = $nextRow["caom2:Plane.uri.downloadable"];
 
                                        var $input = $('<input>');
@@ -894,7 +956,7 @@
                                        $input.val($nextPlaneURI);
 
                                        downloadForm.append($input);
-                                     });
+                                     }
 
                                      // Story 1566, when all 'Product Types'
                                      // checkboxes are checked, do not send any
@@ -909,7 +971,7 @@
                                        });
                                      }
 
-                                     window.open('', 'DOWNLOAD', '');
+                                     window.open("", "DOWNLOAD", "");
                                      downloadForm.submit();
 
                                      // Story 1566, re-enable all product types
@@ -920,7 +982,7 @@
                                        // checkboxes
                                        $.each(downloadForm.find("input.product_type_option_flag:checked"), function ()
                                        {
-                                         $(this).prop('disabled', false);
+                                         $(this).prop("disabled", false);
                                        });
                                      }
                                    }
@@ -929,7 +991,7 @@
         $('#results_bookmark').click(function (event)
                                      {
                                        event.preventDefault();
-                                       var hrefURI = new cadc.web.util.URI(this.href);
+                                       var hrefURI = new cadc.web.util.URI(event.target.href);
                                        hrefURI.clearQuery();
                                        var href = hrefURI.toString();
 
@@ -942,7 +1004,7 @@
                                        }
 
                                        var serializer = new cadc.vot.ResultStateSerializer(
-                                           href + getFormQueryString(),
+                                           href + this._getFormQueryString(),
                                            resultsVOTV.sortcol,
                                            resultsVOTV.sortDir ? "asc" : "dsc",
                                            resultsVOTV.getDisplayedColumns(),
@@ -950,41 +1012,41 @@
                                            resultsVOTV.getColumnFilters(),
                                            resultsVOTV.getUpdatedColumnSelects());
                                        alert(serializer.getResultStateUrl());
-                                     });
+                                     }.bind(this));
 
         resultsVOTV.setDisplayColumns([]);
 
         // Set the default columns.
-        setDefaultColumns(resultsVOTV);
-        setDefaultUnitTypes(resultsVOTV);
+        this._setDefaultColumns(resultsVOTV);
+        this._setDefaultUnitTypes(resultsVOTV);
 
         queryOverlay.find("#overlay_cancel").show();
         queryOverlay.popup("open");
-      };
+      }.bind(this);
 
-      caomform.subscribe(ca.nrc.cadc.search.events.onValid, onFormValid);
-      obscoreform.subscribe(ca.nrc.cadc.search.events.onValid, onFormValid);
+      caomSearchForm.subscribe(ca.nrc.cadc.search.events.onValid, onFormValid);
+      obsCoreSearchForm.subscribe(ca.nrc.cadc.search.events.onValid, onFormValid);
 
       var onFormInvalid = function ()
       {
         alert("Please enter at least one value to search on.");
       };
 
-      caomform.subscribe(ca.nrc.cadc.search.events.onInvalid, onFormInvalid);
-      obscoreform.subscribe(ca.nrc.cadc.search.events.onInvalid, onFormInvalid);
+      caomSearchForm.subscribe(ca.nrc.cadc.search.events.onInvalid, onFormInvalid);
+      obsCoreSearchForm.subscribe(ca.nrc.cadc.search.events.onInvalid, onFormInvalid);
 
       $(':reset').click(function ()
                         {
-                          getActiveForm().resetFields();
-                        });
+                          this._getActiveForm().resetFields();
+                        }.bind(this));
 
       $('#cancel_search').click(function ()
                                 {
-                                  getActiveForm().cancel();
-                                });
+                                  this._getActiveForm().cancel();
+                                }.bind(this));
 
       // End form setup.
-    }
+    };
 
     // End initForms function.
 
@@ -993,14 +1055,17 @@
      *
      * Check the sessionStorage for the activePanel component, then the
      * currently listed active tab (i.e. with class 'active').
+     *
+     * @return  {String}    The ID of the active tab.
+     * @private
      */
-    function getActiveTabID()
+    this._getActiveTabID = function ()
     {
-      var activeTab = $('ul#tabList li.active');
-      var defaultTab = $('ul#tabList li.default');
-      var langURLPath = $("span[lang='" + getPageLanguage() + "'].lang-link-target").text();
-      var cachedTabID =
-          sessionStorage.getItem("activePanel-" + langURLPath + "0");
+      var $tabList = $("ul#tabList");
+      var activeTab = $tabList.find("li.active");
+      var defaultTab = $tabList.find("li.default");
+      var langURLPath = $("span[lang='" + this.getPageLanguage() + "'].lang-link-target").text();
+      var cachedTabID = sessionStorage.getItem("activePanel-" + langURLPath + "0");
       var targetTabID;
 
       if (cachedTabID)
@@ -1017,22 +1082,25 @@
       }
 
       return targetTabID;
-    }
+    };
 
     /**
      * Start this application.  This will check for a quick submission.
      */
-    function start()
+    this.start = function ()
     {
       // After the series of columns (Data Train) has loaded, then proceed.
       var postDataTrainLoad = function (_continue)
       {
+        var currentURI = new cadc.web.util.currentURI();
+
         if (_continue)
         {
-          var queryObject = currentURI().getQuery();
+          var queryObject = currentURI.getQuery();
 
           // Work directly with the form object.
-          var $submitForm = getActiveForm().getForm();
+          var activeSearchForm = this._getActiveForm();
+          var $submitForm = activeSearchForm.getForm();
           var doSubmit;
 
           if (JSON.stringify(queryObject) !== JSON.stringify({}))
@@ -1045,27 +1113,28 @@
                 if ((qKey === ca.nrc.cadc.search.CAOM2_RESOLVER_VALUE_KEY)
                     || (qKey === ca.nrc.cadc.search.OBSCORE_RESOLVER_VALUE_KEY))
                 {
-                  getActiveForm().clearTimeout();
-                  getActiveForm().setSelectValue(ca.nrc.cadc.search.CAOM2_TARGET_NAME_FIELD_ID, qKey,
-                                                 decodeURIComponent(qValue.join()));
+                  activeSearchForm.clearTimeout();
+                  activeSearchForm.setSelectValue(ca.nrc.cadc.search.CAOM2_TARGET_NAME_FIELD_ID, qKey,
+                                                  decodeURIComponent(qValue.join()));
                 }
                 else
                 {
-                  getActiveForm().setInputValue(qKey, decodeURIComponent(qValue.join()));
+                  activeSearchForm.setInputValue(qKey, decodeURIComponent(qValue.join()));
                 }
 
                 doSubmit = true;
               }
             });
 
-            getActiveForm().getForm().find("input").change();
+            $submitForm.find("input").change();
 
-            // Update datatrain
-            var dtUtype = $submitForm.find(".hierarchy_utype").text();
-            var dtUtypes = dtUtype.split("/");
-            for (var i = 0; i < dtUtypes.length; i++)
+            // Update DataTrain
+            var dtUType = $submitForm.find(".hierarchy_utype").text();
+            var dtUTypes = dtUType.split("/");
+
+            for (var i = 0; i < dtUTypes.length; i++)
             {
-              var dtSelectUtype = dtUtypes[i];
+              var dtSelectUtype = dtUTypes[i];
               var dtSelectUtypeValues = [];
 
               // Array of values.
@@ -1073,8 +1142,7 @@
 
               if (dtSelectValues && (dtSelectValues.length > 0))
               {
-                dtSelectUtypeValues =
-                    dtSelectUtypeValues.concat(dtSelectValues);
+                dtSelectUtypeValues = dtSelectUtypeValues.concat(dtSelectValues);
               }
 
               // The "collection" keyword is grandfathered in, but actually
@@ -1084,32 +1152,25 @@
               // jenkinsd 2014.02.25
               if (dtSelectUtype === 'Observation.collection')
               {
-                var grandfatheredCollectionValues =
-                    currentURI.getQueryValues("collection");
+                var grandfatheredCollectionValues = currentURI.getQueryValues("collection");
 
-                if (grandfatheredCollectionValues
-                    && (grandfatheredCollectionValues.length > 0))
+                if (grandfatheredCollectionValues && (grandfatheredCollectionValues.length > 0))
                 {
-                  dtSelectUtypeValues =
-                      dtSelectUtypeValues.concat(grandfatheredCollectionValues);
+                  dtSelectUtypeValues = dtSelectUtypeValues.concat(grandfatheredCollectionValues);
                 }
               }
 
               if (dtSelectUtypeValues && (dtSelectUtypeValues.length > 0))
               {
-                var dtSelect = $submitForm.find('select[id="' + dtSelectUtype
-                                                + '"]');
-                if (dtSelect
-                    && getActiveForm().setDatatrainValue($(dtSelect[0]),
-                                                         dtSelectUtypeValues))
+                var dtSelect = $submitForm.find("select[id='" + dtSelectUtype + "']");
+                if (dtSelect && activeSearchForm.setDataTrainValue($(dtSelect[0]), dtSelectUtypeValues))
                 {
                   doSubmit = true;
                 }
                 else
                 {
-                  alert('Incompatible query parameter: '
-                        + dtSelectUtype + " > " + dtSelectUtypeValues);
-                  getActiveForm().cancel();
+                  alert('Incompatible query parameter: ' + dtSelectUtype + " > " + dtSelectUtypeValues);
+                  activeSearchForm.cancel();
                   doSubmit = false;
                   break;
                 }
@@ -1124,16 +1185,15 @@
             $('#queryOverlay').popup();
 
             // Execute the form submission.
-            getActiveForm().submit();
+            activeSearchForm.submit();
           }
           else
           {
-            // If the current tab is the results tab, display the search
-            // results if necessary.
+            // If the current tab is the results tab, display the search results if necessary.
 
-            var activeTabID = window.location.hash || getActiveTabID();
-            var isNoExecFlag = ((currentURI.getQueryValue('noexec') !== null)
-                                && (currentURI.getQueryValue('noexec') === "true"));
+            var activeTabID = window.location.hash || this._getActiveTabID();
+            var isNoExecFlag = ((currentURI.getQueryValue("noexec") !== null)
+                                && (currentURI.getQueryValue("noexec") === "true"));
             var destinationTabID;
 
             if (((activeTabID !== "#queryFormTab") && (sessionStorage.getItem("isReload") === false)) || isNoExecFlag
@@ -1148,83 +1208,62 @@
             }
 
             //window.location.hash = "#" + destinationTabID;
-            selectTab(destinationTabID);
+            this._selectTab(destinationTabID);
           }
         }
-      };
+      }.bind(this);
+
+      var caomSearchForm = this.getCAOMSearchForm();
+      var obsCoreSearchForm = this.getObsCoreSearchForm();
 
       // Default form.
-      getCAOMSearchForm().subscribe(ca.nrc.cadc.search.events.onInit,
-                                    function (event, args)
-                                    {
-                                      if (args && args.error)
-                                      {
-                                        console.error(
-                                            'Error reading TAP schema >> '
-                                            + args.error);
-                                      }
-                                      else
-                                      {
-                                        getCAOMSearchForm().enable();
-                                        getCAOMSearchForm().resetFields();
-                                      }
-                                    });
+      caomSearchForm.subscribe(ca.nrc.cadc.search.events.onInit,
+                               function (event, args)
+                               {
+                                 if (args && args.error)
+                                 {
+                                   console.error("Error reading TAP schema >> " + args.error);
+                                 }
+                                 else
+                                 {
+                                   caomSearchForm.enable();
+                                   caomSearchForm.resetFields();
+                                 }
+                               });
 
-      getCAOMSearchForm().getDataTrain().subscribe(ca.nrc.cadc.search.datatrain.events.onDataTrainLoaded,
-                                                   function ()
-                                                   {
-                                                     postDataTrainLoad(true);
-                                                   });
+      caomSearchForm.getDataTrain().subscribe(ca.nrc.cadc.search.datatrain.events.onDataTrainLoaded,
+                                              function ()
+                                              {
+                                                postDataTrainLoad(true);
+                                              });
 
-      getCAOMSearchForm().getDataTrain().subscribe(ca.nrc.cadc.search.datatrain.events.onDataTrainLoadFail,
-                                                   function ()
-                                                   {
-                                                     postDataTrainLoad(false);
-                                                   });
+      caomSearchForm.getDataTrain().subscribe(ca.nrc.cadc.search.datatrain.events.onDataTrainLoadFail,
+                                              function ()
+                                              {
+                                                postDataTrainLoad(false);
+                                              });
 
-      getObsCoreSearchForm().subscribe(ca.nrc.cadc.search.events.onInit,
-                                       function ()
-                                       {
-                                         getObsCoreSearchForm().enable();
-                                         getObsCoreSearchForm().resetFields();
-                                       });
+      obsCoreSearchForm.subscribe(ca.nrc.cadc.search.events.onInit,
+                                  function ()
+                                  {
+                                    obsCoreSearchForm.enable();
+                                    obsCoreSearchForm.resetFields();
+                                  });
 
-      getCAOMSearchForm().init();
-      getObsCoreSearchForm().init();
-    }
+      caomSearchForm.init();
+      obsCoreSearchForm.init();
+    };
 
     // End start method.
 
     /**
-     * Default columns for a new search.  If previously saved columns exist,
-     * then use those.
+     *  Sanitize the values for the column options.
      *
-     * @param _viewer  {cadc.vot.Viewer}    The VOTV viewer instance.
+     * @param {{}}  _columnOptions    Column options object.
+     * @return {{}} Sanitized object.
+     * @private
      */
-    function setDefaultColumns(_viewer)
-    {
-      // Check if defaultColumnIDs has already been set in the
-      // viewer options (i.e. from a bookmark url) and if so use them.
-
-      // Clear the existing ones first.
-      _viewer.getOptions().defaultColumnIDs = [];
-
-      var deserializer = new cadc.vot.ResultStateDeserializer(window.location.href);
-      var viewerOptions = deserializer.getViewerOptions();
-
-      if (!$.isEmptyObject(viewerOptions))
-      {
-        $.extend(true, _viewer.getOptions(), sanitizeColumnOptions(viewerOptions));
-      }
-
-      if (!_viewer.getOptions().defaultColumnIDs || _viewer.getOptions().defaultColumnIDs.length === 0)
-      {
-        var $activeFormConfiguration = getActiveForm().getConfiguration();
-        _viewer.getOptions().defaultColumnIDs = $activeFormConfiguration.getDefaultColumnIDs();
-      }
-    }
-
-    function sanitizeColumnOptions(_columnOptions)
+    this._sanitizeColumnOptions = function (_columnOptions)
     {
       var sanitizedObject = {};
 
@@ -1245,8 +1284,7 @@
         sanitizedObject.columnFilters = {};
         $.each(_columnOptions.columnFilters, function (key, obj)
         {
-          sanitizedObject.columnFilters[columnManager.getIDFromLabel(key)] =
-              obj;
+          sanitizedObject.columnFilters[columnManager.getIDFromLabel(key)] = obj;
         });
       }
 
@@ -1256,22 +1294,52 @@
 
         for (var i = 0; i < _columnOptions.defaultColumnIDs.length; i++)
         {
-          sanitizedObject.defaultColumnIDs.push(
-              columnManager.getIDFromLabel(_columnOptions.defaultColumnIDs[i]));
+          sanitizedObject.defaultColumnIDs.push(columnManager.getIDFromLabel(_columnOptions.defaultColumnIDs[i]));
         }
       }
 
       return sanitizedObject;
-    }
+    };
+
+    /**
+     * Default columns for a new search.  If previously saved columns exist,
+     * then use those.
+     *
+     * @param {cadc.vot.Viewer|Viewer} _viewer    The VOTV viewer instance.
+     * @private
+     */
+    this._setDefaultColumns = function (_viewer)
+    {
+      // Check if defaultColumnIDs has already been set in the
+      // viewer options (i.e. from a bookmark url) and if so use them.
+
+      // Clear the existing ones first.
+      _viewer.getOptions().defaultColumnIDs = [];
+
+      var deserializer = new cadc.vot.ResultStateDeserializer(window.location.href);
+      var viewerOptions = deserializer.getViewerOptions();
+
+      if (!$.isEmptyObject(viewerOptions))
+      {
+        $.extend(true, _viewer.getOptions(), this._sanitizeColumnOptions(viewerOptions));
+      }
+
+      if (!_viewer.getOptions().defaultColumnIDs || _viewer.getOptions().defaultColumnIDs.length === 0)
+      {
+        var $activeFormConfiguration = this._getActiveForm().getConfiguration();
+        _viewer.getOptions().defaultColumnIDs = $activeFormConfiguration.getDefaultColumnIDs();
+      }
+    };
 
     /**
      * Default unit type specfic to a collection.
      *
-     * @param _viewer {cadc.vot.Viewer}     The VOTV viewer instance.
+     * @param {cadc.vot.Viewer|Viewer} _viewer     The VOTV viewer instance.
+     * @private
      */
-    function setDefaultUnitTypes(_viewer)
+    this._setDefaultUnitTypes = function (_viewer)
     {
-      var unitTypes = getActiveForm().getConfiguration().getDefaultUnitTypes();
+      var unitTypes = this._getActiveForm().getConfiguration().getDefaultUnitTypes();
 
       for (var columnName in unitTypes)
       {
@@ -1282,28 +1350,28 @@
         {
           var defaultUnitType = unitTypes[columnName];
           var columnOptions = _viewer.getOptionsForColumn(columnName);
-          var units = columnOptions['header']['units'];
+          var units = columnOptions["header"]["units"];
           for (var i = 0; i < units.length; i++)
           {
             var unit = units[i];
-            if (defaultUnitType === unit['value'])
+            if (defaultUnitType === unit["value"])
             {
-              if (unit['default'])
+              if (unit["default"])
               {
                 // no need to remove default unit type
                 oldDefaultRemoved = true;
               }
 
-              unit['default'] = true;
+              unit["default"] = true;
               newDefaultAdded = true;
             }
             else
             {
               // look for default being set in other unit types
-              if (unit['default'])
+              if (unit["default"])
               {
                 // remove it
-                delete unit['default'];
+                delete unit["default"];
                 oldDefaultRemoved = true;
               }
             }
@@ -1317,13 +1385,20 @@
           _viewer.setOptionsForColumn(columnName, columnOptions);
         }
       }
-    }
+    };
 
-    // Called when the results are in and the UWS Job is complete.
-    function setJobParameters(jobParams, callback)
+    /**
+     * Called when the results are in and the UWS Job is complete.
+     *
+     * @param {{}}  jobParams   JSON containing post job creation Upload URL information.
+     * @param {String} jobParams.upload_url   URL for upload information to be passed to TAP.
+     * @param {function}  [callback]    Optional on completion function.
+     * @private
+     */
+    this._setJobParameters = function (jobParams, callback)
     {
-      var queryParam = "QUERY=" + encodeURIComponent(getADQL(true));
-      var votableURL = ca.nrc.cadc.search.TAP_SYNC + "?LANG=ADQL&REQUEST=doQuery&" + queryParam;
+      var queryParam = "QUERY=" + encodeURIComponent(this._getADQL(true));
+      var votableURL = this.options.tapSyncEndpoint + "?LANG=ADQL&REQUEST=doQuery&" + queryParam;
 
       if (jobParams.upload_url && (jobParams.upload_url !== null))
       {
@@ -1342,9 +1417,15 @@
       {
         callback();
       }
-    }
+    };
 
-    function postQuerySubmission(jobParams)
+    /**
+     * Called after the query form has been submitted.
+     *
+     * @param {{}}  jobParams   JSON containing post job creation Upload URL information.
+     * @private
+     */
+    this._postQuerySubmission = function (jobParams)
     {
       queryOverlay.popup("close");
 
@@ -1366,12 +1447,18 @@
                                           tooltip: "mouseover,mouseout"
                                         }
                                       });
-      setJobParameters(jobParams);
-    }
+      this._setJobParameters(jobParams);
+    };
 
-    function processErrorResults(error_url)
+    /**
+     * Display the error VOTable Grid.
+     * @param {String}  error_url   UWS Job error URL.
+     * @private
+     */
+    this._processErrorResults = function (error_url)
     {
-      var $errorTooltipColumnPickerHolder = $('#errorTooltipColumnPickerHolder');
+      var $errorTooltipColumnPickerHolder = $("#errorTooltipColumnPickerHolder");
+      var pageLanguage = this.getPageLanguage();
 
       // Options for the Error CADC VOTV instance
       var errorVOTVOptions =
@@ -1390,70 +1477,66 @@
             headerRowHeight: 50,
             multiSelect: false,
             leaveSpaceForNewRows: false,
-            sortColumn: 'LineNumber',  // ID of the sort column.
-            sortDir: 'asc',
+            sortColumn: "LineNumber",  // ID of the sort column.
+            sortDir: "asc",
             topPanelHeight: 5,
             enableTextSelectionOnCells: true,
             gridResizable: true,
             rerenderOnResize: false,
             enableSelection: false,
-            targetNodeSelector: '#errorTable',    // Shouldn't really be an option
-                                                  // as it's mandatory!
+            targetNodeSelector: "#errorTable",    // Shouldn't really be an option as it's mandatory!
             columnManager: {
               filterable: true,
               forceFitColumns: false,
-              //          forceFitColumnMode: 'max',
               resizable: true,
               picker: {
-                style: 'tooltip',
-                panel: $('div#error-grid-header'),
+                style: "tooltip",
+                panel: $("div#error-grid-header"),
                 options: {
-                  buttonText: ((getPageLanguage() === 'fr') ?
-                               'Gérer l\'affichage des colonnes' :
-                               'Change Columns')
+                  buttonText: ((pageLanguage === "fr") ? "Gérer l'affichage des colonnes" : "Change Columns")
                 },
                 tooltipOptions: {
-                  targetSelector: $errorTooltipColumnPickerHolder.find('.tooltip_content').first(),
+                  targetSelector: $errorTooltipColumnPickerHolder.find(".tooltip_content").first(),
                   appendTooltipContent: true,
-                  tooltipContent: $errorTooltipColumnPickerHolder.find('.tooltip').first(),
-                  position: 'center right',
+                  tooltipContent: $errorTooltipColumnPickerHolder.find(".tooltip").first(),
+                  position: "center right",
                   // The horizontal spacing is 0 so that when hovering from the
                   // input field to the tooltip, the parent div is not left (and
                   // the tooltip stays open
                   offset: [150, 0],
                   relative: true,
                   delay: 50,
-                  effect: 'toggle',
+                  effect: "toggle",
                   events: {
-                    def: ',',
-                    widget: 'click,mouseleave'
+                    def: ",",
+                    widget: "click,mouseleave"
                   }
                 }
               }
             },
             columnOptions: {
-              'TargetError': {
+              "TargetError": {
                 width: 400
               },
-              'LineNumber': {
+              "LineNumber": {
                 width: 100
               },
-              'Target': {
+              "Target": {
                 width: 100
               },
-              'RA': {
+              "RA": {
                 width: 100
               },
-              'DEC': {
+              "DEC": {
                 width: 100
               },
-              'radius': {
+              "radius": {
                 width: 80
               }
             }  // Done by column ID.
           };
 
-      var errorVOTV = new cadc.vot.Viewer('#errorTable', errorVOTVOptions);
+      var errorVOTV = new cadc.vot.Viewer("#errorTable", errorVOTVOptions);
 
       try
       {
@@ -1464,43 +1547,51 @@
                         {
                           errorVOTV.render();
 
-                          $('#errorTable').find('.grid-header-label')
-                              .text(getPageLanguage() === 'fr' ? 'Erreur.' : 'Error');
+                          $("#errorTable").find(".grid-header-label").text(pageLanguage === "fr" ? "Erreur." : "Error");
 
                           // Necessary at the end!
                           errorVOTV.refreshGrid();
 
-                          queryOverlay.popup('close');
+                          queryOverlay.popup("close");
                         },
                         function (jqXHR, status, message)
                         {
-                          console.error('Error status: ' + status);
-                          console.error('Error message: ' + message);
-                          console.error('Error from response: ' + jqXHR.responseText);
+                          console.error("Error status: " + status);
+                          console.error("Error message: " + message);
+                          console.error("Error from response: " + jqXHR.responseText);
                         });
 
-        $('#errorTableTab-link').click();
+        $("#errorTableTab-link").click();
       }
       catch (e)
       {
-        console.error('Found error! > ' + e);
-        queryOverlay.popup('close');
+        console.error("Found error! > " + e);
+        queryOverlay.popup("close");
       }
-    }
+    };
 
-    function processFilterValue(filterValue, args, callback)
+    /**
+     * Called when a unit selection has changed and the current filter value needs to be taken into account.
+     *
+     * Made public only to support tests.
+     *
+     * @param filterValue
+     * @param args
+     * @param callback
+     * @private
+     */
+    this.processFilterValue = function (filterValue, args, callback)
     {
       var columnID = args.column.id;
       var unit = args.unitValue;
       var $col = $(args.column);
       var converter = columnManager.getConverter(columnID, filterValue, unit);
-      var previousUnit = $col.data('previousUnitValue');
-      var pureFilterValue = $col.data('pureFilterValue') || filterValue;
-      var breakdownPureFilterValue = '';
-      var breakdownDisplayFilterValue = '';
+      var previousUnit = $col.data("previousUnitValue");
+      var pureFilterValue = $col.data("pureFilterValue") || filterValue;
+      var breakdownPureFilterValue = "";
+      var breakdownDisplayFilterValue = "";
 
-      if (pureFilterValue && converter && converter.convertValue
-          && converter.rebase)
+      if (pureFilterValue && converter && converter.convertValue && converter.rebase)
       {
         var filterBreakdown = columnManager.getFilterPattern(pureFilterValue);
 
@@ -1517,8 +1608,7 @@
           // Convert the numbers
           else
           {
-            var rebaseConverter = columnManager.getConverter(columnID, next,
-                                                             unit);
+            var rebaseConverter = columnManager.getConverter(columnID, next, unit);
             var rebasedVal = rebaseConverter.rebase(previousUnit);
             converter = columnManager.getConverter(columnID, rebasedVal, unit);
             breakdownPureFilterValue += converter.convertValue();
@@ -1528,33 +1618,59 @@
       }
 
       callback(breakdownPureFilterValue, breakdownDisplayFilterValue);
-    }
+    };
 
-    function processResults(json, startDate, searchCompleteCallback)
+    /**
+     * Process results from the TAP search.  This function populates the ADQL tab with the query that was generated,
+     * creates the VOTV grid, and finally builds it.
+     *
+     * @param {{}} json                       The json object with the URL to obtain the TAP query results.
+     * @param {String}  [json.errorMessage]   Any errors with searching.
+     * @param {String}  json.job_url          URL for the search UWS job.
+     * @param {String}  json.results_url      URL to obtain search results.
+     * @param {String}  json.run_id           The Job ID of the archive search job that spawned the TAP job.
+     * @param {{}}      [json.display_units]   Hash map containing uType -> display unit.
+     * @param {String}  [json.cutout]          Requested cutout value as an ICRS cutout shape.
+     * @param {String}  [json.upload_url]     URL for upload information to be passed to TAP.
+     * @param {Number} startDate              The start time in milliseconds to use as a start time.
+     * @param {Function} searchCompleteCallback    Callback on completion.
+     * @private
+     */
+    this._processResults = function (json, startDate, searchCompleteCallback)
     {
       netEnd = (new Date()).getTime();
 
       // Next story should handle this better.
       if (json.errorMessage)
       {
-        searchError(json.errorMessage);
+        this._searchError(json.errorMessage);
       }
       else
       {
         var jobHost = (new cadc.web.util.URI(json.job_url)).getHost();
         var localHost = (new cadc.web.util.URI(window.location.href)).getHost();
+        var pageLanguage = this.getPageLanguage();
         if (jobHost !== localHost)
         {
           console.error("cross domain error - local host: " + localHost + ", requested job host: " + jobHost);
-          searchError(ca.nrc.cadc.search.i18n[getPageLanguage()]["CROSS_DOMAIN_ERROR"]);
+          this._searchError(ca.nrc.cadc.search.i18n[pageLanguage]["CROSS_DOMAIN_ERROR"]);
         }
         else
         {
           var runID = json.run_id;
 
+          /**
+           * Construct a message for the bottom of the panel with interesting time information.
+           *
+           * @param {Number} queryTimeStart     Start of query in milliseconds.
+           * @param {Number} queryTimeEnd       End of TAP query in milliseconds.
+           * @param {Number} loadTimeStart      Start of load into grid in milliseconds.
+           * @param {Number} loadTimeEnd        End of load into grid in milliseconds.
+           * @return {string}
+           */
           var buildPanelMessage = function (queryTimeStart, queryTimeEnd, loadTimeStart, loadTimeEnd)
           {
-            var isFR = getPageLanguage() === "fr";
+            var isFR = (pageLanguage === "fr");
             var totalQueryTime = ((queryTimeEnd - queryTimeStart) / 1000.0);
             var totalLoadTime = ((loadTimeEnd - loadTimeStart) / 1000.0);
             var secondsString = isFR ? " secondes" : " seconds";
@@ -1564,17 +1680,16 @@
                    + totalLoadTime + secondsString;
           };
 
-          loadUWSJob(json.job_url, function (event, args)
+          this._loadUWSJob(json.job_url, function (event, args)
           {
             sessionStorage.setItem("uws_job", JSON.stringify(args.job));
 
             loadStart = (new Date()).getTime();
 
           }, function (event, args)
-                     {
-                       console.error("Status error when loading job: "
-                                     + args.errorStatusCode);
-                     });
+                           {
+                             console.error("Status error when loading job: " + args.errorStatusCode);
+                           });
 
           if (json.display_units)
           {
@@ -1589,7 +1704,7 @@
 
           if (json.cutout)
           {
-            var input = $('<input>');
+            var input = $("<input>");
 
             input.prop("type", "hidden");
             input.prop("name", "cutout");
@@ -1598,13 +1713,13 @@
             downloadForm.append(input);
           }
 
+          var activeForm = this._getActiveForm();
           resultsVOTV.clearColumnFilters();
 
           resultsVOTV.build({
                               url: json.results_url,
-                              // useRelativeURL: true,
                               type: $("input[name='format']").val(),
-                              tableMetadata: getActiveForm().getResultsTableMetadata(),
+                              tableMetadata: activeForm.getResultsTableMetadata(),
                               pageSize: ca.nrc.cadc.search.RESULTS_PAGE_SIZE
                             },
                             function ()
@@ -1618,42 +1733,47 @@
 
                               resultsVOTV.render();
 
-                              postQuerySubmission({upload_url: json.upload_url});
+                              this._postQuerySubmission({upload_url: json.upload_url});
 
-                              var message = buildPanelMessage(startDate, netEnd,
-                                                              loadStart, loadEnd);
+                              var message = buildPanelMessage(startDate, netEnd, loadStart, loadEnd);
 
                               $("#results-grid-footer").find(".grid-footer-label").text(message);
 
                               // Necessary at the end!
                               resultsVOTV.refreshGrid();
-                            },
+                            }.bind(this),
                             function (jqXHR, status, message)
                             {
                               console.error("Error status: " + status);
                               console.error("Error message: " + message);
                               console.error("Error from response: " + jqXHR.responseText);
-                              getActiveForm().cancel();
+                              activeForm.cancel();
                               alert(message);
                             });
         }
       }
-    }
+    };
 
     // End processResults()
 
-    function searchError(message)
+    /**
+     * Handle an error with the search.
+     * @param {String} message   Message to display.
+     * @private
+     */
+    this._searchError = function (message)
     {
-      getActiveForm().cancel();
+      this._getActiveForm().cancel();
       alert(message);
-    }
+    };
 
     /**
      * Fire an event.  Taken from the slick.grid Object.
      *
-     * @param _event       The Event to fire.
-     * @param _args        Arguments to the event.
+     * @param {jQuery.Event} _event       The Event to fire.
+     * @param {{}}  _args        Arguments to the event.
      * @returns {*}       The event notification result.
+     * @private
      */
     this._trigger = function (_event, _args)
     {
@@ -1666,32 +1786,17 @@
     /**
      * Subscribe to one of this form's events.
      *
-     * @param _event      Event object.
-     * @param __handler   Handler function.
+     * @param {jQuery.Event} _event       The Event to fire.
+     * @param {function}  __handler   Handler function.
      */
     this.subscribe = function (_event, __handler)
     {
       $(this).on(_event.type, __handler);
     };
 
-    if (_autoInitFlag)
+    if (this.options.autoInitFlag === true)
     {
-      init();
+      this.init();
     }
-
-    $.extend(this,
-             {
-               'start': start,
-               'getADQL': getADQL,
-               'getActiveForm': getActiveForm,
-               'getDownloadForm': getDownloadForm,
-               'deserializeFormData': deserializeFormData,
-               'selectTab': selectTab,
-               'getActiveTabID': getActiveTabID,
-
-               // Exposed for testing
-               'processFilterValue': processFilterValue,
-               'sanitizeColumnOptions': sanitizeColumnOptions
-             });
   }
-})(jQuery);
+})(jQuery, window);

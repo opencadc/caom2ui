@@ -542,7 +542,7 @@
           // use corresponding specific column bundle
           key = "CFHTMEGAWIR";
         }
-        else if (_collections.length == 1)
+        else if (_collections.length === 1)
         {
           // non-CFHT collection
           // user only selected one collection, use the collection name
@@ -581,6 +581,7 @@
      *
      * @param bundleName Name of a column bundle
      * @param size Number of columns in the column bundle
+     * @return {[]}   Array of column IDs.
      */
     function getColumnIDs(bundleName, size)
     {
@@ -593,7 +594,7 @@
      * default one if none selected or matched the current name.
      *
      * @param bundleName      The bundle name to look up.
-     * @returns {Object}      Bundle selected, or default bundle.
+     * @returns {{}}      Bundle selected, or default bundle.
      */
     function getBundleObject(bundleName)
     {
@@ -605,6 +606,7 @@
      * Retrieves the default columns of a given collection.
      *
      * @param _collections An array of collections
+     * @return {[]}
      */
     function getDefaultColumnIDs(_collections)
     {

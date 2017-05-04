@@ -541,8 +541,7 @@
      * updated. If updateAllOptions is false, then only the given select,
      * and any selects to the right are updated.
      *
-     * @param _select {HTMLSelectElement} the select element that triggered this
-     * function.
+     * @param {Element} _select the select element that triggered this function.
      * @param _updateAllOptionsFlag {boolean} update all selects if true,
      * otherwise update the given select and any selects to the right.
      */

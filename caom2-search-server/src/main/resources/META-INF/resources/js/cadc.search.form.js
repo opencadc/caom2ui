@@ -5,21 +5,23 @@
       "nrc": {
         "cadc": {
           "search": {
+            "form_config_defaults": {
+              "autocompleteEndpoint": "/search/unitconversion",
+              "validatorEndpoint": "/search/validate"
+            },
             "ignore_fields": [
-                "collection", "noexec"
+              "collection", "noexec"
             ],
             "CAOM2_TARGET_NAME_FIELD_ID": "Plane.position.bounds",
             "OBSCORE_TARGET_NAME_FIELD_ID": "Char.SpatialAxis.Coverage.Support.Area",
             "FORM_LABEL_INPUT_LENGTH": 12,
             "TARGET_FORM_LABEL_INPUT_LENGTH": 24,
             "CHECKBOX_CHECKED_REGEX": /^true|on$/g,
-            "AUTOCOMPLETE_ENDPOINT": "/AdvancedSearch/unitconversion/",
             "AUTOCOMPLETE_TAP_REQUEST_DATA": {
-              "endpoint": "/tap/sync",
               "payload": {
                 "LANG": "ADQL",
                 "FORMAT": "CSV",
-                "QUERY": "select {0} from caom2.distinct_{0} where lower({0}) like '%{1}%' order by {0}"
+                "QUERY": "select {1} from caom2.distinct_{1} where lower({1}) like '%{2}%' order by {1}"
               },
               "fields": {
                 "Observation.proposal.pi": {
@@ -105,57 +107,62 @@
   /**
    * Metadata for a form in the application.
    *
-   * @param _config {ObsCoreFormConfiguration|CAOM2FormConfiguration}  Configuration
+   * @param {ObsCoreFormConfiguration|CAOM2FormConfiguration} _config   Configuration for concrete instance.
    *   object.
+   * @param {{}}  _options    Options for the form config.
+   * @param {String}  [_options.tapSyncEndpoint="/search/tap/sync"]   TAP endpoint.
+   * @param {String}  [_options.validatorEndpoint="/search/validate"]   Form validator endpoint.
+   * @param {String}  [_options.autocompleteEndpoint="/search/unitconversion"]   Autocomplete (units, Observation
+   *     constraint autocompletion) endpoint.
    * @constructor
    */
-  function FormConfiguration(_config)
+  function FormConfiguration(_config, _options)
   {
     var stringUtil = new org.opencadc.StringUtil();
-    var _selfFormConfiguration = this;
 
-    this._config = _config;
+    this.config = _config;
+    this.options = $.extend({}, ca.nrc.cadc.search.form_config_defaults, _options);
 
-    // Full metadata set.
-    this.tableMetadata = new cadc.vot.Metadata(null, null, null, null, null,
-                                               null);
+    /**
+     * @type {Metadata|cadc.vot.Metadata}
+     */
+    this.tableMetadata = new cadc.vot.Metadata(null, null, null, null, null, null);
 
     this.columnManager = new ca.nrc.cadc.search.columns.ColumnManager();
-    this.columnOptions = getColumnManager().getOptions().columnOptions;
+    this.columnOptions = this.columnManager.getOptions().columnOptions;
 
 
-    function getDownloadAccessKey()
+    this.getDownloadAccessKey = function ()
     {
-      return _selfFormConfiguration._config.getConfig().download_access_key;
-    }
+      return this.config.getConfig().download_access_key;
+    };
 
     /**
      * Obtain the full default metadata.
      *
-     * @return {cadc.vot.Metadata|*}
+     * @return {Metadata|cadc.vot.Metadata}
      */
-    function getTableMetadata()
+    this.getTableMetadata = function ()
     {
-      return _selfFormConfiguration.tableMetadata;
-    }
+      return this.tableMetadata;
+    };
 
     /**
-     * Get this form configuration's metadata.  It will self-reconfigure based
-     * on current search values.  To get the default metadata (Full set), use
-     * getTableMetadata().
+     * Get this form configuration's metadata.  It will self-reconfigure based on current search values.  To get the
+     * default metadata (Full set), use #getTableMetadata().
      *
-     * @return {cadc.vot.Metadata|*}
+     * @return {Metadata|cadc.vot.Metadata}
      */
-    function getResultsTableMetadata()
+    this.getResultsTableMetadata = function ()
     {
       // Current order of column IDs.
-      var columnIDs = _selfFormConfiguration._config.getAllColumnIDs();
+      var columnIDs = this.config.getAllColumnIDs();
       var currentMetadata = new cadc.vot.Metadata(null, null, null, null, null, null);
 
-      for (var ci = 0; ci < columnIDs.length; ci++)
+      for (var ci = 0, cl = columnIDs.length; ci < cl; ci++)
       {
         var colID = columnIDs[ci];
-        var field = _selfFormConfiguration.tableMetadata.getField(colID);
+        var field = this.tableMetadata.getField(colID);
 
         if (field)
         {
@@ -164,17 +171,16 @@
       }
 
       return currentMetadata;
-    }
+    };
 
-    function getColumnOptions()
+    /**
+     * Obtain the column options for this configuration.
+     * @return {{}}   Hash of all columns and their options.
+     */
+    this.getColumnOptions = function ()
     {
-      return _selfFormConfiguration.columnOptions;
-    }
-
-    function getColumnManager()
-    {
-      return _selfFormConfiguration.columnManager;
-    }
+      return this.columnOptions;
+    };
 
     /**
      * Create a field for the given row.  This field will be set in the result
@@ -184,8 +190,10 @@
      * list's alias value.
      *
      * @param _row    The vot Row object.
+     * @return {{}}   Plain object of items for metadata.
+     * @private
      */
-    function _rowData(_row)
+    this._rowData = function (_row)
     {
       var cells = _row.getCells();
 
@@ -196,140 +204,143 @@
         var nextCell = cells[ci];
         var nextFieldName = nextCell.getField().getName();
 
-        if (nextFieldName === 'table_name')
+        if (nextFieldName === "table_name")
         {
           rowData.tableName = nextCell.getValue();
         }
-        else if (nextFieldName === 'column_name')
+        else if (nextFieldName === "column_name")
         {
           rowData.fieldName = nextCell.getValue();
         }
-        else if (nextFieldName === 'ucd')
+        else if (nextFieldName === "ucd")
         {
           rowData.ucd = nextCell.getValue();
         }
-        else if (nextFieldName === 'utype')
+        else if (nextFieldName === "utype")
         {
           rowData.utype = nextCell.getValue();
         }
-        else if (nextFieldName === 'unit')
+        else if (nextFieldName === "unit")
         {
           rowData.unit = nextCell.getValue();
         }
-        else if (nextFieldName === 'description')
+        else if (nextFieldName === "description")
         {
           rowData.description = nextCell.getValue();
         }
-        else if (nextFieldName === 'datatype')
+        else if (nextFieldName === "datatype")
         {
           rowData.datatype = nextCell.getValue();
         }
-        else if (nextFieldName === 'size')
+        else if (nextFieldName === "size")
         {
           rowData.arraysize = nextCell.getValue();
         }
-        else if (nextFieldName === 'xtype')
+        else if (nextFieldName === "xtype")
         {
           rowData.xtype = nextCell.getValue();
         }
       }
 
       return rowData;
-    }
+    };
 
-    function addField(_row)
+    /**
+     *
+     * @param {cadc.vot.Row|Row} _row   Row object for a row in the VOTV grid.
+     * @return {{}}   Plain hash of items.
+     */
+    this.addField = function (_row)
     {
-      var rowData = _rowData(_row);
-      var utype = rowData.utype;
+      var rowData = this._rowData(_row);
+      var uType = rowData.utype;
       var ucd = rowData.ucd;
       var unit = rowData.unit;
       var datatype = rowData.datatype;
-      var arraysize = rowData.arraysize;
+      var arraySize = rowData.arraysize;
       var description = rowData.description;
       var order;
 
-      if (utype in _selfFormConfiguration.getColumnOptions())
+      if (uType in this.getColumnOptions())
       {
-        var allColumnIDs = _selfFormConfiguration._config.getAllColumnIDs();
-        order = allColumnIDs.indexOf(utype);
+        var allColumnIDs = this.config.getAllColumnIDs();
+        order = allColumnIDs.indexOf(uType);
 
-        addFieldsForUType(utype, ucd, unit, datatype, arraysize, description, order);
+        this._addFieldsForUType(uType, ucd, unit, datatype, arraySize, description, order);
 
         // Hack to include non-standard UTypes into the mix.
-        if (utype === getFootprintColumnID())
+        if (uType === this.getFootprintColumnID())
         {
-          var raColumnID = getRAColumnID();
+          var raColumnID = this.getRAColumnID();
           order = allColumnIDs.indexOf(raColumnID);
-          addFieldsForUType(raColumnID, ucd, unit, datatype, arraysize,
-                            description, order);
+          this._addFieldsForUType(raColumnID, ucd, unit, datatype, arraySize, description, order);
 
-          var decColumnID = getDecColumnID();
+          var decColumnID = this.getDecColumnID();
           order = allColumnIDs.indexOf(decColumnID);
-          addFieldsForUType(decColumnID, ucd, unit, datatype, arraysize,
-                            description, order);
+          this._addFieldsForUType(decColumnID, ucd, unit, datatype, arraySize, description, order);
 
-          var areaFOVColumnID = getFOVColumnID();
+          var areaFOVColumnID = this.getFOVColumnID();
           order = allColumnIDs.indexOf(areaFOVColumnID);
-          addFieldsForUType(areaFOVColumnID, ucd, unit, datatype, arraysize,
-                            description, order);
+          this._addFieldsForUType(areaFOVColumnID, ucd, unit, datatype, arraySize, description, order);
         }
-        else if (utype === "caom2:Plane.uri")
+        else if (uType === "caom2:Plane.uri")
         {
           order = allColumnIDs.indexOf("caom2:Plane.uri.downloadable");
-          addFieldsForUType("caom2:Plane.uri.downloadable", ucd, unit,
-                            datatype, arraysize, description, order);
+          this._addFieldsForUType("caom2:Plane.uri.downloadable", ucd, unit, datatype, arraySize, description, order);
         }
       }
 
       return rowData;
-    }
+    };
 
     /**
      * Iterate through all of the individual columns for the given UType, and
      * add them to the table metadata, if appropriate.
      *
-     * @param _utype
-     * @param _ucd
-     * @param _unit
-     * @param _datatype
-     * @param _arraysize
-     * @param _description
-     * @param _order
+     * @param {string} _uType
+     * @param {string} _ucd
+     * @param {string} _unit
+     * @param {cadc.vot.Datatype|Datatype}  _datatype
+     * @param {String|Number} _arraySize
+     * @param {String} _description
+     * @param {Number} _order
+     * @private
      */
-    function addFieldsForUType(_utype, _ucd, _unit, _datatype, _arraysize, _description, _order)
+    this._addFieldsForUType = function (_uType, _ucd, _unit, _datatype, _arraySize, _description, _order)
     {
-      var utypeFields = getColumnOptions()[_utype];
-      var tableMD = getTableMetadata();
+      var utypeFields = this.columnOptions[_uType];
+      var tableMD = this.tableMetadata;
 
-      if ((tableMD.hasFieldWithID(_utype) === false) && !utypeFields.extended)
+      if ((tableMD.hasFieldWithID(_uType) === false) && !utypeFields.extended)
       {
         tableMD.insertField(_order,
                             new cadc.vot.Field(
                                 utypeFields.label,
-                                _utype,
+                                _uType,
                                 _ucd,
-                                _utype,
+                                _uType,
                                 utypeFields.unit ? utypeFields.unit :
                                 _unit,
                                 stringUtil.contains(_datatype, "INTERVAL", false) ? "INTERVAL" : null,
                                 // xtype not normally available
                                 new cadc.vot.Datatype(utypeFields.datatype ? utypeFields.datatype : _datatype),
-                                _arraysize,
+                                _arraySize,
                                 _description,
                                 utypeFields.label));
       }
-    }
+    };
 
     /**
+     * Create the ADQL select clause.
      *
-     * @param _includeExtendedColumns
-     * @returns {string}
+     * @param {boolean} _includeExtendedColumns   Flag to indicate whether extended (hidden) columns are to be included.
+     * @returns {string}    ADQL Select clause, or empty string.  Never null.
      */
-    function getSelectListString(_includeExtendedColumns)
+    this.getSelectListString = function (_includeExtendedColumns)
     {
-      var selectColumnIDs = _selfFormConfiguration._config.getAllColumnIDs();
-      var thisColumnOptions = getColumnOptions();
-      var lowercaseName = getName().toLowerCase();
+      var selectColumnIDs = this.config.getAllColumnIDs();
+      var thisColumnOptions = this.getColumnOptions();
+      var lowercaseName = this.getName().toLowerCase();
       var selectListString = "";
 
       for (var i = 0; i < selectColumnIDs.length; i++)
@@ -342,7 +353,7 @@
           {
             if (!field.extended || _includeExtendedColumns)
             {
-              var selector = getSelect(columnID, field);
+              var selector = this._getSelect(columnID, field);
               var selectorSplit = selector.split(/\.(.+)/);
               var selectorValue;
 
@@ -358,8 +369,7 @@
                 selectorValue = selector;
               }
 
-              selectListString +=
-                  selectorValue + " AS \"" + field.label + "\", ";
+              selectListString += selectorValue + " AS \"" + field.label + "\", ";
             }
           }
           else
@@ -369,207 +379,274 @@
         }
       }
 
-      return selectListString.substring(0, selectListString.length - 2);
-    }
+      return (stringUtil.hasText(selectListString))
+          ? selectListString.substring(0, selectListString.length - 2)
+          : "";
+    };
 
-    function getSelect(_utype, _field)
+    /**
+     * Get select value for the given uType.
+     *
+     * @param {String}  _uType    UType value.
+     * @param {cadc.vot.Field|Field}  _field    VOTV Field instance.
+     * @private
+     */
+    this._getSelect = function (_uType, _field)
     {
       if (_field.select)
       {
         return _field.select;
       }
-      return _utype.slice(_utype.indexOf(":") + 1);
-    }
+      else
+      {
+        return _uType.slice(_uType.indexOf(":") + 1);
+      }
+    };
 
-    function getFootprintColumnID()
+    /**
+     * Obtain the column ID of the column containing footprint vales.
+     * @return {string}
+     */
+    this.getFootprintColumnID = function ()
     {
-      return _selfFormConfiguration._config.getConfig().footprint_column_id;
-    }
+      return this.config.getConfig().footprint_column_id;
+    };
 
-    function getRAColumnID()
+    /**
+     * Obtain the column ID of the column containing RA vales.
+     * @return {string}
+     */
+    this.getRAColumnID = function ()
     {
-      return _selfFormConfiguration._config.getConfig().ra_column_id;
-    }
+      return this.config.getConfig().ra_column_id;
+    };
 
-    function getDecColumnID()
+    /**
+     * Obtain the column ID of the column containing Dec vales.
+     * @return {string}
+     */
+    this.getDecColumnID = function ()
     {
-      return _selfFormConfiguration._config.getConfig().dec_column_id;
-    }
+      return this.config.getConfig().dec_column_id;
+    };
 
-    function getFOVColumnID()
+    /**
+     * Obtain the column ID of the column containing FOV (Field of View) vales.
+     * @return {string}
+     */
+    this.getFOVColumnID = function ()
     {
-      return _selfFormConfiguration._config.getConfig().fov_column_id;
-    }
+      return this.config.getConfig().fov_column_id;
+    };
 
-    function getDefaultSortColumnID()
+    /**
+     * Obtain the column ID of the column to sort by default.
+     * @return {string}
+     */
+    this.getDefaultSortColumnID = function ()
     {
-      return _selfFormConfiguration._config.getConfig().default_sort_column;
-    }
+      return this.config.getConfig().default_sort_column;
+    };
 
-    function getName()
+    /**
+     * Obtain the name of this form.
+     * @return {string}
+     */
+    this.getName = function ()
     {
-      return _selfFormConfiguration._config.getConfig().id;
-    }
+      return this.config.getConfig().id;
+    };
 
-    $.extend(this,
-             {
-               "getDownloadAccessKey": getDownloadAccessKey,
-               "getSelectListString": getSelectListString,
-               "getColumnOptions": getColumnOptions,
-               "getTableMetadata": getTableMetadata,
-               "getResultsTableMetadata": getResultsTableMetadata,
-               "getFootprintColumnID": getFootprintColumnID,
-               "getRAColumnID": getRAColumnID,
-               "getDecColumnID": getDecColumnID,
-               "getFOVColumnID": getFOVColumnID,
-               "getDefaultSortColumnID": getDefaultSortColumnID,
-               "getDefaultColumnIDs": _selfFormConfiguration._config.getDefaultColumnIDs,
-               "getDefaultUnitTypes": _selfFormConfiguration._config.getDefaultUnitTypes,
-               "getAllColumnIDs": _selfFormConfiguration._config.getAllColumnIDs,
-               "addField": addField,
-               "getName": getName
-             });
+    /**
+     * Obtain an array of default column IDs.
+     * @return {[]}
+     * @deprecated    Use FormConfiguration.getDefaultColumnIDs().
+     */
+    this.getDefaultColumnIDs = function ()
+    {
+      return this.config.getDefaultColumnIDs();
+    };
+
+    /**
+     * Obtain a hash of default unit types.
+     * @return {{}}
+     * @deprecated    Use FormConfiguration.getDefaultUnitTypes().
+     */
+    this.getDefaultUnitTypes = function ()
+    {
+      return this.config.getDefaultUnitTypes();
+    };
+
+    /**
+     * All column IDs.
+     *
+     * @return {[]}
+     * @deprecated    use FormConfiguration.getAllColumnIDs().
+     */
+    this.getAllColumnIDs = function ()
+    {
+      return this.config.getAllColumnIDs();
+    };
   }
 
   /**
    * CAOM-2 configuration.
+   *
    * @constructor
    */
   function CAOM2FormConfiguration()
   {
-    var _self = this;
-    this._config = ca.nrc.cadc.search.CAOM2.config;
+    this.config = ca.nrc.cadc.search.CAOM2.config;
     this.columnBundleManager = new ca.nrc.cadc.search.ColumnBundleManager();
 
-    function getSelectedCollections()
+    /**
+     * Return the selected collections from the data train.
+     * @return {String}
+     * @private
+     */
+    this._getSelectedCollections = function ()
     {
-      return $("select[id='" + _self._config.collection_select_id + "']").val();
-    }
+      return $("select[id='" + this.config.collection_select_id + "']").val();
+    };
 
-    function getDefaultColumnIDs()
+    /**
+     * Obtain the default column IDs for this form configuration.
+     *
+     * @return {[]} column ids, or empty array.
+     */
+    this.getDefaultColumnIDs = function ()
     {
-      var selectedCollections = getSelectedCollections();
-      return _self.columnBundleManager.getDefaultColumnIDs(selectedCollections);
-    }
+      var selectedCollections = this._getSelectedCollections();
+      return this.columnBundleManager.getDefaultColumnIDs(selectedCollections);
+    };
 
     /**
      * Obtain the full set of column IDs that will be in the select list, based
      * on some conditions at search time.
      *
-     * @return {Array} Column IDs.
+     * @return {[]} Column IDs.
      */
-    function getAllColumnIDs()
+    this.getAllColumnIDs = function ()
     {
-      var selectedCollections = getSelectedCollections();
-      return _self.columnBundleManager.getAllColumnIDs(selectedCollections);
-    }
+      var selectedCollections = this._getSelectedCollections();
+      return this.columnBundleManager.getAllColumnIDs(selectedCollections);
+    };
 
     /**
      * Obtain an object mapping of unit types.
      *
      * @return {Object}  Of Column ID to unit type mappings.
      */
-    function getDefaultUnitTypes()
+    this.getDefaultUnitTypes = function ()
     {
-      var selectedCollections = getSelectedCollections();
-      return _self.columnBundleManager.getDefaultUnitTypes(selectedCollections);
-    }
+      var selectedCollections = this._getSelectedCollections();
+      return this.columnBundleManager.getDefaultUnitTypes(selectedCollections);
+    };
 
-    function getConfig()
+    /**
+     * Obtain the concrete (base) config.
+     *
+     * @return {true.ca.nrc.cadc.search.CAOM2.config|{id, download_access_key, default_sort_column,
+     *     collection_select_id, footprint_column_id, ra_column_id, dec_column_id, fov_column_id, uri_column_id}|*}
+     */
+    this.getConfig = function ()
     {
-      return _self._config;
-    }
-
-    $.extend(this,
-             {
-               "getDefaultColumnIDs": getDefaultColumnIDs,
-               "getAllColumnIDs": getAllColumnIDs,
-               "getDefaultUnitTypes": getDefaultUnitTypes,
-               "getConfig": getConfig
-             });
+      return this.config;
+    };
   }
 
   /**
    * ObsCore configuration.
+   *
    * @constructor
    */
   function ObsCoreFormConfiguration()
   {
-    var _self = this;
-    this._config = ca.nrc.cadc.search.ObsCore.config;
+    this.config = ca.nrc.cadc.search.ObsCore.config;
     this.columnBundleManager = new ca.nrc.cadc.search.ColumnBundleManager();
 
-    function getDefaultColumnIDs()
+    /**
+     * Obtain the default column IDs for this form configuration.
+     *
+     * @return {[]} column ids, or empty array.
+     */
+    this.getDefaultColumnIDs = function ()
     {
-      return _self.columnBundleManager.getDefaultColumnIDs([_self._config.id]);
-    }
+      return this.columnBundleManager.getDefaultColumnIDs([this.config.id]);
+    };
 
     /**
-     * Obtain the full set of column IDs that will be in the select list, based
-     * on some conditions at search time.
+     * Obtain the full set of column IDs that will be in the select list, based on some conditions at search time.
      *
-     * @return {Array} Column IDs.
+     * @return {[]} Column IDs.
      */
-    function getAllColumnIDs()
+    this.getAllColumnIDs = function ()
     {
-      return _self.columnBundleManager.getAllColumnIDs([_self._config.id]);
-    }
+      return this.columnBundleManager.getAllColumnIDs([this.config.id]);
+    };
 
     /**
      * Obtain an object mapping of unit types.
      *
-     * @return {Object}  Of Column ID to unit type mappings.
+     * @return {{}}  Of Column ID to unit type mappings.
      */
-    function getDefaultUnitTypes()
+    this.getDefaultUnitTypes = function ()
     {
-      return _self.columnBundleManager.getDefaultUnitTypes([_self._config.id]);
-    }
+      return this.columnBundleManager.getDefaultUnitTypes([this.config.id]);
+    };
 
-    function getConfig()
+    /**
+     * Obtain the concrete (base) config.
+     *
+     * @return {true.ca.nrc.cadc.search.ObsCore.config|{id, download_access_key, default_sort_column,
+     *     collection_select_id, footprint_column_id, ra_column_id, dec_column_id, fov_column_id}|*}
+     */
+    this.getConfig = function ()
     {
-      return _self._config;
-    }
-
-
-    $.extend(this,
-             {
-               "getDefaultColumnIDs": getDefaultColumnIDs,
-               "getAllColumnIDs": getAllColumnIDs,
-               "getDefaultUnitTypes": getDefaultUnitTypes,
-               "getConfig": getConfig
-             });
+      return this.config;
+    };
   }
 
   /**
    * Should be an existing form in the document.
    *
-   * @param _id               The unique identifier to find the Form Element.
-   * @param _autoInitFlag     Whether to automatically initialize immediately
-   *                          or not.
-   * @param _configuration    Specific configuration for this form.
+   * @param {String}  _id               The unique identifier to find the Form Element.
+   * @param {Boolean} _autoInitFlag     Whether to automatically initialize immediately or not.
+   * @param {ca.nrc.cadc.search.FormConfiguration|FormConfiguration} _configuration    Specific configuration for this
+   *     form.
    * @constructor
    */
   function SearchForm(_id, _autoInitFlag, _configuration)
   {
     var stringUtil = new org.opencadc.StringUtil();
 
-    var _selfForm = this;
     this.id = _id;
     this.configuration = _configuration;
     this.$form = $("form#" + _id);
     this.currentRequest = null;
-    this.currentTimeoutID = null;
-    this.targetNameFieldID = null;
-    this.dataTrain = new ca.nrc.cadc.search.datatrain.DataTrain(getConfiguration().getName().toLowerCase(), false);
 
-    var VALIDATOR_ENDPOINT = "validate";
+    /**
+     * @type {number}
+     */
+    this.currentTimeoutID = null;
+
+    this.targetNameFieldID = null;
+
+    /**
+     * The data train at the bottom of the form.
+     *
+     * @type {ca.nrc.cadc.search.datatrain.DataTrain|DataTrain}
+     */
+    this.dataTrain = new ca.nrc.cadc.search.datatrain.DataTrain(this.configuration.getName().toLowerCase(), false);
+
     var VALIDATOR_TIMER_DELAY = 500;
 
     var tooltipIconCSS = "advancedsearch-tooltip";
     var initialTooltipIconCSS = "wb-icon-question";
     var hoverTooltipIconCSS = "wb-icon-question-alt";
 
-    this.validator = new ca.nrc.cadc.search.Validator(VALIDATOR_ENDPOINT, VALIDATOR_TIMER_DELAY);
+    this.validator = new ca.nrc.cadc.search.Validator(this.configuration.options.validatorEndpoint,
+                                                      VALIDATOR_TIMER_DELAY);
 
     // Tooltip objects to keep track of.
     this.targetTooltipsters = [];
@@ -577,51 +654,53 @@
     /**
      * Initialize this form.
      */
-    function init()
+    this.init = function ()
     {
-      _selfForm.targetNameFieldID = getForm().find("input[name$='@Shape1.value']").prop("id");
+      var $currForm = this.$form;
+      this.targetNameFieldID = $currForm.find("input[name$='@Shape1.value']").prop("id");
 
-      getForm().find(".search_criteria_input").on("change keyup",
-                                                  function ()
+      $currForm.find(".search_criteria_input").on("change keyup",
+                                                  function (event)
                                                   {
-                                                    searchCriteriaChanged($(this));
-                                                  });
+                                                    this._searchCriteriaChanged($(event.target));
+                                                  }.bind(this));
 
       $("input:file[id$='_targetList']").change(
-          function ()
+          function (event)
           {
-            if ($(this).val() !== "")
+            if ($(event.target).val() !== "")
             {
               $(".targetList_clear").show();
-              toggleDisabled($("input[id='" + _selfForm.targetNameFieldID + "']"), true);
+              this.toggleDisabled($("input[id='" + this.targetNameFieldID + "']"), true);
             }
             else
             {
-              toggleDisabled($("input[id='" + _selfForm.targetNameFieldID + "']"), false);
+              this.toggleDisabled($("input[id='" + this.targetNameFieldID + "']"), false);
             }
-          }).change();
+          }.bind(this)).change();
 
       // Those items with associated fields that will be disabled as an 'OR'
       // field.
       // jenkinsd 2015.01.05
       //
-      $("*[data-assoc-field]").on("change keyup", function ()
+      $("*[data-assoc-field]").on("change keyup", function (event)
       {
-        var $thisElement = $(this);
+        var $thisElement = $(event.target);
         var thisValue = $thisElement.val();
 
-        toggleDisabled($("[id='" + $thisElement.data("assoc-field") + "']"), stringUtil.hasText(thisValue));
-      }).change();
+        this.toggleDisabled($("[id='" + $thisElement.data("assoc-field") + "']"), stringUtil.hasText(thisValue));
+      }.bind(this)).change();
 
       $("input.ui-autocomplete-input").each(
-          function ()
+          function (key, input)
           {
-            var id = $(this).prop("id");
+            var id = $(input).attr("id");
+            var config = this.configuration;
 
             // Create arrays for response objects.
             var suggestionKeys = [];
 
-            $(this).autocomplete(
+            $(input).autocomplete(
                 {
                   // Define the minimum search string length
                   // before the suggested values are shown.
@@ -642,16 +721,16 @@
                                                                                   req.term.toLowerCase()])
                                  });
 
-                    $.get(ca.nrc.cadc.search.AUTOCOMPLETE_TAP_REQUEST_DATA.endpoint,
-                          payload).done(function (csvData)
-                                        {
-                                          var csvArray = csvData.split('\n');
-                                          if (csvArray.length > 1)
-                                          {
-                                            suggestionKeys = csvArray.slice(1);
-                                            callback(suggestionKeys);
-                                          }
-                                        });
+                    $.get(config.options.tapSyncEndpoint, payload)
+                        .done(function (csvData)
+                              {
+                                var csvArray = csvData.split("\n");
+                                if (csvArray.length > 1)
+                                {
+                                  suggestionKeys = csvArray.slice(1);
+                                  callback(suggestionKeys);
+                                }
+                              });
                   },
                   select: function (event, ui)
                   {
@@ -660,61 +739,57 @@
                     ui.item.value = suggestionKeys[index];
                   }
                 });
-          });
+          }.bind(this));
 
       // Click on the tooltip example, and update the representative field.
-      $(document).on("click", "a.advanced_search_tooltip_example", function ()
+      $(document).on("click", "a.advanced_search_tooltip_example", function (event)
       {
-        var $thisLink = $(this);
+        var $thisLink = $(event.target);
         var uTypeID = $thisLink.prop("name");
 
         // Set the <select> option
         if ($thisLink.data("select-id"))
         {
-          setSelectValue(uTypeID, $thisLink.data("select-id"),
-                         $thisLink.data("select-option"));
+          this.setSelectValue(uTypeID, $thisLink.data("select-id"), $thisLink.data("select-option"));
         }
         else
         {
-          setInputValue(uTypeID, $thisLink.text());
+          this.setInputValue(uTypeID, $thisLink.text());
         }
 
         return false;
-      });
+      }.bind(this));
 
       // All of those checkboxes that will disable something when checked.
-      getForm().find("[data-disable-to]").change(function ()
+      $currForm.find("[data-disable-to]").change(function (event)
                                                  {
-                                                   var $checkbox = $(this);
-                                                   var dataItem =
-                                                       $checkbox.data("disable-to");
+                                                   var $checkbox = $(event.target);
+                                                   var dataItem = $checkbox.data("disable-to");
 
-                                                   getForm().find("[id='"
-                                                                  + dataItem
-                                                                  +
-                                                                  "']").prop("disabled",
-                                                                             $checkbox.is(
-                                                                                 ":checked"));
-                                                 });
+                                                   this.getForm().find("[id='" + dataItem
+                                                                       + "']").prop("disabled",
+                                                                                    $checkbox.is(":checked"));
+                                                 }.bind(this));
 
-      $("select.resolver_select").change(function ()
+      $("select.resolver_select").change(function (event)
                                          {
-                                           var $resolverSelectName = $(this).prop("name");
-                                           var $fieldID =
-                                               $resolverSelectName.substring(0, $resolverSelectName.indexOf("@"));
-                                           searchCriteriaChanged($("input[id='" + $fieldID + "']"));
-                                         });
+                                           var $resolverSelectName = $(event.target).prop("name");
+                                           var $fieldID = $resolverSelectName
+                                               .substring(0, $resolverSelectName.indexOf("@"));
+                                           this._searchCriteriaChanged($("input[id='" + $fieldID + "']"));
+                                         }.bind(this));
 
-      getForm().find(".targetList_clear").click(function ()
+      $currForm.find(".targetList_clear").click(function ()
                                                 {
-                                                  clearTargetList();
-                                                });
+                                                  this._clearTargetList();
+                                                }.bind(this));
 
       // Prevent closing details when a value is present.
       $("details[id$='_details'] summary").click(function (event)
                                                  {
                                                    var $detailsElement = $(this).parent("details");
-                                                   var $inputElements = $detailsElement.find("input.search_criteria_input");
+                                                   var $inputElements =
+                                                       $detailsElement.find("input.search_criteria_input");
                                                    var isOpen = $detailsElement.prop("open");
 
                                                    if (isOpen)
@@ -724,8 +799,7 @@
                                                      $.each($inputElements,
                                                             function (inputElementKey, inputElement)
                                                             {
-                                                              var $inputElement =
-                                                                  $(inputElement);
+                                                              var $inputElement = $(inputElement);
 
                                                               if ($inputElement && $inputElement.val()
                                                                   && ($inputElement.val() !== ""))
@@ -757,284 +831,284 @@
                                                  });
 
       // Bind form input validation function.
-      getForm().find('input.ui-form-input-validate').each(function ()
+      $currForm.find("input.ui-form-input-validate").each(function (event)
                                                           {
-                                                            var $input = $(this);
+                                                            var $input = $(event.target);
+                                                            var thisForm = this;
                                                             var callbackFunction = function (jsonError)
                                                             {
-                                                              decorate($input, jsonError);
+                                                              thisForm._decorate($input, jsonError);
                                                             };
-                                                            $input.bind('keydown', function ()
+                                                            $input.bind("keydown", function ()
                                                             {
-                                                              getValidator().inputKeyPressed($input, callbackFunction);
+                                                              thisForm.getValidator().inputKeyPressed($input,
+                                                                                                      callbackFunction);
                                                             });
-                                                          });
+                                                          }.bind(this));
 
       // Bind the form's submission.
-      getForm().submit(formSubmit);
+      $currForm.submit(this._formSubmit.bind(this));
 
-      getTargetNameResolutionStatusObject().tooltipster(
-          {
-            arrow: false,
-            theme: "tooltipster-advanced-search-resolver",
-            position: "left",
-            maxWidth: 170,
-            offsetX: 230,
-            trigger: "click",
-            interactive: true,
-            repositionOnResize: false,
-            repositionOnScroll: false,
-            onlyOne: false
-          });
+      this._getTargetNameResolutionStatusObject().tooltipster({
+                                                                arrow: false,
+                                                                theme: "tooltipster-advanced-search-resolver",
+                                                                position: "left",
+                                                                maxWidth: 170,
+                                                                offsetX: 230,
+                                                                trigger: "click",
+                                                                interactive: true,
+                                                                repositionOnResize: false,
+                                                                repositionOnScroll: false,
+                                                                onlyOne: false
+                                                              });
 
-      subscribe(ca.nrc.cadc.search.events.onTargetNameResolved,
-                function (event, args)
-                {
-                  var $targetNameResolutionStatus = getTargetNameResolutionStatusObject();
-                  var data = args.data;
-                  $targetNameResolutionStatus.addClass("target_ok");
-                  var tooltipCreator = new ca.nrc.cadc.search.TooltipCreator();
-                  tooltipCreator.extractResolverValue(data.resolveValue);
-                  var $resolverTooltip = getForm().find(".resolver-result-tooltip");
-                  var $tooltipContainer = tooltipCreator.getContent($resolverTooltip.html(),
-                                                                    "", // title blank
-                                                                    "resolver-result-tooltip-text",
-                                                                    $targetNameResolutionStatus);
+      this.subscribe(ca.nrc.cadc.search.events.onTargetNameResolved,
 
-                  $targetNameResolutionStatus.tooltipster("content", $tooltipContainer);
-                  $targetNameResolutionStatus.tooltipster("show");
+                     /**
+                      *
+                      * @param event
+                      * @param {{data: {resolveValue}}} args
+                      */
+                     function (event, args)
+                     {
+                       var $targetNameResolutionStatus = this._getTargetNameResolutionStatusObject();
+                       var data = args.data;
+                       $targetNameResolutionStatus.addClass("target_ok");
+                       var tooltipCreator = new ca.nrc.cadc.search.TooltipCreator();
+                       tooltipCreator.extractResolverValue(data.resolveValue);
+                       var $resolverTooltip = this.$form.find(".resolver-result-tooltip");
+                       var $tooltipContainer = tooltipCreator.getContent($resolverTooltip.html(),
+                                                                         "", // title blank
+                                                                         "resolver-result-tooltip-text",
+                                                                         $targetNameResolutionStatus);
 
-                  // Make them draggable.
-                  $(".tooltipster-advanced-search-resolver").draggable(
-                      {
-                        handle: ".tooltip_header",
-                        snap: true,
-                        revert: false
-                      });
-                });
+                       $targetNameResolutionStatus.tooltipster("content", $tooltipContainer);
+                       $targetNameResolutionStatus.tooltipster("show");
 
-      subscribe(ca.nrc.cadc.search.events.onTargetNameUnresolved,
-                function (event, args)
-                {
-                  var $targetNameResolutionStatus = getTargetNameResolutionStatusObject();
-                  var data = args.data;
+                       // Make them draggable.
+                       $(".tooltipster-advanced-search-resolver").draggable(
+                           {
+                             handle: ".tooltip_header",
+                             snap: true,
+                             revert: false
+                           });
+                     });
 
-                  $targetNameResolutionStatus.addClass("target_not_found");
-                  decorate($targetNameResolutionStatus, $.parseJSON('{"status":"' + data.resolveStatus + '"}'));
-                });
+      this.subscribe(ca.nrc.cadc.search.events.onTargetNameUnresolved,
+                     function (event, args)
+                     {
+                       var $targetNameResolutionStatus = this._getTargetNameResolutionStatusObject();
+                       var data = args.data;
 
-      getDataTrain().init();
+                       $targetNameResolutionStatus.addClass("target_not_found");
+                       this._decorate($targetNameResolutionStatus, $.parseJSON("{\"status\":\"" + data.resolveStatus
+                                                                               + "\"}"));
+                     });
+
+      this.dataTrain.init();
 
       try
       {
-        trigger(ca.nrc.cadc.search.events.onInit, {});
+        this._trigger(ca.nrc.cadc.search.events.onInit, {});
       }
       catch (err)
       {
         console.error("Error found.\n" + err);
       }
-    }
+    };
+
+    /**
+     * Handle loading a single tooltip.
+     *
+     * @param {{tipHTML}} tipJSON
+     * @param {ca.nrc.cadc.search.TooltipCreator|TooltipCreator}  tooltipCreator
+     * @param {jQuery} $liItem
+     * @param {String} inputID
+     * @param {String} tooltipHeaderText
+     */
+    this.handleTooltipLoad = function (tipJSON, tooltipCreator, $liItem, inputID, tooltipHeaderText)
+    {
+      if (tipJSON && tipJSON.tipHTML)
+      {
+        var tipMarkup = tipJSON.tipHTML;
+        var tipsterPlacement;
+        var offsetX;
+
+        if ($liItem.hasClass("label_tooltip_right"))
+        {
+          tipsterPlacement = "right";
+          offsetX = -12;
+        }
+        else
+        {
+          tipsterPlacement = "left";
+          offsetX = 240;
+        }
+
+        var offsetY = ((inputID === "Observation.observationID") || (inputID === "DataID.observationID"))
+            ? -350 : 0;
+
+        var $ttIconImg = $("<span class=\"" + tooltipIconCSS + " " + initialTooltipIconCSS + " float-right\" />");
+
+        $liItem.find(".search_criteria_label_contents").before($ttIconImg);
+
+        var $tooltipDiv = tooltipCreator.getContent(tipMarkup, tooltipHeaderText, null, $ttIconImg);
+
+        var tipster = $ttIconImg.tooltipster({
+                                               interactive: true,
+                                               animation: "fade",
+                                               theme: "tooltipster-advanced-search",
+                                               content: $tooltipDiv,
+                                               maxWidth: 400,
+                                               arrow: false,
+                                               repositionOnResize: false,
+                                               repositionOnScroll: false,
+                                               position: tipsterPlacement,
+                                               offsetX: offsetX,
+                                               offsetY: offsetY,
+                                               onlyOne: true,
+                                               trigger: "custom"
+                                             });
+
+        if (inputID === "Plane.position.bounds")
+        {
+          this.targetTooltipsters = this.targetTooltipsters.concat(tipster);
+        }
+
+        $ttIconImg.hover(function (event)
+                         {
+                           var $thisSpan = $(event.target);
+
+                           $thisSpan.removeClass(initialTooltipIconCSS);
+                           $thisSpan.addClass(hoverTooltipIconCSS);
+
+                           return false;
+                         },
+                         function (event)
+                         {
+                           var $thisSpan = $(event.target);
+
+                           $thisSpan.removeClass(hoverTooltipIconCSS);
+                           $thisSpan.addClass(initialTooltipIconCSS);
+
+                           return false;
+                         });
+
+        $ttIconImg.on("click", function (e)
+        {
+          e.preventDefault();
+          $ttIconImg.tooltipster("show");
+
+          // Make them
+          // draggable.
+          $(".tooltipster-advanced-search").draggable(
+              {
+                handle: ".tooltip_header",
+                snap: true,
+                revert: false
+              });
+
+          return false;
+        });
+      }
+    };
 
     /**
      * Given the JSON data, load the tooltips for those fields.
-     * @param jsonData
+     * @param {{}}  jsonData    JSON data from external tooltips.
      */
-    function loadTooltips(jsonData)
+    this.loadTooltips = function (jsonData)
     {
       var tooltipCreator = new ca.nrc.cadc.search.TooltipCreator();
-      getForm().find("ul.search-constraints li").each(function (liKey, liElement)
-                                                      {
-                                                        var $liItem = $(liElement);
-                                                        var $tooltipHeader =
-                                                            $liItem.find("summary.search_criteria_label_container");
-                                                        var tooltipHeaderText = $tooltipHeader.text();
-                                                        var $searchInputItem =
-                                                            $liItem.find(".search_criteria_input:first");
-                                                        var $inputID =
-                                                            $searchInputItem.prop("id");
-                                                        var tipJSON = jsonData[$inputID];
+      this.$form.find("ul.search-constraints li").each(function (key, element)
+                                                       {
+                                                         var $liItem = $(element);
+                                                         var $tooltipHeader = $liItem.find("summary.search_criteria_label_container");
+                                                         var tooltipHeaderText = $tooltipHeader.text();
+                                                         var $searchInputItem = $liItem.find(".search_criteria_input:first");
+                                                         var inputID = $searchInputItem.attr("id");
 
-                                                        if (tipJSON &&
-                                                            tipJSON.tipHTML)
-                                                        {
-                                                          var tipMarkup = tipJSON.tipHTML;
-                                                          var tipsterPlacement;
-                                                          var offsetX, offsetY;
-
-                                                          if ($liItem.hasClass("label_tooltip_right"))
-                                                          {
-                                                            tipsterPlacement =
-                                                                "right";
-                                                            offsetX = -12;
-                                                          }
-                                                          else
-                                                          {
-                                                            tipsterPlacement =
-                                                                "left";
-                                                            offsetX = 240;
-                                                          }
-
-                                                          if (($inputID ===
-                                                               "Observation.observationID")
-                                                              || ($inputID ===
-                                                                  "DataID.observationID"))
-                                                          {
-                                                            offsetY = -350;
-                                                          }
-                                                          else
-                                                          {
-                                                            offsetY = 0;
-                                                          }
-
-                                                          var $ttIconImg = $('<span class="' +
-                                                                             tooltipIconCSS +
-                                                                             ' ' +
-                                                                             initialTooltipIconCSS +
-                                                                             ' float-right" />');
-
-                                                          $liItem.find(".search_criteria_label_contents").before($ttIconImg);
-
-                                                          var $tooltipDiv = tooltipCreator.getContent(tipMarkup,
-                                                                                                      tooltipHeaderText,
-                                                                                                      null,
-                                                                                                      $ttIconImg);
-
-                                                          var tipster = $ttIconImg.tooltipster({
-                                                                                                 interactive: true,
-                                                                                                 animation: "fade",
-                                                                                                 theme: "tooltipster-advanced-search",
-                                                                                                 content: $tooltipDiv,
-                                                                                                 maxWidth: 400,
-                                                                                                 arrow: false,
-                                                                                                 repositionOnResize: false,
-                                                                                                 repositionOnScroll: false,
-                                                                                                 position: tipsterPlacement,
-                                                                                                 offsetX: offsetX,
-                                                                                                 offsetY: offsetY,
-                                                                                                 onlyOne: true,
-                                                                                                 trigger: "custom"
-                                                                                               });
-
-                                                          if ($inputID ===
-                                                              "Plane.position.bounds")
-                                                          {
-                                                            _selfForm.targetTooltipsters =
-                                                                _selfForm.targetTooltipsters.concat(tipster);
-                                                          }
-
-                                                          $ttIconImg.hover(function ()
-                                                                           {
-                                                                             var $thisSpan = $(this);
-
-                                                                             $thisSpan.removeClass(initialTooltipIconCSS);
-                                                                             $thisSpan.addClass(hoverTooltipIconCSS);
-
-                                                                             return false;
-                                                                           },
-                                                                           function ()
-                                                                           {
-                                                                             var $thisSpan = $(this);
-
-                                                                             $thisSpan.removeClass(hoverTooltipIconCSS);
-                                                                             $thisSpan.addClass(initialTooltipIconCSS);
-
-                                                                             return false;
-                                                                           });
-
-                                                          $ttIconImg.on("click", function (e)
-                                                          {
-                                                            e.preventDefault();
-                                                            $ttIconImg.tooltipster("show");
-
-                                                            // Make them
-                                                            // draggable.
-                                                            $(".tooltipster-advanced-search").draggable(
-                                                                {
-                                                                  handle: ".tooltip_header",
-                                                                  snap: true,
-                                                                  revert: false
-                                                                });
-
-                                                            return false;
-                                                          });
-                                                        }
-                                                      });
-    }
+                                                         this.handleTooltipLoad(jsonData[inputID], tooltipCreator,
+                                                                                $liItem, inputID, tooltipHeaderText);
+                                                       }.bind(this));
+    };
 
     /**
      * Action to perform when the given criteria (form element) has changed.
-     * @param $node
+     * @param {jQuery} $node
      */
-    function searchCriteriaChanged($node)
+    this._searchCriteriaChanged = function ($node)
     {
       var id = $node.attr("id");
       var value = $node.val();
-      var autocompleteURL = ca.nrc.cadc.search.AUTOCOMPLETE_ENDPOINT + id;
-      var hasValue = ((value !== "") && (value !== null));
+      var autocompleteURL = this.configuration.options.autocompleteEndpoint + "/" + id;
+      var hasValue = stringUtil.hasText(value);
 
-      if (id === _selfForm.targetNameFieldID)
+      if (id === this.targetNameFieldID)
       {
         // input text field disabled implies file has been chosen
         if (!$("input[id='" + id + "']").prop("disabled"))
         {
-          indicateInputPresence(hasValue, id, value);
+          this._indicateInputPresence(hasValue, id, value);
         }
 
-        toggleDisabled($("input[id='" + id + "_targetList']"), hasValue);
+        this.toggleDisabled($("input[id='" + id + "_targetList']"), hasValue);
 
-        var resolver = getForm().find(
-            "select.resolver_select option:selected").val();
+        var resolver = this.$form.find("select.resolver_select option:selected").val();
 
         if (hasValue && (resolver !== "NONE"))
         {
-          clearTimeout();
+          this.clearTimeout();
 
           // Give the user a little more time to type stuff in.
-          _selfForm.currentTimeoutID = window.setTimeout(
-              function ()
-              {
-                clearTargetNameResolutionStatusOnly();
+          this.currentTimeoutID = window.setTimeout(function ()
+                                                    {
+                                                      this._clearTargetNameResolutionStatusOnly();
 
-                var $targetNameResolutionStatus =
-                    getTargetNameResolutionStatusObject();
+                                                      var $targetNameResolutionStatus =
+                                                          this._getTargetNameResolutionStatusObject();
 
-                $targetNameResolutionStatus.addClass("busy");
+                                                      $targetNameResolutionStatus.addClass("busy");
 
-                $.getJSON(autocompleteURL, {term: value, resolver: resolver},
-                          function (data)
-                          {
-                            $targetNameResolutionStatus.removeClass("busy");
-                            clearTargetNameResolutionTooltip();
+                                                      $.getJSON(autocompleteURL, {term: value, resolver: resolver},
 
-                            // Was input text cleared before the event arrived?
-                            if ($.trim($("input[id='" + id + "']").val()).length >
-                                0)
-                            {
-                              var arg =
-                                  {
-                                    "data": data,
-                                    "id": id
-                                  };
+                                                                /**
+                                                                 * @param {{}} data   Response JSON
+                                                                 * @param {String}  data.resolveStatus  Status text.
+                                                                 */
+                                                                function (data)
+                                                                {
+                                                                  $targetNameResolutionStatus.removeClass("busy");
+                                                                  this._clearTargetNameResolutionTooltip();
 
-                              // no, check resolve status
-                              if (data.resolveStatus === "GOOD")
-                              {
-                                trigger(ca.nrc.cadc.search.events.onTargetNameResolved, arg);
-                              }
-                              else
-                              {
-                                trigger(ca.nrc.cadc.search.events.onTargetNameUnresolved, arg);
-                              }
-                            }
-                          });
-              }, 700);
+                                                                  // Was input text cleared before the event arrived?
+                                                                  if ($.trim($("input[id='" + id + "']").val()).length >
+                                                                      0)
+                                                                  {
+                                                                    var arg = {
+                                                                      "data": data,
+                                                                      "id": id
+                                                                    };
+
+                                                                    // no, check resolve status
+                                                                    if (data.resolveStatus === "GOOD")
+                                                                    {
+                                                                      this._trigger(ca.nrc.cadc.search.events.onTargetNameResolved, arg);
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                      this._trigger(ca.nrc.cadc.search.events.onTargetNameUnresolved, arg);
+                                                                    }
+                                                                  }
+                                                                }.bind(this));
+                                                    }.bind(this), 700);
         }
         else
         {
-          clearTargetNameResolutionStatus();
+          this._clearTargetNameResolutionStatus();
         }
       }
-      else if ($node.hasClass('ui_unitconversion_input'))
+      else if ($node.hasClass("ui_unitconversion_input"))
       {
         // Pass request to server
         $.getJSON(autocompleteURL, {term: value}, function (data)
@@ -1043,7 +1117,7 @@
 
           if (id.indexOf("_targetList") > 0)
           {
-            elementID = _selfForm.targetNameFieldID;
+            elementID = this.targetNameFieldID;
           }
           else if (id.indexOf("_PRESET") > 0)
           {
@@ -1054,14 +1128,14 @@
             elementID = id;
           }
 
-          var $label = getForm().find("label[for='" + elementID +
-                                      "']").prev("summary").children("span.search_criteria_label_contents");
+          var $label = this.$form.find("label[for='" + elementID +
+                                       "']").prev("summary").children("span.search_criteria_label_contents");
           if ($label)
           {
             $label.empty();
             var searchCriteriaLabel;
 
-            if ((value !== '') && (JSON.stringify(data).indexOf("NaN") < 0))
+            if ((value !== "") && (JSON.stringify(data).indexOf("NaN") < 0))
             {
               searchCriteriaLabel = data;
             }
@@ -1076,41 +1150,49 @@
           {
             console.warn("Unable to reset text for " + elementID);
           }
-        }).error(function (jqXHR, status, message)
-                 {
-                   console.log("Error: " + message);
-                 });
+        }.bind(this))
+            .error(function (jqXHR, status, message)
+                   {
+                     console.log("Error: " + message);
+                   });
       }
-      else if (id.match('^Observation.'))
+      else if (id.match("^Observation."))
       {
-        indicateInputPresence(hasValue, id, value);
+        this._indicateInputPresence(hasValue, id, value);
       }
-      else if (id.match('Plane.position.bounds_targetList'))
+      else if (id.match("Plane.position.bounds_targetList"))
       {
         // On chrome, 'value' contains the full path, e.g. C:\fakepath\test.txt.
         // Just use the file name instead.
-        var mPos = value.lastIndexOf('\\');
+        var mPos = value.lastIndexOf("\\");
 
         if (mPos === -1)
         {
-          mPos = value.lastIndexOf('/');
+          mPos = value.lastIndexOf("/");
         }
 
         var mFilename = value.substring(mPos + 1, value.length);
-        indicateInputPresence(hasValue, "Plane.position.bounds", mFilename);
+        this._indicateInputPresence(hasValue, "Plane.position.bounds", mFilename);
       }
 
-      trigger(ca.nrc.cadc.search.events.onSearchCriteriaChanged,
-              {
-                formItem: $node
-              });
-    }
+      this._trigger(ca.nrc.cadc.search.events.onSearchCriteriaChanged,
+                    {
+                      formItem: $node
+                    });
+    };
 
-    function indicateInputPresence(hasValue, elementID, elementValue)
+    /**
+     *
+     * @param {boolean} hasValue    Whether to set it.
+     * @param {String} elementID    The id of the Element to set.
+     * @param {String} elementValue The value to set.
+     * @private
+     */
+    this._indicateInputPresence = function (hasValue, elementID, elementValue)
     {
-      var $label = getForm().find("label[for='" + elementID +
-                                  "']").prev("summary").children("span.search_criteria_label_contents");
-      if ($label)
+      var $label = this.$form.find("label[for='" + elementID + "']").prev("summary")
+          .children("span.search_criteria_label_contents");
+      if ($label.length > 0)
       {
         $label.empty();
 
@@ -1121,87 +1203,109 @@
                       {
                         var maxLength;
 
-                        if ((elementID ===
-                             ca.nrc.cadc.search.CAOM2_TARGET_NAME_FIELD_ID)
-                            || (elementID ===
-                                ca.nrc.cadc.search.OBSCORE_TARGET_NAME_FIELD_ID))
+                        if ((elementID === ca.nrc.cadc.search.CAOM2_TARGET_NAME_FIELD_ID)
+                            || (elementID === ca.nrc.cadc.search.OBSCORE_TARGET_NAME_FIELD_ID))
                         {
-                          maxLength =
-                              ca.nrc.cadc.search.TARGET_FORM_LABEL_INPUT_LENGTH;
+                          maxLength = ca.nrc.cadc.search.TARGET_FORM_LABEL_INPUT_LENGTH;
                         }
                         else
                         {
-                          maxLength =
-                              ca.nrc.cadc.search.FORM_LABEL_INPUT_LENGTH;
+                          maxLength = ca.nrc.cadc.search.FORM_LABEL_INPUT_LENGTH;
                         }
 
                         if (elementValue.length > maxLength)
                         {
                           mText = elementValue.substring(0, maxLength) + "...";
                         }
+
                         return "(" + mText + ")";
                       });
         }
       }
-    }
+    };
 
-    function getForm()
+    /**
+     * Obtain the jQuery Form object.
+     * @return {jQuery}
+     */
+    this.getForm = function ()
     {
-      return _selfForm.$form;
-    }
+      return this.$form;
+    };
 
-    function getID()
+    /**
+     * Obtain this Form's ID.
+     * @return {String}
+     */
+    this.getID = function ()
     {
-      return _selfForm.id;
-    }
+      return this.id;
+    };
 
-    function getDataTrain()
+    /**
+     * Obtain the Data Train instance.
+     * @return {ca.nrc.cadc.search.datatrain.DataTrain|DataTrain}
+     */
+    this.getDataTrain = function ()
     {
-      return _selfForm.dataTrain;
-    }
+      return this.dataTrain;
+    };
 
-    function getName()
+    /**
+     * This form's name.
+     * @return {String}
+     */
+    this.getName = function ()
     {
-      return getConfiguration().getName();
-    }
+      return this.configuration.getName();
+    };
 
-    function getDownloadAccessKey()
+    /**
+     * This form's download access key column.
+     * @return {String}
+     */
+    this.getDownloadAccessKey = function ()
     {
-      return getConfiguration().getDownloadAccessKey();
-    }
+      return this.configuration.getDownloadAccessKey();
+    };
 
-    function getConfiguration()
+    this.getConfiguration = function ()
     {
-      return _selfForm.configuration;
-    }
+      return this.configuration;
+    };
 
     /**
      * Obtain this form's form configuration metadata.
      *
      * @returns {cadc.vot.Metadata|*}
      */
-    function getResultsTableMetadata()
+    this.getResultsTableMetadata = function ()
     {
-      return getConfiguration().getResultsTableMetadata();
-    }
+      return this.configuration.getResultsTableMetadata();
+    };
 
-    function isActive(_formID)
+    /**
+     * @param {String}  _formID   Assess whether this form is active.
+     * @return {boolean}
+     */
+    this.isActive = function (_formID)
     {
-      return _formID === getID();
-    }
+      return (_formID === this.id);
+    };
 
-    function getValidator()
+    this.getValidator = function ()
     {
-      return _selfForm.validator;
-    }
+      return this.validator;
+    };
 
     /**
      * Decorate the appropriate fields with error messages.
      *
-     * @param $input      The jQuery input object.
-     * @param jsonError   The JSON object of error messages.
+     * @param {jQuery} $input      The jQuery input object.
+     * @param {{}} [jsonError]   The JSON object of error messages.
+     * @private
      */
-    function decorate($input, jsonError)
+    this._decorate = function ($input, jsonError)
     {
       var $inputParent = $input.parent();
 
@@ -1213,28 +1317,30 @@
       {
         $inputParent.addClass("form-attention");
       }
-    }
+    };
 
     /**
      * Clear any errors.
+     * @private
      */
-    function clearErrors()
+    this.clearErrors = function ()
     {
-      getForm().find(".form-attention").each(function ()
-                                             {
-                                               decorate($(this).find("input.search_criteria_input"), null);
-                                             });
-    }
+      this.$form.find(".form-attention").each(function (key, value)
+                                              {
+                                                this._decorate($(value).find("input.search_criteria_input"), null);
+                                              }.bind(this));
+    };
 
     /**
      * Perform a basic validation of this form.
      *
      * @returns {boolean}   True if valid, False otherwise.
+     * @private
      */
-    function validate()
+    this._validate = function ()
     {
       var valid = false;
-      var $thisForm = getForm();
+      var $thisForm = this.$form;
 
       $thisForm.find("input:text").each(function ()
                                         {
@@ -1309,119 +1415,127 @@
 
       if (valid)
       {
-        trigger(ca.nrc.cadc.search.events.onValid, {});
+        this._trigger(ca.nrc.cadc.search.events.onValid, {});
       }
       else
       {
-        trigger(ca.nrc.cadc.search.events.onInvalid, {});
+        this._trigger(ca.nrc.cadc.search.events.onInvalid, {});
       }
 
       return valid;
-    }
+    };
 
     /**
      * Toggle a field's disabled attribute.
      *
-     * @param node      The node to set.
-     * @param disable   The disabled flag to set.
+     * @param {jQuery} node      The node to set.
+     * @param {boolean} disable   The disabled flag to set.
      */
-    function toggleDisabled(node, disable)
+    this.toggleDisabled = function (node, disable)
     {
-      node.prop('disabled', disable);
+      node.prop("disabled", disable);
 
       if (disable === false)
       {
-        node.removeAttr('disabled');
+        node.removeAttr("disabled");
       }
-    }
+    };
 
     /**
      * Disable searches from this form.
      */
-    function disable()
+    this.disable = function ()
     {
-      getForm().prop("disabled", true);
-      getForm().find("input:submit").prop("disabled", true);
-    }
+      this.$form.prop("disabled", true).find("input:submit").prop("disabled", true);
+    };
 
     /**
      * Enable searches from this form.
      */
-    function enable()
+    this.enable = function ()
     {
-      getForm().prop("disabled", false);
-      getForm().find("input:submit").prop("disabled", false);
-    }
+      this.$form.prop("disabled", false).find("input:submit").prop("disabled", false);
+    };
 
-    function clearTargetList()
+    /**
+     * @return {jQuery}   Target list object.
+     * @private
+     */
+    this._clearTargetList = function ()
     {
-      var $targetList = getForm().find("input:file[id$='_targetList']");
+      var $targetList = this.$form.find("input:file[id$='_targetList']");
       $targetList.val("");
 
       var targetListID = $targetList.attr("id");
-      var utypeValue =
-          targetListID.substring(0, targetListID.indexOf("_targetList"));
+      var uTypeValue = targetListID.substring(0, targetListID.indexOf("_targetList"));
 
-      toggleDisabled($("input[id='" + utypeValue + "']"), false);
-      toggleDisabled($targetList, false);
+      this.toggleDisabled($("input[id='" + uTypeValue + "']"), false);
+      this.toggleDisabled($targetList, false);
 
       return $targetList;
-    }
+    };
 
-    function getTargetNameResolutionStatusObject()
+    /**
+     * @return {jQuery}
+     * @private
+     */
+    this._getTargetNameResolutionStatusObject = function ()
     {
-      return getForm().find("span.target_name_resolution_status");
-    }
+      return this.$form.find("span.target_name_resolution_status");
+    };
 
     /**
      * Return those checkboxes that disable other fields to unchecked.
+     * @private
      */
-    function clearDisablingCheckboxes()
+    this._clearDisablingCheckboxes = function ()
     {
       // Force issue a change().
-      getForm().find("[data-disable-to]:checked").prop("checked",
-                                                       false).change();
-    }
+      this.$form.find("[data-disable-to]:checked").prop("checked", false).change();
+    };
 
     /**
      * Clear the target name resolution image.
+     * @private
      */
-    function clearTargetNameResolutionStatusOnly()
+    this._clearTargetNameResolutionStatusOnly = function ()
     {
-      var targetNameResolutionStatus = getTargetNameResolutionStatusObject();
+      var targetNameResolutionStatus = this._getTargetNameResolutionStatusObject();
 
       targetNameResolutionStatus.removeClass("busy");
       targetNameResolutionStatus.removeClass("target_ok");
       targetNameResolutionStatus.removeClass("target_not_found");
 
       // Clear errors
-      clearErrors();
-    }
+      this.clearErrors();
+    };
 
     /**
      * Clear the target name resolution image.
+     * @private
      */
-    function clearTargetNameResolutionStatus()
+    this._clearTargetNameResolutionStatus = function ()
     {
-      clearTargetNameResolutionStatusOnly();
+      this._clearTargetNameResolutionStatusOnly();
 
       // Clear the resolution tooltip.
-      clearTargetNameResolutionTooltip();
-    }
+      this._clearTargetNameResolutionTooltip();
+    };
 
     /**
      * Remove the data from the target name resolution tooltip.
+     * @private
      */
-    function clearTargetNameResolutionTooltip()
+    this._clearTargetNameResolutionTooltip = function ()
     {
-      getTargetNameResolutionStatusObject().tooltipster("content", "");
-    }
+      this._getTargetNameResolutionStatusObject().tooltipster("content", "");
+    };
 
     /**
      * Attempt at cross-browser HTTPRequest creation.
      * @returns {*} Request
      */
-    function createRequest()
+    this._createRequest = function ()
     {
       var _thisRequest;
 
@@ -1429,13 +1543,13 @@
       {
         _thisRequest = new XMLHttpRequest();
       }
-      catch (trymicrosoft)
+      catch (tryMicroSoft)
       {
         try
         {
           _thisRequest = new ActiveXObject("Msxml2.XMLHTTP");
         }
-        catch (othermicrosoft)
+        catch (tryMicroSoftOther)
         {
           try
           {
@@ -1448,48 +1562,54 @@
         }
       }
 
-      _selfForm.currentRequest = _thisRequest;
-      return _selfForm.currentRequest;
-    }
+      this.currentRequest = _thisRequest;
+      return this.currentRequest;
+    };
 
-    function submit()
+    /**
+     * Submit the form.
+     */
+    this.submit = function ()
     {
-      getForm().submit();
-    }
+      this.$form.submit();
+    };
 
     /**
      * Cancel the current form submission.
      */
-    function cancel()
+    this.cancel = function ()
     {
-      getForm().stop(true, true);
+      this.$form.stop(true, true);
 
-      if (_selfForm.currentRequest)
+      if (this.currentRequest)
       {
-        _selfForm.currentRequest.abort();
+        this.currentRequest.abort();
       }
 
-      trigger(ca.nrc.cadc.search.events.onCancel, {});
-    }
+      this._trigger(ca.nrc.cadc.search.events.onCancel, {});
+    };
 
     /**
      * Hide all of the tooltips.  This is used when the form is submitted.
+     * @private
      */
-    function closeAllTooltips()
+    this._closeAllTooltips = function ()
     {
       var selector = "." + tooltipIconCSS;
       $(selector).tooltipster("hide");
-    }
+    };
 
     /**
      * Action to perform before form serialization begins.
+     * @private
      */
-    function beforeSerialize()
+    this._beforeSerialize = function ()
     {
       $("#UPLOAD").remove();
 
       var inputFile = $("input:file[name='targetList']");
-      if (inputFile && !inputFile.prop("disabled") && (inputFile.val() !== ""))
+
+      if ((inputFile.length > 0) && !inputFile.prop("disabled") && (inputFile.val() !== ""))
       {
         var upload = $("<input>");
         upload.prop("type", "hidden");
@@ -1497,174 +1617,188 @@
         upload.prop("id", "UPLOAD");
         upload.prop("value", "search_upload,param:targetList");
 
-        getForm().append(upload);
+        this.$form.append(upload);
 
         // Update the file input name with the value from the target list select.
         var resolver = $("select[id='Plane.position.bounds@Shape1Resolver.value']").val();
 
-        inputFile.prop('name', 'targetList.' + resolver);
+        inputFile.prop("name", "targetList." + resolver);
       }
 
       // Save the form to sessionStorage.
-
-      sessionStorage.setItem('form_data', getForm().serialize());
-      sessionStorage.setItem('isReload', false);
-    }
+      sessionStorage.setItem("form_data", this.$form.serialize());
+      sessionStorage.setItem("isReload", false);
+    };
 
     $(window).ready(function ()
                     {
                       // if time between unload and ready is short (1 second or
                       // less), page is reloaded
-                      if (($.now() - sessionStorage.getItem('unloadTime')) < 1000)
+                      if (($.now() - sessionStorage.getItem("unloadTime")) < 1000)
                       {
-                        sessionStorage.setItem('isReload', true);
+                        sessionStorage.setItem("isReload", true);
                       }
                     });
 
     $(window).unload(function ()
                      {
                        // when page is unloaded, save the selected tab
-                       sessionStorage.setItem('unloadTime', $.now());
-                       sessionStorage.setItem('isReload', false);
+                       sessionStorage.setItem("unloadTime", $.now());
+                       sessionStorage.setItem("isReload", false);
                      });
 
-    function formSubmit(event)
+
+    /**
+     * Submit the form.
+     *
+     * @param {jQuery.Event|Event} event
+     * @private
+     */
+    this._formSubmit = function (event)
     {
       event.preventDefault();
 
-      closeAllTooltips();
+      this._closeAllTooltips();
 
       // Clear old session storage form_data.
-      sessionStorage.removeItem('form_data');
+      sessionStorage.removeItem("form_data");
 
-      if (validate())
+      if (this._validate())
       {
-        subscribe(ca.nrc.cadc.search.events.onSubmitComplete,
-                  function ()
-                  {
-                    if (_selfForm.targetTooltipsters.length === 2)
-                    {
-                      _selfForm.targetTooltipsters[1].disable();
-                      _selfForm.targetTooltipsters[1].enable();
-                    }
-                  });
+        this.subscribe(ca.nrc.cadc.search.events.onSubmitComplete,
+                       function ()
+                       {
+                         if (this.targetTooltipsters.length === 2)
+                         {
+                           this.targetTooltipsters[1].disable();
+                           this.targetTooltipsters[1].enable();
+                         }
+                       }.bind(this));
+
         var inputFile = $("input:file");
         var isUpload = (inputFile && (inputFile.val() !== ""));
-        toggleDisabled($("input[name='targetList']"), false);
+        this.toggleDisabled($("input[name='targetList']"), false);
 
         var netStart = (new Date()).getTime();
 
         try
         {
-          $("input." + getConfiguration().getName() + "_selectlist").val(getConfiguration().getSelectListString(false));
+          $("input." + this.configuration.getName() + "_selectlist").val(this.configuration.getSelectListString(false));
         }
         catch (e)
         {
-          cancel();
+          this.cancel();
           alert("Error: " + e.message);
         }
 
-        getForm().ajaxSubmit(
-            {
-              url: "/AdvancedSearch/find",
-              target: "#file_upload_response",
-              dataType: "json",
-              beforeSubmit: beforeSerialize,
-              success: function (json)
-              {
-                getForm().find("input:hidden#target").remove();
-                getForm().find("input:hidden#collection").remove();
+        /**
+         * Cheating...  Oh well.  This is here to alleviate all of the otherwise necessary bind() calls.
+         *
+         * @type {SearchForm}
+         */
+        var myself = this;
 
-                _selfForm.currentRequest = null;
+        this.$form.ajaxSubmit({
+                                url: "/AdvancedSearch/find",
+                                target: "#file_upload_response",
+                                dataType: "json",
+                                beforeSubmit: this._beforeSerialize.bind(this),
+                                success: function (json)
+                                {
+                                  myself.$form.find("input:hidden#target").remove();
+                                  myself.$form.find("input:hidden#collection").remove();
 
-                var args =
-                    {
-                      "data": json,
-                      "success": true,
-                      "startDate": netStart,
-                      "cadcForm": _selfForm
-                    };
+                                  myself.$form.currentRequest = null;
 
-                trigger(ca.nrc.cadc.search.events.onSubmitComplete, args);
-              },
-              error: function (request)
-              {
-                console.error("Error: " + request.responseText);
+                                  var args = {
+                                    "data": json,
+                                    "success": true,
+                                    "startDate": netStart,
+                                    "cadcForm": myself
+                                  };
 
-                trigger(ca.nrc.cadc.search.events.onSubmitComplete,
-                        {
-                          "error_url": request.responseText,
-                          "success": false,
-                          "startDate": netStart,
-                          "cadcForm": _selfForm
-                        });
-              },
-              complete: function (request, textStatus)
-              {
-                // Remove non-form inputs to prevent confusion with further queries.
-                getForm().find("input.form-extra").remove();
+                                  myself._trigger(ca.nrc.cadc.search.events.onSubmitComplete, args);
+                                },
+                                error: function (request)
+                                {
+                                  console.error("Error: " + request.responseText);
 
-                if (textStatus === "timeout")
-                {
-                  alert("The search took too long to return.\n" +
-                        "Please refine your search or try again later.");
+                                  myself._trigger(ca.nrc.cadc.search.events.onSubmitComplete,
+                                                  {
+                                                    "error_url": request.responseText,
+                                                    "success": false,
+                                                    "startDate": netStart,
+                                                    "cadcForm": myself
+                                                  });
+                                },
+                                complete: function (request, textStatus)
+                                {
+                                  // Remove non-form inputs to prevent confusion with further queries.
+                                  myself.$form.find("input.form-extra").remove();
 
-                  trigger(ca.nrc.cadc.search.events.onSubmitComplete,
-                          {
-                            "success": false,
-                            "startDate": netStart,
-                            "cadcForm": _selfForm,
-                            "error": {
-                              status: request.status,
-                              message: textStatus
-                            }
-                          });
-                }
-              },
-              iframe: isUpload,
-              xhr: createRequest
-            });
+                                  if (textStatus === "timeout")
+                                  {
+                                    alert("The search took too long to return.\n"
+                                          + "Please refine your search or try again later.");
+
+                                    myself._trigger(ca.nrc.cadc.search.events.onSubmitComplete,
+                                                    {
+                                                      "success": false,
+                                                      "startDate": netStart,
+                                                      "cadcForm": myself,
+                                                      "error": {
+                                                        status: request.status,
+                                                        message: textStatus
+                                                      }
+                                                    });
+                                  }
+                                },
+                                iframe: isUpload,
+                                xhr: this._createRequest
+                              });
       }
-    }
+    };
 
-    function resetFields()
+    /**
+     * Reset all of the form fields.
+     */
+    this.resetFields = function ()
     {
       // function that resets all fields to default values
-      var $currentForm = getForm();
-      $currentForm.find("input:text").val("");
+      this.$form.find("input:text").val("");
       $("#UPLOAD").remove();
 
       $("#include_proprietary").removeAttr("checked");
 
-      clearTargetList();
+      this._clearTargetList();
 
-      getForm().find("select.search_criteria_input").each(
-          function ()
+      this.$form.find("select.search_criteria_input").each(
+          function (key, value)
           {
-            var $selectCriteria = $(this);
+            var $selectCriteria = $(value);
             $selectCriteria.val("");
-            toggleDisabled($selectCriteria, false);
-          });
+            this.toggleDisabled($selectCriteria, false);
+          }.bind(this));
 
-      getForm().find('input.search_criteria_input').each(
-          function ()
+      this.$form.find("input.search_criteria_input").each(
+          function (key, value)
           {
-            var $formItem = $(this);
+            var $formItem = $(value);
             $("label[for='" + $formItem.attr("id") +
               "']").prev("summary").children("span.search_criteria_label_contents").text("");
-            toggleDisabled($formItem, false);
-            closeDetailsItem($formItem.parents("details"));
-          });
+            this.toggleDisabled($formItem, false);
+            this.closeDetailsItem($formItem.parents("details"));
+          }.bind(this));
 
-      clearTargetNameResolutionStatus();
-      clearDisablingCheckboxes();
+      this._clearTargetNameResolutionStatus();
+      this._clearDisablingCheckboxes();
 
-      $('.hierarchy select').each(function ()
+      $(".hierarchy select").each(function ()
                                   {
                                     $(this).val("");
                                   });
 
-      var firstSelect = $('.hierarchy select:eq(0)');
+      var firstSelect = $(".hierarchy select:eq(0)");
 
       $("input[name$='.DOWNLOADCUTOUT']").prop("checked", false);
 
@@ -1672,47 +1806,54 @@
       var jsFirstSelect = document.getElementById(firstSelect.prop("id"));
       if (jsFirstSelect !== null)
       {
-        getDataTrain().updateLists(jsFirstSelect, true);
+        this.dataTrain.updateLists(jsFirstSelect, true);
       }
 
-      clearErrors();
-      closeAllTooltips();
+      this.clearErrors();
+      this._closeAllTooltips();
 
-      trigger(ca.nrc.cadc.search.events.onReset, {});
-    }
+      this._trigger(ca.nrc.cadc.search.events.onReset, {});
+    };
 
-    function setSelectValue(_uTypeID, _selectID, _optionValue)
+    /**
+     * Set a value in an option of a select (pull-down/multiselect) element.
+     *
+     * @param {String} _uTypeID   The uType (ID) of the <detail> surrounding element.
+     * @param {String}  _selectID The ID of the <select> element.
+     * @param {String} _optionValue    The value of the <option> to set.
+     */
+    this.setSelectValue = function (_uTypeID, _selectID, _optionValue)
     {
-      var $detailsItem = getForm().find("details[id='" + _uTypeID + "_details']");
+      var $detailsItem = this.$form.find("details[id='" + _uTypeID + "_details']");
 
       // Only proceed if a valid input ID was passed in.
-      if ($detailsItem)
+      if ($detailsItem.length > 0)
       {
         var $select = $detailsItem.find("select[id='" + _selectID + "']");
         $select.val(_optionValue).change();
 
         if (_optionValue)
         {
-          openDetailsItem($detailsItem);
+          this.openDetailsItem($detailsItem);
         }
         else
         {
-          closeDetailsItem($detailsItem);
+          this.closeDetailsItem($detailsItem);
         }
       }
-    }
+    };
 
     /**
      * Populate a form <input> value that is encased in a <details> item.  If
      * the value is empty or null, then close the <details> item.
      *
-     * @param _inputID      The ID of the <input> field.
-     * @param _inputValue   The value to set.
+     * @param {String} _inputID      The ID of the <input> field.
+     * @param {String} _inputValue   The value to set.
      */
-    function setInputValue(_inputID, _inputValue)
+    this.setInputValue = function (_inputID, _inputValue)
     {
-      var $inputItem = getForm().find("input[id='" + _inputID + "']");
-      var $formItem = getForm().find("[id='" + _inputID + "']");
+      var $inputItem = this.$form.find("input[id='" + _inputID + "']");
+      var $formItem = this.$form.find("[id='" + _inputID + "']");
 
       if ($inputItem.length > 0)
       {
@@ -1728,15 +1869,15 @@
           $inputItem.val(_inputValue).change();
         }
 
-        var $detailsItem = getForm().find("details[id='" + _inputID + "_details']");
+        var $detailsItem = this.$form.find("details[id='" + _inputID + "_details']");
 
         if (_inputValue)
         {
-          openDetailsItem($detailsItem);
+          this.openDetailsItem($detailsItem);
         }
         else
         {
-          closeDetailsItem($detailsItem);
+          this.closeDetailsItem($detailsItem);
         }
       }
       // The "collection" word is grandfathered in, so ignore it...
@@ -1748,20 +1889,19 @@
         var $newHiddenFormName = $("<input>").attr("type", "hidden").attr("name", "Form.name").val(_inputID + "@Text")
             .addClass("form-extra");
 
-        getForm().append($newHidden);
-        getForm().append($newHiddenFormName);
+        this.$form.append($newHidden);
+        this.$form.append($newHiddenFormName);
       }
-    }
+    };
 
-    /*
-     * Update the select element with the select value. Return true if the
-     * select is updated, false otherwise.
-     * 
-     * @param {Object} _select        The select element to up updated.
-     * @param {Object} _selectValues   The selected value array.
+    /**
+     * Update the select element with the select value. Return true if the select is updated, false otherwise.
+     *
+     * @param {jQuery} _$select     The select element to up updated.
+     * @param {[]} _selectValues    The selected value array.
      * @returns {Boolean}
      */
-    function setDatatrainValue(_$select, _selectValues)
+    this.setDataTrainValue = function (_$select, _selectValues)
     {
       var $options = _$select.find("option").filter(function ()
                                                     {
@@ -1797,103 +1937,72 @@
       }
 
       return ($options && ($options.length > 0));
-    }
+    };
 
     /**
      * Open a one of the hidden items on the form.  This is used by the tooltip
      * examples to set a value.
      *
-     * @param $detailsItem    The <details> item to open.
+     * @param {jQuery} $detailsItem    The <details> item to open.
      */
-    function openDetailsItem($detailsItem)
+    this.openDetailsItem = function ($detailsItem)
     {
       $detailsItem.prop("open", true);
-    }
+    };
 
     /**
      * Close a one of the hidden items on the form.  This is used by the tooltip
      * examples to set a value.
      *
-     * @param $detailsItem    The <details> item to open.
+     * @param {jQuery} $detailsItem    The <details> item to open.
      */
-    function closeDetailsItem($detailsItem)
+    this.closeDetailsItem = function ($detailsItem)
     {
       $detailsItem.prop("open", false);
-    }
+    };
 
-    function createField(_row)
+    /**
+     * Clear any existing timeouts.
+     */
+    this.clearTimeout = function ()
     {
-      return getConfiguration().createField(_row);
-    }
-
-    function clearTimeout()
-    {
-      if (_selfForm.currentTimeoutID)
+      if (this.currentTimeoutID)
       {
-        window.clearTimeout(_selfForm.currentTimeoutID);
+        window.clearTimeout(this.currentTimeoutID);
       }
-    }
+    };
 
     /**
      * Fire an event.  Taken from the slick.grid Object.
      *
-     * @param _event       The Event to fire.
-     * @param _args        Arguments to the event.
+     * @param {jQuery.Event}  _event       The Event to fire.
+     * @param {{}}  _args        Arguments to the event.
      * @returns {*}       The event notification result.
+     * @private
      */
-    function trigger(_event, _args)
+    this._trigger = function (_event, _args)
     {
       var args = _args || {};
-      args.cadcForm = _selfForm;
+      args.cadcForm = this;
 
-      return $(_selfForm).trigger(_event, _args);
-    }
+      return $(this).trigger(_event, _args);
+    };
 
     /**
      * Subscribe to one of this form's events.
      *
-     * @param _event      Event object.
-     * @param __handler   Handler function.
+     * @param {jQuery.Event}  _event      Event object.
+     * @param {function}  __handler   Handler function.
      */
-    function subscribe(_event, __handler)
+    this.subscribe = function (_event, __handler)
     {
-      $(_selfForm).on(_event.type, __handler);
-    }
+      $(this).on(_event.type, __handler);
+    };
 
-    $.extend(this,
-             {
-               // Methods
-               "getForm": getForm,
-               "getID": getID,
-               "getName": getName,
-               "getDownloadAccessKey": getDownloadAccessKey,
-               "getResultsTableMetadata": getResultsTableMetadata,
-               "getConfiguration": getConfiguration,
-               "isActive": isActive,
-               "resetFields": resetFields,
-               "toggleDisabled": toggleDisabled,
-               "cancel": cancel,
-               "submit": submit,
-               "openDetailsItem": openDetailsItem,
-               "setInputValue": setInputValue,
-               "setSelectValue": setSelectValue,
-               "setDatatrainValue": setDatatrainValue,
-               "closeDetailsItem": closeDetailsItem,
-               "getDataTrain": getDataTrain,
-               "init": init,
-               "disable": disable,
-               "enable": enable,
-               "createField": createField,
-               "clearTimeout": clearTimeout,
-               "loadTooltips": loadTooltips,
 
-               // Event handling.
-               "subscribe": subscribe
-             });
-
-    if (_autoInitFlag)
+    if (_autoInitFlag === true)
     {
-      init();
+      this.init();
     }
   }
 
