@@ -48,7 +48,7 @@ public class FormCheckBrowserTest extends AbstractAdvancedSearchIntegrationTest
     public void verifyForm() throws Exception
     {
         final CAOMSearchFormPage caomSearchFormPage =
-                goTo("/en/search/", "", CAOMSearchFormPage.class);
+                goTo(ENGLISH_ENDPOINT, "", CAOMSearchFormPage.class);
         verifyTooltips(caomSearchFormPage);
     }
 

@@ -48,7 +48,7 @@ public abstract class AbstractAdvancedSearchIntegrationTest
         extends AbstractWebApplicationIntegrationTest
 {
     static final Pattern ROW_COUNT_PATTERN = Pattern.compile("\\d+");
-    static final String ENGLISH_ENDPOINT = "/en/search/";
+    static final String ENGLISH_ENDPOINT = "/search/";
 
     AbstractAdvancedSearchIntegrationTest()
     {
@@ -170,7 +170,7 @@ public abstract class AbstractAdvancedSearchIntegrationTest
      */
     void goToApplication(final String query) throws Exception
     {
-        goTo("/en/search/", query);
+        goTo(ENGLISH_ENDPOINT, query);
     }
 
     /**
