@@ -36,6 +36,7 @@ package ca.nrc.cadc.search.integration;
 
 import org.junit.Test;
 
+
 public class BookmarkBrowserTest extends AbstractAdvancedSearchIntegrationTest
 {
     static String BOOKMARK_QUERY_STRING_1 =
@@ -43,12 +44,14 @@ public class BookmarkBrowserTest extends AbstractAdvancedSearchIntegrationTest
     static String BOOKMARK_QUERY_STRING_2 =
             "Observation.proposal.id=M11BU16&Observation.collection=JCMT#sortCol=Start%20Date&sortDir=dsc&col_1=_checkbox_selector;;;&col_2=Rest-frame%20Energy;;;&col_3=Target%20Name;;;&col_4=RA%20(J2000.0);;;&col_5=Dec.%20(J2000.0);;;&col_6=Proposal%20ID;;;&col_7=Start%20Date;;;&col_8=Sequence%20Number;;;&col_9=Instrument;;;&col_10=Preview;;;&col_11=Molecule;;;&col_12=Transition;;;&col_13=Filter;;;&col_14=Int.%20Time;;;&col_15=Field%20of%20View;;;&col_16=Instrument%20Keywords;;;&col_17=Obs.%20Type;;;&col_18=Intent;;;&col_19=Moving%20Target;;;&col_20=Algorithm%20Name;;;&col_21=Product%20ID;;;&col_22=Data%20Type;;;";
 
+    // Querying non-form input fields for Story 2107.
+    static String BOOKMARK_QUERY_STRING_3 = "Observation.proposal.project=OSSOS";
+
 
     @Test
     public void bookmarkTestM17() throws Exception
     {
-        final SearchResultsPage searchResultsPage =
-                bookmarkSearch(BOOKMARK_QUERY_STRING_1);
+        final SearchResultsPage searchResultsPage = bookmarkSearch(BOOKMARK_QUERY_STRING_1);
 
         // Ensure presence.
         verifyFalse(searchResultsPage.getIQColumnHeader() == null);
@@ -59,8 +62,7 @@ public class BookmarkBrowserTest extends AbstractAdvancedSearchIntegrationTest
     @Test
     public void bookmarkTestM11BU16() throws Exception
     {
-        final SearchResultsPage searchResultsPage =
-                bookmarkSearch(BOOKMARK_QUERY_STRING_2);
+        final SearchResultsPage searchResultsPage = bookmarkSearch(BOOKMARK_QUERY_STRING_2);
 
         // Ensure presence.
         verifyFalse(searchResultsPage.getRestFrameEnergyColumnHeader() == null);
@@ -68,10 +70,36 @@ public class BookmarkBrowserTest extends AbstractAdvancedSearchIntegrationTest
         queryTab();
     }
 
+    @Test
+    public void bookmarkTestProposalProject() throws Exception
+    {
+        final SearchResultsPage searchResultsPage = bookmarkSearch(BOOKMARK_QUERY_STRING_3);
+
+        searchResultsPage.includeHiddenColumn("caom2:Observation.proposal.project");
+        searchResultsPage.confirmProposalProjectColumnHeader();
+
+        // Ensure presence.
+
+        queryTab();
+    }
+
+    @Test
+    public void quickSearchTarget() throws Exception
+    {
+        final SearchResultsPage resolvedSearchResultsPage = bookmarkSearch("Plane.position.bounds=m101");
+        verifyGridHeaderLabelHasIntegerValue(resolvedSearchResultsPage, true);
+    }
+
+    @Test
+    public void quickSearchCollection() throws Exception
+    {
+        final SearchResultsPage collectionSearchResultsPage = bookmarkSearch("collection=IRIS");
+        verifyGridHeaderLabelHasIntegerValue(collectionSearchResultsPage, true);
+    }
+
     SearchResultsPage bookmarkSearch(final String requestQuery) throws Exception
     {
-        final SearchResultsPage searchResultsPage =
-                goTo(ENGLISH_ENDPOINT, requestQuery, SearchResultsPage.class);
+        final SearchResultsPage searchResultsPage = goTo(ENGLISH_ENDPOINT, requestQuery, SearchResultsPage.class);
 
         verifyGridHeaderLabelHasIntegerValue(searchResultsPage, true);
 

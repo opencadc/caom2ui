@@ -35,6 +35,7 @@ package ca.nrc.cadc.search.integration;
 
 import org.junit.Test;
 import org.openqa.selenium.By;
+import org.openqa.selenium.support.ui.Select;
 
 
 /**
@@ -47,7 +48,19 @@ public class FormInputBrowserTest extends AbstractAdvancedSearchIntegrationTest
             "Plane.time.bounds_details";
     static final String SPECTRAL_COVERAGE_U_TYPE = "Plane.energy.bounds";
     static final String PIXEL_SCALE_U_TYPE = "Plane.position.sampleSize";
-    
+
+
+    /**
+     * Select in a pulldown.
+     * @param by            The finder element.
+     * @param value         The value to set.
+     * @throws Exception  For any test execution exceptions
+     */
+    private void select(final By by, final String value) throws Exception
+    {
+        final Select select = new Select(find(by));
+        select.selectByValue(value);
+    }
 
     /**
      * Ensure the form inputs put error messages into the tooltips.
@@ -120,9 +133,9 @@ public class FormInputBrowserTest extends AbstractAdvancedSearchIntegrationTest
         //*/
     }
 
-    void verifyFormInput(final String inputID, final String entry,
-                         final boolean expectError,
-                         final String expectedLabelMessage)
+    private void verifyFormInput(final String inputID, final String entry,
+                                 final boolean expectError,
+                                 final String expectedLabelMessage)
             throws Exception
     {
         final String detailsID = inputID + "_details";
@@ -150,9 +163,9 @@ public class FormInputBrowserTest extends AbstractAdvancedSearchIntegrationTest
         hideInputBox(detailsID, inputID);
     }
 
-    void verifyFormInputMessage(final String inputID, final String detailsID,
-                                final boolean errorExpected,
-                                final String expectedMessage)
+    private void verifyFormInputMessage(final String inputID, final String detailsID,
+                                        final boolean errorExpected,
+                                        final String expectedMessage)
             throws Exception
     {
         if (errorExpected)
@@ -167,10 +180,10 @@ public class FormInputBrowserTest extends AbstractAdvancedSearchIntegrationTest
         verifyText(By.xpath(itemLocator), expectedMessage);
     }
 
-    void verifyFormInputMessageMatches(final String inputID,
-                                       final String detailsID,
-                                       final boolean errorExpected,
-                                       final String messageRegex)
+    private void verifyFormInputMessageMatches(final String inputID,
+                                               final String detailsID,
+                                               final boolean errorExpected,
+                                               final String messageRegex)
             throws Exception
     {
         if (errorExpected)
@@ -185,7 +198,7 @@ public class FormInputBrowserTest extends AbstractAdvancedSearchIntegrationTest
         verifyTextMatches(By.xpath(itemLocator), messageRegex);
     }
 
-    void verifyFormInputError(final String inputID) throws Exception
+    private void verifyFormInputError(final String inputID) throws Exception
     {
         verifyElementPresent(
                 By.xpath("//div[@id='" + inputID

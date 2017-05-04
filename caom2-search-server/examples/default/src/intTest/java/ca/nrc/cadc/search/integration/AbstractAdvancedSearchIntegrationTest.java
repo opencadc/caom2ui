@@ -44,7 +44,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import ca.nrc.cadc.web.selenium.AbstractWebApplicationIntegrationTest;
 
 
-abstract class AbstractAdvancedSearchIntegrationTest
+public abstract class AbstractAdvancedSearchIntegrationTest
         extends AbstractWebApplicationIntegrationTest
 {
     static final Pattern ROW_COUNT_PATTERN = Pattern.compile("\\d+");
@@ -95,8 +95,8 @@ abstract class AbstractAdvancedSearchIntegrationTest
     /**
      * Verify if the given search results page has results and is proper.
      *
-     * @param searchResultsPage The page to check.
-     * @param shouldHaveResults Whether the rowcount should be > 0.
+     * @param searchResultsPage     The page to check.
+     * @param shouldHaveResults     Whether the rowcount should be > 0.
      * @throws Exception
      */
     void verifyGridHeaderLabelHasIntegerValue(
@@ -120,7 +120,7 @@ abstract class AbstractAdvancedSearchIntegrationTest
      * @param checkForResults Whether to check for a row count > 0.
      * @throws Exception
      * @deprecated Use {@link #verifyGridHeaderLabelHasIntegerValue(SearchResultsPage, boolean)}
-     * instead, and adopt the Page Object model.
+     *              instead, and adopt the Page Object model.
      */
     void verifyGridHeaderLabelHasIntegerValue(
             final boolean checkForResults) throws Exception
@@ -165,7 +165,7 @@ abstract class AbstractAdvancedSearchIntegrationTest
      * Same as goToHomePage, but doesn't wait for form elements.  This is mainly
      * used for bookmark searches.
      *
-     * @param query The URL Query.
+     * @param query         The URL Query.
      * @throws Exception
      */
     void goToApplication(final String query) throws Exception
@@ -236,7 +236,7 @@ abstract class AbstractAdvancedSearchIntegrationTest
      * @throws Exception
      */
     void searchAndWait(final boolean expectResultPage,
-                       final boolean expectResults)
+                                 final boolean expectResults)
             throws Exception
     {
         find(By.className("submit-query")).click();
@@ -253,7 +253,7 @@ abstract class AbstractAdvancedSearchIntegrationTest
      * @deprecated Use {@link SearchResultsPage instead}
      */
     void waitForSearch(final boolean expectResultPage,
-                       final boolean expectResults)
+                                 final boolean expectResults)
             throws Exception
     {
         waitForElementPresent(By.className("grid-header-label"));
@@ -272,12 +272,16 @@ abstract class AbstractAdvancedSearchIntegrationTest
         }
     }
 
+    void closeTooltip() throws Exception
+    {
+        click(By.className("tooltip-close"));
+    }
+
     void summonTooltip(final String detailLabelID) throws Exception
     {
         final WebElement parentElement =
                 find(By.id(detailLabelID)).findElement(By.tagName("summary"));
-        hover(parentElement
-                      .findElement(By.className("advancedsearch-tooltip")));
+        hover(parentElement.findElement(By.className("advancedsearch-tooltip")));
 
         waitForElementPresent(
                 By.xpath("//details[@id='" + detailLabelID
@@ -296,7 +300,7 @@ abstract class AbstractAdvancedSearchIntegrationTest
                         final String value)
             throws Exception
     {
-        summonTooltip(detailLabelID);
+//        summonTooltip(detailLabelID);
         toggleDetailsItem(detailLabelID);
         inputTextValue(inputID, value);
     }
@@ -320,7 +324,7 @@ abstract class AbstractAdvancedSearchIntegrationTest
     /**
      * Toggle a details item
      *
-     * @param detailLabelID The String ide locator.
+     * @param detailLabelID     The String ide locator.
      */
     void toggleDetailsItem(final String detailLabelID) throws Exception
     {

@@ -80,9 +80,10 @@ import java.util.List;
 
 public class CAOMSearchFormPage extends AbstractSearchFormPage
 {
-    static final By DATA_TRAIN_LOCATOR = By.id("caom2@Hierarchy");
-    static final By DATA_TRAIN_COLLECTION_MENU =
+    private static final By DATA_TRAIN_LOCATOR = By.id("caom2@Hierarchy");
+    private static final By DATA_TRAIN_COLLECTION_MENU =
             By.id("Observation.collection");
+    private static final By TARGET_INPUT = By.id("Plane.position.bounds");
 
     @FindBy(id = "caom2@Hierarchy")
     private WebElement dataTrain;
@@ -99,6 +100,7 @@ public class CAOMSearchFormPage extends AbstractSearchFormPage
         super(driver);
 
         waitForElementPresent(DATA_TRAIN_LOCATOR);
+        waitForElementPresent(TARGET_INPUT);
 
         PageFactory.initElements(driver, this);
     }

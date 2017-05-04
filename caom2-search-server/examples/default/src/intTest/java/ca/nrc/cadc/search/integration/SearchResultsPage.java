@@ -69,9 +69,11 @@
 package ca.nrc.cadc.search.integration;
 
 
+import com.thoughtworks.selenium.SeleniumException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 
@@ -79,6 +81,7 @@ import ca.nrc.cadc.web.selenium.AbstractTestWebPage;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.Select;
 
+import java.lang.reflect.Constructor;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -87,32 +90,29 @@ public class SearchResultsPage extends AbstractTestWebPage
 {
     static final Pattern ROW_COUNT_PATTERN = Pattern.compile("\\d+");
 
-    static final By IQ_COLUMN_HEADER =
-            By.cssSelector("div[id$='caom2:Plane.position.resolution']");
-    static final By REST_FRAME_COLUMN_HEADER =
-            By.cssSelector("div[id$='caom2:Plane.energy.restwav']");
-    static final By REST_FRAME_ENERGY_UNIT_SELECT_LOCATOR =
-            By.id("caom2:Plane.energy.restwav_unitselect");
-    static final By IQ_UNIT_SELECT_LOCATOR =
-            By.id("caom2:Plane.position.resolution_unitselect");
-    private static final By FILTER_FILTER_BY =
-            By.id("caom2:Plane.energy.bandpassName_filter");
-    private static final By RA_FILTER_BY =
-            By.id("caom2:Plane.position.bounds.cval1_filter");
-    private static final By DEC_FILTER_BY =
-            By.id("caom2:Plane.position.bounds.cval2_filter");
+    static final By IQ_COLUMN_HEADER = By.cssSelector("div[id$='caom2:Plane.position.resolution']");
+    static final By REST_FRAME_COLUMN_HEADER = By.cssSelector("div[id$='caom2:Plane.energy.restwav']");
+    static final By PROPOSAL_PROJECT_COLUMN_HEADER = By.cssSelector("div[id$='caom2:Observation.proposal.project']");
+    static final By REST_FRAME_ENERGY_UNIT_SELECT_LOCATOR = By.id("caom2:Plane.energy.restwav_unitselect");
+    static final By IQ_UNIT_SELECT_LOCATOR = By.id("caom2:Plane.position.resolution_unitselect");
+    private static final By FILTER_FILTER_BY = By.id("caom2:Plane.energy.bandpassName_filter");
+    private static final By RA_FILTER_BY = By.id("caom2:Plane.position.bounds.cval1_filter");
+    private static final By DEC_FILTER_BY = By.id("caom2:Plane.position.bounds.cval2_filter");
+    private static final By CHANGE_COLUMNS_BY = By.id("slick-columnpicker-panel-change-column");
+    private static final By CHANGE_COLUMNS_POPUP_BY = By.id("column_manager_container-popup");
+    private static final String CHANGE_COLUMNS_AVAILABLE_COLUMNS_LIST_ID = "cadc_columnpicker_available_items";
+    private static final By CHANGE_COLUMNS_AVAILABLE_COLUMNS_LIST_BY = By.id(CHANGE_COLUMNS_AVAILABLE_COLUMNS_LIST_ID);
+    private static final String CHANGE_COLUMNS_SELECTED_COLUMNS_LIST_ID = "cadc_columnpicker_selected_items";
+    private static final By CHANGE_COLUMNS_SELECTED_COLUMNS_LIST_BY = By.id(CHANGE_COLUMNS_SELECTED_COLUMNS_LIST_ID);
 
-    static final String ICON_BUSY_SRC = "/cadcVOTV/images/PleaseWait-small.gif";
-    static final String ICON_IDLE_SRC = "/cadcVOTV/images/transparent-20.png";
+    static final String ICON_BUSY_SRC = "cadcVOTV/images/PleaseWait-small.gif";
+    static final String ICON_IDLE_SRC = "images/transparent-20.png";
 
     static final By GRID_LOCATOR = By.id("resultTable");
     static final By GRID_HEADER_LOCATOR = By.id("results-grid-header");
-    static final By GRID_HEADER_LABEL_LOCATOR =
-            By.className("grid-header-label");
-    static final String OBSERVATION_DETAILS_LINK_LOCATOR =
-            "caom2:Observation.observationID_%d_observation_details";
-    static final By FIRST_QUICKSEARCH_TARGET_LINK =
-            By.cssSelector("a.quicksearch_link:nth-child(1)");
+    static final By GRID_HEADER_LABEL_LOCATOR = By.className("grid-header-label");
+    static final String OBSERVATION_DETAILS_LINK_LOCATOR = "caom2:Observation.observationID_%d_observation_details";
+    static final By FIRST_QUICKSEARCH_TARGET_LINK = By.cssSelector("a.quicksearch_link:nth-child(1)");
     static final By QUERY_TAB_LOCATOR = By.id("queryFormTab-link");
 
     // Switches between busy and transparent (idle).
@@ -132,20 +132,50 @@ public class SearchResultsPage extends AbstractTestWebPage
     }
 
 
+    void includeHiddenColumn(final String uType) throws Exception
+    {
+        click(gridContainer.findElement(CHANGE_COLUMNS_BY));
+        waitForElementVisible(CHANGE_COLUMNS_POPUP_BY);
+        waitForElementPresent(CHANGE_COLUMNS_AVAILABLE_COLUMNS_LIST_BY);
+
+        final WebElement changeColumnsPopupElement = find(CHANGE_COLUMNS_POPUP_BY);
+        final WebElement availableColumnsListElement = changeColumnsPopupElement.findElement(
+                CHANGE_COLUMNS_AVAILABLE_COLUMNS_LIST_BY);
+        final WebElement selectedColumnsListElement =
+                changeColumnsPopupElement.findElement(CHANGE_COLUMNS_SELECTED_COLUMNS_LIST_BY);
+        final String listItemID = "ITEM_" + uType;
+        final String listItemSelector = "#" + listItemID;
+
+        scrollVerticallyIntoView(listItemID, "cadc_columnpicker_available_items");
+        final WebElement listItem = availableColumnsListElement.findElement(By.id(listItemID));
+        waitForElementVisible(listItem);
+
+        if (listItem == null)
+        {
+            throw new RuntimeException("Unable to locate list item in change columns for " + listItemSelector);
+        }
+        else
+        {
+            // check that the drag-and-drop changed the ordinal of the column
+            (new Actions(driver)).dragAndDrop(listItem, selectedColumnsListElement).perform();
+            waitForElementVisible(selectedColumnsListElement.findElement(By.id(listItemID)));
+            click(changeColumnsPopupElement.findElement(By.cssSelector("span.dialog-close")));
+        }
+    }
+
     void waitForGridToLoad() throws Exception
     {
         waitForElementPresent(GRID_LOCATOR);
         waitForElementPresent(GRID_HEADER_LOCATOR);
         waitForElementPresent(GRID_HEADER_ICON);
+        waitForElementPresent(CHANGE_COLUMNS_BY);
 
         waitUntil(new ExpectedCondition<Boolean>()
         {
             @Override
             public Boolean apply(final WebDriver webDriver)
             {
-                final String srcAttribute =
-                        webDriver.findElement(GRID_HEADER_ICON)
-                                .getAttribute("src");
+                final String srcAttribute = webDriver.findElement(GRID_HEADER_ICON).getAttribute("src");
                 return srcAttribute.endsWith(ICON_IDLE_SRC);
             }
         });
@@ -158,6 +188,15 @@ public class SearchResultsPage extends AbstractTestWebPage
     {
         click(FIRST_QUICKSEARCH_TARGET_LINK);
         return new SearchResultsPage(driver);
+    }
+
+    <T extends AbstractTestWebPage> T clickPreview(final String windowName, final Class<T> pageClass) throws Exception
+    {
+        click(By.className("preview_tooltip_link"));
+
+        final Class[] constructorArgTypes = new Class[]{WebDriver.class};
+        final Constructor<T> constructor = pageClass.getConstructor(constructorArgTypes);
+        return constructor.newInstance(selectWindow(windowName));
     }
 
     WebElement getGridHeader() throws Exception
@@ -178,25 +217,13 @@ public class SearchResultsPage extends AbstractTestWebPage
     int getCurrentResultsRowCount() throws Exception
     {
         final Matcher matcher = ROW_COUNT_PATTERN.matcher(getPagerStatusText());
-        final int count;
-
-        if (matcher.find())
-        {
-            count = Integer.parseInt(matcher.group());
-        }
-        else
-        {
-            count = -1;
-        }
-
-        return count;
+        return matcher.find() ? Integer.parseInt(matcher.group()) : -1;
     }
 
     CAOMObservationDetailsPage openObservationDetails(final int rowNumber)
             throws Exception
     {
-        click(By.id(String.format(OBSERVATION_DETAILS_LINK_LOCATOR,
-                                  rowNumber)));
+        click(By.id(String.format(OBSERVATION_DETAILS_LINK_LOCATOR, rowNumber)));
 
         return new CAOMObservationDetailsPage(driver);
     }
@@ -217,19 +244,21 @@ public class SearchResultsPage extends AbstractTestWebPage
         return getGrid().findElement(REST_FRAME_COLUMN_HEADER);
     }
 
+    void confirmProposalProjectColumnHeader() throws Exception
+    {
+        waitForElementVisible(getGrid().findElement(PROPOSAL_PROJECT_COLUMN_HEADER));
+    }
+
     String getSelectedRestFrameEnergyUnit() throws Exception
     {
-        final Select rfUnitSelect = new Select(gridContainer.findElement(
-                REST_FRAME_ENERGY_UNIT_SELECT_LOCATOR));
-        final WebElement rfUnitSelectedOption =
-                rfUnitSelect.getFirstSelectedOption();
+        final Select rfUnitSelect = new Select(gridContainer.findElement(REST_FRAME_ENERGY_UNIT_SELECT_LOCATOR));
+        final WebElement rfUnitSelectedOption = rfUnitSelect.getFirstSelectedOption();
 
         return rfUnitSelectedOption.getText();
     }
 
     String getSelectIQUnit() throws Exception
-    {
-        final Select iqUnitSelectElement = new Select(gridContainer.findElement(
+    {final Select iqUnitSelectElement = new Select(gridContainer.findElement(
                 IQ_UNIT_SELECT_LOCATOR));
         return iqUnitSelectElement.getFirstSelectedOption().getText();
     }

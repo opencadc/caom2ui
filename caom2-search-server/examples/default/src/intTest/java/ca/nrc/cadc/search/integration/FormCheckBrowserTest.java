@@ -47,12 +47,9 @@ public class FormCheckBrowserTest extends AbstractAdvancedSearchIntegrationTest
     @Test
     public void verifyForm() throws Exception
     {
-        goToHomePage();
-        queryTab();
-
-        // Look for the Hierarchy Data Train.
-        verifyElementPresent(By.id("caom2@Hierarchy"));
-        verifyTooltips();
+        final CAOMSearchFormPage caomSearchFormPage =
+                goTo("/en/search/", "", CAOMSearchFormPage.class);
+        verifyTooltips(caomSearchFormPage);
     }
 
     /**
@@ -60,10 +57,15 @@ public class FormCheckBrowserTest extends AbstractAdvancedSearchIntegrationTest
      *
      * @throws Exception
      */
-    void verifyTooltips() throws Exception
+    private void verifyTooltips(final CAOMSearchFormPage searchFormPage) throws Exception
     {
-        summonTooltip("Plane.position.bounds_details");
-        summonTooltip("Plane.position.sampleSize_details");
-        summonTooltip("Plane.time.bounds_details");
+        searchFormPage.summonTooltip("Plane.position.bounds_details");
+        searchFormPage.closeTooltip();
+
+        searchFormPage.summonTooltip("Plane.position.sampleSize_details");
+        searchFormPage.closeTooltip();
+
+        searchFormPage.summonTooltip("Plane.time.bounds_details");
+        searchFormPage.closeTooltip();
     }
 }

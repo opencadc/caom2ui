@@ -75,7 +75,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 
-public abstract class AbstractSearchFormPage extends AbstractTestWebPage
+abstract class AbstractSearchFormPage extends AbstractTestWebPage
 {
     static final String DETAILS_LOCATOR_XPATH =
             "//details[@id='%s']/summary/span";
@@ -90,7 +90,7 @@ public abstract class AbstractSearchFormPage extends AbstractTestWebPage
     private WebElement topResetButton;
 
 
-    public AbstractSearchFormPage(final WebDriver driver)
+    AbstractSearchFormPage(final WebDriver driver)
     {
         super(driver);
 
@@ -110,20 +110,26 @@ public abstract class AbstractSearchFormPage extends AbstractTestWebPage
 
     void summonTooltip(final String detailLabelID) throws Exception
     {
-        final WebElement parentElement =
-                find(By.id(detailLabelID)).findElement(By.tagName("summary"));
-        hover(parentElement.findElement(By.className("advancedsearch-tooltip")));
+        final By tooltipIconTriggerBy = By.xpath("//details[@id='" + detailLabelID
+                                                 + "']/summary/span[contains(@class, 'advancedsearch-tooltip')]");
 
-        waitForElementPresent(
-                By.xpath(String.format(DETAILS_WITH_HELP_ICON_HOVER,
-                                       detailLabelID)));
-        click(parentElement.findElement(By.className("wb-icon-question-alt")));
+        waitForElementPresent(tooltipIconTriggerBy);
+        hover(tooltipIconTriggerBy);
+
+        click(tooltipIconTriggerBy);
     }
+
+    void closeTooltip() throws Exception
+    {
+        click(By.className("tooltip-close"));
+        waitForElementNotPresent(By.className("tooltipster-advanced-search"));
+    }
+
 
     /**
      * Toggle a details item
      *
-     * @param detailLabelID     The String ide locator.
+     * @param detailLabelID The String ide locator.
      */
     void toggleDetailsItem(final String detailLabelID) throws Exception
     {
