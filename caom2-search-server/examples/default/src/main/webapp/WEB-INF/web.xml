@@ -221,6 +221,7 @@
   <servlet-mapping>
     <servlet-name>PreviewServlet</servlet-name>
     <url-pattern>/preview/*</url-pattern>
+    <url-pattern>/preview</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>

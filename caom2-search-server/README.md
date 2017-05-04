@@ -1,4 +1,4 @@
-### CAOM-2 Search interface v1.2
+### CAOM-2 Search interface v1.2.4
 
 This is the User Interface to perform complicated searches to a running [TAP](http://www.ivoa.net/documents/TAP/) web service.
 

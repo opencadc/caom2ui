@@ -38,7 +38,7 @@
     this.productID = _productID;
     this.size = _size;
     this.runID = _runID;
-    this.endpoint = _endpoint || "/AdvancedSearch/preview";
+    this.endpoint = _endpoint || "/search/preview";
 
 
     /**

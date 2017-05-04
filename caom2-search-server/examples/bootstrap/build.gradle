@@ -16,13 +16,13 @@ repositories {
 dependencies {
     compile 'log4j:log4j:1.2.+'
 
-    compile 'org.opencadc:caom2-search-server:1.+'
+    compile 'org.opencadc:caom2-search-server:[1.2.4, )'
 
     providedCompile 'javax.servlet:javax.servlet-api:3.1.+'
     providedCompile 'javax.servlet:javax.servlet-api:3.0.+'
 
     runtime 'commons-logging:commons-logging:1.+'
-    runtime 'org.postgresql:postgresql:9.4.1209.jre7'
+    runtime 'org.postgresql:postgresql:42.0.0.jre7'
     runtime 'jstl:jstl:1.+'
 
     testCompile 'junit:junit:4.+'

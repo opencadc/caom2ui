@@ -107,6 +107,7 @@
    *   object.
    * @param {{}}  _options    Options for the form config.
    * @param {String}  [_options.tapSyncEndpoint="/search/tap/sync"]   TAP endpoint.
+   * @param {String}  [_options.searchEndpoint="/search/find"]   Form submission endpoint.
    * @param {String}  [_options.validatorEndpoint="/search/validate"]   Form validator endpoint.
    * @param {String}  [_options.autocompleteEndpoint="/search/unitconversion"]   Autocomplete (units, Observation
    *     constraint autocompletion) endpoint.
@@ -1685,7 +1686,7 @@
         var myself = this;
 
         this.$form.ajaxSubmit({
-                                url: "/AdvancedSearch/find",
+                                url: this.configuration.options.searchEndpoint,
                                 target: "#file_upload_response",
                                 dataType: "json",
                                 beforeSubmit: this._beforeSerialize.bind(this),

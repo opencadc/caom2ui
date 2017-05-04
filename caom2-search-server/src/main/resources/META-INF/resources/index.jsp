@@ -24,8 +24,7 @@
 
 <%-- Request scope variables so they can be seen in the imported JSPs --%>
 <fmt:setLocale value="<%= requestHeaderLang %>" scope="request" />
-<fmt:setBundle basename="AdvancedSearchBundle" var="langBundle"
-               scope="request"/>
+<fmt:setBundle basename="AdvancedSearchBundle" var="langBundle" scope="request"/>
 
 <c:import url="_page_header.html" />
 
@@ -606,7 +605,7 @@
   <script type="text/javascript"
           src="cadcVOTV/javascript/cadc.votv.comparer.js?version=@version@"></script>
   <script type="text/javascript"
-          src="cadcJS/javascript/opencadc.uri.js?version=@version@"></script>
+          src="cadcJS/javascript/cadc.uri.js?version=@version@"></script>
   <script type="text/javascript"
           src="cadcVOTV/javascript/cadc.resultstate.js?version=@version@"></script>
   <script type="text/javascript"
@@ -635,7 +634,6 @@
           src="js/cadc.search.app.js?version=@version@"></script>
   <script type="text/javascript"
           src="js/cadc.search.tooltipcreator.js?version=@version@"></script>
-
   <script type="text/javascript"
           src="js/hierarchy.js?version=@version@"></script>
 
@@ -643,14 +641,16 @@
   $(document).ready(function ()
                     {
                       var searchApp =
-                          new ca.nrc.cadc.search.AdvancedSearchApp($("html").prop("lang"), false,
-                            "${pageContext.request.contextPath}");
+                          new ca.nrc.cadc.search.AdvancedSearchApp({
+                                                                     "pageLanguage": $("html").prop("lang"),
+                                                                     "autoInitFlag": false
+                                                                   });
 
                       searchApp.subscribe(ca.nrc.cadc.search.events.onAdvancedSearchInit,
-                                          function ()
+                                          function (event, args)
                                           {
                                             // TODO: Deal with situation where error is not null
-                                            searchApp.start();
+                                            args.application.start();
                                           });
 
                       searchApp.init();

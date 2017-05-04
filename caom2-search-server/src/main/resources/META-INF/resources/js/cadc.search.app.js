@@ -13,7 +13,8 @@
               "packageEndpoint": "/search/package",
               "autocompleteEndpoint": "/search/unitconversion",
               "validatorEndpoint": "/search/validate",
-              "previewsEndpoint": "/search/preview"
+              "previewsEndpoint": "/search/preview",
+              "searchEndpoint": "/search/find"
             },
             "field_ignore": [
               "sort_column", "sort_order", "formName", "SelectList", "MaxRecords", "format", "Form.name"
