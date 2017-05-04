@@ -37,32 +37,21 @@
   /**
    * Create the Validator object.
    *
-   * @param _serviceEndpoint
-   * @param _timerDelay
+   * @param {String} _serviceEndpoint
+   * @param {Number} _timerDelay
    * @constructor
    */
   function Validator(_serviceEndpoint, _timerDelay)
   {
-    var myself = this;
     this.serviceEndpoint = _serviceEndpoint;
+
+    /**
+     * @type {number}
+     */
     this.validatorTimer = null;
+
     this.timerDelay = _timerDelay;
 
-
-    function getServiceEndpoint()
-    {
-      return myself.serviceEndpoint;
-    }
-
-    function getValidatorTimer()
-    {
-      return myself.validatorTimer;
-    }
-
-    function getTimerDelay()
-    {
-      return myself.timerDelay;
-    }
 
     /**
      * Initiate the timeout of a key press.
@@ -71,37 +60,35 @@
      * @param onValidateCompleteCallback  The callback upon validation
      *                                    completion. {Optional}
      */
-    function inputKeyPressed(input, onValidateCompleteCallback)
+    this.inputKeyPressed = function (input, onValidateCompleteCallback)
     {
-      if (getValidatorTimer())
+      if (this.validatorTimer)
       {
-        clearTimeout(getValidatorTimer());
+        clearTimeout(this.validatorTimer);
       }
 
-      myself.validatorTimer = setTimeout(function ()
-                                  {
-                                    myself.validate(input,
-                                                    onValidateCompleteCallback);
-                                  }, getTimerDelay());
-    }
+      this.validatorTimer = setTimeout(function ()
+                                       {
+                                         this.validate(input, onValidateCompleteCallback);
+                                       }.bind(this), this.timerDelay);
+    };
 
     /**
      * Validate the value of the given input.
      *
-     * @param input                       The input element.
-     * @param onValidateCompleteCallback  The callback upon validation
-     *                                    completion. {Optional}
-     * @returns {*}
+     * @param {jQuery}    $input                       The input element.
+     * @param {function}  [onValidateCompleteCallback]  The callback upon validation completion.
+     * @returns {boolean}
      */
-    function validate(input, onValidateCompleteCallback)
+    this.validate = function($input, onValidateCompleteCallback)
     {
       var validated;
-      var value = input.val() ? $.trim(input.val()) : "";
+      var value = $input.val() ? $.trim($input.val()) : "";
 
       // Nothing to validate.
-      if (value == "")
+      if (value === "")
       {
-        myself.clearError(input);
+        this.clearError($input);
         validated = false;
 
         if (onValidateCompleteCallback)
@@ -111,27 +98,27 @@
       }
       else
       {
-        var name = input.attr('name');
+        var name = $input.attr("name");
 
         // Query parameters.
         var parameters = {};
-        parameters['field'] = name;
+        parameters["field"] = name;
         parameters[name] = value;
 
         // Do the query. If JSON is returned indicating a validation error
         // decorate the field, else clear the error decoration.
-        $.getJSON(getServiceEndpoint(), parameters)
+        $.getJSON(this.serviceEndpoint, parameters)
             .done(function (data)
                   {
                     try
                     {
                       if (data)
                       {
-                        myself.addError(input);
+                        this.addError($input);
                       }
                       else
                       {
-                        myself.clearError(input);
+                        this.clearError($input);
                       }
                     }
                     catch (e)
@@ -143,7 +130,7 @@
                     {
                       onValidateCompleteCallback(data);
                     }
-                  })
+                  }.bind(this))
             .fail(function (jqXHR, textStatus, errorThrown)
                   {
                     console.error("An error occurred.\n\n" + errorThrown);
@@ -153,27 +140,25 @@
       }
 
       return validated;
-    }
+    };
 
-    // Decorate the input to indicate a validation error.
-    function addError(input)
+    /**
+     * Decorate the input to indicate a validation error.
+     *
+     * @param {jQuery} $input    jQuery input element.
+     */
+    this.addError = function($input)
     {
-      input.addClass("input_error");
-    }
+      $input.addClass("input_error");
+    };
 
-    // Clear the error decoration for this input.
-    function clearError(input)
+    /**
+     * Clear the error decoration for this input.
+     * @param {jQuery} $input
+     */
+    this.clearError = function($input)
     {
-      input.removeClass("input_error");
-    }
-
-    $.extend(this,
-             {
-               "inputKeyPressed": inputKeyPressed,
-               "validate": validate,
-               "addError": addError,
-               "clearError": clearError
-             });
-
+      $input.removeClass("input_error");
+    };
   }
 })(jQuery);

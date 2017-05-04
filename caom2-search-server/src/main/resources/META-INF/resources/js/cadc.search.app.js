@@ -11,7 +11,9 @@
               "autoInitFlag": true,
               "tapSyncEndpoint": "/search/tap/sync",
               "packageEndpoint": "/search/package",
-              "autocompleteEndpoint": "/search/unitconversion"
+              "autocompleteEndpoint": "/search/unitconversion",
+              "validatorEndpoint": "/search/validate",
+              "previewsEndpoint": "/search/preview"
             },
             "field_ignore": [
               "sort_column", "sort_order", "formName", "SelectList", "MaxRecords", "format", "Form.name"
@@ -50,6 +52,8 @@
    * @param {Boolean} [_options.autoInitFlag=true]   Whether to auto-initialize this application.
    * @param {String} [_options.tapSyncEndpoint="/search/tap/sync"]   Relative URI endpoint to the TAP service.
    * @param {String} [_options.packageEndpoint="/search/package"]   Relative URI endpoint to the CAOM2 package service.
+   * @param {String} [_options.previewsEndpoint="/search/preview"]   Relative URI endpoint to the Preview service.
+   * @param {String} [_options.validatorEndpoint="/search/validate"]   Relative URI endpoint to the Validator service.
    * @param {String} [_options.autocompleteEndpoint="/search/unitconversion"]   Relative URI endpoint to the unit
    *     conversion service.
    * @constructor
@@ -870,13 +874,11 @@
                   raFieldID: activeForm.getConfiguration().getRAColumnID(),
                   decFieldID: activeForm.getConfiguration().getDecColumnID()
                 }
-              }
+              },
+              columnOptions: columnManager.getColumnOptions()
             };
 
-        var options = columnManager.getOptions();
-        var opts = $.extend(true, {}, cadcVOTVOptions, options);
-
-        resultsVOTV = new cadc.vot.Viewer(ca.nrc.cadc.search.GRID_SELECTOR, opts);
+        resultsVOTV = new cadc.vot.Viewer(ca.nrc.cadc.search.GRID_SELECTOR, cadcVOTVOptions);
 
         // Unfortunately this has to be selected at the Document level since the items in question (located by
         // ca.nrc.cadc.search.QUICKSEARCH_SELECTOR) aren't actually created yet.

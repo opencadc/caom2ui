@@ -5,10 +5,6 @@
       "nrc": {
         "cadc": {
           "search": {
-            "form_config_defaults": {
-              "autocompleteEndpoint": "/search/unitconversion",
-              "validatorEndpoint": "/search/validate"
-            },
             "ignore_fields": [
               "collection", "noexec"
             ],
@@ -121,7 +117,7 @@
     var stringUtil = new org.opencadc.StringUtil();
 
     this.config = _config;
-    this.options = $.extend({}, ca.nrc.cadc.search.form_config_defaults, _options);
+    this.options = _options;
 
     /**
      * @type {Metadata|cadc.vot.Metadata}
@@ -129,7 +125,7 @@
     this.tableMetadata = new cadc.vot.Metadata(null, null, null, null, null, null);
 
     this.columnManager = new ca.nrc.cadc.search.columns.ColumnManager();
-    this.columnOptions = this.columnManager.getOptions().columnOptions;
+    this.columnOptions = this.columnManager.getColumnOptions();
 
 
     this.getDownloadAccessKey = function ()
@@ -831,18 +827,18 @@
                                                  });
 
       // Bind form input validation function.
-      $currForm.find("input.ui-form-input-validate").each(function (event)
+      $currForm.find("input.ui-form-input-validate").each(function (key, value)
                                                           {
-                                                            var $input = $(event.target);
-                                                            var thisForm = this;
+                                                            var $input = $(value);
+                                                            var thisSearchForm = this;
                                                             var callbackFunction = function (jsonError)
                                                             {
-                                                              thisForm._decorate($input, jsonError);
+                                                              thisSearchForm._decorate($input, jsonError);
                                                             };
                                                             $input.bind("keydown", function ()
                                                             {
-                                                              thisForm.getValidator().inputKeyPressed($input,
-                                                                                                      callbackFunction);
+                                                              thisSearchForm.getValidator()
+                                                                  .inputKeyPressed($input, callbackFunction);
                                                             });
                                                           }.bind(this));
 
@@ -1082,8 +1078,7 @@
                                                                   this._clearTargetNameResolutionTooltip();
 
                                                                   // Was input text cleared before the event arrived?
-                                                                  if ($.trim($("input[id='" + id + "']").val()).length >
-                                                                      0)
+                                                                  if ($.trim($("input[id='" + id + "']").val()).length > 0)
                                                                   {
                                                                     var arg = {
                                                                       "data": data,
@@ -1133,16 +1128,7 @@
           if ($label)
           {
             $label.empty();
-            var searchCriteriaLabel;
-
-            if ((value !== "") && (JSON.stringify(data).indexOf("NaN") < 0))
-            {
-              searchCriteriaLabel = data;
-            }
-            else
-            {
-              searchCriteriaLabel = "";
-            }
+            var searchCriteriaLabel = ((value !== "") && (JSON.stringify(data).indexOf("NaN") < 0)) ? data : "";
 
             $label.text(searchCriteriaLabel);
           }
