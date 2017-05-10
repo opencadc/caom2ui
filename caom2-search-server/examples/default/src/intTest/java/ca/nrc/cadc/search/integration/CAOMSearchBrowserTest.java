@@ -134,6 +134,8 @@ public class CAOMSearchBrowserTest extends AbstractAdvancedSearchIntegrationTest
 
         searchResultsPage.filterOnRA("18:03..18:07");
 
+        searchResultsPage.includeHiddenColumn("caom2:Observation.target.keywords");
+
         /*
         TODO - Complete for new Page Object model going forward.
         TODO - jenkinsd 2016.02.16
