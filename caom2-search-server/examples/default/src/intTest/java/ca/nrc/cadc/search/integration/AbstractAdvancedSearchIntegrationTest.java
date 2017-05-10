@@ -50,7 +50,7 @@ public abstract class AbstractAdvancedSearchIntegrationTest
     static final Pattern ROW_COUNT_PATTERN = Pattern.compile("\\d+");
     static final String ENGLISH_ENDPOINT = "/search/";
 
-    AbstractAdvancedSearchIntegrationTest()
+    AbstractAdvancedSearchIntegrationTest() throws Exception
     {
         super();
         setFailOnTimeout(true);
@@ -79,7 +79,7 @@ public abstract class AbstractAdvancedSearchIntegrationTest
         return count;
     }
 
-    boolean isObsCoreEnabled()
+    boolean isObsCoreEnabled() throws Exception
     {
         try
         {
@@ -138,42 +138,6 @@ public abstract class AbstractAdvancedSearchIntegrationTest
     }
 
     /**
-     * Open the home page.
-     *
-     * @throws Exception
-     */
-    void goToHomePage() throws Exception
-    {
-        goToHomePage(null);
-    }
-
-    /**
-     * Open the home page.
-     *
-     * @throws Exception
-     */
-    void goToHomePage(final String query) throws Exception
-    {
-        goToApplication(query);
-
-        waitForElementPresent(By.id("caom2@Hierarchy"));
-        waitForElementPresent(By.cssSelector("select[id='Observation.type']"));
-        waitOneSecond();
-    }
-
-    /**
-     * Same as goToHomePage, but doesn't wait for form elements.  This is mainly
-     * used for bookmark searches.
-     *
-     * @param query         The URL Query.
-     * @throws Exception
-     */
-    void goToApplication(final String query) throws Exception
-    {
-        goTo(ENGLISH_ENDPOINT, query);
-    }
-
-    /**
      * Go to the query tab.
      *
      * @throws Exception
@@ -203,28 +167,6 @@ public abstract class AbstractAdvancedSearchIntegrationTest
     {
         click(By.id(id));
         waitOneSecond();
-    }
-
-    void login() throws Exception
-    {
-        // Click login
-        find(By.linkText("Login")).click();
-        waitOneSecond();
-
-        inputTextValue(By.id("username"), getUsername());
-        inputTextValue(By.id("password"), getPassword());
-        find(By.id("login_button")).click();
-
-        waitForTextPresent("Logout");
-        waitOneSecond();
-    }
-
-    void logout() throws Exception
-    {
-        click(By.linkText("Sharon Goliath"));
-        click(By.linkText("Logout"));
-
-        waitForElementPresent(By.linkText("Login"));
     }
 
     /**
@@ -289,22 +231,6 @@ public abstract class AbstractAdvancedSearchIntegrationTest
         click(parentElement.findElement(By.className("wb-icon-question-alt")));
     }
 
-    /**
-     * Input a text field value.  This should work for text areas as well.
-     *
-     * @param inputID The locator (e.g. id=fieldID).
-     * @param value   The value.
-     * @throws Exception
-     */
-    void inputTextValue(final By inputID, final String detailLabelID,
-                        final String value)
-            throws Exception
-    {
-//        summonTooltip(detailLabelID);
-        toggleDetailsItem(detailLabelID);
-        inputTextValue(inputID, value);
-    }
-
     void checkboxOn(final By locator) throws Exception
     {
         toggleCheckbox(locator);
@@ -319,36 +245,5 @@ public abstract class AbstractAdvancedSearchIntegrationTest
 
         checkboxElement.click();
         waitOneSecond();
-    }
-
-    /**
-     * Toggle a details item
-     *
-     * @param detailLabelID     The String ide locator.
-     */
-    void toggleDetailsItem(final String detailLabelID) throws Exception
-    {
-        final String xpath =
-                "//details[@id='" + detailLabelID + "']/summary/span";
-        final WebElement element = find(By.xpath(xpath));
-
-        // show the input box
-        element.click();
-    }
-
-    void hideInputBox(final String detailLabelID, final String locator)
-            throws Exception
-    {
-        final String xpath =
-                "//details[@id='" + detailLabelID + "']/summary/span";
-        click(By.xpath(xpath));
-
-        waitUntil(ExpectedConditions.invisibilityOfElementLocated(
-                By.id(locator)));
-    }
-
-    void relocate() throws Exception
-    {
-        hover(By.id("downloadFormSubmit"));
     }
 }

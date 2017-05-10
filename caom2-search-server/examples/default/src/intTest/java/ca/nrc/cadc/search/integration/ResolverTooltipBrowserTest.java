@@ -37,28 +37,24 @@ import org.junit.Test;
 import org.openqa.selenium.By;
 
 
-public class ResolverTooltipBrowserTest
-        extends AbstractAdvancedSearchIntegrationTest
+public class ResolverTooltipBrowserTest extends AbstractAdvancedSearchIntegrationTest
 {
+    public ResolverTooltipBrowserTest() throws Exception
+    {
+        super();
+    }
+
     /**
      * Tooltip for the Name resolver
-     * @throws Exception
+     * @throws Exception        Any issue at all.
      */
     @Test
     public void resolverToolTipTest() throws Exception
     {
-        goToHomePage();
-        queryTab();
-        click(By.linkText("Advanced Search"));
-        waitForElementPresent(By.id("Plane.position.bounds_details"));
+        final CAOMSearchFormPage searchFormPage = goTo(ENGLISH_ENDPOINT, null, CAOMSearchFormPage.class);
 
-        inputTextValue(By.id("Plane.position.bounds"),
-                       "Plane.position.bounds_details", "m101");
-        waitFor(2);
-
-        hover(By.className("target_name_resolution_status"));
+        searchFormPage.enterValidTarget("m101");
 
         resetForm();
-        waitFor(2);
     }
 }

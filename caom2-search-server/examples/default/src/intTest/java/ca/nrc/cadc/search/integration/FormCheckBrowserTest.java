@@ -34,11 +34,15 @@
 package ca.nrc.cadc.search.integration;
 
 import org.junit.Test;
-import org.openqa.selenium.By;
 
 
 public class FormCheckBrowserTest extends AbstractAdvancedSearchIntegrationTest
 {
+    public FormCheckBrowserTest() throws Exception
+    {
+        super();
+    }
+
     /**
      * Verify the form page (Query Tab)'s items.
      *
@@ -47,8 +51,7 @@ public class FormCheckBrowserTest extends AbstractAdvancedSearchIntegrationTest
     @Test
     public void verifyForm() throws Exception
     {
-        final CAOMSearchFormPage caomSearchFormPage =
-                goTo(ENGLISH_ENDPOINT, "", CAOMSearchFormPage.class);
+        final CAOMSearchFormPage caomSearchFormPage = goTo(ENGLISH_ENDPOINT, "", CAOMSearchFormPage.class);
         verifyTooltips(caomSearchFormPage);
     }
 

@@ -313,14 +313,12 @@
         {
           // Last column is the state.
           var val = $.trim(groupValues[j]);
-          var formattedVal = ((val === null) || (val === ''))
-            ? "null" : groupValues[j].replace(plus, " ");
+          var formattedVal = ((val === null) || (val === '')) ? "null" : groupValues[j].replace(plus, " ");
 
-          var freshFlag = (groupValues[gvl - 1] === 1);
+          var freshFlag = (groupValues[gvl - 1] === "1");
           var instrumentName = groupValues[instrumentNameIndex];
 
-          if ((freshFlag === true) &&
-              (this.freshInstruments.indexOf(instrumentName) < 0))
+          if ((freshFlag === true) && (this.freshInstruments.indexOf(instrumentName) < 0))
           {
             this.freshInstruments.push(instrumentName);
           }
@@ -350,8 +348,7 @@
       var firstSelect;
 
       // Loop through each attribute.
-      for (var i = 0, groupUTypesLength = _group.uTypes.length;
-           i < groupUTypesLength; i++)
+      for (var i = 0, groupUTypesLength = _group.uTypes.length; i < groupUTypesLength; i++)
       {
         // Get the JSON text from hidden input and
         // eval into an enumerated object.
@@ -369,8 +366,7 @@
         else
         {
           var containerElement = document.createElement("div");
-          containerElement.className =
-            "align-left advanced_search_hierarchy_select_div";
+          containerElement.className = "align-left advanced_search_hierarchy_select_div";
 
           if (i === 0)
           {
@@ -541,7 +537,8 @@
      * updated. If updateAllOptions is false, then only the given select,
      * and any selects to the right are updated.
      *
-     * @param {Element} _select the select element that triggered this function.
+     * @param _select {HTMLSelectElement} the select element that triggered this
+     * function.
      * @param _updateAllOptionsFlag {boolean} update all selects if true,
      * otherwise update the given select and any selects to the right.
      */

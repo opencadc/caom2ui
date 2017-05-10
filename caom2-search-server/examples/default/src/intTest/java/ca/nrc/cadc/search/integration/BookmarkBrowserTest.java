@@ -48,6 +48,11 @@ public class BookmarkBrowserTest extends AbstractAdvancedSearchIntegrationTest
     static String BOOKMARK_QUERY_STRING_3 = "Observation.proposal.project=OSSOS";
 
 
+    public BookmarkBrowserTest() throws Exception
+    {
+        super();
+    }
+
     @Test
     public void bookmarkTestM17() throws Exception
     {

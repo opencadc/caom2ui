@@ -49,7 +49,7 @@ sourceSets {
         }
         dependencies {
             intTestCompile 'junit:junit:4.+'
-            intTestCompile 'org.opencadc:cadc-web-test:1.+'
+            intTestCompile 'org.opencadc:cadc-web-test:[1.0.3, )'
             intTestCompile 'org.seleniumhq.selenium:selenium-java:2.53.+'
         }
 
@@ -65,7 +65,11 @@ sourceSets {
         if (project.hasProperty('intTest_web_app_url')) {
             systemProperty 'web.app.url', project.intTest_web_app_url
         }
+        else {
+            systemProperty 'web.app.url', project.intTest_default_web_app_url
+        }
 
-        maxParallelForks = 3
+        systemProperty 'user.name', project.intTest_user_name
+        systemProperty 'user.password', project.intTest_user_password
     }
 }
