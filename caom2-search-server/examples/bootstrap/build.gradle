@@ -1,16 +1,12 @@
 plugins {
     id 'maven'
     id 'war'
+    id 'idea'
 }
 
 repositories {
     jcenter()
     mavenLocal()
-
-    // Used for web-test browser testing.
-    maven {
-        url = 'http://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/m2repo'
-    }
 }
 
 dependencies {
@@ -34,7 +30,10 @@ dependencies {
 
 ext {
     // Change this value to test other locations, such as Production or RC.
-    intTest_web_app_url = 'http://localhost:8080/search/'
+    intTest_default_web_app_url = 'http://localhost:8080/search/'
+
+    intTest_user_name = 'CADCtest'
+    intTest_user_password = 'sywymUL4'
 
     // Modify this to your liking!
     docker_image_name = 'opencadc/archive-search:bootstrap-3.3.7'
@@ -43,6 +42,6 @@ ext {
 sourceCompatibility = 1.7
 
 group = 'org.opencadc'
-version = '1002'
+version = '1003'
 
 apply from: '../_shared.gradle'

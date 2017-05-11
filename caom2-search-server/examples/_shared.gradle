@@ -40,6 +40,19 @@ sourceSets {
     intTest
 }
 
+configurations {
+    intTestCompile
+    intTestCompile.extendsFrom(testCompile)
+}
+
+idea {
+    module {
+        //and some extra test source dirs
+        testSourceDirs += file('src/intTest/java')
+        scopes.TEST.plus += [ configurations.intTestCompile ]
+    }
+}
+
 ['firefox', 'chrome'].each { driver ->
     task "intTest${driver.capitalize()}"(type: Test) { driverTest ->
         testClassesDir = sourceSets.intTest.output.classesDir
