@@ -78,7 +78,7 @@ import org.openqa.selenium.support.PageFactory;
 
 abstract class AbstractSearchFormPage extends AbstractTestWebPage
 {
-    static final String DETAILS_LOCATOR_XPATH = "//details[@id='%s']/summary/span";
+    private static final String DETAILS_LOCATOR_XPATH = "//details[@id='%s']/summary/span";
 
 
     @FindBy(className = "submit-query")
@@ -91,6 +91,13 @@ abstract class AbstractSearchFormPage extends AbstractTestWebPage
     AbstractSearchFormPage(final WebDriver driver) throws Exception
     {
         super(driver);
+
+        PageFactory.initElements(driver, this);
+    }
+
+    AbstractSearchFormPage(WebDriver driver, int timeoutInSeconds)
+    {
+        super(driver, timeoutInSeconds);
 
         PageFactory.initElements(driver, this);
     }
@@ -154,6 +161,7 @@ abstract class AbstractSearchFormPage extends AbstractTestWebPage
                                                  + "']/summary/span[contains(@class, 'advancedsearch-tooltip')]");
 
         waitForElementPresent(tooltipIconTriggerBy);
+//        hover(tooltipIconTriggerBy);
         click(tooltipIconTriggerBy);
     }
 

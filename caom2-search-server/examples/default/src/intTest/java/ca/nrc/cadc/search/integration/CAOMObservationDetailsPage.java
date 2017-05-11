@@ -72,19 +72,19 @@ import ca.nrc.cadc.web.selenium.AbstractTestWebPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
-public class CAOMObservationDetailsPage extends AbstractTestWebPage
+
+class CAOMObservationDetailsPage extends AbstractTestWebPage
 {
-    static final By H1_HEADER = By.cssSelector("h1");
-    static final String WINDOW_ID = "_observation_details";
+    private static final By H1_HEADER = By.cssSelector("h1");
+    private static final String WINDOW_ID = "_observation_details";
 
 
-    public CAOMObservationDetailsPage(final WebDriver driver) throws Exception
+    CAOMObservationDetailsPage(final WebDriver driver) throws Exception
     {
         super(driver);
 
         selectWindow(WINDOW_ID);
-        waitForTextPresent(H1_HEADER,
-                           "Common Archive Observation Model (CAOM2)");
+        waitForTextPresent(H1_HEADER, "Common Archive Observation Model (CAOM2)");
     }
 
     void close() throws Exception

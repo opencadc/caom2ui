@@ -33,6 +33,7 @@
  */
 package ca.nrc.cadc.search.integration;
 
+import ca.nrc.cadc.util.StringUtil;
 import org.junit.Test;
 import org.openqa.selenium.By;
 
@@ -55,7 +56,7 @@ public class FormInputBrowserTest extends AbstractAdvancedSearchIntegrationTest
     @Test
     public void verifyFormInputs() throws Exception
     {
-        final CAOMSearchFormPage caomSearchFormPage = goTo(ENGLISH_ENDPOINT, "", CAOMSearchFormPage.class);
+        final CAOMSearchFormPage caomSearchFormPage = goTo(endpoint, "", CAOMSearchFormPage.class);
 
 //        Observation Date.
         verifyFormInput(caomSearchFormPage, CAOMSearchFormPage.OBSERVATION_DATE_INPUT_ID, "BOG", true,
@@ -142,6 +143,10 @@ public class FormInputBrowserTest extends AbstractAdvancedSearchIntegrationTest
             caomSearchFormPage.verifyFormInputMessage(inputID, false, expectedLabelMessage);
         }
 
-        caomSearchFormPage.hideInputBox(inputID);
+        // Can only close the input field collapse (<details>) tag if no value present.
+        if (!StringUtil.hasText(entry))
+        {
+            caomSearchFormPage.hideInputBox(inputID);
+        }
     }
 }

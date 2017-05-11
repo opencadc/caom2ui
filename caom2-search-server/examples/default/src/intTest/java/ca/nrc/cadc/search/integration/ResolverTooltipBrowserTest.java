@@ -34,7 +34,6 @@
 package ca.nrc.cadc.search.integration;
 
 import org.junit.Test;
-import org.openqa.selenium.By;
 
 
 public class ResolverTooltipBrowserTest extends AbstractAdvancedSearchIntegrationTest
@@ -51,7 +50,7 @@ public class ResolverTooltipBrowserTest extends AbstractAdvancedSearchIntegratio
     @Test
     public void resolverToolTipTest() throws Exception
     {
-        final CAOMSearchFormPage searchFormPage = goTo(ENGLISH_ENDPOINT, null, CAOMSearchFormPage.class);
+        final CAOMSearchFormPage searchFormPage = goTo(endpoint, null, CAOMSearchFormPage.class);
 
         searchFormPage.enterValidTarget("m101");
 

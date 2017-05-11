@@ -13,7 +13,7 @@ public class PreviewsPageBrowserTest extends AbstractAdvancedSearchIntegrationTe
     public void test() throws Exception
     {
         final SearchResultsPage searchResultsPage =
-                goTo(ENGLISH_ENDPOINT,
+                goTo(endpoint,
                      "Observation.observationID=2007420&Observation.collection=CFHT&Plane.calibrationLevel=1",
                      SearchResultsPage.class);
 

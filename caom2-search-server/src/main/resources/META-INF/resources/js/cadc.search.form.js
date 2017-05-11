@@ -634,7 +634,9 @@
      *
      * @type {ca.nrc.cadc.search.datatrain.DataTrain|DataTrain}
      */
-    this.dataTrain = new ca.nrc.cadc.search.datatrain.DataTrain(this.configuration.getName().toLowerCase(), false);
+    this.dataTrain = new ca.nrc.cadc.search.datatrain.DataTrain(this.configuration.getName().toLowerCase(), {
+      tapSyncEndpoint: this.configuration.options.tapSyncEndpoint
+    });
 
     var VALIDATOR_TIMER_DELAY = 500;
 

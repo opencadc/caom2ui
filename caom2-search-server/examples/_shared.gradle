@@ -62,8 +62,8 @@ idea {
         }
         dependencies {
             intTestCompile 'junit:junit:4.+'
-            intTestCompile 'org.opencadc:cadc-web-test:[1.0.3, )'
-            intTestCompile 'org.seleniumhq.selenium:selenium-java:2.53.+'
+            intTestCompile 'org.opencadc:cadc-web-test:[2.0.0, )'
+            intTestCompile 'org.seleniumhq.selenium:selenium-java:3.+'
         }
 
         systemProperty "driver", "${driver}"

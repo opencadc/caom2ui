@@ -33,217 +33,26 @@
  */
 package ca.nrc.cadc.search.integration;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
+import ca.nrc.cadc.util.StringUtil;
 
 import ca.nrc.cadc.web.selenium.AbstractWebApplicationIntegrationTest;
 
 
-public abstract class AbstractAdvancedSearchIntegrationTest
-        extends AbstractWebApplicationIntegrationTest
+public abstract class AbstractAdvancedSearchIntegrationTest extends AbstractWebApplicationIntegrationTest
 {
-    static final Pattern ROW_COUNT_PATTERN = Pattern.compile("\\d+");
-    static final String ENGLISH_ENDPOINT = "/search/";
+    private static final String DEFAULT_ENGLISH_ENDPOINT = "/archive-search/";
+
+    final String endpoint;
+
 
     AbstractAdvancedSearchIntegrationTest() throws Exception
     {
         super();
         setFailOnTimeout(true);
-    }
 
-
-    String getPagerStatusText() throws Exception
-    {
-        return find(By.className("grid-header-label")).getText();
-    }
-
-    int getCurrentResultsRowCount() throws Exception
-    {
-        final Matcher matcher = ROW_COUNT_PATTERN.matcher(getPagerStatusText());
-        final int count;
-
-        if (matcher.find())
-        {
-            count = Integer.parseInt(matcher.group());
-        }
-        else
-        {
-            count = -1;
-        }
-
-        return count;
-    }
-
-    boolean isObsCoreEnabled() throws Exception
-    {
-        try
-        {
-            find(By.linkText("ObsCore Search"));
-            return true;
-        }
-        catch (NoSuchElementException e)
-        {
-            return false;
-        }
-    }
-
-    /**
-     * Verify if the given search results page has results and is proper.
-     *
-     * @param searchResultsPage     The page to check.
-     * @param shouldHaveResults     Whether the rowcount should be > 0.
-     * @throws Exception
-     */
-    void verifyGridHeaderLabelHasIntegerValue(
-            final SearchResultsPage searchResultsPage,
-            final boolean shouldHaveResults) throws Exception
-    {
-        final String result = searchResultsPage.getPagerStatusText();
-        verifyTrue(result.startsWith("Showing "));
-        verifyTrue(result.indexOf(" rows") > 0);
-
-        if (shouldHaveResults)
-        {
-            final int rowCount = searchResultsPage.getCurrentResultsRowCount();
-            verifyTrue(rowCount > 0);
-        }
-    }
-
-    /**
-     * Will throw a NumberFormatException when no integer present.
-     *
-     * @param checkForResults Whether to check for a row count > 0.
-     * @throws Exception
-     * @deprecated Use {@link #verifyGridHeaderLabelHasIntegerValue(SearchResultsPage, boolean)}
-     *              instead, and adopt the Page Object model.
-     */
-    void verifyGridHeaderLabelHasIntegerValue(
-            final boolean checkForResults) throws Exception
-    {
-        final String result = getPagerStatusText();
-        verifyTrue(result.startsWith("Showing "));
-        verifyTrue(result.indexOf(" rows") > 0);
-
-        final int rowCount = getCurrentResultsRowCount();
-
-        if (checkForResults)
-        {
-            verifyTrue(rowCount > 0);
-        }
-    }
-
-    /**
-     * Go to the query tab.
-     *
-     * @throws Exception
-     */
-    void queryTab() throws Exception
-    {
-        tab("queryFormTab-link");
-    }
-
-    void adqlTab() throws Exception
-    {
-        tab("queryTab-link");
-        verifyElementPresent(By.id("query_holder"));
-    }
-
-    /**
-     * Go to the results tab.
-     *
-     * @throws Exception
-     */
-    void resultsTab() throws Exception
-    {
-        tab("resultTableTab-link");
-    }
-
-    void tab(final String id) throws Exception
-    {
-        click(By.id(id));
-        waitOneSecond();
-    }
-
-    /**
-     * Execute a search and wait for the Results Grid to be displayed.
-     *
-     * @param expectResultPage Whether the search should succeed to the
-     *                         results page.
-     * @param expectResults    Whether or not to expect a row count > 0.
-     * @throws Exception
-     */
-    void searchAndWait(final boolean expectResultPage,
-                                 final boolean expectResults)
-            throws Exception
-    {
-        find(By.className("submit-query")).click();
-        waitForSearch(expectResultPage, expectResults);
-    }
-
-    /**
-     * Wait for an already started search.
-     *
-     * @param expectResultPage Whether the search should succeed to the
-     *                         results page.
-     * @param expectResults    Whether or not to expect a row count > 0.
-     * @throws Exception
-     * @deprecated Use {@link SearchResultsPage instead}
-     */
-    void waitForSearch(final boolean expectResultPage,
-                                 final boolean expectResults)
-            throws Exception
-    {
-        waitForElementPresent(By.className("grid-header-label"));
-
-        // Allow for streaming to finish.
-        waitFor(5);
-
-        if (expectResultPage)
-        {
-            waitForElementPresent(By.cssSelector("div.slick-viewport"));
-            waitForElementPresent(By.id("results_bookmark"));
-            waitForElementPresent(By.className("grid-header-icon"));
-            waitForElementPresent(
-                    By.xpath("//div[@title='Select/Deselect All']"));
-            verifyGridHeaderLabelHasIntegerValue(expectResults);
-        }
-    }
-
-    void closeTooltip() throws Exception
-    {
-        click(By.className("tooltip-close"));
-    }
-
-    void summonTooltip(final String detailLabelID) throws Exception
-    {
-        final WebElement parentElement =
-                find(By.id(detailLabelID)).findElement(By.tagName("summary"));
-        hover(parentElement.findElement(By.className("advancedsearch-tooltip")));
-
-        waitForElementPresent(
-                By.xpath("//details[@id='" + detailLabelID
-                         + "']/summary/span[contains(@class, 'wb-icon-question-alt')]"));
-        click(parentElement.findElement(By.className("wb-icon-question-alt")));
-    }
-
-    void checkboxOn(final By locator) throws Exception
-    {
-        toggleCheckbox(locator);
-
-        final WebElement checkboxElement = find(locator);
-        verifyTrue(checkboxElement.isSelected());
-    }
-
-    void toggleCheckbox(final By locator) throws Exception
-    {
-        final WebElement checkboxElement = find(locator);
-
-        checkboxElement.click();
-        waitOneSecond();
+        // Base Host of the web application to be tested.
+        final String configuredEndpoint = System.getProperty("web.app.endpoint");
+        endpoint = StringUtil.hasText(configuredEndpoint) ? configuredEndpoint : DEFAULT_ENGLISH_ENDPOINT;
     }
 }

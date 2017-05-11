@@ -80,6 +80,8 @@ import java.util.List;
 
 public class CAOMSearchFormPage extends AbstractSearchFormPage
 {
+    private static final int DEFAULT_TIMEOUT_IN_SECONDS = 20;
+
     static final By DATA_TRAIN_LOCATOR = By.id("caom2@Hierarchy");
     static final By DATA_TRAIN_COLLECTION_MENU = By.id("Observation.collection");
     static final By TARGET_INPUT = By.id("Plane.position.bounds");
@@ -106,9 +108,15 @@ public class CAOMSearchFormPage extends AbstractSearchFormPage
     WebElement observationDateInput;
 
 
+    /**
+     * Constructors need to be public for reflection to find them.
+     *
+     * @param driver        WebDriver instance.
+     * @throws Exception        Any errors.
+     */
     public CAOMSearchFormPage(final WebDriver driver) throws Exception
     {
-        super(driver);
+        super(driver, DEFAULT_TIMEOUT_IN_SECONDS);
 
         waitForElementPresent(DATA_TRAIN_LOCATOR);
         waitForElementPresent(TARGET_INPUT);

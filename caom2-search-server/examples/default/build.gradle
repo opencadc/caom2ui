@@ -14,7 +14,7 @@ repositories {
 dependencies {
     compile 'log4j:log4j:1.2.+'
 
-    compile 'org.opencadc:caom2-search-server:[1.2.5, )'
+    compile 'org.opencadc:caom2-search-server:[1.2.6, )'
 
     providedCompile 'javax.servlet:javax.servlet-api:3.1.+'
     providedCompile 'javax.servlet:javax.servlet-api:3.0.+'
@@ -25,8 +25,8 @@ dependencies {
 
     testCompile 'junit:junit:4.+'
     testCompile 'org.skyscreamer:jsonassert:1.+'
-    testCompile 'org.seleniumhq.selenium:selenium-java:2.53.+'
-    testCompile 'org.opencadc:cadc-web-test:[1.0.3, )'
+    testCompile 'org.seleniumhq.selenium:selenium-java:3.+'
+    testCompile 'org.opencadc:cadc-web-test:[2.0.0, )'
     testCompile 'org.easymock:easymock:3.+'
 }
 
@@ -44,6 +44,6 @@ ext {
 sourceCompatibility = 1.7
 
 group = 'org.opencadc'
-version = '1009'
+version = '1010'
 
 apply from: '../_shared.gradle'
