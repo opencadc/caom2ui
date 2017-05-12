@@ -14,7 +14,7 @@ war {
 clean {
     doFirst {
         exec {
-            executable 'rm'
+            executable = 'rm'
             args = ['-rf', './docker']
         }
     }
@@ -62,8 +62,8 @@ idea {
         }
         dependencies {
             intTestCompile 'junit:junit:4.+'
-            intTestCompile 'org.opencadc:cadc-web-test:[2.0.0, )'
-            intTestCompile 'org.seleniumhq.selenium:selenium-java:3.+'
+            intTestCompile 'org.opencadc:cadc-web-test:[1.0.3, )'
+            intTestCompile 'org.seleniumhq.selenium:selenium-java:2.53.+'
         }
 
         systemProperty "driver", "${driver}"
@@ -80,6 +80,13 @@ idea {
         }
         else {
             systemProperty 'web.app.url', project.intTest_default_web_app_url
+        }
+
+        if (project.hasProperty('intTest_web_app_endpoint')) {
+            systemProperty 'web.app.endpoint', project.intTest_web_app_endpoint
+        }
+        else {
+            systemProperty 'web.app.endpoint', project.intTest_default_web_app_endpoint
         }
 
         systemProperty 'user.name', project.intTest_user_name

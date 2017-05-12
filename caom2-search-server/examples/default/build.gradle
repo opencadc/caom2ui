@@ -25,14 +25,15 @@ dependencies {
 
     testCompile 'junit:junit:4.+'
     testCompile 'org.skyscreamer:jsonassert:1.+'
-    testCompile 'org.seleniumhq.selenium:selenium-java:3.+'
-    testCompile 'org.opencadc:cadc-web-test:[2.0.0, )'
+    testCompile 'org.seleniumhq.selenium:selenium-java:2.53.+'
+    testCompile 'org.opencadc:cadc-web-test:[1.0.3, )'
     testCompile 'org.easymock:easymock:3.+'
 }
 
 ext {
     // Change this value to test other locations, such as Production or RC.
-    intTest_default_web_app_url = 'http://localhost:8080/search/'
+    intTest_default_web_app_url = 'http://localhost:8080/'
+    intTest_default_web_app_endpoint = '/archive-search/'
 
     intTest_user_name = 'CADCtest'
     intTest_user_password = 'sywymUL4'

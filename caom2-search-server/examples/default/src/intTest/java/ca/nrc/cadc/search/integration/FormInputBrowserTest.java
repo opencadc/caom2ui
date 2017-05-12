@@ -74,13 +74,13 @@ public class FormInputBrowserTest extends AbstractAdvancedSearchIntegrationTest
         verifyFormInput(caomSearchFormPage, CAOMSearchFormPage.OBSERVATION_DATE_INPUT_ID, "aaa", true, null);
         verifyFormInput(caomSearchFormPage, CAOMSearchFormPage.OBSERVATION_DATE_INPUT_ID, "", false, "");
 
-        caomSearchFormPage.toggleInputField(CAOMSearchFormPage.OBSERVATION_DATE_INPUT_ID);
+        caomSearchFormPage.showInputField(CAOMSearchFormPage.OBSERVATION_DATE_INPUT_ID);
         caomSearchFormPage.select(By.id(CAOMSearchFormPage.OBSERVATION_DATE_INPUT_ID + "_PRESET"), "PAST_WEEK");
         caomSearchFormPage
                 .verifyFormInputMessageMatches(CAOMSearchFormPage.OBSERVATION_DATE_INPUT_ID, false, "(.*)\\d\\.\\.\\d(.*)");
 
         // Close it again.
-        caomSearchFormPage.toggleInputField(CAOMSearchFormPage.OBSERVATION_DATE_INPUT_ID);
+        caomSearchFormPage.hideInputField(CAOMSearchFormPage.OBSERVATION_DATE_INPUT_ID);
 
         verifyFormInput(caomSearchFormPage, CAOMSearchFormPage.SPECTRAL_COVERAGE_INPUT_ID, "aaa", true, null);
         verifyFormInput(caomSearchFormPage, CAOMSearchFormPage.SPECTRAL_COVERAGE_INPUT_ID, "", false, "");
@@ -124,7 +124,14 @@ public class FormInputBrowserTest extends AbstractAdvancedSearchIntegrationTest
                                  final boolean expectError, final String expectedLabelMessage)
             throws Exception
     {
-        caomSearchFormPage.inputValue(find(By.id(inputID)), entry);
+        if (StringUtil.hasText(entry))
+        {
+            caomSearchFormPage.enterInputValue(find(By.id(inputID)), entry);
+        }
+        else
+        {
+            caomSearchFormPage.clearInputValue(inputID);
+        }
 
         if (expectError)
         {
@@ -141,12 +148,6 @@ public class FormInputBrowserTest extends AbstractAdvancedSearchIntegrationTest
         else
         {
             caomSearchFormPage.verifyFormInputMessage(inputID, false, expectedLabelMessage);
-        }
-
-        // Can only close the input field collapse (<details>) tag if no value present.
-        if (!StringUtil.hasText(entry))
-        {
-            caomSearchFormPage.hideInputBox(inputID);
         }
     }
 }

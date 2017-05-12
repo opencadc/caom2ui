@@ -128,12 +128,12 @@ public class CAOMSearchFormPage extends AbstractSearchFormPage
 
     void enterObservationID(final String observationIDValue) throws Exception
     {
-        inputValue(observationIDInput, observationIDValue);
+        enterInputValue(observationIDInput, observationIDValue);
     }
 
     void enterTarget(final String targetValue) throws Exception
     {
-        inputValue(targetInput, targetValue);
+        enterInputValue(targetInput, targetValue);
     }
 
     void enterValidTarget(final String targetValue) throws Exception

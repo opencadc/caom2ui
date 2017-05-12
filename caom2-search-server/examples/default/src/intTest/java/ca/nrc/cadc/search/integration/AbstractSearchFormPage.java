@@ -68,6 +68,7 @@
 
 package ca.nrc.cadc.search.integration;
 
+import ca.nrc.cadc.util.StringUtil;
 import ca.nrc.cadc.web.selenium.AbstractTestWebPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -103,14 +104,29 @@ abstract class AbstractSearchFormPage extends AbstractTestWebPage
     }
 
 
-    void inputValue(final WebElement inputElement, final String value) throws Exception
+    void enterInputValue(final WebElement inputElement, final String value) throws Exception
     {
         final String inputID = inputElement.getAttribute("id");
         final String detailElementID = inputID + "_details";
         summonTooltip(detailElementID);
-        toggleInputField(inputID);
+        showInputField(inputID);
         sendKeys(inputElement, value);
         closeTooltip();
+    }
+
+    void clearInputValue(final String inputID) throws Exception
+    {
+        final WebElement inputElement = find(By.id(inputID));
+
+        if (inputElement.isDisplayed())
+        {
+            sendKeys(inputElement, "");
+            hideInputField(inputID);
+        }
+        else
+        {
+            throw new IllegalStateException("Input element " + inputID + " is not displayed.");
+        }
     }
 
     void verifyFormInputError(final String inputID) throws Exception
@@ -161,7 +177,6 @@ abstract class AbstractSearchFormPage extends AbstractTestWebPage
                                                  + "']/summary/span[contains(@class, 'advancedsearch-tooltip')]");
 
         waitForElementPresent(tooltipIconTriggerBy);
-//        hover(tooltipIconTriggerBy);
         click(tooltipIconTriggerBy);
     }
 
@@ -173,16 +188,37 @@ abstract class AbstractSearchFormPage extends AbstractTestWebPage
 
 
     /**
-     * Toggle a details item
+     * Ensure the field is open.
      *
-     * @param inputID The String id locator.
+     * @param inputID The String ID locator.
+     * @throws Exception Any error.
      */
-    void toggleInputField(final String inputID) throws Exception
+    void showInputField(final String inputID) throws Exception
     {
         final WebElement element = find(By.xpath(String.format(DETAILS_LOCATOR_XPATH, (inputID + "_details"))));
 
-        // show the input box
-        click(element);
+        if (!find(By.id(inputID)).isDisplayed())
+        {
+            // show the input box
+            click(element);
+        }
+    }
+
+    /**
+     * Ensure the field is open.
+     *
+     * @param inputID The String ID locator.
+     * @throws Exception Any error.
+     */
+    void hideInputField(final String inputID) throws Exception
+    {
+        final WebElement element = find(By.xpath(String.format(DETAILS_LOCATOR_XPATH, (inputID + "_details"))));
+
+        if (find(By.id(inputID)).isDisplayed())
+        {
+            // show the input box
+            click(element);
+        }
     }
 
     SearchResultsPage submitSuccess() throws Exception

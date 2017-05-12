@@ -156,7 +156,7 @@ public class SearchResultsPage extends AbstractTestWebPage
         else
         {
             // check that the drag-and-drop changed the ordinal of the column
-            (new Actions(driver)).dragAndDrop(listItem, selectedColumnsListElement).perform();
+            (new Actions(driver)).dragAndDrop(listItem, selectedColumnsListElement).build().perform();
             waitForElementVisible(selectedColumnsListElement.findElement(By.id(listItemID)));
             click(changeColumnsPopupElement.findElement(By.cssSelector("span.dialog-close")));
         }
