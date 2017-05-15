@@ -1,16 +1,5 @@
 import org.apache.tools.ant.filters.ReplaceTokens
 
-war {
-    // Trying to fix static file caching on new build.
-    eachFile {
-        if (it.name.endsWith(".jsp")) {
-            filter(ReplaceTokens, tokens: [version: project.version])
-        }
-    }
-
-    archiveName = "search##" + project.version + ".war"
-}
-
 clean {
     doFirst {
         exec {
@@ -21,8 +10,9 @@ clean {
 }
 
 task initDockerize(type: Copy, dependsOn: [build]) {
-    from 'Dockerfile'
-    from 'org.opencadc.search.properties'
+    from './'
+    include 'Dockerfile'
+    include '*.properties'
     into 'docker/'
 }
 
@@ -62,7 +52,7 @@ idea {
         }
         dependencies {
             intTestCompile 'junit:junit:4.+'
-            intTestCompile 'org.opencadc:cadc-web-test:[1.0.3, )'
+            intTestCompile 'org.opencadc:cadc-web-test:[1.0.4, )'
             intTestCompile 'org.seleniumhq.selenium:selenium-java:2.53.+'
         }
 
@@ -89,7 +79,14 @@ idea {
             systemProperty 'web.app.endpoint', project.intTest_default_web_app_endpoint
         }
 
-        systemProperty 'user.name', project.intTest_user_name
-        systemProperty 'user.password', project.intTest_user_password
+        if (project.hasProperty('intTest_user_name'))
+        {
+          systemProperty 'user.name', project.intTest_user_name
+        }
+
+        if (project.hasProperty('intTest_user_password'))
+        {
+          systemProperty 'user.password', project.intTest_user_password
+        }
     }
 }
