@@ -634,7 +634,9 @@
      *
      * @type {ca.nrc.cadc.search.datatrain.DataTrain|DataTrain}
      */
-    this.dataTrain = new ca.nrc.cadc.search.datatrain.DataTrain(this.configuration.getName().toLowerCase(), false);
+    this.dataTrain = new ca.nrc.cadc.search.datatrain.DataTrain(this.configuration.getName().toLowerCase(), {
+      tapSyncEndpoint: this.configuration.options.tapSyncEndpoint
+    });
 
     var VALIDATOR_TIMER_DELAY = 500;
 
@@ -917,7 +919,10 @@
     /**
      * Handle loading a single tooltip.
      *
-     * @param {{tipHTML}} tipJSON
+     * @param {{}} tipJSON    Object hash of tooltips
+     * @param {String} tipJSON.tipHTML  HTML String of content.
+     * @param {Number} [tipJSON.horizontalOffset]  Offset on the x axis.
+     * @param {Number} [tipJSON.verticalOffset=0]  Offset on the y axis.
      * @param {ca.nrc.cadc.search.TooltipCreator|TooltipCreator}  tooltipCreator
      * @param {jQuery} $liItem
      * @param {String} inputID
@@ -931,7 +936,11 @@
         var tipsterPlacement;
         var offsetX;
 
-        if ($liItem.hasClass("label_tooltip_right"))
+        if (tipJSON.horizontalOffset)
+        {
+          offsetX = tipJSON.horizontalOffset;
+        }
+        else if ($liItem.hasClass("label_tooltip_right"))
         {
           tipsterPlacement = "right";
           offsetX = -12;
@@ -942,8 +951,7 @@
           offsetX = 240;
         }
 
-        var offsetY = ((inputID === "Observation.observationID") || (inputID === "DataID.observationID"))
-            ? -350 : 0;
+        var offsetY = tipJSON.verticalOffset ? tipJSON.verticalOffset : 0;
 
         var $ttIconImg = $("<span class=\"" + tooltipIconCSS + " " + initialTooltipIconCSS + " float-right\" />");
 

@@ -69,7 +69,6 @@
 package ca.nrc.cadc.search.integration;
 
 
-import com.thoughtworks.selenium.SeleniumException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -157,7 +156,7 @@ public class SearchResultsPage extends AbstractTestWebPage
         else
         {
             // check that the drag-and-drop changed the ordinal of the column
-            (new Actions(driver)).dragAndDrop(listItem, selectedColumnsListElement).perform();
+            (new Actions(driver)).dragAndDrop(listItem, selectedColumnsListElement).build().perform();
             waitForElementVisible(selectedColumnsListElement.findElement(By.id(listItemID)));
             click(changeColumnsPopupElement.findElement(By.cssSelector("span.dialog-close")));
         }
@@ -218,6 +217,26 @@ public class SearchResultsPage extends AbstractTestWebPage
     {
         final Matcher matcher = ROW_COUNT_PATTERN.matcher(getPagerStatusText());
         return matcher.find() ? Integer.parseInt(matcher.group()) : -1;
+    }
+
+    /**
+     * Will throw a NumberFormatException when no integer present.
+     *
+     * @param checkForResults Whether to check for a row count > 0.
+     * @throws Exception
+     */
+    void verifyGridHeaderLabelHasIntegerValue(final boolean checkForResults) throws Exception
+    {
+        final String result = getPagerStatusText();
+        verifyTrue(result.startsWith("Showing "));
+        verifyTrue(result.indexOf(" rows") > 0);
+
+        final int rowCount = getCurrentResultsRowCount();
+
+        if (checkForResults)
+        {
+            verifyTrue(rowCount > 0);
+        }
     }
 
     CAOMObservationDetailsPage openObservationDetails(final int rowNumber)

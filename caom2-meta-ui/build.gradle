@@ -1,6 +1,9 @@
 plugins {
     id 'maven'
     id 'war'
+
+    // IntelliJ IDEA plugin here to allow int
+    id 'idea'
 }
 
 repositories {
@@ -37,76 +40,20 @@ dependencies {
 
 ext {
     // Change this value to test other locations, such as Production or RC.
-    intTest_web_app_url = 'http://localhost/caom2ui/'
+    intTest_default_web_app_url = 'http://localhost:8080/'
+    intTest_default_web_app_endpoint = '/caom2ui/'
+
+    // Modify this to your liking!
+    docker_image_name = 'opencadc/caom2-meta-ui'
 }
 
 sourceCompatibility = '1.7'
 
 group = 'ca.nrc.cadc'
-version = '1001'
-
-// Modify this to your liking!
-def docker_image_name = 'opencadc/caom2-meta-ui'
+version = '1002'
 
 war {
     archiveName = 'caom2ui##' + project.version + '.war'
 }
 
-clean {
-    doFirst {
-        exec {
-            executable 'rm'
-            args = ['-rf', './docker']
-        }
-    }
-}
-
-task initDockerize(type: Copy, dependsOn: build) {
-    from 'Dockerfile'
-    from 'org.opencadc.caom2ui.properties'
-    into 'docker/'
-}
-
-task copyWAR(type: Copy, dependsOn: war) {
-    from 'build/libs/'
-    into 'docker/'
-    include '*.war'
-}
-
-task dockerize(type: Exec, dependsOn: [initDockerize, copyWAR]) {
-    commandLine 'docker', 'build', '-t', docker_image_name, '-f', './docker/Dockerfile', './docker/'
-}
-
-sourceSets {
-    intTest
-}
-
-['firefox', 'chrome'].each { driver ->
-    task "intTest${driver.capitalize()}"(type: Test) { driverTest ->
-        testClassesDir = sourceSets.intTest.output.classesDir
-        classpath = sourceSets.intTest.runtimeClasspath
-        reports {
-            html.destination = reporting.file("$name/html")
-        }
-        dependencies {
-            intTestCompile 'junit:junit:4.+'
-            intTestCompile 'ca.nrc.cadc:web-test:1.+'
-            intTestCompile 'org.seleniumhq.selenium:selenium-java:2.53.1'
-        }
-
-        systemProperty "driver", "${driver}"
-
-        if (project.hasProperty('intTest_selenium_server_url')) {
-            systemProperty 'selenium.server.url', project.intTest_selenium_server_url
-        }
-        else {
-            systemProperty 'selenium.server.url', 'http://cadcint2.cadc.dao.nrc.ca:4444'
-        }
-
-        if (project.hasProperty('intTest_web_app_url')) {
-            systemProperty 'web.app.url', project.intTest_web_app_url
-        }
-
-        maxParallelForks = 3
-    }
-}
+apply from: '../_shared.gradle'

@@ -1650,16 +1650,16 @@
       }
       else
       {
-        var jobHost = (new cadc.web.util.URI(json.job_url)).getHost();
-        var localHost = (new cadc.web.util.URI(window.location.href)).getHost();
+        // var jobHost = (new cadc.web.util.URI(json.job_url)).getHost();
+        // var localHost = (new cadc.web.util.URI(window.location.href)).getHost();
         var pageLanguage = this.getPageLanguage();
-        if (jobHost !== localHost)
-        {
-          console.error("cross domain error - local host: " + localHost + ", requested job host: " + jobHost);
-          this._searchError(ca.nrc.cadc.search.i18n[pageLanguage]["CROSS_DOMAIN_ERROR"]);
-        }
-        else
-        {
+        // if (jobHost !== localHost)
+        // {
+        //   console.error("cross domain error - local host: " + localHost + ", requested job host: " + jobHost);
+        //   this._searchError(ca.nrc.cadc.search.i18n[pageLanguage]["CROSS_DOMAIN_ERROR"]);
+        // }
+        // else
+        // {
           var runID = json.run_id;
 
           /**
@@ -1720,7 +1720,7 @@
           resultsVOTV.clearColumnFilters();
 
           resultsVOTV.build({
-                              url: json.results_url,
+                              url: this.options.tapSyncEndpoint + "?tap_url=" + encodeURIComponent(json.results_url),
                               type: $("input[name='format']").val(),
                               tableMetadata: activeForm.getResultsTableMetadata(),
                               pageSize: ca.nrc.cadc.search.RESULTS_PAGE_SIZE
@@ -1753,7 +1753,7 @@
                               activeForm.cancel();
                               alert(message);
                             });
-        }
+        // }
       }
     };
 

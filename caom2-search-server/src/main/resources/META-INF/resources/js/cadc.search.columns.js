@@ -437,6 +437,10 @@
                   return formatOutputHTML(formatNumeric(value, 2), columnDef.utype, value);
                 }
               },
+              "caom2:Observation.target.keywords": {
+                "label": "Target Keywords",
+                "fitMax": true
+              },
               "caom2:Observation.instrument.name": {
                 "label": "Instrument"
               },

@@ -80,57 +80,89 @@ import java.util.List;
 
 public class CAOMSearchFormPage extends AbstractSearchFormPage
 {
-    private static final By DATA_TRAIN_LOCATOR = By.id("caom2@Hierarchy");
-    private static final By DATA_TRAIN_COLLECTION_MENU =
-            By.id("Observation.collection");
-    private static final By TARGET_INPUT = By.id("Plane.position.bounds");
+    private static final int DEFAULT_TIMEOUT_IN_SECONDS = 20;
+
+    static final By DATA_TRAIN_LOCATOR = By.id("caom2@Hierarchy");
+    static final By DATA_TRAIN_COLLECTION_MENU = By.id("Observation.collection");
+    static final By TARGET_INPUT = By.id("Plane.position.bounds");
+    static final By TARGET_RESOLUTION_STATUS_ICON_BY = By.className("target_name_resolution_status");
+    static final By TARGET_RESOLUTION_STATUS_GOOD_ICON_BY = By.className("target_ok");
+    static final String SPECTRAL_COVERAGE_INPUT_ID = "Plane.energy.bounds";
+    static final String OBSERVATION_DATE_INPUT_ID = "Plane.time.bounds";
+    static final String PIXEL_SCALE_INPUT_ID = "Plane.position.sampleSize";
+
 
     @FindBy(id = "caom2@Hierarchy")
-    private WebElement dataTrain;
+    WebElement dataTrain;
 
     @FindBy(id = "Observation.observationID")
-    private WebElement observationIDInput;
+    WebElement observationIDInput;
 
     @FindBy(id = "Plane.position.bounds")
-    private WebElement targetInput;
+    WebElement targetInput;
+
+    @FindBy(id = "Plane.energy.bounds")
+    WebElement spectralCoverageInput;
+
+    @FindBy(id = "Plane.time.bounds")
+    WebElement observationDateInput;
 
 
+    /**
+     * Constructors need to be public for reflection to find them.
+     *
+     * @param driver        WebDriver instance.
+     * @throws Exception        Any errors.
+     */
     public CAOMSearchFormPage(final WebDriver driver) throws Exception
     {
-        super(driver);
+        super(driver, DEFAULT_TIMEOUT_IN_SECONDS);
 
         waitForElementPresent(DATA_TRAIN_LOCATOR);
         waitForElementPresent(TARGET_INPUT);
+        waitForElementPresent(By.id(SPECTRAL_COVERAGE_INPUT_ID));
+        waitForElementPresent(By.id(OBSERVATION_DATE_INPUT_ID));
 
         PageFactory.initElements(driver, this);
     }
 
     void enterObservationID(final String observationIDValue) throws Exception
     {
-        inputValue(observationIDInput, observationIDValue);
+        enterInputValue(observationIDInput, observationIDValue);
     }
 
     void enterTarget(final String targetValue) throws Exception
     {
-        inputValue(targetInput, targetValue);
+        enterInputValue(targetInput, targetValue);
+    }
+
+    void enterValidTarget(final String targetValue) throws Exception
+    {
+        enterTarget(targetValue);
+        confirmResolverOK();
+    }
+
+    void confirmResolverOK() throws Exception
+    {
+        waitForElementPresent(TARGET_RESOLUTION_STATUS_ICON_BY);
+        waitForElementVisible(TARGET_RESOLUTION_STATUS_ICON_BY);
+        waitForElementPresent(TARGET_RESOLUTION_STATUS_GOOD_ICON_BY);
+        waitForElementVisible(TARGET_RESOLUTION_STATUS_GOOD_ICON_BY);
     }
 
     void enterCollection(final String collection) throws Exception
     {
-        final Select collSelect =
-                new Select(dataTrain.findElement(DATA_TRAIN_COLLECTION_MENU));
+        final Select collSelect = new Select(dataTrain.findElement(DATA_TRAIN_COLLECTION_MENU));
 
         // Unselect the 'All' option
         collSelect.deselectByIndex(0);
         collSelect.selectByValue(collection);
     }
 
-    int findDataTrainValueIndex(final By menuLocator, final String value,
-                                final boolean ignoreCase)
+    int findDataTrainValueIndex(final By menuLocator, final String value, final boolean ignoreCase)
             throws Exception
     {
-        final Select selectMenu =
-                new Select(dataTrain.findElement(menuLocator));
+        final Select selectMenu = new Select(dataTrain.findElement(menuLocator));
         final List<WebElement> options = selectMenu.getOptions();
         final int optionSize = options.size();
 
@@ -139,16 +171,13 @@ public class CAOMSearchFormPage extends AbstractSearchFormPage
             final WebElement option = options.get(i);
             final String optionValue = option.getAttribute("value");
 
-            if ((ignoreCase && optionValue.equalsIgnoreCase(value))
-                || optionValue.equals(value))
+            if ((ignoreCase && optionValue.equalsIgnoreCase(value)) || optionValue.equals(value))
             {
                 return i;
             }
         }
 
-        throw new IllegalStateException("No such element with value '"
-                                        + value + "' (Case"
-                                        + (ignoreCase ? " " : " not ")
-                                        + "ignored)");
+        throw new IllegalStateException("No such element with value '" + value + "' (Case"
+                                        + (ignoreCase ? " " : " not ") + "ignored)");
     }
 }

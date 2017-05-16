@@ -68,6 +68,7 @@
 
 package ca.nrc.cadc.search.integration;
 
+import ca.nrc.cadc.util.StringUtil;
 import ca.nrc.cadc.web.selenium.AbstractTestWebPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -75,12 +76,10 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 
+
 abstract class AbstractSearchFormPage extends AbstractTestWebPage
 {
-    static final String DETAILS_LOCATOR_XPATH =
-            "//details[@id='%s']/summary/span";
-    static final String DETAILS_WITH_HELP_ICON_HOVER =
-            DETAILS_LOCATOR_XPATH + "[contains(@class, 'wb-icon-question-alt')]";
+    private static final String DETAILS_LOCATOR_XPATH = "//details[@id='%s']/summary/span";
 
 
     @FindBy(className = "submit-query")
@@ -90,22 +89,86 @@ abstract class AbstractSearchFormPage extends AbstractTestWebPage
     private WebElement topResetButton;
 
 
-    AbstractSearchFormPage(final WebDriver driver)
+    AbstractSearchFormPage(final WebDriver driver) throws Exception
     {
         super(driver);
 
         PageFactory.initElements(driver, this);
     }
 
+    AbstractSearchFormPage(WebDriver driver, int timeoutInSeconds)
+    {
+        super(driver, timeoutInSeconds);
 
-    void inputValue(final WebElement inputElement, final String value)
+        PageFactory.initElements(driver, this);
+    }
+
+
+    void enterInputValue(final WebElement inputElement, final String value) throws Exception
+    {
+        final String inputID = inputElement.getAttribute("id");
+        final String detailElementID = inputID + "_details";
+        summonTooltip(detailElementID);
+        showInputField(inputID);
+        sendKeys(inputElement, value);
+        closeTooltip();
+    }
+
+    void clearInputValue(final String inputID) throws Exception
+    {
+        final WebElement inputElement = find(By.id(inputID));
+
+        if (inputElement.isDisplayed())
+        {
+            sendKeys(inputElement, "");
+            hideInputField(inputID);
+        }
+        else
+        {
+            throw new IllegalStateException("Input element " + inputID + " is not displayed.");
+        }
+    }
+
+    void verifyFormInputError(final String inputID) throws Exception
+    {
+        waitForElementPresent(By.xpath("//div[@id='" + inputID
+                                       + "_input_decorate'][contains(@class,'form-attention')]"));
+    }
+
+    void verifyFormInputMessage(final String inputID, final boolean errorExpected, final String expectedMessage)
             throws Exception
     {
-        final String detailElementID = inputElement.getAttribute("id")
-                                       + "_details";
-        summonTooltip(detailElementID);
-        toggleDetailsItem(detailElementID);
-        sendKeys(inputElement, value);
+        if (errorExpected)
+        {
+            verifyFormInputError(inputID);
+        }
+
+        final String itemLocator = "//details[@id='" + (inputID + "_details")
+                                   + "']/summary/span[contains(@class,'search_criteria_label_contents')]";
+
+        waitForTextPresent(By.xpath(itemLocator), expectedMessage);
+    }
+
+    void verifyFormInputMessageMatches(final String inputID, final boolean errorExpected,
+                                       final String messageRegex) throws Exception
+    {
+        if (errorExpected)
+        {
+            verifyFormInputError(inputID);
+        }
+
+        final String itemLocator = "//details[@id='" + (inputID + "_details")
+                                   + "']/summary/span[contains(@class,'search_criteria_label_contents')]";
+
+        verifyTextMatches(By.xpath(itemLocator), messageRegex);
+    }
+
+    void hideInputBox(final String inputID) throws Exception
+    {
+        final String xpath = "//details[@id='" + (inputID + "_details") + "']/summary/span";
+        click(By.xpath(xpath));
+
+        waitForElementInvisible(By.id(inputID));
     }
 
     void summonTooltip(final String detailLabelID) throws Exception
@@ -114,8 +177,6 @@ abstract class AbstractSearchFormPage extends AbstractTestWebPage
                                                  + "']/summary/span[contains(@class, 'advancedsearch-tooltip')]");
 
         waitForElementPresent(tooltipIconTriggerBy);
-        hover(tooltipIconTriggerBy);
-
         click(tooltipIconTriggerBy);
     }
 
@@ -127,18 +188,37 @@ abstract class AbstractSearchFormPage extends AbstractTestWebPage
 
 
     /**
-     * Toggle a details item
+     * Ensure the field is open.
      *
-     * @param detailLabelID The String ide locator.
+     * @param inputID The String ID locator.
+     * @throws Exception Any error.
      */
-    void toggleDetailsItem(final String detailLabelID) throws Exception
+    void showInputField(final String inputID) throws Exception
     {
-        final WebElement element =
-                find(By.xpath(String.format(DETAILS_LOCATOR_XPATH,
-                                            detailLabelID)));
+        final WebElement element = find(By.xpath(String.format(DETAILS_LOCATOR_XPATH, (inputID + "_details"))));
 
-        // show the input box
-        click(element);
+        if (!find(By.id(inputID)).isDisplayed())
+        {
+            // show the input box
+            click(element);
+        }
+    }
+
+    /**
+     * Ensure the field is open.
+     *
+     * @param inputID The String ID locator.
+     * @throws Exception Any error.
+     */
+    void hideInputField(final String inputID) throws Exception
+    {
+        final WebElement element = find(By.xpath(String.format(DETAILS_LOCATOR_XPATH, (inputID + "_details"))));
+
+        if (find(By.id(inputID)).isDisplayed())
+        {
+            // show the input box
+            click(element);
+        }
     }
 
     SearchResultsPage submitSuccess() throws Exception

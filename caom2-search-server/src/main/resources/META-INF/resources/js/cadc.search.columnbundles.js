@@ -1,4 +1,4 @@
-(function ($)
+(function ($, window)
 {
   $.extend(true, window, {
     "ca": {
@@ -47,6 +47,7 @@
                   "caom2:Plane.provenance.keywords",
                   "caom2:Observation.target.type",
                   "caom2:Observation.target.standard",
+                  "caom2:Observation.target.keywords",
                   "caom2:Plane.metaRelease",
                   "caom2:Observation.proposal.title",
                   "caom2:Observation.proposal.keywords",
@@ -102,6 +103,7 @@
                   "caom2:Observation.intent",
                   "caom2:Observation.target.type",
                   "caom2:Observation.target.standard",
+                  "caom2:Observation.target.keywords",
                   "caom2:Plane.metaRelease",
                   "caom2:Observation.algorithm.name",
                   "caom2:Observation.proposal.title",
@@ -164,6 +166,7 @@
                   "caom2:Observation.intent",
                   "caom2:Observation.target.type",
                   "caom2:Observation.target.standard",
+                  "caom2:Observation.target.keywords",
                   "caom2:Plane.metaRelease",
                   "caom2:Observation.algorithm.name",
                   "caom2:Observation.proposal.title",
@@ -218,6 +221,7 @@
                   "caom2:Observation.intent",
                   "caom2:Observation.target.type",
                   "caom2:Observation.target.standard",
+                  "caom2:Observation.target.keywords",
                   "caom2:Observation.sequenceNumber",
                   "caom2:Observation.algorithm.name",
                   "caom2:Observation.proposal.title",
@@ -274,6 +278,7 @@
                   "caom2:Observation.intent",
                   "caom2:Observation.target.type",
                   "caom2:Observation.target.standard",
+                  "caom2:Observation.target.keywords",
                   "caom2:Plane.time.bounds.upper",
                   "caom2:Plane.metaRelease",
                   "caom2:Observation.algorithm.name",
@@ -332,6 +337,7 @@
                   "caom2:Observation.intent",
                   "caom2:Observation.target.type",
                   "caom2:Observation.target.standard",
+                  "caom2:Observation.target.keywords",
                   "caom2:Plane.time.bounds.upper",
                   "caom2:Plane.metaRelease",
                   "caom2:Observation.algorithm.name",
@@ -389,6 +395,7 @@
                   "caom2:Observation.intent",
                   "caom2:Observation.target.type",
                   "caom2:Observation.target.standard",
+                  "caom2:Observation.target.keywords",
                   "caom2:Plane.metaRelease",
                   "caom2:Observation.sequenceNumber",
                   "caom2:Observation.algorithm.name",
@@ -477,66 +484,73 @@
      * Determine if all collections selected by the user are related
      * to CFHT or CFHTTERAPIX. 
      * 
-     * @param _collections An array of collections
+     * @param {[]}  _collections An array of collections
+     * @private
      */
-    function isCFHTBundle(_collections)
+    this._isCFHTBundle = function(_collections)
     {
       var isCFHT = true;
-      $.each(_collections, function (k, v)
+      for (var ci = 0, cl = _collections.length; ci < cl; ci++)
       {
-        if (!((v == "CFHT") || (v == "CFHTTERAPIX")))
+        var v = _collections[ci];
+
+        if (!((v === "CFHT") || (v === "CFHTTERAPIX")))
         {
           // contains a non-CFHT collection
           isCFHT = false;
           return isCFHT;
         }
-      });
+      }
 
       return isCFHT;
-    }
+    };
 
     /**
      * Determine if all collections selected by the user are related
      * to CFHTMEGAPIPE or CFHTWIRWOLF. 
      * 
-     * @param _collections An array of collections
+     * @param {[]}  _collections An array of collections
+     * @private
      */
-    function isCFHTMEGAWIRBundle(_collections)
+    this._isCFHTMEGAWIRBundle = function(_collections)
     {
       var isCFHT = true;
-      $.each(_collections, function (k, v)
+      for (var ci = 0, cl = _collections.length; ci < cl; ci++)
       {
-        if (!((v == "CFHTMEGAPIPE") || (v == "CFHTWIRWOLF")))
+        var v = _collections[ci];
+
+        if (!((v === "CFHTMEGAPIPE") || (v === "CFHTWIRWOLF")))
         {
           // contains a non-CFHT collection
           isCFHT = false;
           return isCFHT;
         }
-      });
+      }
 
       return isCFHT;
-    }
+    };
 
     /**
      * Determine the key and size of the column bundle object based on the 
      * collection(s) selected by the user.
      * 
-     * @param _collections An array of collections
-     * @return {Object} a dictionary containing bundle name and number of columns in the bundle
+     * @param {[]}  _collections An array of collections
+     * @return {{}} a dictionary containing bundle name and number of columns in the bundle
+     * @private
      */
-    function getColumnBundleInfo(_collections)
+    this._getColumnBundleInfo = function(_collections)
     {
       var key = "DEFAULT";
 
       if (_collections)
       {
-        if (isCFHTBundle(_collections))
+        if (this._isCFHTBundle(_collections))
         {
           // user selected CFHT and/or CFHTTERAPIX collection(s) only,
           // use corresponding specific column bundle
           key = "CFHT";
         }
-        else if (isCFHTMEGAWIRBundle(_collections))
+        else if (this._isCFHTMEGAWIRBundle(_collections))
         {
           // user selected CFHTMEGAPIPE and/or CFHTWIRWOLF collection(s) only,
           // use corresponding specific column bundle
@@ -556,102 +570,88 @@
           // use default column bundle
         }
       }
-      else
-      {
-         // log error, use default column bundle
-//         console.error("Error: no collection was selected.");
-      }
 
-      return { key:key, size:getBundleObject(key).size };
-    }
+      return { key:key, size:this._getBundleObject(key).size };
+    };
 
     /**
      * Retrieves the column bundle for a given collection.
      *
-     * @param _collections An array of collections
+     * @param {[]} _collections An array of collections
+     * @return {{}}   Array of columnIDs.
      */
-    function getBundle(_collections)
+    this.getBundle = function(_collections)
     {
-      var bundleInfo = getColumnBundleInfo(_collections);
-      return getBundleObject(bundleInfo.key);
-    }
+      var bundleInfo = this._getColumnBundleInfo(_collections);
+      return this._getBundleObject(bundleInfo.key);
+    };
 
     /**
      * Retrieves the first size number of columns for a given collection.
      *
-     * @param bundleName Name of a column bundle
-     * @param size Number of columns in the column bundle
-     * @return {[]}   Array of column IDs.
+     * @param {String} bundleName Name of a column bundle
+     * @param {Number} size Number of columns in the column bundle
+     * @return {[]} Array of column IDs.
      */
-    function getColumnIDs(bundleName, size)
+    this.getColumnIDs = function(bundleName, size)
     {
-      var bundle = getBundleObject(bundleName);
+      var bundle = this._getBundleObject(bundleName);
       return $(bundle["columns"]).slice(0, size); 
-    }
+    };
 
     /**
      * Failsafe convenient method to retrieve the current bundle, or the
      * default one if none selected or matched the current name.
      *
-     * @param bundleName      The bundle name to look up.
+     * @param {String} bundleName      The bundle name to look up.
      * @returns {{}}      Bundle selected, or default bundle.
+     * @private
      */
-    function getBundleObject(bundleName)
+    this._getBundleObject = function(bundleName)
     {
-      return ca.nrc.cadc.search.columnBundles[bundleName]
-             || ca.nrc.cadc.search.columnBundles["DEFAULT"];
-    }
+      return ca.nrc.cadc.search.columnBundles[bundleName] || ca.nrc.cadc.search.columnBundles["DEFAULT"];
+    };
 
     /**
      * Retrieves the default columns of a given collection.
      *
-     * @param _collections An array of collections
-     * @return {[]}
+     * @param {[]}  _collections An array of collections
+     * @return {[]} Array of column IDs.
      */
-    function getDefaultColumnIDs(_collections)
+    this.getDefaultColumnIDs = function(_collections)
     {
       // number of default columns for collections other than
       // those considered below
-      var bundleInfo = getColumnBundleInfo(_collections);
+      var bundleInfo = this._getColumnBundleInfo(_collections);
       
-      return getColumnIDs(bundleInfo.key, bundleInfo.size);
-    }
+      return this.getColumnIDs(bundleInfo.key, bundleInfo.size);
+    };
 
     /**
      * Retrieves the default unit types of a given collection.
      *
-     * @param _collections An array of collections
+     * @param {[]}  _collections An array of collections
+     * @return {{}} Hash of column ID to unit types.
      */
-    function getDefaultUnitTypes(_collections)
+    this.getDefaultUnitTypes = function(_collections)
     {
-      var bundle = getBundle(_collections);
+      var bundle = this.getBundle(_collections);
 
       return bundle["unitTypes"];
-    }
+    };
 
     /**
      * Retrieves all of the columns of a given collection.
      *
-     * @param _collections An array of collections
+     * @param {[]}  _collections An array of collections
+     * @return {[]} Array of colum IDs.
      */
-    function getAllColumnIDs(_collections)
+    this.getAllColumnIDs = function(_collections)
     {
-      var bundle = getBundle(_collections);
+      var bundle = this.getBundle(_collections);
 
       return bundle["columns"];
-    }
-
-    $.extend(this,
-             {
-               // Methods
-               "getBundle": getBundle,
-               "getColumnIDs": getColumnIDs,
-               "getColumnBundleInfo": getColumnBundleInfo,
-               "getDefaultColumnIDs": getDefaultColumnIDs,
-               "getAllColumnIDs": getAllColumnIDs,
-               "getDefaultUnitTypes": getDefaultUnitTypes,
-               "isCFHTBundle": isCFHTBundle,
-               "isCFHTMEGAWIRBundle": isCFHTMEGAWIRBundle
-             });
+    };
   }
-})(jQuery);
+
+})(jQuery, window);

@@ -1,22 +1,19 @@
 plugins {
     id 'maven'
     id 'war'
+    id 'idea'
 }
 
 repositories {
     jcenter()
     mavenLocal()
-
-    // Used for web-test browser testing.
-    maven {
-        url = 'http://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/m2repo'
-    }
 }
 
 dependencies {
     compile 'log4j:log4j:1.2.+'
 
-    compile 'org.opencadc:caom2-search-server:[1.2.6, )'
+
+    compile 'org.opencadc:caom2-search-server:[1.2.7, )'
 
     providedCompile 'javax.servlet:javax.servlet-api:3.1.+'
     providedCompile 'javax.servlet:javax.servlet-api:3.0.+'
@@ -27,17 +24,28 @@ dependencies {
 
     testCompile 'junit:junit:4.+'
     testCompile 'org.skyscreamer:jsonassert:1.+'
+    testCompile 'org.seleniumhq.selenium:selenium-java:2.53.+'
+    testCompile 'org.opencadc:cadc-web-test:1.+'
     testCompile 'org.easymock:easymock:3.+'
 }
 
 ext {
     // Change this value to test other locations, such as Production or RC.
-    intTest_web_app_url = 'http://localhost:8080/search/'
+    intTest_default_web_app_url = 'http://localhost:8080/search/'
+
+    intTest_user_name = 'CADCtest'
+    intTest_user_password = 'sywymUL4'
+
+    // Modify this to your liking!
+    docker_image_name = 'opencadc/archive-search:bootstrap-3.3.7'
 }
 
 sourceCompatibility = 1.7
 
 group = 'org.opencadc'
+//version = '1003'
+//
+//apply from: '../_shared.gradle'
 
 version = '1002'
 
@@ -106,3 +114,4 @@ sourceSets {
         maxParallelForks = 3
     }
 }
+

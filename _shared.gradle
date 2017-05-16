@@ -1,0 +1,92 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
+clean {
+    doFirst {
+        exec {
+            executable = 'rm'
+            args = ['-rf', './docker']
+        }
+    }
+}
+
+task initDockerize(type: Copy, dependsOn: [build]) {
+    from './'
+    include 'Dockerfile'
+    include '*.properties'
+    into 'docker/'
+}
+
+task copyWAR(type: Copy, dependsOn: war) {
+    from 'build/libs/'
+    into 'docker/'
+    include '*.war'
+}
+
+task dockerize(type: Exec, dependsOn: [initDockerize, copyWAR]) {
+    commandLine 'docker', 'build', '-t', project.docker_image_name, '-f', './docker/Dockerfile', './docker/'
+}
+
+sourceSets {
+    intTest
+}
+
+configurations {
+    intTestCompile
+    intTestCompile.extendsFrom(testCompile)
+}
+
+idea {
+    module {
+        //and some extra test source dirs
+        testSourceDirs += file('src/intTest/java')
+        scopes.TEST.plus += [ configurations.intTestCompile ]
+    }
+}
+
+['firefox', 'chrome'].each { driver ->
+    task "intTest${driver.capitalize()}"(type: Test) { driverTest ->
+        testClassesDir = sourceSets.intTest.output.classesDir
+        classpath = sourceSets.intTest.runtimeClasspath
+        reports {
+            html.destination = reporting.file("$name/html")
+        }
+        dependencies {
+            intTestCompile 'junit:junit:4.+'
+            intTestCompile 'org.opencadc:cadc-web-test:[1.0.4, )'
+            intTestCompile 'org.seleniumhq.selenium:selenium-java:2.53.+'
+        }
+
+        systemProperty "driver", "${driver}"
+
+        if (project.hasProperty('intTest_selenium_server_url')) {
+            systemProperty 'selenium.server.url', project.intTest_selenium_server_url
+        }
+        else {
+            systemProperty 'selenium.server.url', 'http://cadcint2.cadc.dao.nrc.ca:4444'
+        }
+
+        if (project.hasProperty('intTest_web_app_url')) {
+            systemProperty 'web.app.url', project.intTest_web_app_url
+        }
+        else {
+            systemProperty 'web.app.url', project.intTest_default_web_app_url
+        }
+
+        if (project.hasProperty('intTest_web_app_endpoint')) {
+            systemProperty 'web.app.endpoint', project.intTest_web_app_endpoint
+        }
+        else {
+            systemProperty 'web.app.endpoint', project.intTest_default_web_app_endpoint
+        }
+
+        if (project.hasProperty('intTest_user_name'))
+        {
+          systemProperty 'user.name', project.intTest_user_name
+        }
+
+        if (project.hasProperty('intTest_user_password'))
+        {
+          systemProperty 'user.password', project.intTest_user_password
+        }
+    }
+}

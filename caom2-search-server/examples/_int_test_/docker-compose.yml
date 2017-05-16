@@ -1,0 +1,53 @@
+version: '2'
+services:
+  proxy.cadc.dao.nrc.ca:
+    image: nginx:alpine
+    ports:
+      - '80:80'
+    networks:
+      - 'selenium'
+    volumes:
+      - './default.conf:/etc/nginx/conf.d/default.conf'
+      - './:/usr/share/nginx/html'
+    environment:
+      - NGINX_HOST=proxy.cadc.dao.nrc.ca
+      - NGINX_PORT=80
+    depends_on:
+      - archive-search.cadc.dao.nrc.ca
+      - caom2-meta-ui.cadc.dao.nrc.ca
+  selenium-firefox:
+    image: selenium/standalone-firefox:2.53.1
+    ports:
+      - '4444:4444'
+    networks:
+      - 'selenium'
+  archive-search.cadc.dao.nrc.ca:
+    image: opencadc/archive-search
+    ports:
+      - '8080:8080'
+      - '5555:5555'
+    networks:
+      - 'selenium'
+    depends_on:
+      - uwspg.cadc.dao.nrc.ca
+    environment:
+      - CATALINA_OPTS=-Dca.nrc.cadc.reg.client.RegistryClient.host=proxy.cadc.dao.nrc.ca -Dorg.opencadc.search.tap-service-host-port=http://proxy.cadc.dao.nrc.ca -Dorg.opencadc.search.tap-service-endpoint=/search/tap/sync -Dorg.opencadc.search.caom2ops-service-host-port=http://proxy.cadc.dao.nrc.ca -Dorg.opencadc.caom2ui.caom2ops-service-host-port=http://proxy.cadc.dao.nrc.ca
+  uwspg.cadc.dao.nrc.ca:
+    image: opencadc/uws_postgres
+    networks:
+      - 'selenium'
+    environment:
+      - POSTGRES_USER=uws
+      - POSTGRES_PASSWORD=astr0query
+  caom2-meta-ui.cadc.dao.nrc.ca:
+    image: opencadc/caom2-meta-ui
+    networks:
+      - 'selenium'
+    environment:
+      - CATALINA_OPTS=-Dca.nrc.cadc.reg.client.RegistryClient.host=proxy.cadc.dao.nrc.ca -Dorg.opencadc.caom2ui.caom2ops-service-host-port=http://proxy.cadc.dao.nrc.ca
+
+
+# Create the network 'selenium' for which this system will run within.
+networks:
+  selenium:
+    driver: 'bridge'

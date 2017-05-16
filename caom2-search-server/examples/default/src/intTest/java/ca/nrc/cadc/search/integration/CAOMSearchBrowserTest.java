@@ -36,54 +36,31 @@ package ca.nrc.cadc.search.integration;
 
 import org.junit.Test;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.Select;
 
 
 public class CAOMSearchBrowserTest extends AbstractAdvancedSearchIntegrationTest
 {
-    private static final String FILTER_FILTER_ID =
-            "caom2:Plane.energy.bandpassName_filter";
-    private static final By FILTER_FILTER_BY = By.id(FILTER_FILTER_ID);
-    private static final By RA_FILTER_BY =
-            By.id("caom2:Plane.position.bounds.cval1_filter");
-    private static final By DEC_FILTER_BY =
-            By.id("caom2:Plane.position.bounds.cval2_filter");
-    private static final By FIRST_QUICKSEARCH_TARGET_LINK =
-            By.cssSelector("a.quicksearch_link:nth-child(1)");
-    private static final By COLUMN_MANAGER_BUTTON_BY =
-            By.name("slick-columnpicker-panel-change-column");
-    private static final String COLUMN_PICKER_ENERGY_INTERVAL_ITEM_ID =
-            "ITEM_caom2:Plane.energy.bounds";
-    private static final String COLUMN_PICKER_AVAILABLE_ITEMS_CONTAINER_ID =
-            "cadc_columnpicker_available_items";
-    private static final By COLUMN_PICKER_SELECTED_ITEMS_CONTAINER =
-            By.id("cadc_columnpicker_selected_items");
-    private static final By PI_NAME_COLUMN_ADD_BY =
-            By.id("column-picker-caom2:Observation.proposal.pi");
-    private static final By TARGET_FORM_FIELD_BY =
-            By.id("Plane.position.bounds");
-    private static final By OBSERVATION_ID_FORM_FIELD_BY =
-            By.id("Observation.observationID");
-    private static final By ONE_CLICK_DOWNLOAD_LINK_ROW_3_ID_BY =
-            By.id("_one-click_vov_3");
-    private static final By INSTRUMENT_NAME_FRESH_STALE_DIVIDER =
-            By.xpath("//*[@id=\"Observation.instrument.name\"]/option[@value='SPACER']");
+    private static final By ONE_CLICK_DOWNLOAD_LINK_ROW_3_ID_BY = By.id("_one-click_vov_3");
+
+
+    public CAOMSearchBrowserTest() throws Exception
+    {
+        super();
+    }
 
 
     @Test
     public void searchCAOM() throws Exception
     {
-        CAOMSearchFormPage searchFormPage =
-                goTo(ENGLISH_ENDPOINT, null, CAOMSearchFormPage.class);
+        CAOMSearchFormPage searchFormPage = goTo(endpoint, null, CAOMSearchFormPage.class);
 
         searchFormPage.enterTarget("210.05  54.3");
         searchFormPage.enterObservationID("692512");
 
         searchFormPage.reset();
 
-        final int index = searchFormPage.findDataTrainValueIndex(
-                By.id("Observation.instrument.name"), "SPACER", false);
+        final int index = searchFormPage.findDataTrainValueIndex(By.id("Observation.instrument.name"), "SPACER",
+                                                                 false);
 
         verifyTrue(index > 0);
 
@@ -91,13 +68,11 @@ public class CAOMSearchBrowserTest extends AbstractAdvancedSearchIntegrationTest
 
         SearchResultsPage searchResultsPage = searchFormPage.submitSuccess();
 
-        searchResultsPage.waitForElementPresent(
-                ONE_CLICK_DOWNLOAD_LINK_ROW_3_ID_BY);
+        searchResultsPage.waitForElementPresent(ONE_CLICK_DOWNLOAD_LINK_ROW_3_ID_BY);
 
         final String currentWindow = getCurrentWindowHandle();
 
-        final CAOMObservationDetailsPage detailsPage =
-                searchResultsPage.openObservationDetails(1);
+        final CAOMObservationDetailsPage detailsPage = searchResultsPage.openObservationDetails(1);
 
         detailsPage.waitForElementPresent(By.cssSelector("table.content"));
         detailsPage.close();
@@ -133,6 +108,8 @@ public class CAOMSearchBrowserTest extends AbstractAdvancedSearchIntegrationTest
         verifyTrue(searchResultsPage.getCurrentResultsRowCount() > 0);
 
         searchResultsPage.filterOnRA("18:03..18:07");
+
+        searchResultsPage.includeHiddenColumn("caom2:Observation.target.keywords");
 
         /*
         TODO - Complete for new Page Object model going forward.
