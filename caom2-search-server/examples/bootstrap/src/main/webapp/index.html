@@ -116,11 +116,58 @@
               <div class="panel-heading">Observation constraints</div>
               <div class="panel-body">
                 <div class="form-group">
+                  <label for="observationID" class="col-sm-4 control-label">Observation
+                    ID</label>
+                  <div class="col-sm-8">
+                    <input type="text" class="form-control" id="observationID"
+                           placeholder="Text">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="piName" class="col-sm-4 control-label">P.I. Name</label>
+                  <div class="col-sm-8">
+                    <input type="text" class="form-control" id="piName"
+                           placeholder="Text">
+                  </div>
+                </div>
+                <div class="form-group">
                   <label for="proposalID" class="col-sm-4 control-label">Proposal
                     ID</label>
                   <div class="col-sm-8">
                     <input type="text" class="form-control" id="proposalID"
                            placeholder="Text">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="proposalTitle" class="col-sm-4 control-label">Proposal Title</label>
+                  <div class="col-sm-8">
+                    <input type="text" class="form-control" id="proposalTitle"
+                           placeholder="Text">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="proposalKeywords" class="col-sm-4 control-label">Proposal Keywords</label>
+                  <div class="col-sm-8">
+                    <input type="text" class="form-control" id="proposalKeywords"
+                           placeholder="Text">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="dataReleaseDate" class="col-sm-4 control-label">Data Release Date</label>
+                  <div class="col-sm-8">
+                    <input type="text" class="form-control" id="dataReleaseDate"
+                           placeholder="Text">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="sel1" class="col-sm-4 control-label">Select list:</label>
+                  <div class="col-sm-8">
+                    <select class="form-control" id="sel1">
+                      <option>Science and Calibration data</option>
+                      <option>selection 2</option>
+                      <option>selection 3</option>
+                      <option>selection 4</option>
+                    </select>
                   </div>
                 </div>
               </div>
@@ -132,10 +179,24 @@
               <div class="panel-body">
                 <div class="form-group">
                   <label for="target"
-                         class="col-sm-2 control-label">Target</label>
-                  <div class="col-sm-10">
+                         class="col-sm-3 control-label">Target</label>
+                  <div class="col-sm-9">
                     <input type="text" class="form-control" id="target"
                            placeholder="RA/Dec or Target name">
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="pixelScale" class="col-sm-3 control-label">Pixel Scale</label>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" id="pixelScale"
+                           placeholder="RA/Dec or Target name">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="col-sm-2"></div>
+                  <div class="col-sm-10 checkbox">
+                    <label><input type="checkbox" value="">Do Spatial Cutout</label>
                   </div>
                 </div>
               </div>
@@ -146,17 +207,25 @@
               <div class="panel-heading">Temporal constraints</div>
               <div class="panel-body">
                 <div class="form-group">
-                  <label for="date" class="col-sm-4 control-label">Date</label>
+                  <label for="observationDate" class="col-sm-4 control-label">Observation Date</label>
                   <div class="col-sm-8">
-                    <input type="date" class="form-control" id="date"
+                    <input type="date" class="form-control" id="observationDate"
                            placeholder="Calendar Date or MJD">
                   </div>
                 </div>
                 <div class="form-group">
-                  <label for="exposure"
-                         class="col-sm-4 control-label">Exposure</label>
+                  <label for="integrationTime"
+                         class="col-sm-4 control-label">Integration Time</label>
                   <div class="col-sm-8">
-                    <input type="date" class="form-control" id="exposure"
+                    <input type="date" class="form-control" id="integrationTime"
+                           placeholder="Time span">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="timeSpan"
+                         class="col-sm-4 control-label">Time Span</label>
+                  <div class="col-sm-8">
+                    <input type="date" class="form-control" id="timeSpan"
                            placeholder="Time span">
                   </div>
                 </div>
@@ -168,10 +237,44 @@
               <div class="panel-heading">Spectral constraints</div>
               <div class="panel-body">
                 <div class="form-group">
-                  <label for="bandwidth" class="col-sm-3 control-label">Bandwidth</label>
+                  <label for="spectralCoverage" class="col-sm-3 control-label">Spectral Coverage</label>
                   <div class="col-sm-9">
-                    <input type="text" class="form-control" id="bandwidth"
+                    <input type="text" class="form-control" id="spectralCoverage"
                            placeholder="Default unit is MHz">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="spectralSampling" class="col-sm-3 control-label">Spectral Sampling</label>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" id="spectralSampling"
+                           placeholder="Default unit is MHz">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="resolvingPower" class="col-sm-3 control-label">Resolving Power</label>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" id="resolvingPower"
+                           placeholder="Default unit is MHz">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="bandpassWidth" class="col-sm-3 control-label">Bandpass Width</label>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" id="bandpassWidth"
+                           placeholder="Default unit is MHz">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="restframeEnergy" class="col-sm-3 control-label">Rest-frame Energy</label>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" id="restframeEnergy"
+                           placeholder="Default unit is MHz">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="col-sm-2"></div>
+                  <div class="col-sm-10 checkbox">
+                    <label><input type="checkbox" value="">Do Spatial Cutout</label>
                   </div>
                 </div>
               </div>

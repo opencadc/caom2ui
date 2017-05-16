@@ -9,12 +9,12 @@
 
 <c:set var="labelKey" value="${param.utype}_FORM_LABEL" />
 
-<li class="label_tooltip_${param.tipSide}">
-  <details id="${param.utype}_details">
-    <summary class="search_criteria_label_container">
-      <span class="search_criteria_label ${param.utype}_details"><fmt:message key="${labelKey}" bundle="${langBundle}"/></span>
-      <span class="search_criteria_label_contents color-accent"></span>
-    </summary>
+<%--<li class="label_tooltip_${param.tipSide}">--%>
+  <%--<details id="${param.utype}_details">--%>
+    <%--<summary class="search_criteria_label_container">--%>
+      <%--<span class="search_criteria_label ${param.utype}_details"><fmt:message key="${labelKey}" bundle="${langBundle}"/></span>--%>
+      <%--<span class="search_criteria_label_contents color-accent"></span>--%>
+    <%--</summary>--%>
     <label for="${param.utype}" class="wb-invisible">
       <fmt:message key="${labelKey}" bundle="${langBundle}"/></label>
     <div class="data_release_date_panel">
@@ -31,5 +31,5 @@
 
     <cadc:formName formName="${param.utype}@TimestampFormConstraint" />
     <cadc:formName formName="${param.utype}@PublicTimestampFormConstraint" />
-  </details>
-</li>
+  <%--</details>--%>
+<%--</li>--%>

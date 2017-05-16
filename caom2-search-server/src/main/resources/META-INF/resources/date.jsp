@@ -29,13 +29,38 @@
       utype + "_PRESET_PAST_MONTH_FORM_LABEL";
 %>
 
-<li class="label_tooltip_<%= tipSide %>">
-  <details id="<%= detailsID %>">
-    <summary class="search_criteria_label_container">
-      <span class="search_criteria_label <%= detailsID %>"><fmt:message key="<%= labelKey %>" bundle="${langBundle}"/></span>
-      <span class="search_criteria_label_contents color-accent"></span>
-    </summary>
-    <label for="<%= utype %>" class="wb-invisible">
+<%--<div class="label_tooltip_<%= tipSide %>">--%>
+<%--<details id="<%= detailsID %>">--%>
+<%--<summary class="search_criteria_label_container">--%>
+<%--<span class="search_criteria_label <%= detailsID %>"><fmt:message key="<%= labelKey %>" bundle="${langBundle}"/></span>--%>
+<%--<span class="search_criteria_label_contents color-accent"></span>--%>
+<%--</summary>--%>
+<div class="form-group">
+  <%--<label for="<%= utype %>" class="control-label">--%>
+    <%--<fmt:message key="<%= labelKey %>" bundle="${langBundle}"/>--%>
+  <%--</label>--%>
+  <%--<div class="">--%>
+    <%--<input type="text"--%>
+           <%--class="form-control"--%>
+           <%--id="<%= utype %>"--%>
+           <%--name="<%= utype %>"--%>
+           <%--placeholder="Text">--%>
+  <%--</div>--%>
+
+  <%--<input type="hidden"--%>
+         <%--name="<%= FormConstraint.FORM_NAME %>"--%>
+         <%--value="<%= formName %>"/>--%>
+<%--</div>--%>
+<%--</details>--%>
+<%--</div>--%>
+
+<%--<li class="label_tooltip_<%= tipSide %>">--%>
+  <%--<details id="<%= detailsID %>">--%>
+    <%--<summary class="search_criteria_label_container">--%>
+      <%--<span class="search_criteria_label <%= detailsID %>"><fmt:message key="<%= labelKey %>" bundle="${langBundle}"/></span>--%>
+      <%--<span class="search_criteria_label_contents color-accent"></span>--%>
+    <%--</summary>--%>
+    <label for="<%= utype %>" class="">
       <fmt:message key="<%= labelKey %>" bundle="${langBundle}"/>
     </label>
     <div id="<%= utype %>_input_decorate">
@@ -64,4 +89,5 @@
            name="<%= FormConstraint.FORM_NAME %>"
            value="<%= formName %>"/>
   </details>
-</li>
+    </div>
+<%--</li>--%>

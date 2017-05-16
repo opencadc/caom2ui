@@ -16,13 +16,13 @@
   final String detailsID = utype + "_details";
 %>
 
-<li class="label_tooltip_<%= tipSide %>">
-  <details id="<%= detailsID %>">
-    <summary class="search_criteria_label_container">
-      <span class="search_criteria_label <%= detailsID %>"><fmt:message key="<%= labelKey %>" bundle="${langBundle}"/></span>
-      <span class="search_criteria_label_contents color-accent"></span>
-    </summary>
-    <label for="<%= utype %>" class="wb-invisible">
+<%--<li class="label_tooltip_<%= tipSide %>">--%>
+  <%--<details id="<%= detailsID %>">--%>
+    <%--<summary class="search_criteria_label_container">--%>
+      <%--<span class="search_criteria_label <%= detailsID %>"><fmt:message key="<%= labelKey %>" bundle="${langBundle}"/></span>--%>
+      <%--<span class="search_criteria_label_contents color-accent"></span>--%>
+    <%--</summary>--%>
+    <label for="<%= utype %>" class="">
       <fmt:message key="<%= labelKey %>" bundle="${langBundle}"/>
     </label>
 
@@ -35,5 +35,5 @@
     <input type="hidden"
            name="<%= FormConstraint.FORM_NAME %>"
            value="<%= formName %>"/>
-  </details>
-</li>
+  <%--</details>--%>
+<%--</li>--%>

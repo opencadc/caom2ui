@@ -1016,18 +1016,33 @@
      */
     this.loadTooltips = function (jsonData)
     {
-      var tooltipCreator = new ca.nrc.cadc.search.TooltipCreator();
-      this.$form.find("ul.search-constraints li").each(function (key, element)
-                                                       {
-                                                         var $liItem = $(element);
-                                                         var $tooltipHeader = $liItem.find("summary.search_criteria_label_container");
-                                                         var tooltipHeaderText = $tooltipHeader.text();
-                                                         var $searchInputItem = $liItem.find(".search_criteria_input:first");
-                                                         var inputID = $searchInputItem.attr("id");
+      // var tooltipCreator = new ca.nrc.cadc.search.TooltipCreator();
+      // // this.$form.find("ul.search-constraints li").each(function (key, element)
+      // this.$form.find("div.search-constraints div").each(function (key, element)
+      //                                                  {
+      //                                                    var $liItem = $(element);
+      //                                                    var $tooltipHeader = $liItem.find("summary.search_criteria_label_container");
+      //                                                    var tooltipHeaderText = $tooltipHeader.text();
+      //                                                    var $searchInputItem = $liItem.find(".search_criteria_input:first");
+      //                                                    var inputID = $searchInputItem.attr("id");
+      //
+      //                                                    this.handleTooltipLoad(jsonData[inputID], tooltipCreator,
+      //                                                                           $liItem, inputID, tooltipHeaderText);
+      //                                                  }.bind(this));
 
-                                                         this.handleTooltipLoad(jsonData[inputID], tooltipCreator,
-                                                                                $liItem, inputID, tooltipHeaderText);
-                                                       }.bind(this));
+      $('[data-toggle="tooltip"]').tooltip();
+      // this.$form.find("div.search-constraints div").each(function (key, element)
+      // {
+      //   var $liItem = $(element);
+      //   var $tooltipHeader = $liItem.find("summary.search_criteria_label_container");
+      //   var tooltipHeaderText = $tooltipHeader.text();
+      //   var $searchInputItem = $liItem.find(".search_criteria_input:first");
+      //   var inputID = $searchInputItem.attr("id");
+      //
+      //   this.handleTooltipLoad(jsonData[inputID], tooltipCreator,
+      //       $liItem, inputID, tooltipHeaderText);
+      // }.bind(this));
+
     };
 
     /**

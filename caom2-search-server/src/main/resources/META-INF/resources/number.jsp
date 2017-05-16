@@ -14,24 +14,27 @@
   final String detailsID = utype + "_details";
 %>
 
-<li class="label_tooltip_<%= tipSide %>">
-  <details id="<%= detailsID %>">
-    <summary class="search_criteria_label_container">
-      <span class="search_criteria_label <%= detailsID %>"><fmt:message key="<%= labelKey %>" bundle="${langBundle}"/></span>
-      <span class="search_criteria_label_contents color-accent"></span>
-    </summary>
-    <label for="<%= utype %>" class="wb-invisible">
-      <fmt:message key="<%= labelKey %>" bundle="${langBundle}"/>
-    </label>
-
-    <div id="<%= utype %>_input_decorate">
-      <input id="<%= utype %>"
-             name="<%= utype %>" value="" size="15"
-             type="text"
-             class="search_criteria_input width-100 ui-form-input-validate ui_unitconversion_input" />
-    </div>
-    <input type="hidden"
-           name="<%= FormConstraint.FORM_NAME %>"
-           value="<%= formName %>"/>
-  </details>
-</li>
+<div data-toggle="tooltip" data-placement="<%= tipSide %>" title="<%= utype %>">
+  <div class="form-group">
+    <%--<details id="<%= detailsID %>">--%>
+      <%--<summary class="search_criteria_label_container">--%>
+        <%--<span class="search_criteria_label <%= detailsID %>"><fmt:message key="<%= labelKey %>" bundle="${langBundle}"/></span>--%>
+        <%--<span class="search_criteria_label_contents color-accent"></span>--%>
+      <%--</summary>--%>
+      <label for="<%= utype %>" class="control-label">
+        <fmt:message key="<%= labelKey %>" bundle="${langBundle}"/>
+      </label>
+      <div class="">
+        <div id="<%= utype %>_input_decorate">
+          <input id="<%= utype %>"
+                 name="<%= utype %>" value="" size="15"
+                 type="text"
+                 class="search_criteria_input width-100 ui-form-input-validate ui_unitconversion_input" />
+        </div>
+      </div>
+      <input type="hidden"
+             name="<%= FormConstraint.FORM_NAME %>"
+             value="<%= formName %>"/>
+    <%--</details>--%>
+  </div>
+</div>

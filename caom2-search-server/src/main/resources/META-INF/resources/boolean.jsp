@@ -13,11 +13,16 @@
   final String formName = name + "@Boolean";
 %>
 
-<li class="label_tooltip_<%= tipSide %>">
-  <div id="<%= name %>_details" class="form-inline">
-    <cadc:checkbox checkboxName="<%= name %>" i18nKey="<%= labelKey %>" />
-    <input type="hidden"
-           name="<%= FormConstraint.FORM_NAME %>"
-           value="<%= formName %>" />
-  </div>
-</li>
+<%--TODO: handle tooltips--%>
+<div class="col-sm-12 label_tooltip_<%= tipSide %>">
+  <%--<div id="<%= name %>_details" class="form-inline">--%>
+
+    <div class="form-group">
+      <%--<div class="col-sm-2"></div>--%>
+      <%--<div class="col-sm-10 checkbox">--%>
+        <cadc:checkbox checkboxName="<%= name %>" i18nKey="<%= labelKey %>" />
+        <input type="hidden"
+               name="<%= FormConstraint.FORM_NAME %>" >
+      <%--</div>--%>
+    </div>
+</div>

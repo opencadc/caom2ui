@@ -20,7 +20,7 @@
   final String formName = name + "@Text";
 %>
 
-<li class="label_tooltip_<%= tipSide %> margin-top-medium">
+<%--<li class="label_tooltip_<%= tipSide %> margin-top-medium">--%>
   <div id="<%= name %>_details" class="form-inline">
     <label for="<%= name %>" id="<%= name %>_LABEL"
            class="wb-invisible search_criteria_label">
@@ -33,4 +33,4 @@
            name="<%= FormConstraint.FORM_NAME %>"
            value="<%= formName %>" />
   </div>
-</li>
+<%--</li>--%>

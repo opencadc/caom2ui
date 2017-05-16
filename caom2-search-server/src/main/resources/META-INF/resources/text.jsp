@@ -24,6 +24,19 @@
 %>
 
 
+
+
+
+<div class="form-group">
+  <label for="<%= utype %>" class="col-sm-4 control-label">
+    <fmt:message key="<%= labelKey %>" bundle="${langBundle}"/>
+  </label>
+  <div class="col-sm-8">
+    <input type="text" class="form-control" id="<%= utype %>" name="<%= utype %>" placeholder="Text">
+  </div>
+</div>
+
+
 <li class="label_tooltip_<%= tipSide %>">
   <details id="<%= detailsID %>">
     <summary class="search_criteria_label_container">
@@ -45,3 +58,27 @@
            value="<%= formName %>"/>
   </details>
 </li>
+
+
+<%--<li class="label_tooltip_<%= tipSide %>">--%>
+  <%--<details id="<%= detailsID %>">--%>
+    <%--<summary class="search_criteria_label_container">--%>
+      <%--<span class="search_criteria_label <%= detailsID %>"><fmt:message key="<%= labelKey %>" bundle="${langBundle}"/></span>--%>
+      <%--<span class="search_criteria_label_contents color-accent"></span>--%>
+    <%--</summary>--%>
+    <%--<label for="<%= utype %>" class="wb-invisible">--%>
+      <%--<fmt:message key="<%= labelKey %>" bundle="${langBundle}"/>--%>
+    <%--</label>--%>
+
+    <%--<div id="<%= utype %>_input_decorate">--%>
+      <%--<input type="text" class="<%= classes %>"--%>
+             <%--id="<%= utype %>"--%>
+             <%--name="<%= utype %>"--%>
+             <%--size="20"/>--%>
+    <%--</div>--%>
+    <%--<input type="hidden"--%>
+           <%--name="<%= FormConstraint.FORM_NAME %>"--%>
+           <%--value="<%= formName %>"/>--%>
+  <%--</details>--%>
+<%--</li>--%>
+

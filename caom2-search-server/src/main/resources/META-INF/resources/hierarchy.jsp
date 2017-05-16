@@ -29,7 +29,7 @@
   }
 %>
 
-<div class="maintable hierarchy">
+<div class="col-sm-12 maintable hierarchy">
   <div class="hierarchy module background-light">
     <h2 class="background-accent">
       <fmt:message key="DATA_ACQUISITION_LABEL" bundle="${langBundle}"/></h2>
