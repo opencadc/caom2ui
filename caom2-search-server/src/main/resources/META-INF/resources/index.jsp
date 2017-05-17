@@ -32,7 +32,7 @@
 <body>
 
 <!-- Always include wb-body at the top, even though it's not ended until the footer. -->
-<div id="wb-body" class="container-fluid">
+<div class="container-fluid">
 
 <%--<div id="wb-skip">--%>
   <%--<ul id="wb-tphp">--%>
@@ -50,65 +50,48 @@
 <%--<div id="wb-main-in">--%>
 <%-- MainContentStart --%>
 
-  <h1 id="wb-cont"><fmt:message key="TITLE" bundle="${langBundle}"/></h1>
-
-
-  <%--<ul class="nav nav-tabs" role="tablist">--%>
-    <%--<li role="presentation" class="active">--%>
-      <%--<a href="#queryFormTab"--%>
-         <%--aria-controls="queryFormTab"--%>
-         <%--role="tab"--%>
-         <%--data-toggle="tab"><fmt:message key="CAOM_QUERY_TAB_TITLE"--%>
-                                           <%--bundle="${langBundle}"/></a>--%>
-    <%--</li>--%>
-    <%--<% if (showObsCoreTab)--%>
-    <%--{ %>--%>
-    <%--<li role="presentation">--%>
-      <%--<a href="#obsCoreQueryFormTab"--%>
-         <%--aria-controls="obsCoreQueryFormTab"--%>
-         <%--role="tab"--%>
-         <%--data-toggle="tab"><fmt:message key="OBSCORE_QUERY_TAB_TITLE"--%>
-                                                  <%--bundle="${langBundle}"/></a>--%>
-    <%--</li>--%>
-    <%--<% } %>--%>
-    <%--<li role="presentation">--%>
-      <%--<a href="#resultTableTab" aria-controls="resultTableTab" role="tab"--%>
-         <%--data-toggle="tab"><fmt:message key="RESULTS_TAB_TITLE"--%>
-                                             <%--bundle="${langBundle}"/></a>--%>
-    <%--</li>--%>
-    <%--<li role="presentation">--%>
-      <%--<a href="#errorTableTab" aria-controls="errorTableTab" role="tab"--%>
-         <%--data-toggle="tab"><fmt:message key="ERROR_TAB_TITLE"--%>
-                                            <%--bundle="${langBundle}"/></a>--%>
-    <%--</li>--%>
-    <%--<li role="presentation">--%>
-      <%--<a href="#queryTab" aria-controls="queryTab" role="tab"--%>
-         <%--data-toggle="tab"><fmt:message key="ADQL_QUERY_TAB_TITLE"--%>
-                                       <%--bundle="${langBundle}"/></a>--%>
-    <%--</li>--%>
-    <%--<li role="presentation">--%>
-      <%--<a href="#helpTab" aria-controls="helpTab" role="tab"--%>
-         <%--data-toggle="tab"> <fmt:message key="HELP_TAB_TITLE"--%>
-                                       <%--bundle="${langBundle}"/></a>--%>
-    <%--</li>--%>
-  <%--</ul>--%>
+  <h1><fmt:message key="TITLE" bundle="${langBundle}"/></h1>
 
   <ul class="nav nav-tabs" role="tablist">
     <li role="presentation" class="active">
-      <a href="#queryFormTab" aria-controls="queryFormTab" role="tab"
-         data-toggle="tab">CAOM-2</a></li>
+      <a href="#queryFormTab"
+         aria-controls="queryFormTab"
+         role="tab"
+         data-toggle="tab"><fmt:message key="CAOM_QUERY_TAB_TITLE"
+                                           bundle="${langBundle}"/></a>
+    </li>
+    <% if (showObsCoreTab)
+    { %>
     <li role="presentation">
       <a href="#obsCoreQueryFormTab"
-         aria-controls="obsCoreQueryFormTab" role="tab"
-         data-toggle="tab">ObsCore</a></li>
+         aria-controls="obsCoreQueryFormTab"
+         role="tab"
+         data-toggle="tab"><fmt:message key="OBSCORE_QUERY_TAB_TITLE"
+                                                  bundle="${langBundle}"/></a>
+    </li>
+    <% } %>
     <li role="presentation">
-      <a href="#adql" aria-controls="adql" role="tab"
-         data-toggle="tab">ADQL</a></li>
-    <li role="presentation" class="disabled hidden" disabled="disabled">
-      <a href="#resultTableTab" aria-controls="resultTableTab" class="disabled"
-         disabled="disabled"
-         role="tab" data-toggle="tab">Results</a></li>
+      <a href="#resultTableTab" aria-controls="resultTableTab" role="tab"
+         data-toggle="tab"><fmt:message key="RESULTS_TAB_TITLE"
+                                             bundle="${langBundle}"/></a>
+    </li>
+    <li role="presentation">
+      <a href="#errorTableTab" aria-controls="errorTableTab" role="tab"
+         data-toggle="tab"><fmt:message key="ERROR_TAB_TITLE"
+                                            bundle="${langBundle}"/></a>
+    </li>
+    <li role="presentation">
+      <a href="#queryTab" aria-controls="queryTab" role="tab"
+         data-toggle="tab"><fmt:message key="ADQL_QUERY_TAB_TITLE"
+                                       bundle="${langBundle}"/></a>
+    </li>
+    <li role="presentation">
+      <a href="#helpTab" aria-controls="helpTab" role="tab"
+         data-toggle="tab"> <fmt:message key="HELP_TAB_TITLE"
+                                       bundle="${langBundle}"/></a>
+    </li>
   </ul>
+
 
     <%--todo: maxRowLimit needs to be fed in here properly--%>
   <div class="tab-content">
@@ -286,6 +269,7 @@
                   src="js/cadc.search.tooltipcreator.js?version=@version@"></script>
           <script type="text/javascript"
                   src="js/hierarchy.js?version=@version@"></script>
+            <script type="application/javascript" src="js/bootstrap.min.js"></script>
 
           <script type="text/javascript">
             $(document).ready(function ()
@@ -304,16 +288,10 @@
                                                       args.application.start();
                                                     });
 
-//                                searchApp.init();
+                                searchApp.init();
                               });
           </script>
 
-        <%--</div>--%>
-      <%--</div>--%>
-
-      <!-- noindex -->
-    <%--</div>--%>
-  <%--</div>--%>
   <!-- Close off the wb-body -->
 </div>
 

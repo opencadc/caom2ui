@@ -55,7 +55,7 @@
               <span class="font-large">- <fmt:message key="OR_LABEL" bundle="${langBundle}"/> -</span>
             </div>
             <div id="<%= utype %>_targetList_fileInputDiv" class="">
-              <label for="<%= utype %>_targetList" class="wb-invisible">
+              <label for="<%= utype %>_targetList" class="disabled" disabled>
                 <fmt:message key="TARGET_LIST_FORM_LABEL" bundle="${langBundle}" /></label>
                 <div>
                   <input type="file" class="col-sm-11"

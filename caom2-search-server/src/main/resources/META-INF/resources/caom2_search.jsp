@@ -67,7 +67,7 @@
 
         <%--<div class="span-8 margin-top-none margin-bottom-none clarify-message">--%>
         <div class="col-sm-12">
-            <fmt:message key="TOOLTIP_CLARIFICATION_MESSAGE_PREFIX" bundle="${langBundle}" />&nbsp;<span class="wb-icon-question"></span><fmt:message key="TOOLTIP_CLARIFICATION_MESSAGE_SUFFIX" bundle="${langBundle}" />
+            <fmt:message key="TOOLTIP_CLARIFICATION_MESSAGE_PREFIX" bundle="${langBundle}" />&nbsp;<span class=""></span><fmt:message key="TOOLTIP_CLARIFICATION_MESSAGE_SUFFIX" bundle="${langBundle}" />
         </div>
 
         <div class="row">
@@ -90,7 +90,6 @@
                                 url="timestamp.jsp?utype=Plane.dataRelease&tipSide=right"/>
                         <c:import
                                 url="_pulldown.jsp?utype=Observation.intent&tipSide=right"/>
-
                     </div>
                 </div>
             </div>
@@ -164,8 +163,8 @@
                 <p class="resolver-result-time"></p>
             </div>
 
-            <%--<c:import--%>
-                    <%--url="hierarchy.jsp?utype=Plane.energy.emBand/Observation.collection/Observation.instrument.name/Plane.energy.bandpassName/Plane.calibrationLevel/Plane.dataProductType/Observation.type&modelDataSource=caom2"/>--%>
+            <c:import
+                    url="hierarchy.jsp?utype=Plane.energy.emBand/Observation.collection/Observation.instrument.name/Plane.energy.bandpassName/Plane.calibrationLevel/Plane.dataProductType/Observation.type&modelDataSource=caom2"/>
 
             <div class="col-sm-12 button-holder">
                 <button type="submit" class="btn btn-primary submit-query" value="<fmt:message key="SEARCH_BUTTON_LABEL" bundle="${langBundle}" />" >

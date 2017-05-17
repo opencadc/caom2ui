@@ -145,8 +145,8 @@
         <div class="clear"></div>
         </div>
 
-        <%--<c:import--%>
-        <%--url="hierarchy.jsp?utype=DataID.Collection/Provenance.ObsConfig.Facility.name/Provenance.ObsConfig.Instrument.name/ObsDataset.calibLevel/ObsDataset.dataProductType&modelDataSource=obscore"/>--%>
+        <c:import
+        url="hierarchy.jsp?utype=DataID.Collection/Provenance.ObsConfig.Facility.name/Provenance.ObsConfig.Instrument.name/ObsDataset.calibLevel/ObsDataset.dataProductType&modelDataSource=obscore"/>
 
         <%--<div class="equalize margin-top-large margin-bottom-none">--%>
         <%--<div class="span-3 row-start form-inline">--%>
