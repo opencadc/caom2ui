@@ -44,4 +44,4 @@ sourceCompatibility = 1.7
 group = 'org.opencadc'
 version = '1003'
 
-apply from: '../_shared.gradle'
+apply from: '../../../_shared.gradle'
