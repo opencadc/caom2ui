@@ -17,7 +17,7 @@
 %>
 
 
-<div role="tabpanel" class="tab-pane active col-offset" id="queryFormTab">
+<div role="tabpanel" class="tab-pane active" id="queryFormTab">
     <h2>CAOM-2</h2>
     <form id="queryForm" name="queryForm" class=""
           method="post" action="${pageContext.request.contextPath}/find"
@@ -164,8 +164,8 @@
                 <p class="resolver-result-time"></p>
             </div>
 
-            <c:import
-                    url="hierarchy.jsp?utype=Plane.energy.emBand/Observation.collection/Observation.instrument.name/Plane.energy.bandpassName/Plane.calibrationLevel/Plane.dataProductType/Observation.type&modelDataSource=caom2"/>
+            <%--<c:import--%>
+                    <%--url="hierarchy.jsp?utype=Plane.energy.emBand/Observation.collection/Observation.instrument.name/Plane.energy.bandpassName/Plane.calibrationLevel/Plane.dataProductType/Observation.type&modelDataSource=caom2"/>--%>
 
             <div class="col-sm-12 button-holder">
                 <button type="submit" class="btn btn-primary submit-query" value="<fmt:message key="SEARCH_BUTTON_LABEL" bundle="${langBundle}" />" >

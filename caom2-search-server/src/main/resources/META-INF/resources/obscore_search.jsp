@@ -16,9 +16,8 @@
     final String maxRowLimit = request.getParameter("maxRowLimit");
 %>
 
-
-<!-- ObsCore Query Tab -->
-<div role="tabpanel" class="tab-pane active col-offset" id="obsCoreQueryFormTab">
+<div role="tabpanel" class="tab-pane active" id="obsCoreQueryFormTab">
+    <h2>ObsCore From JSP</h2>
     <form id="obscoreQueryForm" name="obscoreQueryForm" class="queryForm"
     method="post" action="${pageContext.request.contextPath}/find"
     enctype="multipart/form-data">
@@ -60,8 +59,6 @@
             </button>
         </div>
 
-
-            <%--<div class="equalize">--%>
         <div class="row">
             <div class="col-md-3 search-category">
                 <div class="panel panel-default">
@@ -144,13 +141,12 @@
                     </div>
                 </div>
             </div>
-        </div>
 
         <div class="clear"></div>
         </div>
 
-        <c:import
-        url="hierarchy.jsp?utype=DataID.Collection/Provenance.ObsConfig.Facility.name/Provenance.ObsConfig.Instrument.name/ObsDataset.calibLevel/ObsDataset.dataProductType&modelDataSource=obscore"/>
+        <%--<c:import--%>
+        <%--url="hierarchy.jsp?utype=DataID.Collection/Provenance.ObsConfig.Facility.name/Provenance.ObsConfig.Instrument.name/ObsDataset.calibLevel/ObsDataset.dataProductType&modelDataSource=obscore"/>--%>
 
         <%--<div class="equalize margin-top-large margin-bottom-none">--%>
         <%--<div class="span-3 row-start form-inline">--%>
