@@ -25,7 +25,7 @@
       <div id="${param.utype}_input_decorate">
         <input id="${param.utype}" name="${param.utype}" value="" size="20"
                type="text"
-               class="search_criteria_input width-100 ui-form-input-validate ui_unitconversion_input" />
+               class="form-control search_criteria_input width-100 ui-form-input-validate ui_unitconversion_input" />
       </div>
     </div>
 

@@ -32,8 +32,7 @@
         <input type="text"
                class="form-control"
                id="<%= utype %>"
-               name="<%= utype %>"
-               placeholder="Text">
+               name="<%= utype %>">
     </div>
 
     <input type="hidden"

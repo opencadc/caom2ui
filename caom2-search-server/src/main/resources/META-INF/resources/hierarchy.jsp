@@ -30,20 +30,21 @@
 %>
 
 <div class="col-sm-12 maintable hierarchy">
-  <div class="hierarchy module background-light">
-    <h2 class="background-accent">
-      <fmt:message key="DATA_ACQUISITION_LABEL" bundle="${langBundle}"/></h2>
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <fmt:message key="DATA_ACQUISITION_LABEL" bundle="${langBundle}"/></div>
+        <div class="panel-body">
+            <div id="${param.modelDataSource}<%= Hierarchy.NAME %>"
+                            class="width-100 align-center margin-bottom-none advanced_search_data_train modelDataSource_${param.modelDataSource}"
+                            data-utypes="<%= uType %>">
+                <span class="wb-invisible hierarchy_utype"><%= uType %></span>
 
-    <div id="${param.modelDataSource}<%= Hierarchy.NAME %>"
-         class="width-100 align-center margin-bottom-none advanced_search_data_train modelDataSource_${param.modelDataSource}"
-         data-utypes="<%= uType %>">
-      <span class="wb-invisible hierarchy_utype"><%= uType %></span>
-
-      <div class="hidden" id="<%= uType + ".building" %>">
-        <span class="wb-icon-busy"></span>
-        <fmt:message key="LOADING_MESSAGE" bundle="${langBundle}"/>
-      </div>
-    </div>
+                <div class="hidden" id="<%= uType + ".building" %>">
+                    <span class="wb-icon-busy"></span>
+                    <fmt:message key="LOADING_MESSAGE" bundle="${langBundle}"/>
+                </div>
+            </div>
+        </div>
     <div class="clear"></div>
   </div>
 </div>

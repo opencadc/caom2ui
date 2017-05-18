@@ -29,7 +29,7 @@
           <input id="<%= utype %>"
                  name="<%= utype %>" value="" size="15"
                  type="text"
-                 class="search_criteria_input width-100 ui-form-input-validate ui_unitconversion_input" />
+                 class="form-control search_criteria_input width-100 ui-form-input-validate ui_unitconversion_input" />
         </div>
       </div>
       <input type="hidden"

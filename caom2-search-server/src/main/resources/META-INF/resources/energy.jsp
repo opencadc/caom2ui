@@ -30,7 +30,7 @@
       <input id="<%= utype %>"
              name="<%= name %>" value="" size="20"
              type="text"
-             class="search_criteria_input width-100 ui-form-input-validate ui_unitconversion_input"/>
+             class="form-control search_criteria_input width-100 ui-form-input-validate ui_unitconversion_input"/>
     </div>
     <input type="hidden"
            name="<%= FormConstraint.FORM_NAME %>"
