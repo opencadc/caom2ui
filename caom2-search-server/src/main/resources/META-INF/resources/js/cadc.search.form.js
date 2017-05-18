@@ -385,19 +385,13 @@
      * Get select value for the given uType.
      *
      * @param {String}  _uType    UType value.
-     * @param {cadc.vot.Field|Field}  _field    VOTV Field instance.
+     * @param {{}}  _field    Column option object.
+     * @param {String} _field.tap_column_name    TAP Column name.
      * @private
      */
     this._getSelect = function (_uType, _field)
     {
-      if (_field.select)
-      {
-        return _field.select;
-      }
-      else
-      {
-        return _uType.slice(_uType.indexOf(":") + 1);
-      }
+      return (_field.tap_column_name) ? _field.tap_column_name : _uType.slice(_uType.indexOf(":") + 1);
     };
 
     /**
@@ -634,9 +628,12 @@
      *
      * @type {ca.nrc.cadc.search.datatrain.DataTrain|DataTrain}
      */
-    this.dataTrain = new ca.nrc.cadc.search.datatrain.DataTrain(this.configuration.getName().toLowerCase(), {
-      tapSyncEndpoint: this.configuration.options.tapSyncEndpoint
-    });
+    this.dataTrain = new ca.nrc.cadc.search.datatrain.DataTrain(this.configuration.getName().toLowerCase(),
+                                                                this.configuration.columnManager,
+                                                                {
+                                                                  tapSyncEndpoint:
+                                                                  this.configuration.options.tapSyncEndpoint
+                                                                });
 
     var VALIDATOR_TIMER_DELAY = 500;
 
@@ -1087,7 +1084,8 @@
                                                                   this._clearTargetNameResolutionTooltip();
 
                                                                   // Was input text cleared before the event arrived?
-                                                                  if ($.trim($("input[id='" + id + "']").val()).length > 0)
+                                                                  if ($.trim($("input[id='" + id + "']").val()).length >
+                                                                      0)
                                                                   {
                                                                     var arg = {
                                                                       "data": data,

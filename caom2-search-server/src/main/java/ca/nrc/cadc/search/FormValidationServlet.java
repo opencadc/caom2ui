@@ -89,8 +89,7 @@ public class FormValidationServlet extends HttpServlet
      * @throws IOException      If IO exception.
      */
     @Override
-    protected void doGet(final HttpServletRequest request,
-                         final HttpServletResponse response)
+    protected void doGet(final HttpServletRequest request, final HttpServletResponse response)
             throws ServletException, IOException
     {
         // Validate the parameters.
@@ -109,17 +108,16 @@ public class FormValidationServlet extends HttpServlet
      *
      * @param parameters Map of parameter names and values.
      * @return FormError containing any validation errors.
-     * @throws ServletException
+     * @throws ServletException     Any Servlet errors to be bubbled up.
      */
-    protected FormErrors getFormErrors(final Map<String, String[]> parameters)
-            throws ServletException
+    protected FormErrors getFormErrors(final Map<String, String[]> parameters) throws ServletException
     {
         // Fields to validate.
-        String[] fields = parameters.get("field");
+        final String[] fields = parameters.get("field");
+
         if (fields == null)
         {
-            throw new IllegalArgumentException(
-                    "Required field parameter not found");
+            throw new IllegalArgumentException("Required field parameter not found");
         }
 
         // Holds any validation errors.
@@ -168,24 +166,15 @@ public class FormValidationServlet extends HttpServlet
      * @param value Form input value.
      * @return A FormConstraint
      */
-    protected FormConstraint getFormConstraint(final String field,
-                                               final String value)
+    FormConstraint getFormConstraint(final String field, final String value)
     {
         final FormConstraint formConstraint;
 
         if (StringUtil.hasText(field))
         {
             // Field might have a @[form name].value appended, strip out.
-            final String utype;
             int index = field.indexOf("@");
-            if (index == -1)
-            {
-                utype = field;
-            }
-            else
-            {
-                utype = field.substring(0, index);
-            }
+            final String utype = (index == -1) ? field : field.substring(0, index);
 
             // Text
             if (ObsModel.isTextUtype(utype))
@@ -196,8 +185,7 @@ public class FormValidationServlet extends HttpServlet
             // Number
             else if (ObsModel.isNumberUtype(utype))
             {
-                formConstraint =
-                        new ca.nrc.cadc.search.form.Number(value, utype);
+                formConstraint = new ca.nrc.cadc.search.form.Number(value, utype);
             }
 
             // Timestamp
@@ -207,12 +195,9 @@ public class FormValidationServlet extends HttpServlet
             }
 
             // Date
-            else if (ObsModel.isMJDUtype(utype) ||
-                     ObsModel.isLocalDateUtype(utype) ||
-                     ObsModel.isTimeUtype(utype))
+            else if (ObsModel.isMJDUtype(utype) || ObsModel.isLocalDateUtype(utype) || ObsModel.isTimeUtype(utype))
             {
-                formConstraint = new ca.nrc.cadc.search.form.Date(value, utype,
-                                                                  null);
+                formConstraint = new ca.nrc.cadc.search.form.Date(value, utype, null);
             }
 
             // Energy
@@ -240,9 +225,7 @@ public class FormValidationServlet extends HttpServlet
      * @param writer     Response Writer.
      * @throws IOException if unable to write JSON.
      */
-    protected void writeFormErrors(final FormErrors formErrors,
-                                   final Writer writer)
-            throws IOException
+    void writeFormErrors(final FormErrors formErrors, final Writer writer) throws IOException
     {
         final JSONWriter jsonWriter = new JSONWriter(writer);
         try

@@ -40,7 +40,6 @@ import ca.nrc.cadc.caom2.NumericSearch;
 import ca.nrc.cadc.caom2.SearchTemplate;
 import ca.nrc.cadc.caom2.SpatialSearch;
 import ca.nrc.cadc.caom2.TextSearch;
-import ca.nrc.cadc.search.form.Enumerated;
 import ca.nrc.cadc.search.form.SearchableFormConstraint;
 import ca.nrc.cadc.search.form.Shape1;
 import ca.nrc.cadc.uws.Job;

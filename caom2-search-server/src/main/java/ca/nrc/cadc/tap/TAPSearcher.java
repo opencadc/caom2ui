@@ -82,11 +82,8 @@ public class TAPSearcher implements Searcher
     private static final Logger LOGGER =
             Logger.getLogger(TAPSearcher.class);
 
-    private static final String CAOM2_RESOLVER_VALUE_KEY =
-            "Plane.position.bounds@Shape1Resolver.value";
-    private static final String CAOM2_TARGET_NAME_VALUE_KEY =
-            "Plane.position.bounds@Shape1.value";
-
+    private static final String CAOM2_RESOLVER_VALUE_KEY = "Plane.position.bounds@Shape1Resolver.value";
+    private static final String CAOM2_TARGET_NAME_VALUE_KEY = "Plane.position.bounds@Shape1.value";
     private static final String CAOM2_RESOLVER_VALUE_NONE = "NONE";
 
     private final SyncResponseWriter syncResponseWriter;
@@ -97,13 +94,12 @@ public class TAPSearcher implements Searcher
 
     /**
      * Full constructor.
+     *
      * @param writer         The Sync writer to write out results to.
      * @param jobUpdater     The UWS Job Updater.
      * @param queryGenerator The generator to use to handle queries
      */
-    public TAPSearcher(final SyncResponseWriter writer,
-                       final JobUpdater jobUpdater,
-                       final SyncTAPClient tapClient,
+    public TAPSearcher(final SyncResponseWriter writer, final JobUpdater jobUpdater, final SyncTAPClient tapClient,
                        final QueryGenerator queryGenerator)
             throws PositionParserException
     {
@@ -116,14 +112,13 @@ public class TAPSearcher implements Searcher
     /**
      * Determine whether the passed in resolver is set.
      *
-     * @param resolverName      The resolver name pulled from the job
-     *                          parameters.
-     * @return                  True if set, false otherwise.
+     * @param resolverName The resolver name pulled from the job
+     *                     parameters.
+     * @return True if set, false otherwise.
      */
     private boolean hasSetValidResolver(final String resolverName)
     {
-        return StringUtil.hasText(resolverName)
-               && !resolverName.equals(CAOM2_RESOLVER_VALUE_NONE);
+        return StringUtil.hasText(resolverName) && !resolverName.equals(CAOM2_RESOLVER_VALUE_NONE);
     }
 
 
@@ -137,20 +132,17 @@ public class TAPSearcher implements Searcher
      * @throws Exception Any unforeseen errors.
      */
     @Override
-    public void search(final Job job, final URI serviceURI,
-                       final SyncResponseWriter syncResponseWriter)
+    public void search(final Job job, final URI serviceURI, final SyncResponseWriter syncResponseWriter)
             throws Exception
     {
         // Validate search form.
         final FormData formData = new FormData(job);
         final FormErrors formError = new FormErrors();
-        final JSONWriter jsonWriter =
-                new JSONWriter(syncResponseWriter.getWriter());
+        final JSONWriter jsonWriter = new JSONWriter(syncResponseWriter.getWriter());
 
         try
         {
-            syncResponseWriter.setResponseHeader("Content-Type",
-                                                 "application/json");
+            syncResponseWriter.setResponseHeader("Content-Type", "application/json");
 
             jsonWriter.object();
 
@@ -158,8 +150,7 @@ public class TAPSearcher implements Searcher
             if (!formData.isValid(formError))
             {
                 handleError(job, formError.toString(), ErrorType.FATAL);
-                jsonWriter.key("errorMessage").value(
-                        job.getErrorSummary().getSummaryMessage());
+                jsonWriter.key("errorMessage").value(job.getErrorSummary().getSummaryMessage());
             }
             else
             {
@@ -188,20 +179,17 @@ public class TAPSearcher implements Searcher
     /**
      * Execute the TAP search and write out the JSON results.
      *
-     * @param serviceURI    The TAP Service URI.
+     * @param serviceURI The TAP Service URI.
      * @param jsonWriter The Writer for the JSON results.
      * @param formData   The FormData object.
-
      * @throws IOException   Any I/O weirdness.
      * @throws JSONException Any weirdness writing out JSON.
      */
-    void runSearch(final URI serviceURI, final JSONWriter jsonWriter,
-                   final Job job, final FormData formData)
+    void runSearch(final URI serviceURI, final JSONWriter jsonWriter, final Job job, final FormData formData)
             throws IOException, JSONException
     {
         // Generate the ADQL query string.
-        final Templates templates =
-                new Templates(formData.getFormConstraints());
+        final Templates templates = new Templates(formData.getFormConstraints());
         final FormErrors formError = new FormErrors();
 
         if (!templates.isValid(formError))
@@ -223,7 +211,7 @@ public class TAPSearcher implements Searcher
             jsonWriter.key("results_url").value(tapResultsURL.toExternalForm());
             jsonWriter.key("job_url").value(
                     new URL(resultsURLValue.substring(0,
-                                              resultsURLValue.indexOf("/run")))
+                                                      resultsURLValue.indexOf("/run")))
                             .toExternalForm());
             jsonWriter.key("run_id").value(job.getID());
 
@@ -398,10 +386,8 @@ public class TAPSearcher implements Searcher
         tapJobParams.add(new Parameter("FORMAT", format));
         tapJobParams.add(new Parameter("QUERY", query));
         tapJobParams.add(new Parameter("REQUEST", "doQuery"));
-        tapJobParams.add(new Parameter("MAXREC",
-                                       StringUtil.hasText(maxRecords)
-                                       ? maxRecords
-                                       : DEFAULT_MAXREC.toString()));
+        tapJobParams.add(new Parameter("MAXREC", StringUtil.hasText(maxRecords)
+                                                 ? maxRecords : DEFAULT_MAXREC.toString()));
 
         if (StringUtil.hasText(uploadParameterValue))
         {
@@ -416,14 +402,12 @@ public class TAPSearcher implements Searcher
     /**
      * Issue a TAP query.
      *
-     * @param serviceURI    The TAP Service URI.
-     * @param tapJob        The TAP job to execute.
-     * @param outputStream  The stream to write out results to.
-     * @throws IOException  Any writing errors.
+     * @param serviceURI   The TAP Service URI.
+     * @param tapJob       The TAP job to execute.
+     * @param outputStream The stream to write out results to.
+     * @throws IOException Any writing errors.
      */
-    void queryTAP(final URI serviceURI, final Job tapJob,
-                  final OutputStream outputStream)
-            throws IOException
+    void queryTAP(final URI serviceURI, final Job tapJob, final OutputStream outputStream) throws IOException
     {
         final Subject ownerSubject = tapJob.ownerSubject;
 
@@ -519,8 +503,9 @@ public class TAPSearcher implements Searcher
 
     /**
      * Obtain a cutout from the query parameters.
-     * @param templates     The Search templates to obtain values from.
-     * @return              Cutout instance.
+     *
+     * @param templates The Search templates to obtain values from.
+     * @return Cutout instance.
      */
     private Cutout getCutout(final Job job, final Templates templates)
     {

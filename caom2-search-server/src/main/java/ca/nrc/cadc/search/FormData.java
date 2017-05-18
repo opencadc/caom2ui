@@ -46,6 +46,7 @@ import java.util.*;
 
 import org.apache.log4j.Logger;
 
+
 /**
  * Class checks the request parameter names for potential forms, and
  * if found instantiates the form class and add it to a list of forms.
@@ -58,39 +59,35 @@ public class FormData
 {
     private static Logger log = Logger.getLogger(FormData.class);
 
-    private static final String ENERGY_FREQ_WIDTH_UTYPE =
-            "Plane.energy.freqWidth";
-    private static final String ENERGY_FREQ_SAMPLE_SIZE_UTYPE =
-            "Plane.energy.freqSampleSize";
-    private static final Map<String, String> ENERGY_FREQ_UTYPES =
-            new HashMap<>();
+    private static final String ENERGY_FREQ_WIDTH_UTYPE = "Plane.energy.freqWidth";
+    private static final String ENERGY_FREQ_SAMPLE_SIZE_UTYPE = "Plane.energy.freqSampleSize";
+    private static final Map<String, String> ENERGY_FREQ_UTYPES = new HashMap<>();
+
     private final ParameterUtil parameterUtil = new ParameterUtil();
 
 
     static
     {
-        ENERGY_FREQ_UTYPES.put("Plane.energy.bounds.width",
-                               ENERGY_FREQ_WIDTH_UTYPE);
-        ENERGY_FREQ_UTYPES.put("Plane.energy.sampleSize",
-                               ENERGY_FREQ_SAMPLE_SIZE_UTYPE);
+        ENERGY_FREQ_UTYPES.put("Plane.energy.bounds.width", ENERGY_FREQ_WIDTH_UTYPE);
+        ENERGY_FREQ_UTYPES.put("Plane.energy.sampleSize", ENERGY_FREQ_SAMPLE_SIZE_UTYPE);
         ENERGY_FREQ_UTYPES.put("Plane.energy.restwav", "Plane.energy.restwav");
     }
 
     private static final String FORM_PACKAGE_NAME = "ca.nrc.cadc.search.form.";
 
     // List of forms from the Job.
-    private List<FormConstraint> formConstraints;
+    private final List<FormConstraint> formConstraints = new ArrayList<>();
 
     /**
      * List of form validation errors.
      */
-    private List<FormError> errorList;
+    private final List<FormError> errorList = new ArrayList<>();
 
 
     /**
      * Map of non-default form field utypes and units.
      */
-    private Map<String, String> formValueUnits;
+    private final Map<String, String> formValueUnits = new HashMap<>();
 
 
     /**
@@ -118,9 +115,7 @@ public class FormData
         logParameters(job);
 
         // Gather all form name parameters
-        final List<String> formNames =
-                parameterUtil.getValues(FormConstraint.FORM_NAME,
-                                        job.getParameterList());
+        final List<String> formNames = parameterUtil.getValues(FormConstraint.FORM_NAME, job.getParameterList());
         if (formNames != null)
         {
             // Process the form id's.
@@ -136,24 +131,23 @@ public class FormData
                 else
                 {
                     final String component = FORM_PACKAGE_NAME + names[1];
-                    final String utype = names[0];
+                    final String uType = names[0];
 
                     // Ignore the cutouts.
-                    if (!utype.endsWith("DOWNLOADCUTOUT"))
+                    if (!uType.endsWith("DOWNLOADCUTOUT"))
                     {
-                        log.debug("init: utype " + utype + ", component "
-                                  + component);
+                        log.debug("init: utype " + uType + ", component " + component);
 
                         try
                         {
-                            final Class componentClass =
-                                    Class.forName(component);
-                            addFormConstraints(componentClass, job, utype);
+                            @SuppressWarnings("unchecked")
+                            final Class<? extends SearchableFormConstraint> componentClass =
+                                    (Class<? extends SearchableFormConstraint>) Class.forName(component);
+                            addFormConstraints(componentClass, job, uType);
                         }
                         catch (ClassNotFoundException e)
                         {
-                            log.error("Class not found for component "
-                                      + component);
+                            log.error("Class not found for component " + component);
                         }
                     }
                 }
@@ -166,35 +160,30 @@ public class FormData
      *
      * @param componentClass The class to create for.
      * @param job            The job to use.
-     * @param utype          The utype.
+     * @param uType          The uType.
      */
-    private void addFormConstraints(final Class componentClass,
-                                    final Job job, final String utype)
+    private void addFormConstraints(final Class<? extends SearchableFormConstraint> componentClass, final Job job,
+                                    final String uType)
     {
         if (componentClass == Enumerated.class)
         {
-            addEnumeratedFormConstraints(job, utype);
+            addEnumeratedFormConstraints(job, uType);
         }
         else if (componentClass == Select.class)
         {
-            addSelectFormConstraints(job, utype);
+            addSelectFormConstraints(job, uType);
         }
         else
         {
             // Create a default form constraint.
             try
             {
-                @SuppressWarnings("unchecked")
-                final Constructor constructor =
-                        componentClass.getDeclaredConstructor(Job.class,
-                                                              String.class);
+                final Constructor constructor = componentClass.getDeclaredConstructor(Job.class, String.class);
                 final SearchableFormConstraint formConstraint =
-                        (SearchableFormConstraint) constructor.newInstance(job,
-                                                                           utype);
+                        (SearchableFormConstraint) constructor.newInstance(job, uType);
 
                 // Story 888 - Special case for Number frequency unit.
-                if (ObsModel.isEnergyUtype(utype)
-                    && (componentClass == Number.class))
+                if (ObsModel.isEnergyUtype(uType) && (componentClass == Number.class))
                 {
                     addFrequencyConstraints((Number) formConstraint);
                 }
@@ -207,28 +196,24 @@ public class FormData
             }
             catch (Exception e)
             {
-                throw new RuntimeException("Error instantiating class "
-                                           + componentClass.getName(), e);
+                throw new RuntimeException("Error instantiating class " + componentClass.getName(), e);
             }
         }
     }
 
     /**
      * Story 888.  Handle special frequency searches.
-     *
+     * <p>
      * TODO - This method is ridiculously ugly.  Will try to improve.
      * TODO - jenkinsd 2012.01.27
      *
      * @param numberEnergyConstraint The FormConstraint object.
      * @throws NumericParserException If the input cannot be parsed.
      */
-    void addFrequencyConstraints(final Number numberEnergyConstraint)
-            throws NumericParserException
+    void addFrequencyConstraints(final Number numberEnergyConstraint) throws NumericParserException
     {
-        final String lowerValue =
-                numberEnergyConstraint.getLowerValue();
-        final String upperValue =
-                numberEnergyConstraint.getUpperValue();
+        final String lowerValue = numberEnergyConstraint.getLowerValue();
+        final String upperValue = numberEnergyConstraint.getUpperValue();
 
         if (numberEnergyConstraint.getOperand() == Operand.RANGE)
         {
@@ -268,55 +253,43 @@ public class FormData
 
             // Lower unit is frequency, upper unit is not.
             if ((ArrayUtil.matches("^" + lowerUnit + "$",
-                                   EnergyValidator.FREQUENCY_UNITS,
-                                   true) >= 0)
+                                   EnergyValidator.FREQUENCY_UNITS, true) >= 0)
                 && (ArrayUtil.matches("^" + upperUnit + "$",
-                                      EnergyValidator.FREQUENCY_UNITS,
-                                      true) < 0))
+                                      EnergyValidator.FREQUENCY_UNITS, true) < 0))
             {
                 addFormConstraint(
                         new Number(">= " + lowerValue,
-                                   ENERGY_FREQ_UTYPES.get(
-                                           numberEnergyConstraint.getUType())));
+                                   ENERGY_FREQ_UTYPES.get(numberEnergyConstraint.getUType())));
                 addFormConstraint(
                         new Number("<= " + upperValue
-                                   + (!StringUtil.hasLength(upperUnit) ? "Hz"
-                                                                       : ""),
+                                   + (!StringUtil.hasLength(upperUnit) ? "Hz" : ""),
                                    (!StringUtil.hasLength(upperUnit)
-                                    ? ENERGY_FREQ_UTYPES.get(
-                                           numberEnergyConstraint.getUType())
+                                    ? ENERGY_FREQ_UTYPES.get(numberEnergyConstraint.getUType())
                                     : numberEnergyConstraint.getUType())));
             }
             // Upper unit is frequency, lower is not.
             else if ((ArrayUtil.matches("^" + lowerUnit + "$",
-                                        EnergyValidator.FREQUENCY_UNITS,
-                                        true) < 0)
+                                        EnergyValidator.FREQUENCY_UNITS, true) < 0)
                      && (ArrayUtil.matches("^" + upperUnit + "$",
-                                           EnergyValidator.FREQUENCY_UNITS,
-                                           true) >= 0))
+                                           EnergyValidator.FREQUENCY_UNITS, true) >= 0))
             {
                 addFormConstraint(
                         new Number(">= " + lowerValue
-                                   + (!StringUtil.hasLength(lowerUnit) ? "Hz"
-                                                                       : ""),
+                                   + (!StringUtil.hasLength(lowerUnit) ? "Hz" : ""),
                                    (!StringUtil.hasLength(lowerUnit)
-                                    ? ENERGY_FREQ_UTYPES.get(
-                                           numberEnergyConstraint.getUType())
+                                    ? ENERGY_FREQ_UTYPES.get(numberEnergyConstraint.getUType())
                                     : numberEnergyConstraint.getUType())));
                 addFormConstraint(
                         new Number("<= " + upperValue,
-                                   ENERGY_FREQ_UTYPES.get(
-                                           numberEnergyConstraint.getUType())));
+                                   ENERGY_FREQ_UTYPES.get(numberEnergyConstraint.getUType())));
             }
             // Both items are of frequency unit.
             else if (ArrayUtil.matches("^" + lowerUnit + "$",
-                                       EnergyValidator.FREQUENCY_UNITS,
-                                       true) >= 0)
+                                       EnergyValidator.FREQUENCY_UNITS, true) >= 0)
             {
                 addFormConstraint(
                         new Number(numberEnergyConstraint.getFormValue(),
-                                   ENERGY_FREQ_UTYPES.get(
-                                           numberEnergyConstraint.getUType())));
+                                   ENERGY_FREQ_UTYPES.get(numberEnergyConstraint.getUType())));
             }
             else
             {
@@ -330,15 +303,11 @@ public class FormData
             final NumberParser lowerParser = new NumberParser(lowerValue);
             if (StringUtil.hasLength(lowerParser.getUnit())
                 && (ArrayUtil.matches("^" + lowerParser.getUnit() + "$",
-                                      EnergyValidator.FREQUENCY_UNITS, true)
-                    >= 0))
+                                      EnergyValidator.FREQUENCY_UNITS, true) >= 0))
             {
                 addFormConstraint(
-                        new Number(numberEnergyConstraint.getOperand()
-                                           .getOperand()
-                                   + " " + lowerValue,
-                                   ENERGY_FREQ_UTYPES.get(
-                                           numberEnergyConstraint.getUType())));
+                        new Number(numberEnergyConstraint.getOperand().getOperand() + " " + lowerValue,
+                                   ENERGY_FREQ_UTYPES.get(numberEnergyConstraint.getUType())));
             }
             else
             {
@@ -352,15 +321,11 @@ public class FormData
             final NumberParser upperParser = new NumberParser(upperValue);
             if (StringUtil.hasLength(upperParser.getUnit())
                 && (ArrayUtil.matches("^" + upperParser.getUnit() + "$",
-                                      EnergyValidator.FREQUENCY_UNITS, true)
-                    >= 0))
+                                      EnergyValidator.FREQUENCY_UNITS, true) >= 0))
             {
                 addFormConstraint(
-                        new Number(numberEnergyConstraint.getOperand()
-                                           .getOperand()
-                                   + " " + upperValue,
-                                   ENERGY_FREQ_UTYPES.get(
-                                           numberEnergyConstraint.getUType())));
+                        new Number(numberEnergyConstraint.getOperand().getOperand() + " " + upperValue,
+                                   ENERGY_FREQ_UTYPES.get(numberEnergyConstraint.getUType())));
             }
             else
             {
@@ -375,12 +340,9 @@ public class FormData
             final NumberParser valueParser = new NumberParser(value);
             if (StringUtil.hasLength(valueParser.getUnit())
                 && (ArrayUtil.matches("^" + valueParser.getUnit() + "$",
-                                      EnergyValidator.FREQUENCY_UNITS, true)
-                    >= 0))
+                                      EnergyValidator.FREQUENCY_UNITS, true) >= 0))
             {
-                addFormConstraint(
-                        new Number(value, ENERGY_FREQ_UTYPES.get(
-                                numberEnergyConstraint.getUType())));
+                addFormConstraint(new Number(value, ENERGY_FREQ_UTYPES.get(numberEnergyConstraint.getUType())));
             }
             else
             {
@@ -399,29 +361,23 @@ public class FormData
     void addEnumeratedFormConstraints(final Job job, final String utype)
     {
         final List<Parameter> parameterList = job.getParameterList();
+        final String[] values = parameterUtil.getValuesAsArray(utype, parameterList);
 
-        final String[] values =
-                parameterUtil.getValuesAsArray(utype, parameterList);
-        if (!ArrayUtil.isEmpty(values) &&
-            !(values.length == 1 && values[0].trim().isEmpty()))
+        if (!ArrayUtil.isEmpty(values) && !(values.length == 1 && values[0].trim().isEmpty()))
         {
             log.debug("Enumerated[" + utype + "]");
             try
             {
                 final Constructor constructor =
-                        Enumerated.class.getDeclaredConstructor(
-                                Job.class, String.class,
-                                String[].class, boolean.class);
+                        Enumerated.class.getDeclaredConstructor(Job.class, String.class, String[].class, boolean.class);
                 final FormConstraint formConstraint =
-                        (FormConstraint) constructor.newInstance(
-                                job, utype, values, false);
+                        (FormConstraint) constructor.newInstance(job, utype, values, false);
                 addFormConstraint(formConstraint);
                 log.debug("add " + formConstraint.toString());
             }
             catch (Exception e)
             {
-                throw new RuntimeException(
-                        "Error instantiating class Enumerated", e);
+                throw new RuntimeException("Error instantiating class Enumerated", e);
             }
         }
     }
@@ -434,31 +390,22 @@ public class FormData
      */
     private void addSelectFormConstraints(final Job job, final String utype)
     {
-        final String[] values =
-                parameterUtil.getValuesAsArray(utype + "@" + Select.NAME,
-                                               job.getParameterList());
+        final String[] values = parameterUtil.getValuesAsArray(utype + "@" + Select.NAME, job.getParameterList());
 
-        if (!ArrayUtil.isEmpty(values)
-            && !((values.length == 1) && (values[0].trim().length() == 0)))
+        if (!ArrayUtil.isEmpty(values) && !((values.length == 1) && (values[0].trim().length() == 0)))
         {
             try
             {
                 final Constructor constructor =
-                        Select.class.getDeclaredConstructor(Job.class,
-                                                            String.class,
-                                                            String[].class,
-                                                            boolean.class);
+                        Select.class.getDeclaredConstructor(Job.class, String.class, String[].class, boolean.class);
                 final FormConstraint formConstraint =
-                        (FormConstraint) constructor.newInstance(job, utype,
-                                                                 values,
-                                                                 false);
+                        (FormConstraint) constructor.newInstance(job, utype, values, false);
                 addFormConstraint(formConstraint);
                 log.debug("add " + formConstraint.toString());
             }
             catch (Exception e)
             {
-                throw new RuntimeException(
-                        "Error instantiating class Select", e);
+                throw new RuntimeException("Error instantiating class Select", e);
             }
         }
     }
@@ -479,17 +426,14 @@ public class FormData
             {
                 if (formConstraint.getFormValueUnit() != null)
                 {
-                    getFormValueUnits().put(
-                            formConstraint.getUType(),
-                            formConstraint.getFormValueUnit());
+                    getFormValueUnits().put(formConstraint.getUType(), formConstraint.getFormValueUnit());
                 }
 
                 log.debug("valid form " + formConstraint.toString());
             }
             else
             {
-                log.debug("invalid form " + formConstraint.toString()
-                          + getErrors(formConstraint.getErrorList()));
+                log.debug("invalid form " + formConstraint.toString() + getErrors(formConstraint.getErrorList()));
                 getErrorList().addAll(formConstraint.getErrorList());
             }
         }
@@ -509,38 +453,23 @@ public class FormData
 
     Collection<FormConstraint> getAllFormConstraints()
     {
-        if (formConstraints == null)
-        {
-            formConstraints = new ArrayList<>();
-        }
-
         return formConstraints;
     }
 
     public Map<String, String> getFormValueUnits()
     {
-        if (formValueUnits == null)
-        {
-            formValueUnits = new HashMap<>();
-        }
-
         return formValueUnits;
     }
 
     public List<FormError> getErrorList()
     {
-        if (errorList == null)
-        {
-            errorList = new ArrayList<>();
-        }
-
         return errorList;
     }
 
     /**
      * Creates a List of all the forms with data that can
      * be used to generate the search templates.
-     *
+     * <p>
      * TODO - This is really weird.  We iterate over FormConstraint instances,
      * TODO - but assume that they are all SearchableFormConstraint instances.
      * TODO -
@@ -592,8 +521,7 @@ public class FormData
     {
         for (final Parameter parameter : job.getParameterList())
         {
-            log.debug("job " + parameter.getName() + " = "
-                      + parameter.getValue());
+            log.debug("job " + parameter.getName() + " = " + parameter.getValue());
         }
     }
 
