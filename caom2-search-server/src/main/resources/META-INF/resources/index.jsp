@@ -13,7 +13,7 @@
   final String requestHeaderLang = (contentLanguage == null)
                                    ? "en" : contentLanguage;
 
-  final String downloadLink = "/downloadManager/download";
+//  final String downloadLink = "/downloadManager/download";
 
   final int maxRowLimit =
       configuration.lookupInt("org.opencadc.search.max-row-count",
