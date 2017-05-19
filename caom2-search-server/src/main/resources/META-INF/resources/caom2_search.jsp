@@ -3,7 +3,7 @@
 
 <%@ page import="ca.nrc.cadc.search.form.Enumerated" %>
 <%@ page import="ca.nrc.cadc.search.form.FormConstraint" %>
-<%@ page import="ca.nrc.cadc.search.form.Hierarchy" %>
+<%--<%@ page import="ca.nrc.cadc.search.form.Hierarchy" %>--%>
 
 <jsp:useBean id="job" scope="request" class="ca.nrc.cadc.uws.Job"/>
 <jsp:useBean id="errors" scope="request"
