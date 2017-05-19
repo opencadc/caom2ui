@@ -23,15 +23,12 @@ script:
 - docker-compose up -d
 - docker ps -a
 - cd ../default
-- gradle -i -PintTest_selenium_server_url=http://localhost:4444 -PintTest_web_app_url=http://proxy.cadc.dao.nrc.ca -PintTest_web_app_endpoint=/search/ intTestFirefox
+- gradle -i -PintTest_selenium_server_url=http://localhost:4444 -PintTest_web_app_url=http://proxy.cadc.dao.nrc.ca
+  -PintTest_web_app_endpoint=/search/ intTestFirefox
 after_success:
-- if [ "$(. ./can-deploy.sh)" = "DEPLOY" ]; then
-    docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
-    docker push opencadc/archive-search;
-  fi
-- if [ "$(. ./can-deploy.sh)" != "DEPLOY" ]; then
-      echo "Not deploying.";
-  fi
+- if [ "$(. ./can-deploy.sh)" = "DEPLOY" ]; then docker login -u="$DOCKER_USERNAME"
+  -p="$DOCKER_PASSWORD"; docker push opencadc/archive-search; fi
+- if [ "$(. ./can-deploy.sh)" != "DEPLOY" ]; then echo "Not deploying."; fi
 notifications:
   slack:
-    secure: FMzP6Yk5MNDz1dvR9YvAaQmdPM5ul7AEpzu8wpBrr2N2Qm6Yeok217WelMzRu4Zak7Pr65oCEMvpAE9TiWRNzuZvMsIB/h2TU+JlLtjAJx1hhX4ME5YaLgIOhaBNyNG64gTr9TTLYuTP0S/Zuy952hmL4hS1OBFSjU7E0xJH156NISb10tQfcoi/axWxSQSBfKnAiSt6KmNMbSwU+RTyRcq+665lIeW4Pj2QJaRDi7LcPUQZbV1iDKJ0mEjYxCS+Gvz+Su0jBHL+GTv1KvKh54I4cHTL1QpQADWkHcAFbPB+XX0jxid2GIJUtHj2j8bIRjAofILJDxh6tcuBARU0aCgRzHB5g3b4t4Y30bMZCkL6+eGg9uUNWGJUIno50AwsCoPLXFkEAdeGvxuVMXtCGylNDXf+KSeh7+1ZHzWEAqcOZYo6GEZbDceeRiM7DhflI7yX4lRHVI6SfaZ5cV1S6Q9iBS2yJbFdLLp63Y5NWtLTVS6FEZKt7qQZCNaM0mkljv7kpPiQZ6mqS+iqvdZBieFQ4C47goP/CrxXR5yYi1kNpg2AZAP08rhbFVAALC4GMAtyflwhuVhlCbaxS9uZOc9i8bHmnTr2NEIUHcUbezNhx/fDszv2BIrjh1hLMfnSfe+uf/5xmUsfPvHUL5IjGauPPJRGFMQGyjtl/6YsXg0=
+    secure: cZECco78mN3ZdEmLRSjH26KShRQV0awRRFp77HzFCttlcNPCPDn0o4vI0nW7Jqi5qBvPTYmaYLjcJah9+nvaJQnKnYZTNy0b4q9dch8h5456kiN4Tsi98yxxp5IMGgXoxHEBGiYvBnnqiL3RmoCH6Z2FifekO/36HyyMFSn5cwF/2lvyJp7lxq+sRQHcp4BjcPrR19nd54AIvoEtxfnjsIo6WIuQkBXuUaHOD+0qpR8nbT2cR5bP/h+Fq9tJH+/2HuLiGNzOH6rkMBCyqD57OTTffvgsfiw+TUcqhCKwDa3MbZG4SZfM8m6J8tjusC1YtuxHkSS+dcgxBLWwFx//y9gFHGuFExzW5AZTYlWf91kSD6TqtElN8FFvhIYGJ3j1XKDL3TgYbliTU/3cCVIeiCbZA/Hh/t5o6L/XZmQOiMbSCJGGHiyyg/nmltdLaxzOnHZr0sR4UeywQCMXQrK3U3X1qA3DeXTOzi6WoDHlKkqek8MsThLsCgGw39+tfVPYW0Jns+rnMtLeZSQ8maeJGrGAxi8b8UXHULIiuPljOZIYhyC4K32pqe60R0LnMuwURXGv3eozcrq9bixKd7IbqPSQc3+mrcTeVMuDiJ/P57KcbWRozES99Y7vhXkfVZ9cTjZXo4aexkvLEdVYUBulwOXXINRTKICzM1EPS9i3+Lk=
