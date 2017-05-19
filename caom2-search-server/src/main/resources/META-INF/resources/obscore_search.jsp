@@ -17,7 +17,7 @@
 %>
 
 <div role="tabpanel" class="tab-pane active" id="obsCoreQueryFormTab">
-    <h2>ObsCore From JSP</h2>
+    <h2>ObsCore</h2>
     <form id="obscoreQueryForm" name="obscoreQueryForm" class="queryForm"
     method="post" action="${pageContext.request.contextPath}/find"
     enctype="multipart/form-data">

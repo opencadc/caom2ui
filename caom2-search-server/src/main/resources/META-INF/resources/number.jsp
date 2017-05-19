@@ -14,7 +14,7 @@
   final String detailsID = utype + "_details";
 %>
 
-<div data-toggle="tooltip" data-placement="<%= tipSide %>" title="<%= utype %>">
+<div data-toggle="tooltip" data-placement="<%= tipSide %>" title="<fmt:message key="<%= labelKey %>" bundle="${langBundle}"/>">
   <div class="form-group">
     <%--<details id="<%= detailsID %>">--%>
       <%--<summary class="search_criteria_label_container">--%>
@@ -29,7 +29,7 @@
           <input id="<%= utype %>"
                  name="<%= utype %>" value="" size="15"
                  type="text"
-                 class="search_criteria_input width-100 ui-form-input-validate ui_unitconversion_input" />
+                 class="form-control search_criteria_input width-100 ui-form-input-validate ui_unitconversion_input" />
         </div>
       </div>
       <input type="hidden"

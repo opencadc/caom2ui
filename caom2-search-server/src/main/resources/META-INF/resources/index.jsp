@@ -20,7 +20,7 @@
                               defaultMaxRowLimit);
   final boolean showObsCoreTab =
       configuration.lookupBoolean("org.opencadc.search.obs-core", true);
-  final String tapSyncEndpoint = configuration.lookup("org.opencadc.search.tap-service-endpoint", "/tap/sync");
+  final String tapSyncEndpoint = configuration.lookup("org.opencadc.search.tap-service-endpoint", "/search/tap/sync");
 %>
 
 <%-- Request scope variables so they can be seen in the imported JSPs --%>
@@ -31,7 +31,6 @@
 
 <body>
 
-<!-- Always include wb-body at the top, even though it's not ended until the footer. -->
 <div class="container-fluid">
 
 <%--<div id="wb-skip">--%>
@@ -52,7 +51,7 @@
 
   <h1><fmt:message key="TITLE" bundle="${langBundle}"/></h1>
 
-  <ul class="nav nav-tabs" role="tablist">
+  <ul id="tabList" class="nav nav-tabs" role="tablist">
     <li role="presentation" class="active">
       <a href="#queryFormTab"
          aria-controls="queryFormTab"
@@ -186,6 +185,7 @@
               });
           </script>
 
+            <script type="application/javascript" src="js/bootstrap.min.js"></script>
           <script type="text/javascript"
                   src="cadcVOTV/javascript/jquery.event.drag-2.2.min.js?version=@version@"></script>
           <script type="text/javascript"
@@ -269,7 +269,7 @@
                   src="js/cadc.search.tooltipcreator.js?version=@version@"></script>
           <script type="text/javascript"
                   src="js/hierarchy.js?version=@version@"></script>
-            <script type="application/javascript" src="js/bootstrap.min.js"></script>
+
 
           <script type="text/javascript">
             $(document).ready(function ()

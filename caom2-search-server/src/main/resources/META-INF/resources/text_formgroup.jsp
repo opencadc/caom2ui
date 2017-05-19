@@ -23,22 +23,22 @@
     final String detailsID = utype + "_details";
 %>
 
+<div data-toggle="tooltip" data-placement="<%= tipSide %>" title="<fmt:message key="<%= labelKey %>" bundle="${langBundle}"/>">
+    <div class="form-group">
+        <label for="<%= utype %>" class="control-label">
+            <fmt:message key="<%= labelKey %>" bundle="${langBundle}"/>
+        </label>
+        <div class="">
+            <input type="text"
+                   class="form-control"
+                   id="<%= utype %>"
+                   name="<%= utype %>">
+        </div>
 
-<div class="form-group">
-    <label for="<%= utype %>" class="control-label">
-        <fmt:message key="<%= labelKey %>" bundle="${langBundle}"/>
-    </label>
-    <div class="">
-        <input type="text"
-               class="form-control"
-               id="<%= utype %>"
-               name="<%= utype %>"
-               placeholder="Text">
+        <input type="hidden"
+               name="<%= FormConstraint.FORM_NAME %>"
+               value="<%= formName %>"/>
     </div>
-
-    <input type="hidden"
-           name="<%= FormConstraint.FORM_NAME %>"
-           value="<%= formName %>"/>
 </div>
 
 <%--<li class="label_tooltip_<%= tipSide %>">--%>
