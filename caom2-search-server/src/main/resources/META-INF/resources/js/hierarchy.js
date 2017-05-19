@@ -333,7 +333,7 @@
         // Create either hidden or select input.
         var select;
         var containerElement = document.createElement("div");
-        containerElement.className = "align-left advanced_search_hierarchy_select_div";
+        containerElement.className = "text-left col-md-1";
 
         if (i === 0)
         {
@@ -368,7 +368,7 @@
     {
       // Remove temporary div.
       var building = document.getElementById(this.uType + ".building");
-      building.className = (building.className.indexOf("wb-invisible") >= 0) ? "" : "wb-invisible";
+      building.className = (building.className.indexOf("invisible") >= 0) ? "" : "invisible";
     };
 
     /**

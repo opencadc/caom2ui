@@ -15,8 +15,6 @@
 
 <%--TODO: handle tooltips--%>
 <div class="col-sm-12 label_tooltip_<%= tipSide %>">
-  <%--<div id="<%= name %>_details" class="form-inline">--%>
-
     <div class="form-group">
         <cadc:checkbox checkboxName="<%= name %>" i18nKey="<%= labelKey %>" />
         <input type="hidden"

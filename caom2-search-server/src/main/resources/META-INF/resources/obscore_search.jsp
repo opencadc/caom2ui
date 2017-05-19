@@ -8,9 +8,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
-<%
-    final String maxRowLimit = request.getParameter("maxRowLimit");
-%>
 
 <div role="tabpanel" class="tab-pane" id="obsCoreQueryFormTab">
     <h2>ObsCore</h2>
@@ -25,7 +22,7 @@
 
         <!-- Used by AdvancedSearch to pass to TAP. -->
         <input type="hidden" name="SelectList" class="ObsCore_selectlist" />
-        <input type="hidden" name="MaxRecords" value="<%= maxRowLimit %>"/>
+        <input type="hidden" name="MaxRecords" value="${param.maxRowLimit}"/>
         <input type="hidden" name="format" value="csv"/>
 
         <%--<div class="equalize margin-top-large margin-bottom-none">--%>
@@ -142,7 +139,7 @@
         </div>
 
         <c:import
-        url="hierarchy.jsp?utype=DataID.Collection/Provenance.ObsConfig.Facility.name/Provenance.ObsConfig.Instrument.name/ObsDataset.calibLevel/ObsDataset.dataProductType&modelDataSource=obscore"/>
+        url="hierarchy.jsp?colcount=five-col&utype=DataID.Collection/Provenance.ObsConfig.Facility.name/Provenance.ObsConfig.Instrument.name/ObsDataset.calibLevel/ObsDataset.dataProductType&modelDataSource=obscore"/>
 
         <%--<div class="equalize margin-top-large margin-bottom-none">--%>
         <%--<div class="span-3 row-start form-inline">--%>
