@@ -72,7 +72,7 @@
            value="targetList.targetList" />
     <input type="hidden"
            name="<%= FormConstraint.FORM_NAME %>"
-           value="<%= formName %>" /
+           value="<%= formName %>" />
 </div>
 
   <%--</details>--%>

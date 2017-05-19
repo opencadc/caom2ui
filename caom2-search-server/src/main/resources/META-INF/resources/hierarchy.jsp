@@ -37,7 +37,7 @@
             <div id="${param.modelDataSource}<%= Hierarchy.NAME %>"
                             class="width-100 align-center margin-bottom-none advanced_search_data_train modelDataSource_${param.modelDataSource}"
                             data-utypes="<%= uType %>">
-                <span class="wb-invisible hierarchy_utype"><%= uType %></span>
+                <span class="invisible hierarchy_utype"><%= uType %></span>
 
                 <div class="hidden" id="<%= uType + ".building" %>">
                     <span class="wb-icon-busy"></span>
