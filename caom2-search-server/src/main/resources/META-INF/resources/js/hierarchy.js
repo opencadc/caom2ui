@@ -61,60 +61,6 @@
                 "TABLE": {
                   "caom2": "caom2.enumfield",
                   "obscore": "caom2.obscoreenumfield"
-                },
-                "UTYPE_COLUMN_NAME_KEYS": {
-                  "caom2": {
-                    "Plane.energy.emBand": {
-                      tap_column_name: "energy_emband",
-                      size: 1
-                    },
-                    "Observation.collection": {
-                      tap_column_name: "collection",
-                      size: 2
-                    },
-                    "Observation.instrument.name": {
-                      tap_column_name: "instrument_name",
-                      size: 2
-                    },
-                    "Plane.energy.bandpassName": {
-                      tap_column_name: "energy_bandpassname",
-                      size: 2
-                    },
-                    "Plane.calibrationLevel": {
-                      tap_column_name: "calibrationlevel",
-                      size: 2
-                    },
-                    "Plane.dataProductType": {
-                      tap_column_name: "dataproducttype",
-                      size: 1
-                    },
-                    "Observation.type": {
-                      tap_column_name: "type",
-                      size: 2
-                    }
-                  },
-                  "obscore": {
-                    "DataID.Collection": {
-                      tap_column_name: "obs_collection",
-                      size: 2
-                    },
-                    "Provenance.ObsConfig.Facility.name": {
-                      tap_column_name: "facility_name",
-                      size: 1
-                    },
-                    "Provenance.ObsConfig.Instrument.name": {
-                      tap_column_name: "instrument_name",
-                      size: 2
-                    },
-                    "ObsDataset.calibLevel": {
-                      tap_column_name: "calib_level",
-                      size: 1
-                    },
-                    "ObsDataset.dataProductType": {
-                      tap_column_name: "dataproduct_type",
-                      size: 1
-                    }
-                  }
                 }
               },
               "CALIBRATION_LEVEL_MAP": {
