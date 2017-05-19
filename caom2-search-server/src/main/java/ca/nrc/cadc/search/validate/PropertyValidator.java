@@ -40,7 +40,7 @@ import ca.nrc.cadc.util.StringUtil;
  */
 public class PropertyValidator
 {
-    boolean isNumeric = false;
+    private final boolean isNumeric;
 
 
     public PropertyValidator(final String utype)

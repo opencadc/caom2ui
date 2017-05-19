@@ -53,6 +53,7 @@
                 return val;
               },
               "tap": {
+                "QUERY_TEMPLATE": "SELECT {1}, CASE WHEN {2} >= {3} THEN 1 ELSE 0 END FROM {4}",
                 "INSTRUMENT_FRESH_MJD_FIELD_NAME": {
                   "caom2": "max_time_bounds_cval1",
                   "obscore": "max_t_min"
@@ -61,7 +62,7 @@
                   "caom2": "caom2.enumfield",
                   "obscore": "caom2.obscoreenumfield"
                 },
-                "UTYPE_COLUMN_NAMES": {
+                "UTYPE_COLUMN_NAME_KEYS": {
                   "caom2": {
                     "Plane.energy.emBand": {
                       tap_column_name: "energy_emband",
@@ -212,12 +213,15 @@
   /**
    * @param {String} _modelDataSource   Name of the data source [caom2 | obscore]
    * @param {{}} _options   Options to this DataTrain.
+   * @param {ColumnManager} _columnManager   Column Manager instance.
    * @param {boolean} [_options.autoInit=false]   Whether to initialize on creation.
    * @param {String} [_options.tapSyncEndpoint=/search/tap/sync]    TAP Endpoint.
    * @constructor
    */
-  function DataTrain(_modelDataSource, _options)
+  function DataTrain(_modelDataSource, _columnManager, _options)
   {
+    var stringUtil = new org.opencadc.StringUtil();
+
     this.modelDataSource = _modelDataSource;
     this.pageLanguage = $("html").attr("lang");
     this.$dataTrainDOM = $("div[id='" + this.modelDataSource + "@Hierarchy']");
@@ -231,6 +235,18 @@
     };
 
     this.options = $.extend({}, true, this.defaults, _options);
+    this.columnManager = _columnManager;
+
+    /**
+     * Obtain a column configuration object.
+     * @param {String}  _uType    The uType.
+     * @return {{}}
+     * @private
+     */
+    this._getColumnConfig = function(_uType)
+    {
+      return this.columnManager.getColumnOptions()[this.modelDataSource + ":" + _uType];
+    };
 
     /**
      * Initialize this DataTrain.
@@ -238,7 +254,6 @@
     this.init = function ()
     {
       var tapQuery = this._createTAPQuery();
-      var myself = this;
 
       $.get(this.options.tapSyncEndpoint, {
         "LANG": "ADQL",
@@ -246,14 +261,12 @@
         "QUERY": tapQuery
       }).done(function (data)
               {
-                myself._trigger(ca.nrc.cadc.search.datatrain.events.onDataTrainLoaded,
-                                {data: data});
-              })
-        .fail(function (jqXHR)
-              {
-                trigger(ca.nrc.cadc.search.datatrain.events.onDataTrainLoadFail,
-                        {responseText: jqXHR.responseText});
-              });
+                this._trigger(ca.nrc.cadc.search.datatrain.events.onDataTrainLoaded, {data: data});
+              }.bind(this))
+          .fail(function (jqXHR)
+                {
+                  trigger(ca.nrc.cadc.search.datatrain.events.onDataTrainLoadFail, {responseText: jqXHR.responseText});
+                }.bind(this));
     };
 
     /**
@@ -268,28 +281,28 @@
 
       for (var i = 0, ul = uTypes.length; i < ul; i++)
       {
-        tapColumns.push(ca.nrc.cadc.search.datatrain.tap.UTYPE_COLUMN_NAMES[
-                          this.modelDataSource][uTypes[i]].tap_column_name);
+        var nextUType = uTypes[i];
+        var colOpts = this._getColumnConfig(nextUType);
+
+        if (colOpts.hasOwnProperty("tap_column_name"))
+        {
+          tapColumns.push(colOpts.tap_column_name);
+        }
+        else
+        {
+          tapColumns.push(nextUType.substring(nextUType.indexOf(".") + 1).replace(".", "_"));
+        }
       }
 
       var now = new Date();
-      var dateThreshold = new Date(now.getFullYear() - 5, now.getMonth(),
-                                   now.getDate(), now.getHours(),
-                                   now.getMinutes(), now.getSeconds(),
-                                   now.getMilliseconds());
+      var dateThreshold = new Date(now.getFullYear() - 5, now.getMonth(), now.getDate(), now.getHours(),
+                                   now.getMinutes(), now.getSeconds(), now.getMilliseconds());
+      var mjdConverter = new ca.nrc.cadc.search.unitconversion.MJDConverter(dateThreshold);
 
-      var mjdConverter =
-        new ca.nrc.cadc.search.unitconversion.MJDConverter(dateThreshold);
-      var mjdCondition = ", CASE WHEN "
-                         +
-                         ca.nrc.cadc.search.datatrain.tap.INSTRUMENT_FRESH_MJD_FIELD_NAME[
-                           this.modelDataSource]
-                         + " >= " + mjdConverter.convert()
-                         + " THEN 1 ELSE 0 END ";
-
-      return "SELECT " + tapColumns.join(",") + mjdCondition
-             + " FROM "
-             + ca.nrc.cadc.search.datatrain.tap.TABLE[_modelDataSource];
+      return stringUtil.format(ca.nrc.cadc.search.datatrain.tap.QUERY_TEMPLATE,
+                               [tapColumns.join(","),
+                                ca.nrc.cadc.search.datatrain.tap.INSTRUMENT_FRESH_MJD_FIELD_NAME[this.modelDataSource],
+                                mjdConverter.convert(), ca.nrc.cadc.search.datatrain.tap.TABLE[_modelDataSource]]);
     };
 
     /**
@@ -330,7 +343,7 @@
         {
           // Last column is the state.
           var val = $.trim(groupValues[j]);
-          var formattedVal = ((val === null) || (val === '')) ? "null" : groupValues[j].replace(plus, " ");
+          var formattedVal = ((val === null) || (val === "")) ? "null" : groupValues[j].replace(plus, " ");
 
           var freshFlag = (groupValues[gvl - 1] === "1");
           var instrumentName = groupValues[instrumentNameIndex];
@@ -369,38 +382,28 @@
       {
         // Get the JSON text from hidden input and
         // eval into an enumerated object.
-        var uType = _group.uTypes[i];
-        var input = document.getElementById(uType + ".json");
-        var enumerated = JSON.parse(input.value);
         var row = _group.values[i];
 
         // Create either hidden or select input.
         var select;
-        if (enumerated.hidden)
+        var containerElement = document.createElement("div");
+        containerElement.className = "align-left advanced_search_hierarchy_select_div";
+
+        if (i === 0)
         {
-          select = buildHidden(enumerated, row);
+          containerElement.className += " row-start";
         }
-        else
+        // Last item
+        else if (i === (groupUTypesLength - 1))
         {
-          var containerElement = document.createElement("div");
-          containerElement.className = "align-left advanced_search_hierarchy_select_div";
+          containerElement.className += " row-end";
+        }
 
-          if (i === 0)
-          {
-            containerElement.className += " row-start";
-          }
-          // Last item
-          else if (i === (groupUTypesLength - 1))
-          {
-            containerElement.className += " row-end";
-          }
+        select = this._buildSelect(_group.uTypes[i], containerElement);
 
-          select = this._buildSelect(enumerated, containerElement);
-
-          if (firstSelect === undefined)
-          {
-            firstSelect = select.childNodes[1];
-          }
+        if (firstSelect === undefined)
+        {
+          firstSelect = select.childNodes[1];
         }
 
         // Add <select> to the table cell.
@@ -419,21 +422,19 @@
     {
       // Remove temporary div.
       var building = document.getElementById(this.uType + ".building");
-      building.className = (building.className.indexOf("wb-invisible") >= 0)
-        ? ""
-        : "wb-invisible";
+      building.className = (building.className.indexOf("wb-invisible") >= 0) ? "" : "wb-invisible";
     };
 
     /**
      * Creates a select Input Object, assigning values from the
      * enumeration Object.
      *
-     * @param enumerated        The enumerated row object.
-     * @param containerElement  The containing DOM.
+     * @param {String} uType   The uType ID for this select.
+     * @param {HTMLElement}     containerElement  The containing DOM.
      * @returns {*}
      * @private
      */
-    this._buildSelect = function (enumerated, containerElement)
+    this._buildSelect = function (uType, containerElement)
     {
       var label = document.createElement("label");
       if (this.pageLanguage === "fr")
@@ -441,12 +442,16 @@
         label.className = "advanced_search_hierarchy_select_div_label";
       }
 
-      var labelSpanFieldName = document.createElement("span");
+      var hidden = document.createElement("input");
+      hidden.type = "hidden";
+      hidden.value = uType + "@Enumerated";
+      hidden.name = "Form.name";
 
+      var labelSpanFieldName = document.createElement("span");
       var select = document.createElement("select");
-      select.id = enumerated.utype;
+      select.id = uType;
       select.name = select.id;
-      select.title = this.getDataTrainHeader(enumerated.label);
+      select.title = this._getDataTrainHeader(this._getColumnConfig(uType).label);
 
       labelSpanFieldName.className = "indent-small field-name";
       labelSpanFieldName.innerHTML = select.title;
@@ -455,16 +460,8 @@
       label.setAttribute("for", select.id);
 
       select.label = label;
-
-      if (enumerated.size)
-      {
-        select.size = enumerated.size;
-      }
-      else
-      {
-        select.size = ca.nrc.cadc.search.datatrain.SELECT_DISPLAY_OPTION_COUNT;
-        select.multiple = true;
-      }
+      select.size = ca.nrc.cadc.search.datatrain.SELECT_DISPLAY_OPTION_COUNT;
+      select.multiple = true;
 
       select.onchange = function (e)
       {
@@ -475,40 +472,12 @@
 
       containerElement.appendChild(label);
       containerElement.appendChild(select);
+      containerElement.appendChild(hidden);
 
       return containerElement;
     };
 
-    /*
-     * Creates a hidden Input Object, assigning values from the
-     * enumerated Object.
-     *
-     * @enumerated - enumerated Object.
-     * @values - array of select option values.
-     *
-     */
-    function buildHidden(enumerated, values)
-    {
-      var hidden = document.createElement("input");
-      hidden.type = "hidden";
-      hidden.name = enumerated.utype;
-      hidden.value = values[0];
-      return hidden;
-    }
-
-    this.getDataTrainHeader = function (name)
-    {
-      if (this.pageLanguage === "fr")
-      {
-        return getFrenchDataTrainHeaderMap()[name];
-      }
-      else
-      {
-        return name;
-      }
-    };
-
-    function getFrenchDataTrainHeaderMap()
+    this.getFrenchDataTrainHeaderMap = function ()
     {
       return {
         "All": "Tout",
@@ -520,24 +489,37 @@
         "Data Type": "Type de donnée",
         "Observation Type": "Type d'observation"
       }
-    }
+    };
+
+    /**
+     * Obtain the header for OLA.
+     *
+     * @param {String}  name  Name key.
+     * @return {String}   Header text.
+     * @private
+     */
+    this._getDataTrainHeader = function (name)
+    {
+      return (this.pageLanguage === "fr") ? this.getFrenchDataTrainHeaderMap()[name] : name;
+    };
 
     /**
      * Return the group when the group utype contains the given utype,
      * or null if no group utype is found containing the given utype.
      *
-     * @param {String}  _uType  uType of the select.
      * @param {Array}   _groups Array of group items.
+     * @param {String}  _uType  uType of the select.
      * @returns {Object} group object or null if not found.
+     * @private
      */
-    function getGroupByUType(_groups, _uType)
+    this._getGroupByUType = function (_groups, _uType)
     {
       // Loop through the group names looking for name.
       for (var i = 0, gl = _groups.length; i < gl; i++)
       {
         var group = _groups[i];
         var groupUTypes = group.uTypes;
-        for (var j = 0; j < groupUTypes.length; j++)
+        for (var j = 0, gutl = groupUTypes.length; j < gutl; j++)
         {
           if (groupUTypes[j] === _uType)
           {
@@ -547,7 +529,7 @@
       }
 
       return null;
-    }
+    };
 
     /**
      * Updates the selects. If updateAllOptions is true then all selects are
@@ -565,36 +547,36 @@
       var uType = _select.id;
 
       // Find the group for this single uType.
-      var group = getGroupByUType(this.groups, uType);
+      var group = this._getGroupByUType(this.groups, uType);
 
       // Find the index in group.utypes array for this enumerated utype,
       // gives index of the select.
-      var selectIndex = getSelectIndex(group, uType);
+      var selectIndex = this._getSelectIndex(group, uType);
 
       // Get the selected options.
       var selected = _updateAllOptionsFlag
-        ? getSelectedOptions(group, group.uTypes.length)
-        : getSelectedOptions(group, selectIndex);
+          ? this._getSelectedOptions(group, group.uTypes.length)
+          : this._getSelectedOptions(group, selectIndex);
 
       // Get the options for the selects being updated.
       var options = _updateAllOptionsFlag
-        ? getAllOptions(group, selected)
-        : getOptions(group, selected, selectIndex);
+          ? this._getAllOptions(group, selected)
+          : this._getOptions(group, selected, selectIndex);
 
       // Update the selects with new options.
-      this._setOptions(group, selectIndex, selected, options,
-                       _updateAllOptionsFlag);
+      this._setOptions(group, selectIndex, selected, options, _updateAllOptionsFlag);
     };
 
-    /*
+    /**
      * Find the index in the group.uTypes array for this uType.
      * Names is a list of hierarchy attributes.
      *
-     * @group - group containing uTypes array.
-     * @uType - uType.
-     * @return - index of the uType in group.uTypes array.
+     * @group {{}} group containing uTypes array.
+     * @uType {String} uType.
+     * @return {number}   index of the uType in group.uTypes array.
+     * @private
      */
-    function getSelectIndex(group, uType)
+    this._getSelectIndex = function (group, uType)
     {
       // Loop through the group names looking for name.
       var selectIndex = -1;
@@ -610,23 +592,22 @@
       // If the attribute is not found in the group.utypes throw an error.
       if (selectIndex === -1)
       {
-        throw new Error(uType + " not found in group names[" + group.uTypes +
-                        "]");
+        throw new Error(uType + " not found in group names[" + group.uTypes + "]");
       }
 
       return selectIndex;
-    }
+    };
 
-    /*
+    /**
      * Creates and returns an array of the selected options for the group.
      *
-     * @group - group data for this div.
-     * @selectIndex - index into the group.utypes array.
-     * @returns - array of all selected options.
+     * @group {{}} group data for this div.
+     * @selectIndex {number} index into the group.utypes array.
+     * @returns {[]} array of all selected options.
+     * @private
      */
-    function getSelectedOptions(group, selectIndex)
+    this._getSelectedOptions = function (group, selectIndex)
     {
-
       // 2D array to hold selected options arrays.
       var selected = [];
 
@@ -640,6 +621,7 @@
       for (var i = 0; i < selectIndex; i++)
       {
         var select = document.getElementById(group.uTypes[i]);
+
         if (select === null)
         {
           // If select is null it must be a hidden attribute,
@@ -648,30 +630,29 @@
           for (var j = 0; j < group.values.length; j++)
           {
             var v = group.values[j][i];
-            if (!ifArrayContains(selected[i], v))
+            if (!this._arrayContains(selected[i], v))
             {
               selected[i][selected[i].length] = v;
             }
           }
         }
-        else
+        else if (select instanceof HTMLSelectElement)
         {
-          selected[i] = getSelected(select);
+          selected[i] = this._getSelected(select);
         }
       }
       return selected;
-    }
+    };
 
-    /*
+    /**
      * Creates and returns an array of the selected option values
      * for the given select element.
      *
-     * @select - select element.
-     * @returns - array of selected options.
+     * @param {HTMLSelectElement} select    select element.
+     * @returns {[]} array of selected options.
      */
-    function getSelected(select)
+    this._getSelected = function (select)
     {
-
       // Array to hold selected options from this select.
       var selected = [];
 
@@ -700,8 +681,7 @@
       {
         if (select.selectedIndex !== -1)
         {
-          selected[selected.length] =
-            select.options[select.selectedIndex].value;
+          selected[selected.length] = select.options[select.selectedIndex].value;
         }
       }
 
@@ -712,18 +692,19 @@
       }
 
       return selected;
-    }
+    };
 
 
-    /*
+    /**
      * Get the options for the selects being updated.
      *
-     * @group - group containing selects data.
-     * @selected - 2d array of selected option values.
-     * @selectIndex - index into the group.utypes array.
-     * @returns - 2d array of options.
+     * @param {{}} group    group containing selects data.
+     * @param {[]} selected  2d array of selected option values.
+     * @param {number} selectIndex index into the group.utypes array.
+     * @returns {[]} 2d array of options.
+     * @private
      */
-    function getOptions(group, selected, selectIndex)
+    this._getOptions = function (group, selected, selectIndex)
     {
       // Arrays to hold the options for the selects to be updated.
       var options = [];
@@ -734,23 +715,23 @@
       }
 
       // Get the options for the current select.
-      getCurrentOptions(options, group, selected, selectIndex);
+      this.getCurrentOptions(options, group, selected, selectIndex);
 
       // Get the options for any child selects.
-      getChildOptions(options, group, selected, selectIndex);
+      this.getChildOptions(options, group, selected, selectIndex);
 
       return options;
-    }
+    };
 
-    /*
+    /**
      * Get the options for the current select.
      *
-     * @options - 2d array holding the options for each select.
-     * @group - group containing the selects data.
-     * @selected - 2d array of selected option values.
-     * @selectedIndex - index into the group.utypes array.
+     * @param {[]} options  2d array holding the options for each select.
+     * @param {{}} group  Group containing the selects data.
+     * @param {[]} selected   2d array of selected option values.
+     * @param {number}  selectIndex   index into the group.utypes array.
      */
-    function getCurrentOptions(options, group, selected, selectIndex)
+    this.getCurrentOptions = function (options, group, selected, selectIndex)
     {
 
       // The first select should always show all of the select options.
@@ -758,7 +739,7 @@
       {
         for (var i = 0, gvl = group.values.length; i < gvl; i++)
         {
-          if (!ifArrayContains(options[0], group.values[i][0]))
+          if (!this._arrayContains(options[0], group.values[i][0]))
           {
             options[0][options[0].length] = group.values[i][0];
           }
@@ -820,24 +801,24 @@
           if (found)
           {
             value = values[selectIndex];
-            if (!ifArrayContains(options[j], value))
+            if (!this._arrayContains(options[j], value))
             {
               options[selectIndex][options[selectIndex].length] = value;
             }
           }
         }
       }
-    }
+    };
 
-    /*
+    /**
      * Get the options for the child selects of the current select.
      *
-     * @options - 2d array holding the options for each select.
-     * @group - group containing the selects data.
-     * @selected - 2d array of selected option values.
-     * @selectedIndex - index into the group.utypes array.
+     * @param {[]} options  2d array holding the options for each select.
+     * @param {{}} group  Group containing the selects data.
+     * @param {[]} selected   2d array of selected option values.
+     * @param {number}  selectIndex   index into the group.utypes array.
      */
-    function getChildOptions(options, group, selected, selectIndex)
+    this.getChildOptions = function (options, group, selected, selectIndex)
     {
       // If the current select is the last select, no children selects.
       if (selectIndex < (group.uTypes.length - 1))
@@ -896,7 +877,7 @@
                  l++)
             {
               value = values[l];
-              if (!ifArrayContains(options[l], value))
+              if (!this._arrayContains(options[l], value))
               {
                 options[l][options[l].length] = value;
               }
@@ -904,39 +885,39 @@
           }
         }
       }
-    }
+    };
 
-    /*
+    /**
      * Get the options for all selects.
      *
-     * @group - group containing the selects data.
-     * @selected - 2d array of selected option values.
-     * @returns - 2d array of options.
+     * @param {{}} group    group object containing the selects data.
+     * @param {[]} selected   2d array of selected option values.
+     * @returns {[]} 2d array of options.
      */
-    function getAllOptions(group, selected)
+    this._getAllOptions = function (group, selected)
     {
       var options = [];
       for (var i = 0, gutl = group.uTypes.length; i < gutl; i++)
       {
-        var o = getOptions(group, selected, i);
+        var o = this._getOptions(group, selected, i);
         options[i] = o[i];
       }
+
       return options;
-    }
+    };
 
     /**
      * Updates the selects with the options.
      *
-     * @group - group containing names array.
-     * @selectIndex - index into the group.utypes array.
-     * @selected - 2d array of selected option values.
-     * @options - 2d array of option values.
-     * @updateAllOptions - if true update all the options, if false update
-     *   options starting at selectIndex.
+     * @param {{}} group    group containing names array.
+     * @param {number}      selectIndex   index into the group.utypes array.
+     * @param {[]}          selected    2d array of selected option values.
+     * @param {[]}          options  2d array of option values.
+     * @param {boolean}     updateAllOptions    If true update all the options, if false update options starting at
+     * selectIndex.
      * @private
      */
-    this._setOptions = function (group, selectIndex, selected, options,
-                                 updateAllOptions)
+    this._setOptions = function (group, selectIndex, selected, options, updateAllOptions)
     {
       if (updateAllOptions)
       {
@@ -960,8 +941,7 @@
 
           if (ca.nrc.cadc.search.datatrain.CUSTOM_SORT_UTYPES.hasOwnProperty(group.uTypes[i]))
           {
-            customSorter = ca.nrc.cadc.search.datatrain.CUSTOM_SORT_UTYPES[
-              group.uTypes[i]];
+            customSorter = ca.nrc.cadc.search.datatrain.CUSTOM_SORT_UTYPES[group.uTypes[i]];
           }
           else if (/Instrument\.name/i.test(id))
           {
@@ -969,13 +949,11 @@
             // selected items.
             var currFreshInstruments = this.freshInstruments.sort().filter(function (i)
                                                                            {
-                                                                             return selectItems.indexOf(i) >=
-                                                                                    0;
+                                                                             return (selectItems.indexOf(i) >= 0);
                                                                            });
             var staleInstruments = selectItems.filter(function (i)
                                                       {
-                                                        return currFreshInstruments.indexOf(i)
-                                                               < 0;
+                                                        return (currFreshInstruments.indexOf(i) < 0);
                                                       }).sort();
 
             selectItems = [];
@@ -1014,12 +992,12 @@
     /**
      * Create a new HTML Option object as a jQuery object.
      *
-     * @param _label             The option's display label.
-     * @param _value            The option's value.
-     * @param _selectedFlag     Boolean selected or not.
+     * @param {String} _label             The option's display label.
+     * @param {*} _value            The option's value.
+     * @param {Boolean} _selectedFlag     Boolean selected or not.
      * @returns {*|jQuery|HTMLElement}
      */
-    function createOption(_label, _value, _selectedFlag)
+    this._createOption = function (_label, _value, _selectedFlag)
     {
       var $option = $("<option>");
 
@@ -1037,7 +1015,7 @@
       $option.attr("selected", _selectedFlag);
 
       return $option;
-    }
+    };
 
     /**
      * Updates the select with the options.
@@ -1047,25 +1025,25 @@
      * @param selected - array of selected option values for this select.
      * @private
      */
-    this._setSelectOptions = function(select, options, selected)
+    this._setSelectOptions = function (select, options, selected)
     {
       // Remove all the current options for this select.
       var $select = $(select);
       $select.empty();
 
-      var title = this.getDataTrainHeader("All");
+      var title = this._getDataTrainHeader("All");
       var name = title + "  (" + options.length + ")";
       var highlight = false;
       var isHighlighted = false;
 
-      if (ifArrayContains(selected, ""))
+      if (this._arrayContains(selected, ""))
       {
         highlight = true;
         isHighlighted = true;
       }
 
       var selectName = $select.attr("name");
-      var $allOption = createOption(name, "", false);
+      var $allOption = this._createOption(name, "", false);
       $select.append($allOption);
 
       // Add the new options to the select.
@@ -1073,7 +1051,7 @@
       {
         var optionValue = options[i];
         highlight = false;
-        if (ifArrayContains(selected, options[i]))
+        if (this._arrayContains(selected, options[i]))
         {
           highlight = true;
           isHighlighted = true;
@@ -1082,12 +1060,12 @@
         var optionName;
 
         if ((selectName.indexOf("dataProductType") >= 0)
+
             && (optionValue === "null"))
         {
           optionName = "Other";
         }
-        else if ((selectName === "Plane.energy.emBand")
-                 && (optionValue === "null"))
+        else if ((selectName === "Plane.energy.emBand") && (optionValue === "null"))
         {
           optionName = "Unknown";
         }
@@ -1100,7 +1078,7 @@
           else
           {
             var calLevelName =
-              ca.nrc.cadc.search.datatrain.CALIBRATION_LEVEL_MAP[optionValue];
+                ca.nrc.cadc.search.datatrain.CALIBRATION_LEVEL_MAP[optionValue];
             if (calLevelName)
             {
               optionName = "(" + optionValue + ") " + calLevelName;
@@ -1112,7 +1090,7 @@
           optionName = optionValue;
         }
 
-        var $opt = createOption(optionName, optionValue, highlight);
+        var $opt = this._createOption(optionName, optionValue, highlight);
 
         if (ca.nrc.cadc.search.datatrain.SPACER() === optionValue)
         {
@@ -1136,12 +1114,11 @@
      * Searches an array for the given value. Returns true if the value is
      * found in the array, false otherwise.
      *
-     * @array - array to search.
-     * @value - value to search for.
-     * @returns {boolean} true if the value exists in the array, false
-     *   otherwise.
+     * @param {[]} array  Array to search.
+     * @param {*}  value  Value to search for.
+     * @returns {boolean} true if the value exists in the array, false otherwise.
      */
-    function ifArrayContains(array, value)
+    this._arrayContains = function (array, value)
     {
       if (array)
       {
@@ -1155,7 +1132,7 @@
       }
 
       return false;
-    }
+    };
 
     /**
      * Fire an event.  Taken from the slick.grid Object.
@@ -1196,8 +1173,7 @@
     this.subscribe(ca.nrc.cadc.search.datatrain.events.onDataTrainLoadFail,
                    function (event, args)
                    {
-                     alert("Error while querying TAP to initialize the page: "
-                           + args.responseText);
+                     alert("Error while querying TAP to initialize the page: " + args.responseText);
                      var dt = args.dataTrain;
                      dt._toggleLoading();
                    });

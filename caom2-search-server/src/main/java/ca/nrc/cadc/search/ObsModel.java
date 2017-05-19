@@ -28,7 +28,6 @@
 
 package ca.nrc.cadc.search;
 
-import ca.nrc.cadc.util.StringUtil;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -110,25 +109,10 @@ public abstract class ObsModel
     }
 
     /**
-     * Possible Interval CAOM attributes, the corresponding CVO
-     * database name, default label, and unit.
-     */
-    public static final String[] INTERVAL = new String[]
-    {
-        "Plane.energy.bounds",
-        "Plane.time.bounds"
-    };
-    public static final String[] INTERVAL_LABELS = new String[]
-    {
-        "Spectral Coverage",
-        "Observation Date"
-    };
-    
-    /**
      * Possible Number CAOM attributes, the corresponding CVO
      * database name, default label, and unit.
      */
-    public static final String[] NUMBER = new String[]
+    private static final String[] NUMBER = new String[]
     {
         //CAOM2
         "Observation.telescope.geoLocationX",
@@ -179,79 +163,12 @@ public abstract class ObsModel
         "Char.SpectralAxis.numBins",
         "Char.PolarizationAxis.numBins"
     };
-    public static final String[] NUMBER_LABELS = new String[]
-    {
-        //CAOM2
-        "geolocation x",
-        "geolocation y",
-        "geolocation z",
-        "redshift",
-        "Calibration Level",
-        "metric",
-        "position sample size",
-        "position dimension 1",
-        "position dimension 2",
-        "RA",
-        "DEC",
-        "radius",
-        "area",
-        "energy sample size",
-        "energy resolving power",
-        "energy dimension",
-        "lower wavelength",
-        "upper wavelength",
-        "rest frame spectral coverage",
-        "time sample size",
-        "time dimension",
-        "start time",
-        "end time",
-        "time span",
-        "exposure time",
-        "polarization dimension",
-        "metric value",
-        "metric error",
-        //ObsCore
-        "access_estsize",
-        "calib_level",
-        "s_ra",
-        "s_dec",
-        "s_fov",
-        "s_resolution",
-        "em_max",
-        "em_min",
-        "em_res_power",
-        "t_max",
-        "t_min",
-        "t_exptime",
-        "t_resolution"
-    };
-    
-    /**
-     * Possible Shape CAOM attributes, the corresponding CVO
-     * database name, default label, and unit.
-     */
-    public static final String[] SHAPE = new String[]
-    {
-        // CAOM2
-        "Plane.position.bounds",
-        "Plane.position.bounds.center",
-        // ObsCore
-        "Char.SpatialAxis.Coverage.Support.Area"
-    };
-    public static final String[] SHAPE_LABELS = new String[]
-    {
-        // CAOM2
-        "Target",
-        "Target",
-        // ObsCore
-        "s_region"
-    };
-    
+
     /**
      * Possible Text CAOM attributes, the corresponding CVO
      * database name, default label, and unit.
      */
-    public static final String[] TEXT = new String[]
+    private static final String[] TEXT = new String[]
     {
         // CAOM2
         "Observation.collection",
@@ -293,58 +210,16 @@ public abstract class ObsModel
         "Char.SpatialAxis.Coverage.Support.Area",
         "Target.Name"
     };
-    public static final String[] TEXT_LABELS = new String[]
-    {
-        // CAOM2
-        "Collection",
-        "Observation ID",
-        "Project",
-        "Proposal ID",
-        "Proposal P.I.",
-        "Proposal Title",
-        "Proposal Keywords",
-        "Proposal Project",
-        "Intent",
-        "Telescope",
-        "Telescope Keywords",
-        "Instrument",
-        "Instrument Keywords",
-        "Target",
-        "Target Classification",
-        "Algorithm",
-        "Observation Type",
-        "project (product)",
-        "",
-        "",
-        "product unit",
-        "Filter",
-        "Band",
-        "Data Type",
 
-        // ObsCore
-        "access_format",
-        "access_url",
-        "dataproduct_type",
-        "facility_name",
-        "instrument_name",
-        "obs_collection",
-        "obs_id",
-        "obs_publisher_did",
-        "o_ucd",
-        "pol_states",
-        "s_region",
-        "target_name"
-    };
-    
     /**
      * Energy and time attributes.
      */
-    public static final String[] ANGLE = new String[]
+    private static final String[] ANGLE = new String[]
     {
         "Plane.position.bounds.radius",
         "Plane.position.sampleSize"
     };
-    public static final String[] ENERGY = new String[]
+    private static final String[] ENERGY = new String[]
     {
         // CAOM2
         "Plane.energy.bounds",
@@ -359,7 +234,7 @@ public abstract class ObsModel
         "Char.SpectralAxis.Coverage.Bounds.Limits",
         "Char.SpectralAxis.Resolution.ResolPower.refval"
     };
-    public static final String[] TIME = new String[]
+    private static final String[] TIME = new String[]
     {
         // CAOM2
         "Plane.time.exposure",
@@ -370,7 +245,7 @@ public abstract class ObsModel
         "Char.TimeAxis.Coverage.Bounds.Limits",
         "Char.TimeAxis.Resolution.refval.value"
     };
-    public static final String[] MJD_UTC = new String[]
+    private static final String[] MJD_UTC = new String[]
     {
         // CAOM2
         "Plane.time.bounds",
@@ -385,19 +260,19 @@ public abstract class ObsModel
         "Char.TimeAxis.Coverage.Bounds.Limits.StopTime",
         "Char.TimeAxis.Coverage.Bounds.Limits.StopTime_PRESET"
     };
-    public static final String[] DATE_UTC = new String[]
+    private static final String[] DATE_UTC = new String[]
     {
         "Plane.metaRelease",
         "Plane.dataRelease",
         "Curation.releaseDate"
     };
-    public static final String[] DATE_LOCAL = new String[]
+    private static final String[] DATE_LOCAL = new String[]
     {
         "Observation.lastModified",
         "Plane.lastModified"
     };
 
-    public static final String[] WILDCARD_UTYPES = new String[]
+    private static final String[] WILDCARD_UTYPES = new String[]
     {
         // CAOM2
         "Observation.proposal.pi",
@@ -412,126 +287,6 @@ public abstract class ObsModel
     };
 
     /**
-     * Verifies that the utype is valid by checking each of
-     * the Enumerated, Interval, Number, and Shape utype
-     * arrays for the utype.
-     * 
-     * @param utype the utype to verify.
-     * @return true if the utype is valid, false otherwise.
-     */
-    public static boolean isValidUtype(String utype)
-    {
-        if (!StringUtil.hasText(utype))
-        {
-            return false;
-        }
-
-        for (String interval : INTERVAL)
-        {
-            if (interval.equalsIgnoreCase(utype))
-            {
-                return true;
-            }
-        }
-
-        for (String number : NUMBER)
-        {
-            if (number.equalsIgnoreCase(utype))
-            {
-                return true;
-            }
-        }
-
-        for (String shape : SHAPE)
-        {
-            if (shape.equalsIgnoreCase(utype))
-            {
-                return true;
-            }
-        }
-
-        for (String text : TEXT)
-        {
-            if (text.equalsIgnoreCase(utype))
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-        /**
-     * Verifies that the utypes are valid by checking each of
-     * the Enumerated, Interval, Number, and Shape utype
-     * arrays for each of the utypes.
-     * 
-     * @param utypes the array of utypes to verify.
-     * @return true if all the utypes are valid, false otherwise.
-     */
-    public static boolean isValidUtypes(String[] utypes)
-    {
-        if (utypes == null)
-        {
-            return false;
-        }
-
-        for (String utype : utypes)
-        {
-            if (!isValidUtype(utype))
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * For the given utype, return the default label.
-     * 
-     * @param utype the utype.
-     * @return the default label, or an empty string if 
-     * the utype doesn't have a default label.
-     */
-    public static String getUtypeLabel(String utype)
-    {
-        if (StringUtil.hasText(utype))
-        {
-            for (int i = 0; i < INTERVAL.length; i++)
-            {
-                if (INTERVAL[i].equals(utype))
-                {
-                    return INTERVAL_LABELS[i];
-                }
-            }
-            for (int i = 0; i < NUMBER.length; i++)
-            {
-                if (NUMBER[i].equals(utype))
-                {
-                    return NUMBER_LABELS[i];
-                }
-            }
-            for (int i = 0; i < SHAPE.length; i++)
-            {
-                if (SHAPE[i].equals(utype))
-                {
-                    return SHAPE_LABELS[i];
-                }
-            }
-            for (int i = 0; i < TEXT.length; i++)
-            {
-                if (TEXT[i].equals(utype))
-                {
-                    return TEXT_LABELS[i];
-                }
-            }
-        }
-        
-        return "";
-    }
-    
-   /**
      * Test if the given utype is a valid energy utype.
      * 
      * @param utype     The utype.
@@ -614,7 +369,7 @@ public abstract class ObsModel
      * @param utype     The utype.
      * @return boolean true if the utype is a date utype, false otherwise.
      */
-    public static boolean isLocalDateUtype(final String utype)
+    static boolean isLocalDateUtype(final String utype)
     {
         return arrayContains(utype, DATE_LOCAL);
     }

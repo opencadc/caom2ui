@@ -34,7 +34,7 @@
               },
               "caom2:Observation.uri": {
                 "label": "Preview",
-                "select": "Observation.observationURI",
+                "tap_column_name": "Observation.observationURI",
                 "width": 70,
                 "sortable": false,
                 "filterable": false,
@@ -391,7 +391,7 @@
               // only reference to 'proprosal' instead of proposal.
               "caom2:Observation.proposal.project": {
                 "label": "Proposal Project",
-                "select": "Observation.proposal_project"
+                "tap_column_name": "Observation.proposal_project"
               },
               "caom2:Observation.proposal.keywords": {
                 "label": "Proposal Keywords"
@@ -450,16 +450,16 @@
               },
               "caom2:Plane.id": {
                 "label": "planeID",
-                "select": "Plane.planeID",
+                "tap_column_name": "Plane.planeID",
                 "extended": true
               },
               "caom2:Plane.uri": {
                 "label": "CAOM Plane URI",
-                "select": "Plane.planeURI"
+                "tap_column_name": "Plane.planeURI"
               },
               "caom2:Plane.uri.downloadable": {
                 "label": "DOWNLOADABLE",
-                "select": "isDownloadable(Plane.planeURI)"
+                "tap_column_name": "isDownloadable(Plane.planeURI)"
               },
               "caom2:Plane.productID": {
                 "label": "Product ID",
@@ -546,7 +546,7 @@
               },
               "caom2:Plane.position.bounds.cval1": {
                 "label": "RA (J2000.0)",
-                "select": "COORD1(CENTROID(Plane.position.bounds))",
+                "tap_column_name": "COORD1(CENTROID(Plane.position.bounds))",
                 // Fit max would be nice, but the original data is in a long
                 // decimal format, so set it manually.
                 "fitMax": false,
@@ -576,7 +576,7 @@
               },
               "caom2:Plane.position.bounds.cval2": {
                 "label": "Dec. (J2000.0)",
-                "select": "COORD2(CENTROID(Plane.position.bounds))",
+                "tap_column_name": "COORD2(CENTROID(Plane.position.bounds))",
                 // Fit max would be nice, but the original data is in a long
                 // decimal format, so set it manually.
                 "fitMax": false,
@@ -608,7 +608,7 @@
                 "label": "Field of View",
                 "datatype": "double",
                 "unit": "deg**2",
-                "select": "AREA(Plane.position.bounds)",
+                "tap_column_name": "AREA(Plane.position.bounds)",
                 // Fit max would be nice, but the original data is in a long
                 // decimal format, so set it manually.
                 "fitMax": false,
@@ -705,12 +705,12 @@
                 "fitMax": true
               },
               "caom2:Plane.energy.bounds.lower": {
-                "select": "Plane.energy_bounds_lower",
+                "tap_column_name": "Plane.energy_bounds_lower",
 
                 "label": "Min. Wavelength"
               },
               "caom2:Plane.energy.bounds.upper": {
-                "select": "Plane.energy_bounds_upper",
+                "tap_column_name": "Plane.energy_bounds_upper",
                 "label": "Max. Wavelength"
               },
               "caom2:Plane.energy.bandpassName": {
@@ -727,7 +727,7 @@
                 "label": "Rest-frame Energy"
               },
               "caom2:Plane.time.bounds.lower": {
-                "select": "Plane.time_bounds_lower",
+                "tap_column_name": "Plane.time_bounds_lower",
                 "label": "Start Date",
                 // Fit max would be nice, but the default values are in MJD,
                 // which is smaller than the Calendar dates, so set it up for
@@ -766,7 +766,7 @@
                 }
               },
               "caom2:Plane.time.bounds.upper": {
-                "select": "Plane.time_bounds_upper",
+                "tap_column_name": "Plane.time_bounds_upper",
                 "label": "End Date",
                 // Fit max would be nice, but the default values are in MJD,
                 // which is smaller than the Calendar dates, so set it up for
@@ -837,146 +837,146 @@
               "obscore:Char.SpatialAxis.Coverage.Bounds.Extent.diameter": {
                 "fitMax": true,
                 "label": "s_fov",
-                "select": "s_fov"
+                "tap_column_name": "s_fov"
               },
               "obscore:Char.SpatialAxis.Coverage.Support.Area": {
                 "fitMax": true,
                 "label": "s_region",
-                "select": "s_region"
+                "tap_column_name": "s_region"
               },
               "obscore:Char.SpatialAxis.Resolution.refval.value": {
                 "fitMax": true,
                 "label": "s_resolution",
-                "select": "s_resolution"
+                "tap_column_name": "s_resolution"
               },
               "obscore:Char.SpatialAxis.numBins1": {
                 "fitMax": true,
                 "label": "s_xel1",
-                "select": "s_xel1"
+                "tap_column_name": "s_xel1"
               },
               "obscore:Char.SpatialAxis.numBins2": {
                 "fitMax": true,
                 "label": "s_xel2",
-                "select": "s_xel2"
+                "tap_column_name": "s_xel2"
               },
               "obscore:Char.TimeAxis.Coverage.Bounds.Limits.StartTime": {
                 "fitMax": true,
                 "label": "t_min",
-                "select": "t_min"
+                "tap_column_name": "t_min"
               },
               "obscore:Char.TimeAxis.Coverage.Bounds.Limits.StopTime": {
                 "fitMax": true,
                 "label": "t_max",
-                "select": "t_max"
+                "tap_column_name": "t_max"
               },
               "obscore:Curation.PublisherDID": {
                 "fitMax": true,
                 "label": "obs_publisher_did",
-                "select": "obs_publisher_did"
+                "tap_column_name": "obs_publisher_did"
               },
               "obscore:DataID.Collection": {
                 "fitMax": true,
                 "label": "obs_collection",
-                "select": "obs_collection"
+                "tap_column_name": "obs_collection"
               },
               "obscore:Provenance.ObsConfig.Facility.name": {
                 "fitMax": true,
                 "label": "facility_name",
-                "select": "facility_name"
+                "tap_column_name": "facility_name"
               },
               "obscore:Provenance.ObsConfig.Instrument.name": {
                 "fitMax": true,
                 "label": "instrument_name",
-                "select": "instrument_name"
+                "tap_column_name": "instrument_name"
               },
               "obscore:DataID.observationID": {
                 "fitMax": true,
                 "label": "obs_id",
-                "select": "obs_id"
+                "tap_column_name": "obs_id"
               },
               "obscore:ObsDataset.dataProductType": {
                 "label": "dataproduct_type",
-                "select": "dataproduct_type"
+                "tap_column_name": "dataproduct_type"
               },
               "obscore:ObsDataset.calibLevel": {
                 "label": "calib_level",
-                "select": "calib_level"
+                "tap_column_name": "calib_level"
               },
               "obscore:Curation.releaseDate": {
                 "label": "obs_release_date",
-                "select": "obs_release_date"
+                "tap_column_name": "obs_release_date"
               },
               "obscore:Target.Name": {
                 "label": "target_name",
-                "select": "target_name"
+                "tap_column_name": "target_name"
               },
               "obscore:Char.SpatialAxis.Coverage.Location.Coord.Position2D.Value2.C1": {
                 "label": "s_ra",
-                "select": "s_ra"
+                "tap_column_name": "s_ra"
               },
               "obscore:Char.SpatialAxis.Coverage.Location.Coord.Position2D.Value2.C2": {
                 "label": "s_dec",
-                "select": "s_dec"
+                "tap_column_name": "s_dec"
               },
               "obscore:Char.TimeAxis.Coverage.Support.Extent": {
                 "label": "t_exptime",
-                "select": "t_exptime"
+                "tap_column_name": "t_exptime"
               },
               "obscore:Char.TimeAxis.Resolution.refval.value": {
                 "label": "t_resolution",
-                "select": "t_resolution"
+                "tap_column_name": "t_resolution"
               },
               "obscore:Char.TimeAxis.numBins": {
                 "label": "t_xel",
-                "select": "t_xel"
+                "tap_column_name": "t_xel"
               },
               "obscore:Char.SpectralAxis.Coverage.Bounds.Limits.LoLimit": {
                 "label": "em_min",
-                "select": "em_min"
+                "tap_column_name": "em_min"
               },
               "obscore:Char.SpectralAxis.Coverage.Bounds.Limits.HiLimit": {
                 "label": "em_max",
-                "select": "em_max"
+                "tap_column_name": "em_max"
               },
               "obscore:Char.SpectralAxis.Resolution.ResolPower.refval": {
                 "label": "em_res_power",
-                "select": "em_res_power"
+                "tap_column_name": "em_res_power"
               },
               "obscore:Char.SpectralAxis.numBins": {
                 "label": "em_xel",
-                "select": "em_xel"
+                "tap_column_name": "em_xel"
               },
               "obscore:Char.SpectralAxis.ucd": {
                 "label": "em_ucd",
-                "select": "em_ucd"
+                "tap_column_name": "em_ucd"
               },
               "obscore:Char.PolarizationAxis.stateList": {
                 "label": "pol_states",
-                "select": "pol_states"
+                "tap_column_name": "pol_states"
               },
               "obscore:Char.PolarizationAxis.numBins": {
                 "label": "pol_xel",
-                "select": "pol_xel"
+                "tap_column_name": "pol_xel"
               },
               "obscore:Char.ObservableAxis.ucd": {
                 "label": "o_ucd",
-                "select": "o_ucd"
+                "tap_column_name": "o_ucd"
               },
               "obscore:Access.Reference": {
                 "label": "access_url",
-                "select": "access_url"
+                "tap_column_name": "access_url"
               },
               "obscore:Access.Format": {
                 "label": "access_format",
-                "select": "access_format"
+                "tap_column_name": "access_format"
               },
               "obscore:Access.Size": {
                 "label": "access_estsize",
-                "select": "access_estsize"
+                "tap_column_name": "access_estsize"
               },
               "obscore:Curation.PublisherDID.downloadable": {
                 "label": "downloadable",
-                "select": "isDownloadable(obs_publisher_did)"
+                "tap_column_name": "isDownloadable(obs_publisher_did)"
               }
             }
           }
@@ -1319,15 +1319,25 @@
    */
   function ColumnManager()
   {
-    function getColumnOptions()
+    /**
+     * @return {{}}   Options object.
+     */
+    this.getColumnOptions = function ()
     {
       return ca.nrc.cadc.search.columnOptions;
-    }
+    };
 
-    function getColumnOption(_id)
+    /**
+     * Get the options object for the given column.
+     *
+     * @param {String} _id     The column ID to look up.
+     * @return {{}}
+     * @private
+     */
+    this._getColumnOption = function(_id)
     {
-      return getColumnOptions()[_id];
-    }
+      return this.getColumnOptions()[_id];
+    };
 
     /**
      * Obtain the value converter for the column whose ID matches the given _id.
@@ -1337,30 +1347,27 @@
      *
      * @return  Converter object, or null if none found.
      */
-    function getConverter(_id, _value, _unit)
+    this.getConverter = function (_id, _value, _unit)
     {
-      var converterType = getColumnOption(_id).converter;
-
-      return (converterType
-          ? new ca.nrc.cadc.search.unitconversion[converterType](_value, _unit)
-          : null);
-    }
+      var converterType = this._getColumnOption(_id).converter;
+      return (converterType ? new ca.nrc.cadc.search.unitconversion[converterType](_value, _unit) : null);
+    };
 
     /**
      * Obtain the column ID for the given column label.  Can be called with the
      * columnID, too, to provide more robustness for the caller.
      *
      * @param {String} _label      The label to look up.
-     * @returns {String}
+     * @returns {String}    ID value.
      */
-    function getIDFromLabel(_label)
+    this.getIDFromLabel = function(_label)
     {
       var result = null;
 
       // If not label is provided, don't bother iterating.
       if (_label)
       {
-        $.each(getColumnOptions(), function (columnID, object)
+        $.each(this.getColumnOptions(), function (columnID, object)
         {
           if ((columnID === _label) || (object.label === _label))
           {
@@ -1371,16 +1378,17 @@
       }
 
       return result;
-    }
+    };
 
     /**
-     * Format
-     * @param {String} _column   The UType of the column to convert.
+     * Format the value.
+     *
+     * @param {{}} _column   The column object.
      * @param {String} _value    The value to convert.
      */
-    function format(_column, _value)
+    this.format = function(_column, _value)
     {
-      var columnOption = getColumnOption(_column.utype);
+      var columnOption = this._getColumnOption(_column.utype);
       var formattedValue;
 
       if (columnOption && columnOption.formatter)
@@ -1395,7 +1403,7 @@
       }
 
       return formattedValue;
-    }
+    };
 
     /**
      * Obtain an array of the filter pattern used in the given string.
@@ -1407,7 +1415,7 @@
      * @param {String} _string   The string to get the pattern for.
      * @return {[]}  The pattern array.
      */
-    function getFilterPattern(_string)
+    this.getFilterPattern = function (_string)
     {
       var breakdown = [];
       var match;
@@ -1415,7 +1423,8 @@
 
       if (match = pattern.exec(_string))
       {
-        for (var i = 1; i < match.length; i++)
+        var ml = match.length;
+        for (var i = 1; i < ml; i++)
         {
           var nextMatch = match[i];
           if (nextMatch)
@@ -1426,28 +1435,17 @@
       }
 
       return breakdown;
-    }
+    };
 
     /**
      * Obtain whether the given string is filter syntax or not.
-     * @param {String} _string
+     * @param {String} _string    String to check.
+     * @return {boolean}
      */
-    function isFilterSyntax(_string)
+    this.isFilterSyntax = function(_string)
     {
       return _string && /^(<|>|<=|>=|!|\.\.)$/.test($.trim(_string));
-    }
-
-
-    $.extend(this,
-             {
-               "getColumnOptions": getColumnOptions,
-               "getConverter": getConverter,
-               "getIDFromLabel": getIDFromLabel,
-               "getFilterPattern": getFilterPattern,
-               "isFilterSyntax": isFilterSyntax,
-               "format": format,
-               "formatDetailsCell": formatDetailsCell
-             });
+    };
   }
 
 })(jQuery, window);

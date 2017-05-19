@@ -47,11 +47,9 @@ import ca.nrc.cadc.util.ArrayUtil;
 import ca.nrc.cadc.util.StringUtil;
 import ca.nrc.cadc.uws.Job;
 
-abstract class AbstractScalarFormConstraint
-        extends AbstractFormConstraint implements SearchableFormConstraint
+abstract class AbstractScalarFormConstraint extends AbstractFormConstraint implements SearchableFormConstraint
 {
-    private static Logger log = Logger
-            .getLogger(AbstractScalarFormConstraint.class);
+    private static Logger log = Logger.getLogger(AbstractScalarFormConstraint.class);
 
     // TODO: change this attribute to private
     // Array of selected values from the drop down list.
@@ -66,33 +64,25 @@ abstract class AbstractScalarFormConstraint
 
     abstract String getName();
 
-    AbstractScalarFormConstraint(final Job job, final String utype,
-                                 final String[] selectedValues,
-                                 final boolean hidden)
+    AbstractScalarFormConstraint(final Job job, final String utype, final String[] selectedValues, final boolean hidden)
     {
         super(utype);
-        this.selectedValues = selectedValues;
         this.hidden = hidden;
 
-        if ((this.selectedValues == null) && (job != null))
+        if ((selectedValues == null) && (job != null))
         {
-            final List<String> list =
-                    new ParameterUtil().getValues(utype + this.getName(),
-                                                  job.getParameterList());
-            if (list != null)
-            {
-                this.selectedValues = list.toArray(new String[list.size()]);
-            }
-            else
-            {
-                this.selectedValues = new String[]{};
-            }
+            final List<String> list = new ParameterUtil().getValues(utype + this.getName(),
+                                                                    job.getParameterList());
+            this.selectedValues = list.toArray(new String[list.size()]);
+        }
+        else
+        {
+            this.selectedValues = selectedValues;
         }
     }
 
     // Create a TextSearch or InList to SearchTemplates.
-    private SearchTemplate buildScalarSearch(final List<String> list,
-                                             final String tableColumn,
+    private SearchTemplate buildScalarSearch(final List<String> list, final String tableColumn,
                                              final List<FormError> errorList)
     {
         if (list.size() == 1)
@@ -133,8 +123,7 @@ abstract class AbstractScalarFormConstraint
 
         if ((selected != null) && !selected.isEmpty())
         {
-            scalarSearch = buildScalarSearch(selected, this
-                    .getUType(), errorList);
+            scalarSearch = buildScalarSearch(selected, this.getUType(), errorList);
         }
 
         return scalarSearch;
@@ -161,9 +150,9 @@ abstract class AbstractScalarFormConstraint
         this.selected = selected;
     }
 
-    void setSelectedValues(final String[] selectedValues)
+    void resetSelectedValues()
     {
-        this.selectedValues = selectedValues;
+        this.selectedValues = new String[0];
     }
 
     public boolean isHidden()
