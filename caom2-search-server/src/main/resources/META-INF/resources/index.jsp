@@ -101,7 +101,7 @@
       <%--<c:import url="obscore_search.jsp?maxRowLimit=10000000"/>--%>
 
       <!-- Result Tab -->
-      <%--<c:import url="results.jsp?maxRowLimit=10000000"/>--%>
+      <c:import url="results.jsp?maxRowLimit=10000000"/>
 
   <%--<!-- Error Tab -->--%>
   <%--<div id="errorTableTab">--%>
