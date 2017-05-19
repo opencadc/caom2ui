@@ -14,13 +14,13 @@
   final String tipSide = request.getParameter("tipSide");
   final String name = utype + Date.VALUE;
   final String presetName = utype + "_PRESET" + Date.VALUE;
-//  final String formName = utype + Date.NAME;
+  final String formName = utype + Date.NAME;
 //  final String detailsID = utype + "_details";
 
   // For the select list.  These MUST be put into variables as they cannot be
   // built in the fmt:message because who the heck knows.
   // jenkinsd 2015.01.05
-//  final String presetLabelkey = utype + "_PRESET_FORM_LABEL";
+  final String presetLabelkey = utype + "_PRESET_FORM_LABEL";
   final String presetPast24HoursLabelKey =
       utype + "_PRESET_PAST_24_HOURS_FORM_LABEL";
   final String presetPastWeekLabelKey =
@@ -82,7 +82,7 @@
 
 <div class="form-group">
   <label class="sub-label" for="${param.utype}_PRESET">
-    <fmt:message key="${param.utype}_PRESET_FORM_LABEL" bundle="${langBundle}"/>
+    <fmt:message key="<%= presetLabelkey %>" bundle="${langBundle}"/>
   </label>
   <select size="1" id="${param.utype}_PRESET"
           data-assoc-field="${param.utype}" name="<%= presetName %>"
@@ -93,8 +93,8 @@
     <option value="<%= DatePreset.PAST_MONTH.name() %>"><fmt:message key="<%= presetPastMonthLabelKey %>" bundle="${langBundle}"/></option>
   </select>
 </div>
-<%--<input type="hidden"--%>
-       <%--name="<%= FormConstraint.FORM_NAME %>"--%>
-       <%--value="<%= formName %>"/>--%>
+<input type="hidden"
+       name="<%= FormConstraint.FORM_NAME %>"
+       value="<%= formName %>"/>
 
 <%--</li>--%>
