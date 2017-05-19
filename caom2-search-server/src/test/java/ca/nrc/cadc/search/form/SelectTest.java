@@ -76,7 +76,7 @@ public class SelectTest
         select.setSelected(selected);
         assertTrue("Should have some data", select.hasData());
         select.resetSelectedValues();
-        assertNull("selectedValues should be null", select.getSelectedValues());
+        assertEquals("selectedValues should be empty", select.getSelectedValues().length, 0);
 
         // case 2: null job, null selectedValues, hidden
         select = new Select(null, Select.UTYPE, null, true);
