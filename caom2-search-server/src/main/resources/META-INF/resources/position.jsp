@@ -34,7 +34,7 @@
             <span class="italic margin-left-small"><fmt:message key="RESOLVER_FORM_LABEL_ADDENDUM" bundle="${langBundle}" /></span>
         </label>
         <select size="1" name="<%= resolverName %>" title="<fmt:message key="RESOLVER_FORM_LABEL" bundle="${langBundle}" />"
-                id="<%= resolverName %>" class="form-control resolver_select">
+                id="<%= resolverName %>" class="form-control">
           <option value="ALL">
             <fmt:message key="ANY_RESOLVER_FORM_LABEL" bundle="${langBundle}" />
           </option>
@@ -55,8 +55,8 @@
             class="input-group-addon target_name_resolution_status"></span>
     </div>
 
-    <div class="align-center margin-top-none margin-bottom-medium">
-        <span class="font-large">- <fmt:message key="OR_LABEL" bundle="${langBundle}"/> -</span>
+    <div class="text-center">
+        <span><strong>- <fmt:message key="OR_LABEL" bundle="${langBundle}"/> -</strong></span>
     </div>
 
     <div class="form-group">
@@ -65,7 +65,7 @@
                 <fmt:message key="TARGET_LIST_FORM_LABEL" bundle="${langBundle}" />
             </label>
             <div>
-              <input type="file" class="form-control col-sm-11"
+              <input type="file" class="form-control"
                      id="${param.utype}_targetList" name="targetList"
                      title="<fmt:message key="TARGET_LIST_TOOLTIP" bundle="${langBundle}" />" />
             </div>

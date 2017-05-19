@@ -76,8 +76,8 @@
   </div>
 </div>
 
-<div class="align-center margin-top-none margin-bottom-none">
-  <span class="font-large">- <fmt:message key="OR_LABEL" bundle="${langBundle}"/> -</span>
+<div class="text-center">
+  <span><strong>- <fmt:message key="OR_LABEL" bundle="${langBundle}"/> -</strong></span>
 </div>
 
 <div class="form-group">

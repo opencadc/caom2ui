@@ -12,7 +12,7 @@
     final String maxRowLimit = request.getParameter("maxRowLimit");
 %>
 
-<div role="tabpanel" class="tab-pane active" id="obsCoreQueryFormTab">
+<div role="tabpanel" class="tab-pane" id="obsCoreQueryFormTab">
     <h2>ObsCore</h2>
     <form id="obscoreQueryForm" name="obscoreQueryForm" class="queryForm"
     method="post" action="${pageContext.request.contextPath}/find"
