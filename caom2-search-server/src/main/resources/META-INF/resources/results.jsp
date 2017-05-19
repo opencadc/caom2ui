@@ -1,9 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" session="false"
          pageEncoding="UTF-8" %>
 
-<%@ page import="ca.nrc.cadc.search.form.Enumerated" %>
-<%@ page import="ca.nrc.cadc.search.form.FormConstraint" %>
-<%@ page import="ca.nrc.cadc.search.form.Hierarchy" %>
+<%--<%@ page import="ca.nrc.cadc.search.form.Enumerated" %>--%>
+<%--<%@ page import="ca.nrc.cadc.search.form.FormConstraint" %>--%>
+
 
 <jsp:useBean id="job" scope="request" class="ca.nrc.cadc.uws.Job"/>
 <jsp:useBean id="errors" scope="request"
