@@ -185,6 +185,7 @@
               });
           </script>
 
+            <script type="application/javascript" src="js/bootstrap.min.js"></script>
           <script type="text/javascript"
                   src="cadcVOTV/javascript/jquery.event.drag-2.2.min.js?version=@version@"></script>
           <script type="text/javascript"
@@ -268,7 +269,7 @@
                   src="js/cadc.search.tooltipcreator.js?version=@version@"></script>
           <script type="text/javascript"
                   src="js/hierarchy.js?version=@version@"></script>
-            <script type="application/javascript" src="js/bootstrap.min.js"></script>
+
 
           <script type="text/javascript">
             $(document).ready(function ()

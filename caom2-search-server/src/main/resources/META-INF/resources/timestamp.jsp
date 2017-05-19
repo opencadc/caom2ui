@@ -15,7 +15,7 @@
       <%--<span class="search_criteria_label ${param.utype}_details"><fmt:message key="${labelKey}" bundle="${langBundle}"/></span>--%>
       <%--<span class="search_criteria_label_contents color-accent"></span>--%>
     <%--</summary>--%>
-    <label for="${param.utype}" class="wb-invisible">
+    <label for="${param.utype}" class="">
       <fmt:message key="${labelKey}" bundle="${langBundle}"/></label>
     <div class="data_release_date_panel">
       <cadc:checkbox checkboxName="${param.utype}@PublicTimestampFormConstraint.value"

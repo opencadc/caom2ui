@@ -21,14 +21,14 @@
 %>
 
 <%--<li class="label_tooltip_<%= tipSide %> margin-top-medium">--%>
-  <div id="<%= name %>_details" class="form-inline">
+  <div id="<%= name %>_details" class="form-group">
     <label for="<%= name %>" id="<%= name %>_LABEL"
-           class="wb-invisible search_criteria_label">
+           class="invisible search_criteria_label">
       <fmt:message key="<%= labelKey %>" bundle="${langBundle}" /></label>
     <cadc:pulldown utype="${param.utype}"
                    options="${observationIntentOptions}"
                    defaultOptionLabel="Science and Calibration data"
-                   cssClasses="search_criteria_input width-100" />
+                   cssClasses="form-control search_criteria_input width-100" />
     <input type="hidden"
            name="<%= FormConstraint.FORM_NAME %>"
            value="<%= formName %>" />

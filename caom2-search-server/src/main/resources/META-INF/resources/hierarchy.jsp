@@ -35,7 +35,7 @@
       <fmt:message key="DATA_ACQUISITION_LABEL" bundle="${langBundle}"/></div>
         <div class="panel-body">
             <div id="${param.modelDataSource}<%= Hierarchy.NAME %>"
-                            class="width-100 align-center margin-bottom-none advanced_search_data_train modelDataSource_${param.modelDataSource}"
+                            class="col-sm-12 align-center margin-bottom-none advanced_search_data_train modelDataSource_${param.modelDataSource}"
                             data-utypes="<%= uType %>">
                 <span class="invisible hierarchy_utype"><%= uType %></span>
 
