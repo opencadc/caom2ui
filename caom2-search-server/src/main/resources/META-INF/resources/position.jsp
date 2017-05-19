@@ -23,7 +23,7 @@
       <%--<span class="search_criteria_label <%= detailsID %>"><fmt:message key="<%= labelKey %>" bundle="${langBundle}"/></span>--%>
       <%--<span class="search_criteria_label_contents color-accent"></span>--%>
     <%--</summary>--%>
-<%--<div data-toggle="tooltip" data-placement="<%= tipSide %>" title="<%= utype %>">--%>
+<div data-toggle="tooltip" data-placement="<%= tipSide %>" title="<fmt:message key="<%= labelKey %>" bundle="${langBundle}"/>">
     <div class="form-group">
         <label for="<%= utype %>" class="control-label">
           <fmt:message key="<%= labelKey %>" bundle="${langBundle}" />
@@ -73,7 +73,7 @@
     <input type="hidden"
            name="<%= FormConstraint.FORM_NAME %>"
            value="<%= formName %>" />
-<%--</div>--%>
+</div>
 
   <%--</details>--%>
 <%--</li>--%>

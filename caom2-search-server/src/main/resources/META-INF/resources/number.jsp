@@ -14,7 +14,7 @@
   final String detailsID = utype + "_details";
 %>
 
-<div data-toggle="tooltip" data-placement="<%= tipSide %>" title="<%= utype %>">
+<div data-toggle="tooltip" data-placement="<%= tipSide %>" title="<fmt:message key="<%= labelKey %>" bundle="${langBundle}"/>">
   <div class="form-group">
     <%--<details id="<%= detailsID %>">--%>
       <%--<summary class="search_criteria_label_container">--%>
