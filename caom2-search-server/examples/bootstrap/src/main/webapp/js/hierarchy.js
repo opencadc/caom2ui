@@ -61,7 +61,7 @@
                     "caom2": "caom2.enumfield",
                     "obscore": "caom2.obscoreenumfield"
                   },
-                  "UTYPE_COLUMN_NAMES":
+                  "UTYPE_COLUMN_NAME_KEYS":
                   {
                     "caom2": {
                       "Plane.energy.emBand":
@@ -289,7 +289,7 @@ function DataTrain(_modelDataSource, _autoInitFlag)
     for (var i = 0, ul = _self.uTypes.length; i < ul; i++)
     {
       // tapColumns.push(_self.uTypes[i].split('.').slice(1).join("_").toLowerCase());
-      tapColumns.push(ca.nrc.cadc.search.datatrain.tap.UTYPE_COLUMN_NAMES[_self.modelDataSource][_self.uTypes[i].name].tap_column_name);
+      tapColumns.push(ca.nrc.cadc.search.datatrain.tap.UTYPE_COLUMN_NAME_KEYS[_self.modelDataSource][_self.uTypes[i].name].tap_column_name);
     }
 
     var now = new Date();

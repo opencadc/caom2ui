@@ -41,8 +41,7 @@ public class Select extends AbstractScalarFormConstraint
 {
     // Constants used to construct name for form elements.
     public static final String NAME = "@Select";
-    public static final String UTYPE = "@Select.utype";
-
+    static final String UTYPE = "@Select.utype";
 
 
     /**
@@ -53,8 +52,7 @@ public class Select extends AbstractScalarFormConstraint
      * @param selectedValues    The selected values from the user.
      * @param hidden            Whether this item is hidden on the Form.
      */
-    public Select(final Job job, final String utype,
-                  final String[] selectedValues, final boolean hidden)
+    public Select(final Job job, final String utype, final String[] selectedValues, final boolean hidden)
     {
         super(job, utype, selectedValues, hidden);
     }

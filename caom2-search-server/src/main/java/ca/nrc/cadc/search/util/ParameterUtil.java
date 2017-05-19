@@ -25,74 +25,42 @@ public class ParameterUtil
 
     public String getValue(String name, List<Parameter> parameters)
     {
-        if ((name == null) || (parameters == null))
+        for (final Parameter parameter : parameters)
         {
-            return null;
-        }
-        else
-        {
-            for (final Parameter parameter : parameters)
+            if (parameter.getName().equals(name))
             {
-                if (parameter.getName().equals(name))
-                {
-                    return parameter.getValue();
-                }
+                return parameter.getValue();
             }
-
-            return null;
         }
+
+        return null;
     }
 
+    /**
+     * Obtain a list of all parameters whose name matches the given one in the parameter list.
+     * @param name              The name to search for.
+     * @param parameters        The list of parameters.
+     * @return                  List of values, or empty list.  Never null.
+     */
     public List<String> getValues(String name, List<Parameter> parameters)
     {
-        if ((name == null) || (parameters == null))
-        {
-            return null;
-        }
-        else
-        {
-            List<String> list = null;
-            for (final Parameter parameter : parameters)
-            {
-                if (parameter.getName().equals(name))
-                {
-                    if (list == null)
-                    {
-                        list = new ArrayList<>();
-                    }
+        final List<String> values = new ArrayList<>();
 
-                    list.add(parameter.getValue());
-                }
+        for (final Parameter parameter : parameters)
+        {
+            if (parameter.getName().equals(name))
+            {
+                values.add(parameter.getValue());
             }
-            return list;
         }
+
+        return values;
     }
 
-    public String[] getValuesAsArray(final String name,
-                                            final List<Parameter> parameters)
+    public String[] getValuesAsArray(final String name, final List<Parameter> parameters)
     {
-        List<String> list = getValues(name, parameters);
-        if (list == null)
-        {
-            return null;
-        }
-
+        final List<String> list = getValues(name, parameters);
         return list.toArray(new String[list.size()]);
-    }
-
-    public Map<String, Object> asMap(final List<Parameter> parameters)
-    {
-        final Map<String, Object> map = new HashMap<>();
-
-        if (parameters != null)
-        {
-            for (final Parameter parameter : parameters)
-            {
-                map.put(parameter.getName(), parameter.getValue());
-            }
-        }
-
-        return map;
     }
 
     /**
@@ -105,8 +73,7 @@ public class ParameterUtil
     {
         final Set<Parameter> parameters = new HashSet<>();
 
-        for (final Map.Entry<String, String[]> entry
-                : request.getParameterMap().entrySet())
+        for (final Map.Entry<String, String[]> entry : request.getParameterMap().entrySet())
         {
             final String nextKey = entry.getKey().toUpperCase();
 

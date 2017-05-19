@@ -28,10 +28,8 @@
 
 package ca.nrc.cadc.search.form;
 
-import ca.nrc.cadc.search.ObsModel;
 import ca.nrc.cadc.uws.Job;
-import org.json.JSONException;
-import org.json.JSONObject;
+
 
 /**
  * Class to represent a drop down or selection list.
@@ -43,10 +41,6 @@ public class Enumerated extends AbstractScalarFormConstraint implements Searchab
 {    
     // Constants used to construct name for form elements.
     public static final String NAME = "@Enumerated";
-    public static final String UTYPE = "@Enumerated.utype";
-
-    // Label for the list.
-    private String label;
 
     /**
      * Enumerated constructor instantiates a new instance with the given parameters.
@@ -56,31 +50,9 @@ public class Enumerated extends AbstractScalarFormConstraint implements Searchab
      * @param selectedValues    The values from the select lists.
      * @param hidden            Whether or not this is a hidden item.
      */
-    public Enumerated(final Job job, final String utype,
-                      final String[] selectedValues, final boolean hidden)
+    public Enumerated(final Job job, final String utype, final String[] selectedValues, final boolean hidden)
     {
         super(job, utype, selectedValues, hidden);
-        this.label = "";
-
-        if (!hidden)
-        {
-            this.label = ObsModel.getUtypeLabel(utype);
-        }
-    }
-
-    public String getLabel()
-    {
-        return label;
-    }
-
-    /**
-     * Not validating enumerated values, returns empty String.
-     * 
-     * @return String concatenation of the utype and error message.
-     */
-    public String getErrorMessage()
-    {
-        return "";
     }
 
     @Override
@@ -96,25 +68,5 @@ public class Enumerated extends AbstractScalarFormConstraint implements Searchab
     public String toString()
     {
         return super.toString("Enumerated");
-    }
-
-    public String toJSONString()
-    {
-        try
-        {
-            final JSONObject jsonObject = new JSONObject();
-
-            jsonObject.put("utype", getUType());
-            jsonObject.put("label", getLabel());
-            jsonObject.put("hidden", isHidden());
-            jsonObject.put("selected", getSelectedValues());
-            jsonObject.put("error", getErrorMessage());
-
-            return jsonObject.toString();
-        }
-        catch (JSONException e)
-        {
-            throw new IllegalArgumentException("Unable to write JSON", e);
-        }
     }
 }
