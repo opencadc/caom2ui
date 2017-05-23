@@ -1650,110 +1650,100 @@
       }
       else
       {
-        // var jobHost = (new cadc.web.util.URI(json.job_url)).getHost();
-        // var localHost = (new cadc.web.util.URI(window.location.href)).getHost();
         var pageLanguage = this.getPageLanguage();
-        // if (jobHost !== localHost)
-        // {
-        //   console.error("cross domain error - local host: " + localHost + ", requested job host: " + jobHost);
-        //   this._searchError(ca.nrc.cadc.search.i18n[pageLanguage]["CROSS_DOMAIN_ERROR"]);
-        // }
-        // else
-        // {
-          var runID = json.run_id;
+        var runID = json.run_id;
 
-          /**
-           * Construct a message for the bottom of the panel with interesting time information.
-           *
-           * @param {Number} queryTimeStart     Start of query in milliseconds.
-           * @param {Number} queryTimeEnd       End of TAP query in milliseconds.
-           * @param {Number} loadTimeStart      Start of load into grid in milliseconds.
-           * @param {Number} loadTimeEnd        End of load into grid in milliseconds.
-           * @return {string}
-           */
-          var buildPanelMessage = function (queryTimeStart, queryTimeEnd, loadTimeStart, loadTimeEnd)
-          {
-            var isFR = (pageLanguage === "fr");
-            var totalQueryTime = ((queryTimeEnd - queryTimeStart) / 1000.0);
-            var totalLoadTime = ((loadTimeEnd - loadTimeStart) / 1000.0);
-            var secondsString = isFR ? " secondes" : " seconds";
-            return (isFR ? "Recherche et transfert: "
-                    : "Query and transfer: ") + totalQueryTime
-                   + secondsString + " - " + (isFR ? "Lecture et affichage: " : "Load and render: ")
-                   + totalLoadTime + secondsString;
-          };
+        /**
+         * Construct a message for the bottom of the panel with interesting time information.
+         *
+         * @param {Number} queryTimeStart     Start of query in milliseconds.
+         * @param {Number} queryTimeEnd       End of TAP query in milliseconds.
+         * @param {Number} loadTimeStart      Start of load into grid in milliseconds.
+         * @param {Number} loadTimeEnd        End of load into grid in milliseconds.
+         * @return {string}
+         */
+        var buildPanelMessage = function (queryTimeStart, queryTimeEnd, loadTimeStart, loadTimeEnd)
+        {
+          var isFR = (pageLanguage === "fr");
+          var totalQueryTime = ((queryTimeEnd - queryTimeStart) / 1000.0);
+          var totalLoadTime = ((loadTimeEnd - loadTimeStart) / 1000.0);
+          var secondsString = isFR ? " secondes" : " seconds";
+          return (isFR ? "Recherche et transfert: "
+                  : "Query and transfer: ") + totalQueryTime
+                 + secondsString + " - " + (isFR ? "Lecture et affichage: " : "Load and render: ")
+                 + totalLoadTime + secondsString;
+        };
 
-          this._loadUWSJob(json.job_url, function (event, args)
-          {
-            sessionStorage.setItem("uws_job", JSON.stringify(args.job));
+        this._loadUWSJob(json.job_url, function (event, args)
+        {
+          sessionStorage.setItem("uws_job", JSON.stringify(args.job));
 
-            loadStart = (new Date()).getTime();
+          loadStart = (new Date()).getTime();
 
-          }, function (event, args)
-                           {
-                             console.error("Status error when loading job: " + args.errorStatusCode);
-                           });
+        }, function (event, args)
+                         {
+                           console.error("Status error when loading job: " + args.errorStatusCode);
+                         });
 
-          if (json.display_units)
-          {
-            $(document).data("displayUnits", json.display_units);
-          }
+        if (json.display_units)
+        {
+          $(document).data("displayUnits", json.display_units);
+        }
 
-          downloadForm.find("input[name='fragment']").val("RUNID=" + runID);
+        downloadForm.find("input[name='fragment']").val("RUNID=" + runID);
 
-          // Clean and prepare the download form.
-          downloadForm.find("input[name='uri']").remove();
-          downloadForm.find("input[name='cutout']").remove();
+        // Clean and prepare the download form.
+        downloadForm.find("input[name='uri']").remove();
+        downloadForm.find("input[name='cutout']").remove();
 
-          if (json.cutout)
-          {
-            var input = $("<input>");
+        if (json.cutout)
+        {
+          var input = $("<input>");
 
-            input.prop("type", "hidden");
-            input.prop("name", "cutout");
-            input.val(json.cutout);
+          input.prop("type", "hidden");
+          input.prop("name", "cutout");
+          input.val(json.cutout);
 
-            downloadForm.append(input);
-          }
+          downloadForm.append(input);
+        }
 
-          var activeForm = this._getActiveForm();
-          resultsVOTV.clearColumnFilters();
+        var activeForm = this._getActiveForm();
+        resultsVOTV.clearColumnFilters();
 
-          resultsVOTV.build({
-                              url: this.options.tapSyncEndpoint + "?tap_url=" + encodeURIComponent(json.results_url),
-                              type: $("input[name='format']").val(),
-                              tableMetadata: activeForm.getResultsTableMetadata(),
-                              pageSize: ca.nrc.cadc.search.RESULTS_PAGE_SIZE
-                            },
-                            function ()
+        resultsVOTV.build({
+                            url: this.options.tapSyncEndpoint + "?tap_url=" + encodeURIComponent(json.results_url),
+                            type: $("input[name='format']").val(),
+                            tableMetadata: activeForm.getResultsTableMetadata(),
+                            pageSize: ca.nrc.cadc.search.RESULTS_PAGE_SIZE
+                          },
+                          function ()
+                          {
+                            if (searchCompleteCallback)
                             {
-                              if (searchCompleteCallback)
-                              {
-                                searchCompleteCallback();
-                              }
+                              searchCompleteCallback();
+                            }
 
-                              loadEnd = (new Date()).getTime();
+                            loadEnd = (new Date()).getTime();
 
-                              resultsVOTV.render();
+                            resultsVOTV.render();
 
-                              this._postQuerySubmission({upload_url: json.upload_url});
+                            this._postQuerySubmission({upload_url: json.upload_url});
 
-                              var message = buildPanelMessage(startDate, netEnd, loadStart, loadEnd);
+                            var message = buildPanelMessage(startDate, netEnd, loadStart, loadEnd);
 
-                              $("#results-grid-footer").find(".grid-footer-label").text(message);
+                            $("#results-grid-footer").find(".grid-footer-label").text(message);
 
-                              // Necessary at the end!
-                              resultsVOTV.refreshGrid();
-                            }.bind(this),
-                            function (jqXHR, status, message)
-                            {
-                              console.error("Error status: " + status);
-                              console.error("Error message: " + message);
-                              console.error("Error from response: " + jqXHR.responseText);
-                              activeForm.cancel();
-                              alert(message);
-                            });
-        // }
+                            // Necessary at the end!
+                            resultsVOTV.refreshGrid();
+                          }.bind(this),
+                          function (jqXHR, status, message)
+                          {
+                            console.error("Error status: " + status);
+                            console.error("Error message: " + message);
+                            console.error("Error from response: " + jqXHR.responseText);
+                            activeForm.cancel();
+                            alert(message);
+                          });
       }
     };
 
