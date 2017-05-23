@@ -3,7 +3,6 @@
 
 <%@ page import="ca.nrc.cadc.search.form.Enumerated" %>
 <%@ page import="ca.nrc.cadc.search.form.FormConstraint" %>
-<%--<%@ page import="ca.nrc.cadc.search.form.Hierarchy" %>--%>
 
 <jsp:useBean id="job" scope="request" class="ca.nrc.cadc.uws.Job"/>
 <jsp:useBean id="errors" scope="request"
@@ -12,9 +11,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
-<%
-    final String maxRowLimit = request.getParameter("maxRowLimit");
-%>
 
 
 <div role="tabpanel" class="tab-pane active" id="queryFormTab">
@@ -30,7 +26,7 @@
         <!-- Used by AdvancedSearch to pass to TAP. -->
         <input type="hidden" name="formName" value="adsform"/>
         <input type="hidden" name="SelectList" class="CAOM2_selectlist" />
-        <input type="hidden" name="MaxRecords" value="<%= maxRowLimit %>"/>
+        <input type="hidden" name="MaxRecords" value="${param.maxRowLimit}"/>
         <input type="hidden" name="format" value="csv"/>
 
         <!-- Used by AdvancedSearch to pass to VOTV. -->
@@ -164,7 +160,7 @@
             </div>
 
             <c:import
-                    url="hierarchy.jsp?utype=Plane.energy.emBand/Observation.collection/Observation.instrument.name/Plane.energy.bandpassName/Plane.calibrationLevel/Plane.dataProductType/Observation.type&modelDataSource=caom2"/>
+                    url="hierarchy.jsp?colcount=seven-col&utype=Plane.energy.emBand/Observation.collection/Observation.instrument.name/Plane.energy.bandpassName/Plane.calibrationLevel/Plane.dataProductType/Observation.type&modelDataSource=caom2"/>
 
             <div class="col-sm-12 button-holder">
                 <button type="submit" class="btn btn-primary submit-query" value="<fmt:message key="SEARCH_BUTTON_LABEL" bundle="${langBundle}" />" >

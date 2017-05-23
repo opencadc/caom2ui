@@ -23,47 +23,51 @@
       <%--<span class="search_criteria_label <%= detailsID %>"><fmt:message key="<%= labelKey %>" bundle="${langBundle}"/></span>--%>
       <%--<span class="search_criteria_label_contents color-accent"></span>--%>
     <%--</summary>--%>
-<div data-toggle="tooltip" data-placement="<%= tipSide %>" title="<fmt:message key="<%= labelKey %>" bundle="${langBundle}"/>">
+<div data-toggle="tooltip" data-placement="${param.tipSide}" title="<fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}"/>">
     <div class="form-group">
-        <label for="<%= utype %>" class="control-label">
-          <fmt:message key="<%= labelKey %>" bundle="${langBundle}" />
+        <label for="${param.utype}" class="control-label">
+          <fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}" />
         </label>
 
-            <%--<div class="resolve_panel margin-top-medium">--%>
         <label for="<%= resolverName %>" class="sub-label">
-          <fmt:message key="RESOLVER_FORM_LABEL" bundle="${langBundle}" /><span class="italic margin-left-small"><fmt:message key="RESOLVER_FORM_LABEL_ADDENDUM" bundle="${langBundle}" /></span></label>
+          <fmt:message key="RESOLVER_FORM_LABEL" bundle="${langBundle}" />
+            <span class="italic margin-left-small"><fmt:message key="RESOLVER_FORM_LABEL_ADDENDUM" bundle="${langBundle}" /></span>
+        </label>
         <select size="1" name="<%= resolverName %>" title="<fmt:message key="RESOLVER_FORM_LABEL" bundle="${langBundle}" />"
-                id="<%= resolverName %>" class="form-control resolver_select">
+                id="<%= resolverName %>" class="form-control">
           <option value="ALL">
-            <fmt:message key="ANY_RESOLVER_FORM_LABEL" bundle="${langBundle}" /></option>
+            <fmt:message key="ANY_RESOLVER_FORM_LABEL" bundle="${langBundle}" />
+          </option>
           <option value="SIMBAD">SIMBAD</option>
           <option value="NED">NED</option>
           <option value="VIZIER">VIZIER</option>
-          <option value="NONE"><fmt:message key="NO_RESOLVER_FORM_LABEL" bundle="${langBundle}" /></option>
+          <option value="NONE">
+              <fmt:message key="NO_RESOLVER_FORM_LABEL" bundle="${langBundle}" />
+          </option>
         </select>
     </div>
-            <%--</div>--%>
 
-    <div class="form-group col-sm-qwform-input-append">
+    <div class="input-group">
       <input type="text" class="form-control search_criteria_input"
-             size="28" id="<%= utype %>"
+             size="28" id="${param.utype}"
              name="<%= name %>" />
-      <span id="<%= utype %>_target_name_resolution_status"
-            class="form-control form-addon target_name_resolution_status"></span>
+      <span id="${param.utype}_target_name_resolution_status"
+            class="input-group-addon target_name_resolution_status"></span>
+    </div>
+
+    <div class="text-center">
+        <span><strong>- <fmt:message key="OR_LABEL" bundle="${langBundle}"/> -</strong></span>
     </div>
 
     <div class="form-group">
-        <div class="align-center margin-top-none margin-bottom-medium">
-          <span class="font-large">- <fmt:message key="OR_LABEL" bundle="${langBundle}"/> -</span>
-        </div>
-        <div id="<%= utype %>_targetList_fileInputDiv" class="">
-          <label for="<%= utype %>_targetList" class="disabled" disabled>
-            <fmt:message key="TARGET_LIST_FORM_LABEL" bundle="${langBundle}" /></label>
+        <div id="${param.utype}_targetList_fileInputDiv" class="">
+            <label for="${param.utype}_targetList" class="disabled" disabled>
+                <fmt:message key="TARGET_LIST_FORM_LABEL" bundle="${langBundle}" />
+            </label>
             <div>
-              <input type="file" class="form-control col-sm-11"
-                     id="<%= utype %>_targetList" name="targetList"
+              <input type="file" class="form-control"
+                     id="${param.utype}_targetList" name="targetList"
                      title="<fmt:message key="TARGET_LIST_TOOLTIP" bundle="${langBundle}" />" />
-              <span id="<%= utype %>_targetList_clear" class="wb-icon-eraser targetList_clear"></span>
             </div>
         </div>
     </div>

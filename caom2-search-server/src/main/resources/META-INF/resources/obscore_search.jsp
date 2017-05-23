@@ -1,10 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" session="false"
          pageEncoding="UTF-8" %>
 
-<%@ page import="ca.nrc.cadc.search.form.Enumerated" %>
-<%@ page import="ca.nrc.cadc.search.form.FormConstraint" %>
-<%@ page import="ca.nrc.cadc.search.form.Hierarchy" %>
-
 <jsp:useBean id="job" scope="request" class="ca.nrc.cadc.uws.Job"/>
 <jsp:useBean id="errors" scope="request"
              class="ca.nrc.cadc.search.form.FormErrors"/>
@@ -12,11 +8,8 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
-<%
-    final String maxRowLimit = request.getParameter("maxRowLimit");
-%>
 
-<div role="tabpanel" class="tab-pane active" id="obsCoreQueryFormTab">
+<div role="tabpanel" class="tab-pane" id="obsCoreQueryFormTab">
     <h2>ObsCore</h2>
     <form id="obscoreQueryForm" name="obscoreQueryForm" class="queryForm"
     method="post" action="${pageContext.request.contextPath}/find"
@@ -29,7 +22,7 @@
 
         <!-- Used by AdvancedSearch to pass to TAP. -->
         <input type="hidden" name="SelectList" class="ObsCore_selectlist" />
-        <input type="hidden" name="MaxRecords" value="<%= maxRowLimit %>"/>
+        <input type="hidden" name="MaxRecords" value="${param.maxRowLimit}"/>
         <input type="hidden" name="format" value="csv"/>
 
         <%--<div class="equalize margin-top-large margin-bottom-none">--%>
@@ -146,7 +139,7 @@
         </div>
 
         <c:import
-        url="hierarchy.jsp?utype=DataID.Collection/Provenance.ObsConfig.Facility.name/Provenance.ObsConfig.Instrument.name/ObsDataset.calibLevel/ObsDataset.dataProductType&modelDataSource=obscore"/>
+        url="hierarchy.jsp?colcount=five-col&utype=DataID.Collection/Provenance.ObsConfig.Facility.name/Provenance.ObsConfig.Instrument.name/ObsDataset.calibLevel/ObsDataset.dataProductType&modelDataSource=obscore"/>
 
         <%--<div class="equalize margin-top-large margin-bottom-none">--%>
         <%--<div class="span-3 row-start form-inline">--%>

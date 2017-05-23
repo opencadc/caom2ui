@@ -98,7 +98,7 @@
       <c:import url="caom2_search.jsp?maxRowLimit=10000000"/>
 
       <!-- ObsCore Query Tab -->
-      <%--<c:import url="obscore_search.jsp?maxRowLimit=10000000"/>--%>
+      <c:import url="obscore_search.jsp?maxRowLimit=10000000"/>
 
       <!-- Result Tab -->
       <c:import url="results.jsp?maxRowLimit=10000000"/>
