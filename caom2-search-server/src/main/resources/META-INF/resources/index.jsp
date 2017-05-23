@@ -13,7 +13,7 @@
   final String requestHeaderLang = (contentLanguage == null)
                                    ? "en" : contentLanguage;
 
-  final String downloadLink = "/downloadManager/download";
+//  final String downloadLink = "/downloadManager/download";
 
   final int maxRowLimit =
       configuration.lookupInt("org.opencadc.search.max-row-count",
@@ -103,64 +103,64 @@
       <!-- Result Tab -->
       <c:import url="results.jsp?maxRowLimit=10000000"/>
 
-  <%--<!-- Error Tab -->--%>
-  <%--<div id="errorTableTab">--%>
-    <%--<div class="grid-container">--%>
-      <%--<div id="error-grid-header" class="grid-header">--%>
-        <%--<span class="grid-header-label"></span>--%>
-      <%--</div>--%>
-      <%--<div id="errorTable"></div>--%>
-    <%--</div>--%>
-    <%--<div id="errorTooltipColumnPickerHolder">--%>
-      <%--<div class="tooltip columnpicker">--%>
-        <%--<h3>Add/remove displayed columns</h3>--%>
-        <%--<span class="tooltipColumnPickerHelpText">--%>
-          <%--Drag &amp; drop columns above or below the red bar, move the red bar--%>
-          <%--itself or click on the checkboxes.--%>
-        <%--</span>--%>
-        <%--<br/>--%>
-        <%--<br/>--%>
+  <!-- Error Tab -->
+  <div role="tabpanel" class="tab-pane" id="errorTableTab">
+    <div class="grid-container">
+      <div id="error-grid-header" class="grid-header">
+        <span class="grid-header-label"></span>
+      </div>
+      <div id="errorTable"></div>
+    </div>
+    <div id="errorTooltipColumnPickerHolder">
+      <div class="tooltip columnpicker">
+        <h3>Add/remove displayed columns</h3>
+        <span class="tooltipColumnPickerHelpText">
+          Drag &amp; drop columns above or below the red bar, move the red bar
+          itself or click on the checkboxes.
+        </span>
+        <br/>
+        <br/>
 
-        <%--<h3>Reorder columns</h3>--%>
-        <%--<span class="tooltipColumnPickerHelpText">--%>
-          <%--Drag &amp; drop the columns or drag &amp; drop the column headers--%>
-          <%--directly in the results table.--%>
-        <%--</span>--%>
+        <h3>Reorder columns</h3>
+        <span class="tooltipColumnPickerHelpText">
+          Drag &amp; drop the columns or drag &amp; drop the column headers
+          directly in the results table.
+        </span>
 
-        <%--<div class="tooltip_content"></div>--%>
-      <%--</div>--%>
-    <%--</div>--%>
-  <%--</div>--%>
+        <div class="tooltip_content"></div>
+      </div>
+    </div>
+  </div>
 
-  <%--<!-- Query Tab -->--%>
-  <%--<div id="queryTab" class="wet-boew-prettify lang-sql">--%>
-    <%--<div id="query_holder">--%>
-      <%--<h3 class="wb-invisible">ADQL Query</h3>--%>
-      <%--<pre class="prettyprint lang-sql"><code id="query" class="lang-sql"></code></pre>--%>
-    <%--</div>--%>
-  <%--</div>--%>
+  <!-- Query Tab -->
+  <div id="queryTab" class="wet-boew-prettify lang-sql tab-pane" role="tabpanel">
+    <div id="query_holder">
+      <h3 class="wb-invisible">ADQL Query</h3>
+      <pre class="prettyprint lang-sql"><code id="query" class="lang-sql"></code></pre>
+    </div>
+  </div>
 
   <!-- Help Tab -->
-  <%--<div id="helpTab" >--%>
-    <%--<c:import url="_help.jsp"/>--%>
-  <%--</div>--%>
-  <%--</div>--%>
-  <%--</div>--%>
+  <div role="tabpanel" class="tab-pane" id="helpTab" >
+    <c:import url="_help.jsp"/>
+  </div>
+  </div>
+  </div>
 
-  <%--<div class="wb-invisible">--%>
-    <%--<div id="queryOverlay" data-role="popup">--%>
-      <%--<img src="images/queryoverlay.gif" alt=""/>--%>
-      <%--<br/>--%>
-                <%--<span id="overlay_status">--%>
-                  <%--<fmt:message key="EXECUTING_QUERY_LABEL"--%>
-                               <%--bundle="${langBundle}"/></span>--%>
-      <%--<br/>--%>
-                <%--<span id="overlay_cancel">--%>
-                  <%--<input id="cancel_search" type="button" value="Cancel"--%>
-                         <%--class="button"/>--%>
-                <%--</span>--%>
-    <%--</div>--%>
-  <%--</div>--%>
+  <div class="invisible">
+    <div id="queryOverlay" data-role="popup">
+      <img src="images/queryoverlay.gif" alt=""/>
+      <br/>
+                <span id="overlay_status">
+                  <fmt:message key="EXECUTING_QUERY_LABEL"
+                               bundle="${langBundle}"/></span>
+      <br/>
+                <span id="overlay_cancel">
+                  <input id="cancel_search" type="button" value="Cancel"
+                         class="btn"/>
+                </span>
+    </div>
+  </div>
   </div>
 
           <div class="hidden" id="preloadthumbnails"></div>
