@@ -17,7 +17,7 @@
     final String downloadLink = "/downloadManager/download";
 %>
 
-<div id="resultTableTab">
+<div role="tabpanel" class="tab-pane" id="resultTableTab">
 <span class="votable_link_label">
 <fmt:message key="FULL_VOTABLE_LINK_LABEL" bundle="${langBundle}"/></span>
 <a href="#" class="votable_link_votable link_idle">VOTable</a>
