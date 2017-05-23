@@ -25,18 +25,6 @@
 
 
 
-
-
-<div class="form-group">
-  <label for="<%= utype %>" class="col-sm-4 control-label">
-    <fmt:message key="<%= labelKey %>" bundle="${langBundle}"/>
-  </label>
-  <div class="col-sm-8">
-    <input type="text" class="form-control" id="<%= utype %>" name="<%= utype %>" placeholder="Text">
-  </div>
-</div>
-
-
 <li class="label_tooltip_<%= tipSide %>">
   <details id="<%= detailsID %>">
     <summary class="search_criteria_label_container">

@@ -10,12 +10,9 @@
 
 <%
   final String utype = request.getParameter("utype");
-//  final String labelKey = utype + "_FORM_LABEL";
-  final String tipSide = request.getParameter("tipSide");
   final String name = utype + Date.VALUE;
   final String presetName = utype + "_PRESET" + Date.VALUE;
   final String formName = utype + Date.NAME;
-//  final String detailsID = utype + "_details";
 
   // For the select list.  These MUST be put into variables as they cannot be
   // built in the fmt:message because who the heck knows.
@@ -29,44 +26,13 @@
       utype + "_PRESET_PAST_MONTH_FORM_LABEL";
 %>
 
-<%--<div class="label_tooltip_<%= tipSide %>">--%>
-<%--<details id="<%= detailsID %>">--%>
-<%--<summary class="search_criteria_label_container">--%>
-<%--<span class="search_criteria_label <%= detailsID %>"><fmt:message key="<%= labelKey %>" bundle="${langBundle}"/></span>--%>
-<%--<span class="search_criteria_label_contents color-accent"></span>--%>
-<%--</summary>--%>
-<%--<div>--%>
-  <%--<label for="<%= utype %>" class="control-label">--%>
-    <%--<fmt:message key="<%= labelKey %>" bundle="${langBundle}"/>--%>
-  <%--</label>--%>
-  <%--<div class="">--%>
-    <%--<input type="text"--%>
-           <%--class="form-control"--%>
-           <%--id="<%= utype %>"--%>
-           <%--name="<%= utype %>"--%>
-           <%--placeholder="Text">--%>
-  <%--</div>--%>
-
-  <%--<input type="hidden"--%>
-         <%--name="<%= FormConstraint.FORM_NAME %>"--%>
-         <%--value="<%= formName %>"/>--%>
-<%--</div>--%>
-<%--</details>--%>
-<%--</div>--%>
-
-<%--<li class="label_tooltip_<%= tipSide %>">--%>
-  <%--<details id="<%= detailsID %>">--%>
-    <%--<summary class="search_criteria_label_container">--%>
-      <%--<span class="search_criteria_label <%= detailsID %>"><fmt:message key="<%= labelKey %>" bundle="${langBundle}"/></span>--%>
-      <%--<span class="search_criteria_label_contents color-accent"></span>--%>
-    <%--</summary>--%>
 
 <div class="form-group">
 
   <label for="${param.utype}" class="">
     <fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}"/>
   </label>
-  <div id="${param.utype}_input_decorate">
+  <div data-toggle="popover" data-placement="${param.tipSide}" data-title="<fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}"/>"  id="${param.utype}_input_decorate">
     <input id="${param.utype}"
            name="<%= name %>" value="" size="20"
            type="text" data-assoc-field="${param.utype}_PRESET"
@@ -97,4 +63,4 @@
        name="<%= FormConstraint.FORM_NAME %>"
        value="<%= formName %>"/>
 
-<%--</li>--%>
+

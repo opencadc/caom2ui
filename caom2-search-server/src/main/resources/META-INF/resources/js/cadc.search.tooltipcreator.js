@@ -31,8 +31,8 @@
     {
       var $divElement =
           $("<div class='module-tool module-simplify module-tool-tooltip'></div>");
-      var $tooltipHeader = $("<div class='tooltip_header'></div>");
-      var $tooltipHeaderH6Element = $("<h6></h6>").appendTo($tooltipHeader);
+      // var $tooltipHeader = $("<div class='tooltip_header'></div>");
+      // var $tooltipHeaderH6Element = $("<h6></h6>").appendTo($tooltipHeader);
       var $tooltipTextElement =
           $("<p>").appendTo("<div class='tooltip_text'></div>");
 
@@ -42,8 +42,8 @@
       }
 
       $tooltipTextElement.html(tipHTML);
-      $tooltipHeaderH6Element.text(tooltipHeaderText);
-      $divElement.append($tooltipHeaderH6Element.parent());
+      // $tooltipHeaderH6Element.text(tooltipHeaderText);
+      // $divElement.append($tooltipHeaderH6Element.parent());
       $divElement.append($tooltipTextElement.parent());
 
       var $clone;

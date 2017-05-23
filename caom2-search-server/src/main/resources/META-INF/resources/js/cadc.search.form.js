@@ -950,68 +950,54 @@
 
         var offsetY = tipJSON.verticalOffset ? tipJSON.verticalOffset : 0;
 
-        var $ttIconImg = $("<span class=\"" + tooltipIconCSS + " " + initialTooltipIconCSS + " float-right\" />");
+        var $tooltipDiv = tooltipCreator.getContent(tipMarkup, tooltipHeaderText, null, null);
 
-        $liItem.find(".search_criteria_label_contents").before($ttIconImg);
-
-        var $tooltipDiv = tooltipCreator.getContent(tipMarkup, tooltipHeaderText, null, $ttIconImg);
-
-        var tipster = $ttIconImg.tooltipster({
-                                               interactive: true,
-                                               animation: "fade",
-                                               theme: "tooltipster-advanced-search",
-                                               content: $tooltipDiv,
-                                               maxWidth: 400,
-                                               arrow: false,
-                                               repositionOnResize: false,
-                                               repositionOnScroll: false,
-                                               position: tipsterPlacement,
-                                               offsetX: offsetX,
-                                               offsetY: offsetY,
-                                               onlyOne: true,
-                                               trigger: "custom"
-                                             });
+        $liItem.popover({
+          title:tooltipHeaderText,
+          content:$tooltipDiv[0].innerHTML,
+          html: true
+        });
 
         if (inputID === "Plane.position.bounds")
         {
           this.targetTooltipsters = this.targetTooltipsters.concat(tipster);
         }
 
-        $ttIconImg.hover(function (event)
-                         {
-                           var $thisSpan = $(event.target);
+        // $ttIconImg.hover(function (event)
+        //                  {
+        //                    var $thisSpan = $(event.target);
+        //
+        //                    $thisSpan.removeClass(initialTooltipIconCSS);
+        //                    $thisSpan.addClass(hoverTooltipIconCSS);
+        //
+        //                    return false;
+        //                  },
+        //                  function (event)
+        //                  {
+        //                    var $thisSpan = $(event.target);
+        //
+        //                    $thisSpan.removeClass(hoverTooltipIconCSS);
+        //                    $thisSpan.addClass(initialTooltipIconCSS);
+        //
+        //                    return false;
+        //                  });
 
-                           $thisSpan.removeClass(initialTooltipIconCSS);
-                           $thisSpan.addClass(hoverTooltipIconCSS);
-
-                           return false;
-                         },
-                         function (event)
-                         {
-                           var $thisSpan = $(event.target);
-
-                           $thisSpan.removeClass(hoverTooltipIconCSS);
-                           $thisSpan.addClass(initialTooltipIconCSS);
-
-                           return false;
-                         });
-
-        $ttIconImg.on("click", function (e)
-        {
-          e.preventDefault();
-          $ttIconImg.tooltipster("show");
-
-          // Make them
-          // draggable.
-          $(".tooltipster-advanced-search").draggable(
-              {
-                handle: ".tooltip_header",
-                snap: true,
-                revert: false
-              });
-
-          return false;
-        });
+        // $ttIconImg.on("click", function (e)
+        // {
+        //   e.preventDefault();
+        //   $ttIconImg.tooltipster("show");
+        //
+        //   // Make them
+        //   // draggable.
+        //   $(".tooltipster-advanced-search").draggable(
+        //       {
+        //         handle: ".tooltip_header",
+        //         snap: true,
+        //         revert: false
+        //       });
+        //
+        //   return false;
+        // });
       }
     };
 
@@ -1021,32 +1007,20 @@
      */
     this.loadTooltips = function (jsonData)
     {
-      // var tooltipCreator = new ca.nrc.cadc.search.TooltipCreator();
-      // // this.$form.find("ul.search-constraints li").each(function (key, element)
-      // this.$form.find("div.search-constraints div").each(function (key, element)
-      //                                                  {
-      //                                                    var $liItem = $(element);
-      //                                                    var $tooltipHeader = $liItem.find("summary.search_criteria_label_container");
-      //                                                    var tooltipHeaderText = $tooltipHeader.text();
-      //                                                    var $searchInputItem = $liItem.find(".search_criteria_input:first");
-      //                                                    var inputID = $searchInputItem.attr("id");
-      //
-      //                                                    this.handleTooltipLoad(jsonData[inputID], tooltipCreator,
-      //                                                                           $liItem, inputID, tooltipHeaderText);
-      //                                                  }.bind(this));
+      var tooltipCreator = new ca.nrc.cadc.search.TooltipCreator();
+      this.$form.find('[data-toggle="popover"]').each(function (key, element)
+                                                       {
+                                                         var $liItem = $(element);
+                                                         // var $tooltipHeader = $liItem.find("summary.search_criteria_label_container");
+                                                         // var tooltipHeaderText = $tooltipHeader.text();
+                                                         var $searchInputItem = $liItem.find(".search_criteria_input:first");
+                                                         var inputID = $searchInputItem.attr("id");
+
+                                                         this.handleTooltipLoad(jsonData[inputID], tooltipCreator,
+                                                                                $liItem, inputID, element.dataset.title);
+                                                       }.bind(this));
 
       $('[data-toggle="tooltip"]').tooltip();
-      // this.$form.find("div.search-constraints div").each(function (key, element)
-      // {
-      //   var $liItem = $(element);
-      //   var $tooltipHeader = $liItem.find("summary.search_criteria_label_container");
-      //   var tooltipHeaderText = $tooltipHeader.text();
-      //   var $searchInputItem = $liItem.find(".search_criteria_input:first");
-      //   var inputID = $searchInputItem.attr("id");
-      //
-      //   this.handleTooltipLoad(jsonData[inputID], tooltipCreator,
-      //       $liItem, inputID, tooltipHeaderText);
-      // }.bind(this));
 
     };
 
