@@ -18,8 +18,12 @@
     <label for="${param.utype}" class="control-label">
       <fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}"/>
     </label>
-
-    <div data-toggle="popover" data-placement="${param.tipSide}" data-title="<fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}"/>"  id="${param.utype}_input_decorate">
+    <div data-toggle="popover"
+         data-placement="${param.tipSide}"
+         data-title="<fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}"/>"
+         class="glyphicon glyphicon-question-sign popover_blue">
+    </div>
+    <div id="${param.utype}_input_decorate">
       <input id="${param.utype}"
              name="<%= name %>" value="" size="20"
              type="text"

@@ -8,18 +8,21 @@
 
 <%
   final String utype = request.getParameter("utype");
-  final String labelKey = utype + "_FORM_LABEL";
-  final String tipSide = request.getParameter("tipSide");
   final String formName = utype + ca.nrc.cadc.search.form.Number.NAME;
-  final String detailsID = utype + "_details";
 %>
 
 
-<div class="form-group">
+  <div class="form-group tooltip-group">
+
     <label for="${param.utype}" class="control-label">
       <fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}"/>
     </label>
-    <div data-toggle="popover" data-placement="${param.tipSide}" data-title="<fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}"/>"  id="${param.utype}_input_decorate">
+    <div data-toggle="popover"
+         data-placement="${param.tipSide}"
+         data-title="<fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}"/>"
+         class="glyphicon glyphicon-question-sign popover_blue">
+    </div>
+    <div id="${param.utype}_input_decorate">
       <input id="${param.utype}"
              name="${param.utype}" value="" size="15"
              type="text"

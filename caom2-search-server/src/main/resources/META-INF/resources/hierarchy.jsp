@@ -15,7 +15,7 @@
             <div id="${param.modelDataSource}@Hierarchy"
                             class="width-100 text-align advanced_search_data_train modelDataSource_${param.modelDataSource} ${param.colcount}"
                             data-utypes="${param.utype}">
-                <div class="invisible hierarchy_utype">${param.utype}</div>
+                <div class="hidden hierarchy_utype">${param.utype}</div>
 
                 <div class="hidden" id="${param.utype}.building">
                     <span class="wb-icon-busy"></span>

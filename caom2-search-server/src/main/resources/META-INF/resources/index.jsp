@@ -93,6 +93,7 @@
 
 
     <%--todo: maxRowLimit needs to be fed in here properly--%>
+
   <div class="tab-content">
       <!-- CAOM2 Search Query Tab -->
       <c:import url="caom2_search.jsp?maxRowLimit=10000000"/>

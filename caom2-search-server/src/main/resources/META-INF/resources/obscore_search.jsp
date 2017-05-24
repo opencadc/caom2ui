@@ -25,31 +25,19 @@
         <input type="hidden" name="MaxRecords" value="${param.maxRowLimit}"/>
         <input type="hidden" name="format" value="csv"/>
 
-        <%--<div class="equalize margin-top-large margin-bottom-none">--%>
-        <%--<div class="span-3 row-start form-inline">--%>
-        <%--<input type="submit"--%>
-        <%--value="<fmt:message key="SEARCH_BUTTON_LABEL" bundle="${langBundle}" />"--%>
-        <%--data-rel="popup" data-dismissible="false"--%>
-        <%--data-position-to="window" data-inline="true"--%>
-        <%--data-transition="pop" data-corners="true" data-shadow="true"--%>
-        <%--data-iconshadow="true" data-wrapperels="span" data-theme="c"--%>
-        <%--aria-haspopup="true" aria-owns="queryOverlay"--%>
-        <%--class="submit-obscore-query button button-accent ui-btn"/>--%>
-        <%--<input type="reset" data-role="none"--%>
-        <%--value="<fmt:message key="RESET_BUTTON_LABEL" bundle="${langBundle}" />"--%>
-        <%--class="reset-obscore-query-form button ui-btn"/>--%>
-        <%--</div>--%>
-        <%--<div class="span-5 row-end"></div>--%>
-        <%--<div class="clear"></div>--%>
-        <%--</div>--%>
 
         <div class="col-sm-12 button-holder">
-            <button type="submit" class="btn btn-primary" value="<fmt:message key="SEARCH_BUTTON_LABEL" bundle="${langBundle}" />" >
+            <button type="submit" class="btn btn-primary submit_query" value="<fmt:message key="SEARCH_BUTTON_LABEL" bundle="${langBundle}" />" >
                 <fmt:message key="SEARCH_BUTTON_LABEL" bundle="${langBundle}" />
             </button>
-            <button type="reset" class="btn btn-default" value="<fmt:message key="RESET_BUTTON_LABEL" bundle="${langBundle}" />" >
+            <button type="reset" class="btn btn-default reset_query_form" value="<fmt:message key="RESET_BUTTON_LABEL" bundle="${langBundle}" />" >
                 <fmt:message key="RESET_BUTTON_LABEL" bundle="${langBundle}" />
             </button>
+        </div>
+
+
+        <div class="col-sm-12">
+            <fmt:message key="TOOLTIP_CLARIFICATION_MESSAGE_PREFIX" bundle="${langBundle}" />&nbsp;<span class="glyphicon glyphicon-question-sign popover_blue"></span><fmt:message key="TOOLTIP_CLARIFICATION_MESSAGE_SUFFIX" bundle="${langBundle}" />
         </div>
 
         <div class="row">
@@ -141,30 +129,11 @@
         <c:import
         url="hierarchy.jsp?colcount=five-col&utype=DataID.Collection/Provenance.ObsConfig.Facility.name/Provenance.ObsConfig.Instrument.name/ObsDataset.calibLevel/ObsDataset.dataProductType&modelDataSource=obscore"/>
 
-        <%--<div class="equalize margin-top-large margin-bottom-none">--%>
-        <%--<div class="span-3 row-start form-inline">--%>
-        <%--<input type="submit"--%>
-        <%--value="<fmt:message key="SEARCH_BUTTON_LABEL" bundle="${langBundle}" />"--%>
-        <%--data-rel="popup" data-dismissible="false"--%>
-        <%--data-position-to="window" data-inline="true"--%>
-        <%--data-transition="pop" data-corners="true" data-shadow="true"--%>
-        <%--data-iconshadow="true" data-wrapperels="span" data-theme="c"--%>
-        <%--aria-haspopup="true" aria-owns="queryOverlay"--%>
-        <%--class="submit-obscore-query button button-accent ui-btn"/>--%>
-        <%--<input type="reset" data-role="none"--%>
-        <%--value="<fmt:message key="RESET_BUTTON_LABEL" bundle="${langBundle}" />"--%>
-        <%--class="reset-obscore-query-form button ui-btn"/>--%>
-        <%--</div>--%>
-        <%--<div class="span-5 row-end"></div>--%>
-        <%--<div class="clear"></div>--%>
-        <%--</div>--%>
-
-
         <div class="col-sm-12 button-holder">
-            <button type="submit" class="btn btn-primary" value="<fmt:message key="SEARCH_BUTTON_LABEL" bundle="${langBundle}" />" >
+            <button type="submit" class="btn btn-primary submit_query" value="<fmt:message key="SEARCH_BUTTON_LABEL" bundle="${langBundle}" />" >
                 <fmt:message key="SEARCH_BUTTON_LABEL" bundle="${langBundle}" />
             </button>
-            <button type="reset" class="btn btn-default" value="<fmt:message key="RESET_BUTTON_LABEL" bundle="${langBundle}" />" >
+            <button type="reset" class="btn btn-default reset_query_form" value="<fmt:message key="RESET_BUTTON_LABEL" bundle="${langBundle}" />" >
                 <fmt:message key="RESET_BUTTON_LABEL" bundle="${langBundle}" />
             </button>
         </div>

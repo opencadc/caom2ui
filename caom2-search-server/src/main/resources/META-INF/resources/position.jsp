@@ -23,7 +23,7 @@
       <%--<span class="search_criteria_label <%= detailsID %>"><fmt:message key="<%= labelKey %>" bundle="${langBundle}"/></span>--%>
       <%--<span class="search_criteria_label_contents color-accent"></span>--%>
     <%--</summary>--%>
-<div data-toggle="tooltip" data-placement="${param.tipSide}" title="<fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}"/>">
+<div>
     <div class="form-group">
         <label for="${param.utype}" class="control-label">
           <fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}" />
@@ -33,6 +33,11 @@
           <fmt:message key="RESOLVER_FORM_LABEL" bundle="${langBundle}" />
             <span class="italic margin-left-small"><fmt:message key="RESOLVER_FORM_LABEL_ADDENDUM" bundle="${langBundle}" /></span>
         </label>
+        <div data-toggle="popover"
+             data-placement="${param.tipSide}"
+             data-title="<fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}"/>"
+             class="glyphicon glyphicon-question-sign popover_blue">
+        </div>
         <select size="1" name="<%= resolverName %>" title="<fmt:message key="RESOLVER_FORM_LABEL" bundle="${langBundle}" />"
                 id="<%= resolverName %>" class="form-control">
           <option value="ALL">

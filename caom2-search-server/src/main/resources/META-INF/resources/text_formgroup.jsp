@@ -23,13 +23,17 @@
     <label for="${param.utype}" class="control-label">
         <fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}"/>
     </label>
-    <div data-toggle="popover" data-placement="${param.tipSide}" data-title="<fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}"/>">
+    <div data-toggle="popover"
+         data-placement="${param.tipSide}"
+         data-title="<fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}"/>"
+         class="glyphicon glyphicon-question-sign popover_blue">
+    </div>
+    <div>
         <input type="text"
                class="form-control search_criteria_input"
                id="${param.utype}"
                name="${param.utype}">
     </div>
-
     <input type="hidden"
            name="<%= FormConstraint.FORM_NAME %>"
            value="<%= formName %>"/>

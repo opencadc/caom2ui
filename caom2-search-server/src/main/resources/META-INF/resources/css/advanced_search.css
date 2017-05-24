@@ -308,6 +308,7 @@ div.align-middle.column-picker-icon
   height: auto;
 }
 
+
 [class*="target_name_resolution_status"]
 {
   margin-left: -0.5em;
@@ -476,6 +477,7 @@ canvas.aladin-imageCanvas {
 }
 
 
+/* CSS for defining widths of Addtional Constraints colums - 5 and 7 count wide */
 div.search-category {
   height: 100%;
 }
@@ -524,8 +526,15 @@ div.search-category div.panel {
   }
 }
 
-.popover {
-  max-width: 600px;
-  min-width: 400px;
+
+/*Bootstrap Glyphicon and Popover styling*/
+
+.popover_blue {
+  color:mediumblue;
 }
+.popover {
+  max-width: 500px;
+  min-width: 500px;
+}
+
 

@@ -638,7 +638,7 @@
     var VALIDATOR_TIMER_DELAY = 500;
 
     var tooltipIconCSS = "advancedsearch-tooltip";
-    var initialTooltipIconCSS = "wb-icon-question";
+    var initialTooltipIconCSS = "glyphicon-question-sign";
     var hoverTooltipIconCSS = "wb-icon-question-alt";
 
     this.validator = new ca.nrc.cadc.search.Validator(this.configuration.options.validatorEndpoint,
@@ -1013,7 +1013,7 @@
                                                          var $liItem = $(element);
                                                          // var $tooltipHeader = $liItem.find("summary.search_criteria_label_container");
                                                          // var tooltipHeaderText = $tooltipHeader.text();
-                                                         var $searchInputItem = $liItem.find(".search_criteria_input:first");
+                                                         var $searchInputItem = $liItem.parent().find(".search_criteria_input:first");
                                                          var inputID = $searchInputItem.attr("id");
 
                                                          this.handleTooltipLoad(jsonData[inputID], tooltipCreator,
