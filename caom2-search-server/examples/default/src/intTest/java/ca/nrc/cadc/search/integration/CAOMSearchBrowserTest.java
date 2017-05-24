@@ -54,8 +54,8 @@ public class CAOMSearchBrowserTest extends AbstractAdvancedSearchIntegrationTest
     {
         CAOMSearchFormPage searchFormPage = goTo(endpoint, null, CAOMSearchFormPage.class);
 
-        searchFormPage.enterTarget("210.05  54.3");
         searchFormPage.enterObservationID("692512");
+        searchFormPage.enterTarget("210.05  54.3");
 
         searchFormPage.reset();
 

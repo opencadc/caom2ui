@@ -345,37 +345,6 @@
       //
       wgxpath.install();
 
-      this.subscribe(ca.nrc.cadc.search.events.onAdvancedSearchInit, function ()
-      {
-        /*
-         * Story 1644
-         * The start method should set this, then tabs after that should set the
-         * hash as they go.
-         *
-         * This should be automatic from the easy tabs library, but I have a
-         * feeling the WET 3.1 library is getting in the way.
-         *
-         * TODO - Re-evaluate when WET 4.0 is implemented!
-         *
-         * jenkinsd 11.10.2014
-         */
-        $.address.change(function (event)
-                         {
-                           var slashIndex = event.value.indexOf("/");
-                           var eventHash = ((slashIndex >= 0) ? event.value.substring(slashIndex + 1) : event.value);
-                           var tabID = eventHash || this._getActiveTabID().split("#")[1];
-
-                           if (!eventHash)
-                           {
-                             window.location.hash = "#" + tabID;
-                           }
-                           else
-                           {
-                             this._selectTab(tabID);
-                           }
-                         }.bind(this));
-      });
-
       this._initFormConfigurations(function (error, caomConfiguration, obsCoreConfiguration)
                                    {
                                      if (error)
@@ -1030,9 +999,9 @@
       caomSearchForm.subscribe(ca.nrc.cadc.search.events.onValid, onFormValid);
       obsCoreSearchForm.subscribe(ca.nrc.cadc.search.events.onValid, onFormValid);
 
-      var onFormInvalid = function ()
+      var onFormInvalid = function (event, args)
       {
-        alert("Please enter at least one value to search on.");
+        alert("Please enter at least one value to search on. (" + args.cadcForm.getName() + ")");
       };
 
       caomSearchForm.subscribe(ca.nrc.cadc.search.events.onInvalid, onFormInvalid);
@@ -1210,7 +1179,6 @@
               destinationTabID = activeTabID.substring(1);
             }
 
-            //window.location.hash = "#" + destinationTabID;
             this._selectTab(destinationTabID);
           }
         }
@@ -1238,7 +1206,38 @@
                                               function ()
                                               {
                                                 postDataTrainLoad(true);
-                                              });
+
+                                                this.subscribe(ca.nrc.cadc.search.events.onAdvancedSearchInit, function ()
+                                                {
+                                                  /*
+                                                   * Story 1644
+                                                   * The start method should set this, then tabs after that should set the
+                                                   * hash as they go.
+                                                   *
+                                                   * This should be automatic from the easy tabs library, but I have a
+                                                   * feeling the WET 3.1 library is getting in the way.
+                                                   *
+                                                   * TODO - Re-evaluate when WET 4.0 is implemented!
+                                                   *
+                                                   * jenkinsd 11.10.2014
+                                                   */
+                                                  $.address.change(function (event)
+                                                                   {
+                                                                     var slashIndex = event.value.indexOf("/");
+                                                                     var eventHash = ((slashIndex >= 0) ? event.value.substring(slashIndex + 1) : event.value);
+                                                                     var tabID = eventHash || this._getActiveTabID().split("#")[1];
+
+                                                                     if (eventHash)
+                                                                     {
+                                                                       this._selectTab(tabID);
+                                                                     }
+                                                                     else
+                                                                     {
+                                                                       window.location.hash = "#" + tabID;
+                                                                     }
+                                                                   }.bind(this));
+                                                });
+                                              }.bind(this));
 
       caomSearchForm.getDataTrain().subscribe(ca.nrc.cadc.search.datatrain.events.onDataTrainLoadFail,
                                               function ()
