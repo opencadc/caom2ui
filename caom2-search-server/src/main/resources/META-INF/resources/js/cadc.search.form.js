@@ -1023,6 +1023,43 @@
                                                                                 $liItem, inputID, element.dataset.title);
                                                        }.bind(this));
 
+
+      // Manage closing popovers, and maintaining that only one is
+      // open at a time.
+      $(document).on('click', function (e) {
+        if ($(e.target).hasClass("glyphicon-remove-circle"))
+        {
+          $('[data-toggle="popover"],[data-original-title]').each(function ()
+          {
+            (($(this).popover('hide').data('bs.popover') || {}).inState || {}).click = false  // fix for BS 3.3.6
+          });
+        }
+
+        if ($(e.target).hasClass("glyphicon-question-sign"))
+        {
+          $('[data-toggle="popover"]').each(function ()
+          {
+
+            if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0)
+            {
+              (($(this).popover('hide').data('bs.popover')||{}).inState||{}).click = false  // fix for BS 3.3.6
+            }
+          });
+
+          // // reposition popover so it doesn't cover input box
+          // if ($('.popover').hasClass("right"))
+          // {
+          //   $('.popover').css("left","320px")
+          // }
+
+          if ($('.popover').hasClass("left"))
+          {
+            $('.popover').css("left","-480px");
+          }
+        }
+
+      });
+
     };
 
     /**

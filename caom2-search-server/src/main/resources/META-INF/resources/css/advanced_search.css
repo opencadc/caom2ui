@@ -527,14 +527,23 @@ div.search-category div.panel {
 }
 
 
-/*Bootstrap Glyphicon and Popover styling*/
+/* Bootstrap Glyphicon and Popover styling */
 
-.popover_blue {
+.popover-blue {
   color:mediumblue;
 }
+
+.popover-right {
+  float:right;
+}
+
 .popover {
   max-width: 500px;
   min-width: 500px;
 }
 
-
+.popover-info {
+  margin-top:10px;
+  margin-bottom:10px;
+  color:mediumblue;
+}

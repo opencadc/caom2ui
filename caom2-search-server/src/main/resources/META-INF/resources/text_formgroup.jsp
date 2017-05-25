@@ -27,7 +27,7 @@
          id="${param.utype}_tooltip"
          data-placement="${param.tipSide}"
          data-title="<fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}"/>"
-         class="glyphicon glyphicon-question-sign popover_blue">
+         class="glyphicon glyphicon-question-sign popover-blue popover-right">
     </div>
     <div>
         <input type="text"

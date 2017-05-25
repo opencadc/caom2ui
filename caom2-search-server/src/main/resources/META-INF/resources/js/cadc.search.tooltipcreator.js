@@ -31,8 +31,8 @@
     {
       var $divElement =
           $("<div class='module-tool module-simplify module-tool-tooltip'></div>");
-      // var $tooltipHeader = $("<div class='tooltip_header'></div>");
-      // var $tooltipHeaderH6Element = $("<h6></h6>").appendTo($tooltipHeader);
+      var $tooltipHeader = $("<div class='tooltip_header'></div>");
+      var $tooltipHeaderH6Element = $("<h6></h6>").appendTo($tooltipHeader);
       var $tooltipTextElement =
           $("<p>").appendTo("<div class='tooltip_text'></div>");
 
@@ -42,29 +42,9 @@
       }
 
       $tooltipTextElement.html(tipHTML);
-      // $tooltipHeaderH6Element.text(tooltipHeaderText);
-      // $divElement.append($tooltipHeaderH6Element.parent());
       $divElement.append($tooltipTextElement.parent());
 
-      var $clone;
-
-      if (tipHeader)
-      {
-        $("<span class='wb-icon-x-alt2 float-right tooltip-close'></span>").
-            prependTo($tooltipHeader);
-
-        $clone = $divElement.clone();
-
-        $clone.find(".wb-icon-x-alt2").on("click", function (e)
-        {
-          tipHeader.tooltipster("hide");
-          e.preventDefault();
-        });
-      }
-      else
-      {
-        $clone = $divElement.clone(true, true);
-      }
+      var $clone = $divElement.clone();
 
       return $clone;
     }
@@ -85,13 +65,11 @@
       var $spanEl = $('<span class="text-info"></span>');
       $spanEl.text(tooltipHeaderText);
 
-      var $buttonEl = $('<button type="button" id="close" class="glyphicon glyphicon-remove-circle"></button>');
-      $buttonEl.onclick = function() {
-        $('[data-toggle="popover"]').popover("hide");
-      }
+      var buttonID = tooltipID + "_close";
+      var $buttonEl = $('<div id="' + buttonID + '" class="glyphicon glyphicon-remove-circle popover-blue popover-right"></div>');
 
       $divEl.append($spanEl);
-      $divEl.append($buttonEl)
+      $divEl.append($buttonEl);
 
       return $divEl.clone(true, true);
     }
