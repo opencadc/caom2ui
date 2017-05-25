@@ -24,6 +24,7 @@
         <label for="${param.utype}" class="control-label">
           <fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}" />
         </label>
+
         <div data-toggle="popover"
              data-utype="${param.utype}"
              data-placement="${param.tipSide}"
@@ -48,8 +49,8 @@
           <option value="VIZIER">VIZIER</option>
           <option value="NONE">
               <fmt:message key="NO_RESOLVER_FORM_LABEL" bundle="${langBundle}" />
-          </option>
-        </select>
+        </option>
+      </select>
     </div>
 
     <div class="input-group">

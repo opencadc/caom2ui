@@ -377,7 +377,7 @@ a.advanced_search_tooltip_example, a.advanced_search_tooltip_example:visited
   /*border: solid 1px #aaa;*/
   white-space: nowrap;
   font-size: 1em;
-  letter-spacing: 1.2em;
+  /*letter-spacing: 1.2em;*/
   /*line-height: .6em;*/
   overflow: hidden;
   /*width: 615px;*/
@@ -547,3 +547,9 @@ div.search-category div.panel {
   margin-bottom:10px;
   color:mediumblue;
 }
+
+.glyphicon-question-sign, .glyphicon-remove-circle:hover
+{
+  cursor: pointer;
+}
+
