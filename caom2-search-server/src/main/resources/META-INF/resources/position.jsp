@@ -29,27 +29,29 @@
           <fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}" />
         </label>
 
-        <label for="<%= resolverName %>" class="sub-label">
-          <fmt:message key="RESOLVER_FORM_LABEL" bundle="${langBundle}" />
-            <span class="italic margin-left-small"><fmt:message key="RESOLVER_FORM_LABEL_ADDENDUM" bundle="${langBundle}" /></span>
-        </label>
-        <div data-toggle="popover"
+        <div class="form-group">
+          <label for="<%= resolverName %>" class="sub-label">
+            <fmt:message key="RESOLVER_FORM_LABEL" bundle="${langBundle}" />
+              <span class="italic margin-left-small"><fmt:message key="RESOLVER_FORM_LABEL_ADDENDUM" bundle="${langBundle}" /></span>
+          </label>
+          <div data-toggle="popover"
              data-placement="${param.tipSide}"
              data-title="<fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}"/>"
              class="glyphicon glyphicon-question-sign popover-blue popover-right">
-        </div>
-        <select size="1" name="<%= resolverName %>" title="<fmt:message key="RESOLVER_FORM_LABEL" bundle="${langBundle}" />"
-                id="<%= resolverName %>" class="form-control">
-          <option value="ALL">
-            <fmt:message key="ANY_RESOLVER_FORM_LABEL" bundle="${langBundle}" />
-          </option>
-          <option value="SIMBAD">SIMBAD</option>
-          <option value="NED">NED</option>
-          <option value="VIZIER">VIZIER</option>
-          <option value="NONE">
+          </div>
+          <select size="1" name="<%= resolverName %>" title="<fmt:message key="RESOLVER_FORM_LABEL" bundle="${langBundle}" />"
+                  id="<%= resolverName %>" class="form-control">
+            <option value="ALL">
+              <fmt:message key="ANY_RESOLVER_FORM_LABEL" bundle="${langBundle}" />
+            </option>
+            <option value="SIMBAD">SIMBAD</option>
+            <option value="NED">NED</option>
+            <option value="VIZIER">VIZIER</option>
+            <option value="NONE">
               <fmt:message key="NO_RESOLVER_FORM_LABEL" bundle="${langBundle}" />
-          </option>
-        </select>
+            </option>
+          </select>
+        </div>
     </div>
 
     <div class="input-group">
