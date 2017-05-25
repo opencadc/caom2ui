@@ -69,6 +69,35 @@
       return $clone;
     }
 
+
+    /**
+     * Obtain the tooltip header, with markup, for the given markup text and the
+     * given header.  This will return a jQuery object representing the content.
+     *
+     * @param tooltipHeaderText
+     * @returns {jQuery}
+     */
+    function getHeader(tooltipHeaderText, tooltipID)
+    {
+      var $divEl =
+          $("<div class=''></div>");
+
+      var $spanEl = $('<span class="text-info"></span>');
+      $spanEl.text(tooltipHeaderText);
+
+      var $buttonEl = $('<button type="button" id="close" class="glyphicon glyphicon-remove-circle"></button>');
+      $buttonEl.onclick = function() {
+        $('[data-toggle="popover"]').popover("hide");
+      }
+
+      $divEl.append($spanEl);
+      $divEl.append($buttonEl)
+
+      return $divEl.clone(true, true);
+    }
+
+
+
     /**
      * Obtain the text with markup for the tooltip body, from the NameResolver
      * result.
@@ -123,7 +152,8 @@
     $.extend(this,
              {
                "extractResolverValue": extractResolverValue,
-               "getContent": getContent
+               "getContent": getContent,
+               "getHeader": getHeader
              });
 
   }

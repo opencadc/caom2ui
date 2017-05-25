@@ -952,8 +952,11 @@
 
         var $tooltipDiv = tooltipCreator.getContent(tipMarkup, tooltipHeaderText, null, null);
 
+        var tooltipID = $liItem.attr("id");
+        var $tooltipHeaderDiv = tooltipCreator.getHeader(tooltipHeaderText, tooltipID);
+
         $liItem.popover({
-          title:tooltipHeaderText,
+          title:$tooltipHeaderDiv,
           content:$tooltipDiv[0].innerHTML,
           html: true
         });
@@ -1019,8 +1022,6 @@
                                                          this.handleTooltipLoad(jsonData[inputID], tooltipCreator,
                                                                                 $liItem, inputID, element.dataset.title);
                                                        }.bind(this));
-
-      $('[data-toggle="tooltip"]').tooltip();
 
     };
 
