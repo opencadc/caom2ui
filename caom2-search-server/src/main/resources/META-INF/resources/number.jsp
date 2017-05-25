@@ -17,7 +17,7 @@
     <label for="${param.utype}" class="control-label">
       <fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}"/>
     </label>
-    <div id="${param.utype}_tooltip"
+    <div data-utype="${param.utype}"
          data-toggle="popover"
          data-placement="${param.tipSide}"
          data-title="<fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}"/>"

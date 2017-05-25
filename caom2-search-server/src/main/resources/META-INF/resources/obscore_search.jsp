@@ -37,7 +37,7 @@
 
 
         <div class="col-sm-12">
-            <fmt:message key="TOOLTIP_CLARIFICATION_MESSAGE_PREFIX" bundle="${langBundle}" />&nbsp;<span class="glyphicon glyphicon-question-sign popover-info">&nbsp;</span><fmt:message key="TOOLTIP_CLARIFICATION_MESSAGE_SUFFIX" bundle="${langBundle}" />
+            <fmt:message key="TOOLTIP_CLARIFICATION_MESSAGE_PREFIX" bundle="${langBundle}" />&nbsp;<span class="glyphicon glyphicon-question-sign popover-info"></span><fmt:message key="TOOLTIP_CLARIFICATION_MESSAGE_SUFFIX" bundle="${langBundle}" />
         </div>
 
         <div class="row">

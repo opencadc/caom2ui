@@ -17,27 +17,27 @@
   final String detailsID = utype + "_details";
 %>
 
-<%--<li class="label_tooltip_<%= tipSide %>">--%>
-  <%--<details id="<%= detailsID %>">--%>
-    <%--<summary class="search_criteria_label_container">--%>
-      <%--<span class="search_criteria_label <%= detailsID %>"><fmt:message key="<%= labelKey %>" bundle="${langBundle}"/></span>--%>
-      <%--<span class="search_criteria_label_contents color-accent"></span>--%>
-    <%--</summary>--%>
+
 <div>
     <div class="form-group">
+
         <label for="${param.utype}" class="control-label">
           <fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}" />
         </label>
-
-        <label for="<%= resolverName %>" class="sub-label">
-          <fmt:message key="RESOLVER_FORM_LABEL" bundle="${langBundle}" />
-            <span class="italic margin-left-small"><fmt:message key="RESOLVER_FORM_LABEL_ADDENDUM" bundle="${langBundle}" /></span>
-        </label>
         <div data-toggle="popover"
+             data-utype="${param.utype}"
              data-placement="${param.tipSide}"
              data-title="<fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}"/>"
              class="glyphicon glyphicon-question-sign popover-blue popover-right">
         </div>
+
+        <div>
+            <label for="<%= resolverName %>" class="sub-label">
+              <fmt:message key="RESOLVER_FORM_LABEL" bundle="${langBundle}" />
+                <span class="italic margin-left-small"><fmt:message key="RESOLVER_FORM_LABEL_ADDENDUM" bundle="${langBundle}" /></span>
+            </label>
+        </div>
+
         <select size="1" name="<%= resolverName %>" title="<fmt:message key="RESOLVER_FORM_LABEL" bundle="${langBundle}" />"
                 id="<%= resolverName %>" class="form-control">
           <option value="ALL">
@@ -53,8 +53,10 @@
     </div>
 
     <div class="input-group">
-      <input type="text" class="form-control search_criteria_input"
-             size="28" id="${param.utype}"
+      <input id="${param.utype}"
+             type="text"
+             class="form-control search_criteria_input"
+             size="28"
              name="<%= name %>" />
       <span id="${param.utype}_target_name_resolution_status"
             class="input-group-addon target_name_resolution_status"></span>
@@ -83,6 +85,3 @@
            name="<%= FormConstraint.FORM_NAME %>"
            value="<%= formName %>" />
 </div>
-
-  <%--</details>--%>
-<%--</li>--%>
