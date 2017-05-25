@@ -27,6 +27,12 @@
 <div class="form-group">
     <label for="${param.utype}" class="">
       <fmt:message key="${labelKey}" bundle="${langBundle}"/></label>
+    <div id="${param.utype}_tooltip"
+         data-toggle="popover"
+         data-placement="${param.tipSide}"
+         data-title="<fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}"/>"
+         class="glyphicon glyphicon-question-sign popover-blue popover-right">
+    </div>
     <div class="data_release_date_panel">
       <cadc:checkbox checkboxName="${param.utype}@PublicTimestampFormConstraint.value"
                      i18nKey="PUBLIC_DATA_FLAG_FORM_LABEL"

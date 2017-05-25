@@ -36,7 +36,7 @@
         <div data-toggle="popover"
              data-placement="${param.tipSide}"
              data-title="<fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}"/>"
-             class="glyphicon glyphicon-question-sign popover_blue">
+             class="glyphicon glyphicon-question-sign popover-blue popover-right">
         </div>
         <select size="1" name="<%= resolverName %>" title="<fmt:message key="RESOLVER_FORM_LABEL" bundle="${langBundle}" />"
                 id="<%= resolverName %>" class="form-control">
