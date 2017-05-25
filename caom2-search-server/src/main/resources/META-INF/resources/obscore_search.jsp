@@ -27,10 +27,10 @@
 
 
         <div class="col-sm-12 button-holder">
-            <button type="submit" class="btn btn-primary submit_query" value="<fmt:message key="SEARCH_BUTTON_LABEL" bundle="${langBundle}" />" >
+            <button type="submit" class="btn btn-primary submit-query" value="<fmt:message key="SEARCH_BUTTON_LABEL" bundle="${langBundle}" />" >
                 <fmt:message key="SEARCH_BUTTON_LABEL" bundle="${langBundle}" />
             </button>
-            <button type="reset" class="btn btn-default reset_query_form" value="<fmt:message key="RESET_BUTTON_LABEL" bundle="${langBundle}" />" >
+            <button type="reset" class="btn btn-default reset-query-form" value="<fmt:message key="RESET_BUTTON_LABEL" bundle="${langBundle}" />" >
                 <fmt:message key="RESET_BUTTON_LABEL" bundle="${langBundle}" />
             </button>
         </div>
@@ -130,10 +130,10 @@
         url="hierarchy.jsp?colcount=five-col&utype=DataID.Collection/Provenance.ObsConfig.Facility.name/Provenance.ObsConfig.Instrument.name/ObsDataset.calibLevel/ObsDataset.dataProductType&modelDataSource=obscore"/>
 
         <div class="col-sm-12 button-holder">
-            <button type="submit" class="btn btn-primary submit_query" value="<fmt:message key="SEARCH_BUTTON_LABEL" bundle="${langBundle}" />" >
+            <button type="submit" class="btn btn-primary submit-query" value="<fmt:message key="SEARCH_BUTTON_LABEL" bundle="${langBundle}" />" >
                 <fmt:message key="SEARCH_BUTTON_LABEL" bundle="${langBundle}" />
             </button>
-            <button type="reset" class="btn btn-default reset_query_form" value="<fmt:message key="RESET_BUTTON_LABEL" bundle="${langBundle}" />" >
+            <button type="reset" class="btn btn-default reset-query-form" value="<fmt:message key="RESET_BUTTON_LABEL" bundle="${langBundle}" />" >
                 <fmt:message key="RESET_BUTTON_LABEL" bundle="${langBundle}" />
             </button>
         </div>
