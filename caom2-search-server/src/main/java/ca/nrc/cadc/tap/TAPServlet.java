@@ -264,9 +264,7 @@ public class TAPServlet extends ConfigurableServlet
 
     private URI lookupServiceURI()
     {
-        return getServiceID(
-                TAP_SERVICE_URI_PROPERTY_KEY,
-                DEFAULT_TAP_SERVICE_URI);
+        return getServiceID(TAP_SERVICE_URI_PROPERTY_KEY, DEFAULT_TAP_SERVICE_URI);
     }
 
     private Job createJob(final HttpServletRequest req)

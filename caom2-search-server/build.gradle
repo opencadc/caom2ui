@@ -40,4 +40,4 @@ sourceCompatibility = 1.7
 
 group = 'org.opencadc'
 
-version = '1.2.10'
+version = '1.2.11'

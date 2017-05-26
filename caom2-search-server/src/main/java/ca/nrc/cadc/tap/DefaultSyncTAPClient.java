@@ -64,7 +64,6 @@ public class DefaultSyncTAPClient implements SyncTAPClient
 {
     private static final Logger LOGGER = Logger.getLogger(DefaultSyncTAPClient.class);
     static final String TAP_SERVICE_HOST_PORT_PROPERTY_KEY = "org.opencadc.search.tap-service-host-port";
-    static final String DEFAULT_TAP_SERVICE_HOST_PORT = "http://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca";
 
 
     private final ApplicationConfiguration applicationConfiguration;
@@ -91,8 +90,7 @@ public class DefaultSyncTAPClient implements SyncTAPClient
             throws IOException, URISyntaxException
     {
         final URL serviceURL = registryClient.getServiceURL(serviceURI, Standards.TAP_SYNC_11, AuthMethod.ANON);
-        final String tapServiceHost = applicationConfiguration.lookup(TAP_SERVICE_HOST_PORT_PROPERTY_KEY,
-                                                                      DEFAULT_TAP_SERVICE_HOST_PORT);
+        final String tapServiceHost = applicationConfiguration.lookup(TAP_SERVICE_HOST_PORT_PROPERTY_KEY);
 
         final URIBuilder builder = new URIBuilder(serviceURL.toURI());
 
