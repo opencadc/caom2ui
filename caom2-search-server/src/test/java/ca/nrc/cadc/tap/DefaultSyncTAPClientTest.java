@@ -98,7 +98,7 @@ public class DefaultSyncTAPClientTest extends AbstractUnitTest<DefaultSyncTAPCli
         testSubject = new DefaultSyncTAPClient(mockConfiguration, false,
                                                mockRegistryClient);
 
-        final URI testServiceURI = URI.create("ivo://mydomain.com/tap/service");
+        final URI testServiceURI = URI.create("ivo://www.site.com/tap/service");
         final OutputStream outputStream = new ByteArrayOutputStream();
         final Job testJob = new Job();
 

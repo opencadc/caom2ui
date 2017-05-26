@@ -71,8 +71,7 @@ public class DefaultSyncTAPClient implements SyncTAPClient
     private final RegistryClient registryClient;
 
 
-    public DefaultSyncTAPClient(final boolean followToResults,
-                                final RegistryClient registryClient)
+    public DefaultSyncTAPClient(final boolean followToResults, final RegistryClient registryClient)
     {
         this(new ApplicationConfiguration(Configuration.DEFAULT_CONFIG_FILE_PATH), followToResults, registryClient);
     }
@@ -85,9 +84,7 @@ public class DefaultSyncTAPClient implements SyncTAPClient
         this.registryClient = registryClient;
     }
 
-
-    private URL lookupServiceURL(final URI serviceURI)
-            throws IOException, URISyntaxException
+    private URL lookupServiceURL(final URI serviceURI) throws IOException, URISyntaxException
     {
         final URL serviceURL = registryClient.getServiceURL(serviceURI, Standards.TAP_SYNC_11, AuthMethod.ANON);
         final String tapServiceHost = applicationConfiguration.lookup(TAP_SERVICE_HOST_PORT_PROPERTY_KEY);

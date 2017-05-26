@@ -10,6 +10,7 @@
               "pageLanguage": "en",
               "autoInitFlag": true,
               "tapSyncEndpoint": "/search/tap/sync",
+              "tapProxyFlag": false,
               "packageEndpoint": "/search/package",
               "autocompleteEndpoint": "/search/unitconversion",
               "validatorEndpoint": "/search/validate",
@@ -52,6 +53,7 @@
    * @param {String} [_options.pageLanguage="en"]   The language from the page.
    * @param {Boolean} [_options.autoInitFlag=true]   Whether to auto-initialize this application.
    * @param {String} [_options.tapSyncEndpoint="/search/tap/sync"]   Relative URI endpoint to the TAP service.
+   * @param {boolean} [_options.tapProxyFlag=false]   Flag to assume TAP endpoints are proxies.
    * @param {String} [_options.packageEndpoint="/search/package"]   Relative URI endpoint to the CAOM2 package service.
    * @param {String} [_options.previewsEndpoint="/search/preview"]   Relative URI endpoint to the Preview service.
    * @param {String} [_options.validatorEndpoint="/search/validate"]   Relative URI endpoint to the Validator service.
@@ -1709,8 +1711,11 @@
         var activeForm = this._getActiveForm();
         resultsVOTV.clearColumnFilters();
 
+        var url = (this.options.tapProxyFlag === true)
+            ? (this.options.tapSyncEndpoint + "?tap_url=" + encodeURIComponent(json.results_url)) : json.results_url;
+
         resultsVOTV.build({
-                            url: this.options.tapSyncEndpoint + "?tap_url=" + encodeURIComponent(json.results_url),
+                            url: url,
                             type: $("input[name='format']").val(),
                             tableMetadata: activeForm.getResultsTableMetadata(),
                             pageSize: ca.nrc.cadc.search.RESULTS_PAGE_SIZE
