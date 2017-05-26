@@ -13,7 +13,6 @@
   final String formName = name + "@Boolean";
 %>
 
-<%--TODO: handle tooltips--%>
 <div class="col-sm-12 label_tooltip_${param.tipSide}">
     <div class="form-group">
         <cadc:checkbox checkboxName="<%= name %>" i18nKey="<%= labelKey %>" />

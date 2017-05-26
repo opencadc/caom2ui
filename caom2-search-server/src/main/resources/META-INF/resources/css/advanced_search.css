@@ -200,6 +200,10 @@ div.align-middle.column-picker-icon
   padding-right: 0;
 }
 
+.search_criteria_label {
+  width:100%;
+}
+
 
 /* Tooltip (Form) */
 .tooltipster-advanced-search, .tooltipster-advanced-search-resolver, .tooltipster-observation-details
