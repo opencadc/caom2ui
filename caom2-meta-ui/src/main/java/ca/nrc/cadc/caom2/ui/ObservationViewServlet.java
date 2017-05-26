@@ -48,17 +48,12 @@ public class ObservationViewServlet extends HttpServlet
             + "trouvé, ou vous n'avez pas permission.  S'il "
             + "vous plaît connecter et essayez à nouveau.";
 
-    static final String CAOM2META_SERVICE_URI_PROPERTY_KEY =
-            "org.opencadc.caom2ui.caom2ops-service-id";
-    static final String CAOM2META_SERVICE_HOST_PORT_PROPERTY_KEY =
-            "org.opencadc.caom2ui.caom2ops-service-host-port";
-    static final String DEFAULT_CAOM2META_SERVICE_HOST_PORT =
-            "http://caom2ops:8080";
-    static final URI DEFAULT_CAOM2META_SERVICE_URI =
-            URI.create("ivo://cadc.nrc.ca/caom2ops");
-    static final String PROPERTIES_FILE_PATH =
-            System.getProperty("user.home")
-            + "/config/org.opencadc.caom2ui.properties";
+    static final String CAOM2META_SERVICE_URI_PROPERTY_KEY = "org.opencadc.caom2ui.caom2ops-service-id";
+    static final String CAOM2META_SERVICE_HOST_PORT_PROPERTY_KEY = "org.opencadc.caom2ui.caom2ops-service-host-port";
+    static final String DEFAULT_CAOM2META_SERVICE_HOST_PORT = "http://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca";
+    static final URI DEFAULT_CAOM2META_SERVICE_URI = URI.create("ivo://cadc.nrc.ca/caom2ops");
+    private static final String PROPERTIES_FILE_PATH = System.getProperty("user.home")
+                                                       + "/config/org.opencadc.caom2ui.properties";
 
 
     private final RegistryClient registryClient;
@@ -67,12 +62,10 @@ public class ObservationViewServlet extends HttpServlet
 
     public ObservationViewServlet()
     {
-        this(new RegistryClient(),
-             new ApplicationConfiguration(PROPERTIES_FILE_PATH));
+        this(new RegistryClient(), new ApplicationConfiguration(PROPERTIES_FILE_PATH));
     }
 
-    ObservationViewServlet(final RegistryClient registryClient,
-                           final ApplicationConfiguration applicationConfiguration)
+    ObservationViewServlet(final RegistryClient registryClient, final ApplicationConfiguration applicationConfiguration)
     {
         this.registryClient = registryClient;
         this.applicationConfiguration = applicationConfiguration;
@@ -190,18 +183,13 @@ public class ObservationViewServlet extends HttpServlet
                  || subject.getPrincipals(X500Principal.class).isEmpty())
                 ? AuthMethod.ANON : AuthMethod.COOKIE;
 
-        final URL repoURL = registryClient.getServiceURL(
-                applicationConfiguration.lookupServiceURI(
-                        CAOM2META_SERVICE_URI_PROPERTY_KEY,
-                        DEFAULT_CAOM2META_SERVICE_URI),
-                Standards.CAOM2_OBS_20, authMethod);
+        final URL repoURL = registryClient.getServiceURL(applicationConfiguration.lookupServiceURI(
+                CAOM2META_SERVICE_URI_PROPERTY_KEY, DEFAULT_CAOM2META_SERVICE_URI), Standards.CAOM2_OBS_20, authMethod);
 
         final URIBuilder builder = new URIBuilder(repoURL.toURI());
 
-        final String metaServiceHost =
-                applicationConfiguration.lookup(
-                        CAOM2META_SERVICE_HOST_PORT_PROPERTY_KEY,
-                        DEFAULT_CAOM2META_SERVICE_HOST_PORT);
+        final String metaServiceHost = applicationConfiguration.lookup(CAOM2META_SERVICE_HOST_PORT_PROPERTY_KEY,
+                                                                       DEFAULT_CAOM2META_SERVICE_HOST_PORT);
 
         if (StringUtil.hasText(metaServiceHost))
         {
