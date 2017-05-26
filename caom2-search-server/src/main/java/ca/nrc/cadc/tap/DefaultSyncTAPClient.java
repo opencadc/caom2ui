@@ -62,11 +62,9 @@ import java.util.Map;
  */
 public class DefaultSyncTAPClient implements SyncTAPClient
 {
-    private static final Logger LOGGER =
-            Logger.getLogger(DefaultSyncTAPClient.class);
-    static final String TAP_SERVICE_HOST_PORT_PROPERTY_KEY =
-            "org.opencadc.search.tap-service-host-port";
-    static final String DEFAULT_TAP_SERVICE_HOST_PORT = "http://tap:8080";
+    private static final Logger LOGGER = Logger.getLogger(DefaultSyncTAPClient.class);
+    static final String TAP_SERVICE_HOST_PORT_PROPERTY_KEY = "org.opencadc.search.tap-service-host-port";
+    static final String DEFAULT_TAP_SERVICE_HOST_PORT = "http://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca";
 
 
     private final ApplicationConfiguration applicationConfiguration;
@@ -92,13 +90,9 @@ public class DefaultSyncTAPClient implements SyncTAPClient
     private URL lookupServiceURL(final URI serviceURI)
             throws IOException, URISyntaxException
     {
-        final URL serviceURL =
-                registryClient.getServiceURL(serviceURI, Standards.TAP_SYNC_11,
-                                             AuthMethod.ANON);
-        final String tapServiceHost =
-                applicationConfiguration.lookup(
-                        TAP_SERVICE_HOST_PORT_PROPERTY_KEY,
-                        DEFAULT_TAP_SERVICE_HOST_PORT);
+        final URL serviceURL = registryClient.getServiceURL(serviceURI, Standards.TAP_SYNC_11, AuthMethod.ANON);
+        final String tapServiceHost = applicationConfiguration.lookup(TAP_SERVICE_HOST_PORT_PROPERTY_KEY,
+                                                                      DEFAULT_TAP_SERVICE_HOST_PORT);
 
         final URIBuilder builder = new URIBuilder(serviceURL.toURI());
 
@@ -124,16 +118,14 @@ public class DefaultSyncTAPClient implements SyncTAPClient
      * @param outputStream The OutputStream to write out results.
      */
     @Override
-    public void execute(final URI serviceURI, final Job job,
-                        final OutputStream outputStream)
+    public void execute(final URI serviceURI, final Job job, final OutputStream outputStream)
     {
         try
         {
             final URL tapServiceURL = lookupServiceURL(serviceURI);
             if (tapServiceURL == null)
             {
-                throw new IllegalStateException(
-                        "TAP Service URL not found in CADC Registry.");
+                throw new IllegalStateException("TAP Service URL not found in CADC Registry.");
             }
 
             // POST PHASE=RUN to execute on server
@@ -150,8 +142,7 @@ public class DefaultSyncTAPClient implements SyncTAPClient
             }
             catch (IOException we)
             {
-                throw new IllegalStateException("Unable to write error > " + e,
-                                                we);
+                throw new IllegalStateException("Unable to write error > " + e, we);
             }
         }
     }

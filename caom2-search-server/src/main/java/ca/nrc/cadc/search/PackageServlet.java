@@ -90,14 +90,10 @@ import java.net.URL;
  */
 public class PackageServlet extends ConfigurableServlet
 {
-    static final String CAOM2PKG_SERVICE_URI_PROPERTY_KEY =
-            "org.opencadc.search.caom2ops-service-id";
-    static final String CAOM2PKG_SERVICE_HOST_PORT_PROPERTY_KEY =
-            "org.opencadc.search.caom2ops-service-host-port";
-    static final URI DEFAULT_CAOM2PKG_SERVICE_URI =
-            URI.create("ivo://cadc.nrc.ca/caom2ops");
-    static final String DEFAULT_CAOM2PKG_SERVICE_HOST_PORT =
-            "http://caom2ops:8080";
+    static final String CAOM2PKG_SERVICE_URI_PROPERTY_KEY = "org.opencadc.search.caom2ops-service-id";
+    static final String CAOM2PKG_SERVICE_HOST_PORT_PROPERTY_KEY = "org.opencadc.search.caom2ops-service-host-port";
+    static final URI DEFAULT_CAOM2PKG_SERVICE_URI = URI.create("ivo://cadc.nrc.ca/caom2ops");
+    static final String DEFAULT_CAOM2PKG_SERVICE_HOST_PORT = "http://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca";
 
     /**
      * Only supported method.  This will accept an ID parameter in the request
