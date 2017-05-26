@@ -930,23 +930,6 @@
       if (tipJSON && tipJSON.tipHTML)
       {
         var tipMarkup = tipJSON.tipHTML;
-        var tipsterPlacement;
-        var offsetX;
-
-        if (tipJSON.horizontalOffset)
-        {
-          offsetX = tipJSON.horizontalOffset;
-        }
-        else if ($liItem.hasClass("label_tooltip_right"))
-        {
-          tipsterPlacement = "right";
-          offsetX = -12;
-        }
-        else
-        {
-          tipsterPlacement = "left";
-          offsetX = 240;
-        }
 
         var offsetY = tipJSON.verticalOffset ? tipJSON.verticalOffset : 0;
 
@@ -958,33 +941,11 @@
         $liItem.popover({
           title:$tooltipHeaderDiv,
           content:$tooltipDiv[0].innerHTML,
-          html: true
+          html: true,
+          placement: $liItem[0].dataset.placement
         });
 
-        if (inputID === "Plane.position.bounds")
-        {
-          this.targetTooltipsters = this.targetTooltipsters.concat(tipster);
-        }
-
-        // $ttIconImg.hover(function (event)
-        //                  {
-        //                    var $thisSpan = $(event.target);
-        //
-        //                    $thisSpan.removeClass(initialTooltipIconCSS);
-        //                    $thisSpan.addClass(hoverTooltipIconCSS);
-        //
-        //                    return false;
-        //                  },
-        //                  function (event)
-        //                  {
-        //                    var $thisSpan = $(event.target);
-        //
-        //                    $thisSpan.removeClass(hoverTooltipIconCSS);
-        //                    $thisSpan.addClass(initialTooltipIconCSS);
-        //
-        //                    return false;
-        //                  });
-
+        // todo: can popovers be draggable?
         // $ttIconImg.on("click", function (e)
         // {
         //   e.preventDefault();
@@ -1014,13 +975,8 @@
       this.$form.find('[data-toggle="popover"]').each(function (key, element)
                                                        {
                                                          var $liItem = $(element);
-                                                         // var $tooltipHeader = $liItem.find("summary.search_criteria_label_container");
-                                                         // var tooltipHeaderText = $tooltipHeader.text();
-                                                         var $searchInputItem = $liItem.parent().find(".search_criteria_input:first");
-                                                         var inputID = $searchInputItem.attr("id");
-
-                                                         this.handleTooltipLoad(jsonData[inputID], tooltipCreator,
-                                                                                $liItem, inputID, element.dataset.title);
+                                                         this.handleTooltipLoad(jsonData[element.dataset.utype], tooltipCreator,
+                                                                                $liItem, element.dataset.utype, element.dataset.title);
                                                        }.bind(this));
 
 
@@ -1046,12 +1002,7 @@
             }
           });
 
-          // // reposition popover so it doesn't cover input box
-          // if ($('.popover').hasClass("right"))
-          // {
-          //   $('.popover').css("left","320px")
-          // }
-
+          // reposition popover so it doesn't cover input field for left-side display
           if ($('.popover').hasClass("left"))
           {
             $('.popover').css("left","-480px");
