@@ -76,7 +76,6 @@ import static org.easymock.EasyMock.*;
 import ca.nrc.cadc.auth.AuthMethod;
 import ca.nrc.cadc.reg.Standards;
 import ca.nrc.cadc.reg.client.RegistryClient;
-import ca.nrc.cadc.tap.DefaultSyncTAPClient;
 import ca.nrc.cadc.uws.Job;
 import org.junit.Test;
 
@@ -99,13 +98,12 @@ public class DefaultSyncTAPClientTest extends AbstractUnitTest<DefaultSyncTAPCli
         testSubject = new DefaultSyncTAPClient(mockConfiguration, false,
                                                mockRegistryClient);
 
-        final URI testServiceURI = URI.create("ivo://mydomain.com/tap/service");
+        final URI testServiceURI = URI.create("ivo://www.site.com/tap/service");
         final OutputStream outputStream = new ByteArrayOutputStream();
         final Job testJob = new Job();
 
         expect(mockConfiguration.lookup(
-                DefaultSyncTAPClient.TAP_SERVICE_HOST_PORT_PROPERTY_KEY,
-                DefaultSyncTAPClient.DEFAULT_TAP_SERVICE_HOST_PORT))
+                DefaultSyncTAPClient.TAP_SERVICE_HOST_PORT_PROPERTY_KEY))
                 .andReturn(null).once();
 
         expect(mockRegistryClient.getServiceURL(

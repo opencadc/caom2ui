@@ -106,7 +106,7 @@ public class PackageServletTest extends AbstractUnitTest<PackageServlet>
                 requestParameterValues).once();
 
         final String encodedIDParameter = URLEncoder.encode("caom://my/obs", "UTF-8");
-        mockResponse.sendRedirect("http://caom2ops:8080/pkg?ID=" + encodedIDParameter);
+        mockResponse.sendRedirect("http://mysite.com/pkg?ID=" + encodedIDParameter);
         expectLastCall().once();
 
         expect(mockRegistryClient.getServiceURL(

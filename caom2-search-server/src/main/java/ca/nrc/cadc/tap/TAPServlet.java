@@ -91,10 +91,8 @@ import java.util.ArrayList;
 
 public class TAPServlet extends ConfigurableServlet
 {
-    public static final String TAP_SERVICE_URI_PROPERTY_KEY =
-            "org.opencadc.search.tap-service-id";
-    public static final URI DEFAULT_TAP_SERVICE_URI =
-            URI.create("ivo://cadc.nrc.ca/tap");
+    public static final String TAP_SERVICE_URI_PROPERTY_KEY = "org.opencadc.search.tap-service-id";
+    public static final URI DEFAULT_TAP_SERVICE_URI = URI.create("ivo://cadc.nrc.ca/tap");
 
     public TAPServlet()
     {
@@ -226,8 +224,7 @@ public class TAPServlet extends ConfigurableServlet
      * @param registryClient The registry client to lookup the service.
      * @throws IOException If URL management fails.
      */
-    private void sendToTAP(HttpServletRequest req, HttpServletResponse resp,
-                           final RegistryClient registryClient)
+    private void sendToTAP(HttpServletRequest req, HttpServletResponse resp, final RegistryClient registryClient)
             throws IOException
     {
         final OutputStream outputStream = resp.getOutputStream();
@@ -237,19 +234,16 @@ public class TAPServlet extends ConfigurableServlet
         {
             resp.setContentType("text/csv");
 
-            final HttpDownload httpDownload =
-                    new HttpDownload(new URL(sourceURL), outputStream);
+            final HttpDownload httpDownload = new HttpDownload(new URL(sourceURL), outputStream);
             httpDownload.setFollowRedirects(true);
             httpDownload.run();
 
-            resp.setHeader("Content-Length", Long.toString(
-                    httpDownload.getContentLength()));
+            resp.setHeader("Content-Length", Long.toString(httpDownload.getContentLength()));
         }
         else
         {
             final Job job = createJob(req);
-            final SyncTAPClient syncTAPClient =
-                    new DefaultSyncTAPClient(true, registryClient);
+            final SyncTAPClient syncTAPClient = new DefaultSyncTAPClient(true, registryClient);
 
             execute(syncTAPClient, job, outputStream);
         }
@@ -270,9 +264,7 @@ public class TAPServlet extends ConfigurableServlet
 
     private URI lookupServiceURI()
     {
-        return getServiceID(
-                TAP_SERVICE_URI_PROPERTY_KEY,
-                DEFAULT_TAP_SERVICE_URI);
+        return getServiceID(TAP_SERVICE_URI_PROPERTY_KEY, DEFAULT_TAP_SERVICE_URI);
     }
 
     private Job createJob(final HttpServletRequest req)

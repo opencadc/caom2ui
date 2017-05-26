@@ -69,6 +69,7 @@
 package ca.nrc.cadc.web;
 
 import ca.nrc.cadc.auth.HTTPIdentityManager;
+import ca.nrc.cadc.auth.IdentityManager;
 import ca.nrc.cadc.config.ApplicationConfiguration;
 import ca.nrc.cadc.auth.AuthenticationUtil;
 import ca.nrc.cadc.caom2.CAOMQueryGenerator;
@@ -119,7 +120,7 @@ public class SearchJobServlet extends SyncServlet
     {
         super.init(config);
 
-        final DatabaseJobPersistence jobPersistence = new PostgresJobPersistence(new HTTPIdentityManager());
+        final DatabaseJobPersistence jobPersistence = createJobPersistence(new HTTPIdentityManager());
 
         jobManager = createJobManager(config);
         jobManager.setJobPersistence(jobPersistence);
@@ -127,6 +128,17 @@ public class SearchJobServlet extends SyncServlet
         jobUpdater = jobPersistence;
 
         applicationConfiguration = new ApplicationConfiguration(Configuration.DEFAULT_CONFIG_FILE_PATH);
+    }
+
+    /**
+     * Override as needed.
+     *
+     * @param identityManager       The Identity Manager to pass to the persistence.
+     * @return      DatabasePersistence instance.
+     */
+    DatabaseJobPersistence createJobPersistence(final IdentityManager identityManager)
+    {
+        return new PostgresJobPersistence(identityManager);
     }
 
     /**
@@ -260,9 +272,6 @@ public class SearchJobServlet extends SyncServlet
         final Map<String, Object> uploadPayload = new HashMap<>();
         final List<Parameter> extraJobParameters = new ArrayList<>();
 
-//        final JobUpdater jobUpdater =
-//                new PostgresJobPersistence(new ACIdentityManager());
-
         final JobCreator jobCreator = new JobCreator(getInlineContentHandler())
         {
             @Override
@@ -338,8 +347,7 @@ public class SearchJobServlet extends SyncServlet
         final JobRunner runner =
                 new AdvancedRunner(auditJob, jobUpdater, syncOutput,
                                    new TAPSearcher(
-                                           new SyncResponseWriterImpl(
-                                                   syncOutput),
+                                           new SyncResponseWriterImpl(syncOutput),
                                            jobUpdater, tapClient,
                                            getQueryGenerator(auditJob)),
                                    applicationConfiguration.lookupServiceURI(
