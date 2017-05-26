@@ -123,6 +123,11 @@ div.align-middle.column-picker-icon
   height: 22px;
 }
 
+.file-form-control
+{
+  height: auto;
+}
+
 /* Pager and Grid items. */
 .ui-icon
 {

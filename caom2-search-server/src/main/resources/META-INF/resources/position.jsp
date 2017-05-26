@@ -72,7 +72,7 @@
                 <fmt:message key="TARGET_LIST_FORM_LABEL" bundle="${langBundle}" />
             </label>
             <div>
-              <input type="file" class="form-control"
+              <input type="file" class="form-control file-form-control"
                      id="${param.utype}_targetList" name="targetList"
                      title="<fmt:message key="TARGET_LIST_TOOLTIP" bundle="${langBundle}" />" />
             </div>
