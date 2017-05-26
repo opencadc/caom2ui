@@ -91,8 +91,8 @@ import java.util.ArrayList;
 
 public class TAPServlet extends ConfigurableServlet
 {
-    public static final String TAP_SERVICE_URI_PROPERTY_KEY = "org.opencadc.search.tap-service-id";
-    public static final URI DEFAULT_TAP_SERVICE_URI = URI.create("ivo://cadc.nrc.ca/tap");
+    private static final String TAP_SERVICE_URI_PROPERTY_KEY = "org.opencadc.search.tap-service-id";
+    private static final URI DEFAULT_TAP_SERVICE_URI = URI.create("ivo://cadc.nrc.ca/tap");
 
     public TAPServlet()
     {
@@ -157,8 +157,7 @@ public class TAPServlet extends ConfigurableServlet
      * @see ServletResponse#setContentType
      */
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
     {
         sendToTAP(req, resp, new RegistryClient());
     }
@@ -243,7 +242,7 @@ public class TAPServlet extends ConfigurableServlet
         else
         {
             final Job job = createJob(req);
-            final SyncTAPClient syncTAPClient = new DefaultSyncTAPClient(true, registryClient);
+            final SyncTAPClient syncTAPClient = new DefaultSyncTAPClient(false, registryClient);
 
             execute(syncTAPClient, job, outputStream);
         }
@@ -256,8 +255,7 @@ public class TAPServlet extends ConfigurableServlet
      * @param job           The Job to execute.
      * @param outputStream  The Output Stream to write output to.
      */
-    private void execute(final SyncTAPClient syncTAPClient, final Job job,
-                         final OutputStream outputStream)
+    private void execute(final SyncTAPClient syncTAPClient, final Job job, final OutputStream outputStream)
     {
         syncTAPClient.execute(lookupServiceURI(), job, outputStream);
     }
