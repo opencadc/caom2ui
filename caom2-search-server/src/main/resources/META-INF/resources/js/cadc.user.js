@@ -45,7 +45,22 @@
      */
     function loadCurrent()
     {
-      $.getJSON(cadc.web.WHOAMI_ENDPOINT).done(
+      var ajaxInput = {
+        method: "GET",
+        dataType: "json",
+        // headers: "Accept: application/json",
+        url: cadc.web.WHOAMI_ENDPOINT,
+        data: {},
+        beforeSend: function(xhr) {
+          xhr.withCredentials = true;
+          xhr.setRequestHeader("Accept", "application/json");
+          return true;
+        },
+        jsonp: false,
+        crossDomain: true
+      };
+
+      $.ajax(ajaxInput).done(
         function (data/*, textStatus, jqXHR*/)
         {
           loadUser(data);
@@ -75,7 +90,7 @@
       for (var i = 0; i < identities.length; i++)
       {
         var identity = identities[i];
-        if (identity[cadc.web.json.babelfish.ATTRIBUTE_KEY_PREFIX + "type"] == "HTTP")
+        if (identity[cadc.web.json.babelfish.ATTRIBUTE_KEY_PREFIX + "type"] === "HTTP")
         {
           userID = identity[cadc.web.json.babelfish.VALUE_KEY];
           break;

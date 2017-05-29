@@ -208,8 +208,7 @@ public class TAPServlet extends ConfigurableServlet
      * @see ServletResponse#setContentType
      */
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
     {
         sendToTAP(req, resp, new RegistryClient());
     }

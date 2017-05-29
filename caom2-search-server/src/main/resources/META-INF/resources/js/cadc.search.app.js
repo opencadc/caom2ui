@@ -1709,17 +1709,18 @@
         }
 
         var activeForm = this._getActiveForm();
-        resultsVOTV.clearColumnFilters();
-
         var url = (this.options.tapProxyFlag === true)
             ? (this.options.tapSyncEndpoint + "?tap_url=" + encodeURIComponent(json.results_url)) : json.results_url;
+        var buildInput = {
+          url: url,
+          type: $("input[name='format']").val(),
+          tableMetadata: activeForm.getResultsTableMetadata(),
+          pageSize: ca.nrc.cadc.search.RESULTS_PAGE_SIZE
+        };
 
-        resultsVOTV.build({
-                            url: url,
-                            type: $("input[name='format']").val(),
-                            tableMetadata: activeForm.getResultsTableMetadata(),
-                            pageSize: ca.nrc.cadc.search.RESULTS_PAGE_SIZE
-                          },
+        resultsVOTV.clearColumnFilters();
+
+        resultsVOTV.build(buildInput,
                           function ()
                           {
                             if (searchCompleteCallback)
