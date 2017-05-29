@@ -876,11 +876,13 @@
 
     function start()
     {
-      $.ajax({
-               url: getURLString(),
-               type: "GET",
-               xhr: createRequest
-             }).fail(getErrorCallbackFunction());
+      var ajaxInput = {
+        url: getURLString(),
+        type: "GET",
+        xhr: createRequest
+      };
+
+      $.ajax(ajaxInput).fail(getErrorCallbackFunction());
     }
 
     function handleInputError()
@@ -998,8 +1000,9 @@
       }
 
       request.addEventListener("error", loadEnd, false);
-      request.addEventListener("readystatechange", readyStateChangeHandler,
-                               false);
+      request.addEventListener("readystatechange", readyStateChangeHandler, false);
+
+      request.withCredentials = true;
 
       // Load end was not supported by Safari, so use the individual events that
       // it represents instead.

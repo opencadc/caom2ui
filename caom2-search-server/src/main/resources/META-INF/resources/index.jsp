@@ -278,6 +278,7 @@
                                 var searchApp =
                                     new ca.nrc.cadc.search.AdvancedSearchApp({
                                                                                "tapSyncEndpoint": "<%= tapSyncEndpoint %>",
+                                                                               "tapProxyFlag": true,
                                                                                "pageLanguage": $("html").prop("lang"),
                                                                                "autoInitFlag": false
                                                                              });

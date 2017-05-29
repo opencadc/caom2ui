@@ -34,6 +34,7 @@
 package ca.nrc.cadc.tap;
 
 
+import ca.nrc.cadc.auth.AuthenticationUtil;
 import ca.nrc.cadc.caom2.IntervalSearch;
 import ca.nrc.cadc.caom2.SpatialSearch;
 import ca.nrc.cadc.search.*;
@@ -367,6 +368,7 @@ public class TAPSearcher implements Searcher
         final List<Parameter> searchJobParameters = baseJob.getParameterList();
         final Job tapJob = new Job();
         tapJob.setRunID(baseJob.getID());
+        tapJob.ownerSubject = AuthenticationUtil.getCurrentSubject();
 
         final String requestedFormat =
                 ParameterUtil.findParameterValue("format", searchJobParameters);

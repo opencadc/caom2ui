@@ -194,39 +194,21 @@ public class SearchJobServlet extends SyncServlet
      * @see ServletResponse#setContentType
      */
     @Override
-    protected void doPost(final HttpServletRequest request,
-                          final HttpServletResponse response)
+    protected void doPost(final HttpServletRequest request, final HttpServletResponse response)
             throws ServletException, IOException
     {
         try
         {
-            final Subject subject = AuthenticationUtil.getSubject(request);
-
-            if ((subject == null) || (subject.getPrincipals().isEmpty()))
-            {
-                processRequest(request, response);
-            }
-            else
-            {
-                Subject.doAs(subject, new PrivilegedExceptionAction<Object>()
-                {
-                    @Override
-                    public Object run() throws Exception
-                    {
-                        processRequest(request, response);
-                        return null;
-                    }
-                });
-            }
+            processRequest(request, response);
         }
         catch (TransientException ex)
         {
             // OutputStream not open, write an error response
             response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
-            response.addHeader("Retry-After",
-                               Integer.toString(ex.getRetryDelay()));
+            response.addHeader("Retry-After", Integer.toString(ex.getRetryDelay()));
             response.setContentType("text/plain");
-            PrintWriter w = response.getWriter();
+
+            final PrintWriter w = response.getWriter();
             w.println("failed to get or persist job state.");
             w.println("   reason: " + ex.getMessage());
             w.close();
@@ -240,6 +222,8 @@ public class SearchJobServlet extends SyncServlet
             w.println("failed to get or persist job state.");
             w.println("   reason: " + ex.getMessage());
             w.close();
+
+            throw new RuntimeException(ex);
         }
         catch (Throwable t)
         {
@@ -249,6 +233,8 @@ public class SearchJobServlet extends SyncServlet
             w.println("Unable to proceed with job execution.\n");
             w.println("Reason: " + t.getMessage());
             w.close();
+
+            throw new RuntimeException(t);
         }
     }
 
@@ -263,11 +249,9 @@ public class SearchJobServlet extends SyncServlet
         return calendar.getTime();
     }
 
-    private void processRequest(final HttpServletRequest request,
-                                final HttpServletResponse response)
-            throws JobPersistenceException, TransientException,
-                   FileUploadException, IOException, PositionParserException,
-                   JobNotFoundException
+    private void processRequest(final HttpServletRequest request, final HttpServletResponse response)
+            throws JobPersistenceException, TransientException, FileUploadException, IOException,
+                   PositionParserException, JobNotFoundException
     {
         final Map<String, Object> uploadPayload = new HashMap<>();
         final List<Parameter> extraJobParameters = new ArrayList<>();
@@ -275,9 +259,7 @@ public class SearchJobServlet extends SyncServlet
         final JobCreator jobCreator = new JobCreator(getInlineContentHandler())
         {
             @Override
-            protected void processStream(final String name,
-                                         final String contentType,
-                                         final InputStream inputStream)
+            protected void processStream(final String name, final String contentType, final InputStream inputStream)
                     throws IOException
             {
                 try
@@ -285,20 +267,14 @@ public class SearchJobServlet extends SyncServlet
                     final String[] nameParts = name.split("\\.");
                     final String paramName = nameParts[0];
                     final File uploadFile = new File(paramName);
-                    final FileOutputStream fos =
-                            new FileOutputStream(uploadFile);
-                    final String resolver = (nameParts.length == 2)
-                                            ? nameParts[1] : "ALL";
-                    final UploadResults uploadResults =
-                            new UploadResults(resolver, 0, 0);
+                    final FileOutputStream fos = new FileOutputStream(uploadFile);
+                    final String resolver = (nameParts.length == 2) ? nameParts[1] : "ALL";
+                    final UploadResults uploadResults = new UploadResults(resolver, 0, 0);
                     final StreamingVOTableWriter tableWriter =
-                            new StreamingVOTableWriter(uploadResults,
-                                                       new DefaultNameResolverClient());
+                            new StreamingVOTableWriter(uploadResults, new DefaultNameResolverClient());
 
                     tableWriter.write(inputStream, fos);
-                    extraJobParameters.add(
-                            new Parameter(UploadResults.UPLOAD_RESOLVER,
-                                          resolver));
+                    extraJobParameters.add(new Parameter(UploadResults.UPLOAD_RESOLVER, resolver));
 
                     fos.flush();
                     fos.close();
@@ -332,27 +308,22 @@ public class SearchJobServlet extends SyncServlet
                     @Override
                     protected Map<String, Object> getQueryPayload(Job job)
                     {
-                        final Map<String, Object> queryPayload =
-                                super.getQueryPayload(job);
+                        final Map<String, Object> queryPayload = super.getQueryPayload(job);
                         queryPayload.putAll(uploadPayload);
 
                         return queryPayload;
                     }
                 };
 
-        jobUpdater.setPhase(auditJob.getID(), ExecutionPhase.PENDING,
-                            ExecutionPhase.QUEUED, currentDateUTC());
+        jobUpdater.setPhase(auditJob.getID(), ExecutionPhase.PENDING, ExecutionPhase.QUEUED, currentDateUTC());
 
         // Create the TAP job to prepare to be executed.
         final JobRunner runner =
                 new AdvancedRunner(auditJob, jobUpdater, syncOutput,
-                                   new TAPSearcher(
-                                           new SyncResponseWriterImpl(syncOutput),
-                                           jobUpdater, tapClient,
-                                           getQueryGenerator(auditJob)),
-                                   applicationConfiguration.lookupServiceURI(
-                                           TAP_SERVICE_URI_PROPERTY_KEY,
-                                           DEFAULT_TAP_SERVICE_URI));
+                                   new TAPSearcher(new SyncResponseWriterImpl(syncOutput), jobUpdater, tapClient,
+                                                   getQueryGenerator(auditJob)),
+                                   applicationConfiguration.lookupServiceURI(TAP_SERVICE_URI_PROPERTY_KEY,
+                                                                             DEFAULT_TAP_SERVICE_URI));
 
         runner.run();
         response.setStatus(HttpServletResponse.SC_OK);

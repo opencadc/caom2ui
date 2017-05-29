@@ -96,10 +96,8 @@ public class AdvancedRunner implements JobRunner
      * @param _searcher   The base searcher.
      * @param  tapServiceURI    The service URI
      */
-    public AdvancedRunner(final Job _job, final JobUpdater _jobUpdater,
-                          final SyncOutput _syncOutput,
-                          final Searcher _searcher,
-                          final URI tapServiceURI)
+    public AdvancedRunner(final Job _job, final JobUpdater _jobUpdater, final SyncOutput _syncOutput,
+                          final Searcher _searcher, final URI tapServiceURI)
     {
         this.job = _job;
         this.jobUpdater = _jobUpdater;
