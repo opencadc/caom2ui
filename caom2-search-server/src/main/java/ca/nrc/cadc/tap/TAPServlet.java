@@ -159,7 +159,7 @@ public class TAPServlet extends ConfigurableServlet
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
     {
-        sendToTAP(req, resp, new RegistryClient());
+        sendToTAP(req, resp, new RegistryClient(), true);
     }
 
     /**
@@ -205,43 +205,45 @@ public class TAPServlet extends ConfigurableServlet
      * @throws ServletException if the request for the POST
      *                          could not be handled
      * @see ServletOutputStream
-     * @see ServletResponse#setContentType
+     * @see ServletResponse#setContentTypecd .
      */
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
     {
-        sendToTAP(req, resp, new RegistryClient());
+        sendToTAP(req, resp, new RegistryClient(), false);
     }
 
 
     /**
      * Create a job and query TAP.
      *
-     * @param req            The HTTP Request.
-     * @param resp           The HTTP Response.
+     * @param request            The HTTP Request.
+     * @param response           The HTTP Response.
      * @param registryClient The registry client to lookup the service.
+     * @param followRedirectsFlag       Whether to follow redirects or not.
      * @throws IOException If URL management fails.
      */
-    private void sendToTAP(HttpServletRequest req, HttpServletResponse resp, final RegistryClient registryClient)
+    private void sendToTAP(final HttpServletRequest request, final HttpServletResponse response,
+                           final RegistryClient registryClient, final boolean followRedirectsFlag)
             throws IOException
     {
-        final OutputStream outputStream = resp.getOutputStream();
-        final String sourceURL = req.getParameter("tap_url");
+        final OutputStream outputStream = response.getOutputStream();
+        final String sourceURL = request.getParameter("tap_url");
 
         if (StringUtil.hasText(sourceURL))
         {
-            resp.setContentType("text/csv");
+            response.setContentType("text/csv");
 
             final HttpDownload httpDownload = new HttpDownload(new URL(sourceURL), outputStream);
             httpDownload.setFollowRedirects(true);
             httpDownload.run();
 
-            resp.setHeader("Content-Length", Long.toString(httpDownload.getContentLength()));
+            response.setHeader("Content-Length", Long.toString(httpDownload.getContentLength()));
         }
         else
         {
-            final Job job = createJob(req);
-            final SyncTAPClient syncTAPClient = new DefaultSyncTAPClient(false, registryClient);
+            final Job job = createJob(request);
+            final SyncTAPClient syncTAPClient = new DefaultSyncTAPClient(followRedirectsFlag, registryClient);
 
             execute(syncTAPClient, job, outputStream);
         }
