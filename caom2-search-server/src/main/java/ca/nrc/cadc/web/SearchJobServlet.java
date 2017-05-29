@@ -222,6 +222,8 @@ public class SearchJobServlet extends SyncServlet
             w.println("failed to get or persist job state.");
             w.println("   reason: " + ex.getMessage());
             w.close();
+
+            throw new RuntimeException(ex);
         }
         catch (Throwable t)
         {
@@ -231,6 +233,8 @@ public class SearchJobServlet extends SyncServlet
             w.println("Unable to proceed with job execution.\n");
             w.println("Reason: " + t.getMessage());
             w.close();
+
+            throw new RuntimeException(t);
         }
     }
 
