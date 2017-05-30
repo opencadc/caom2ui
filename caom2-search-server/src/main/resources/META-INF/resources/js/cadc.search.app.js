@@ -1681,7 +1681,9 @@
 
           loadStart = (new Date()).getTime();
 
-        }, function (event, args)
+          $queryCode.text(this._adqlPrint(this._getADQL(false)));
+
+        }.bind(this), function (event, args)
                          {
                            console.error("Status error when loading job: " + args.errorStatusCode);
                          });
