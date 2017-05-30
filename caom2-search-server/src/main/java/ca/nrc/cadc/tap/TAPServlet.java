@@ -205,7 +205,7 @@ public class TAPServlet extends ConfigurableServlet
      * @throws ServletException if the request for the POST
      *                          could not be handled
      * @see ServletOutputStream
-     * @see ServletResponse#setContentTypecd .
+     * @see ServletResponse#setContentType
      */
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
