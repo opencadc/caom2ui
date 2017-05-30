@@ -42,32 +42,39 @@
       }
 
       $tooltipTextElement.html(tipHTML);
-      $tooltipHeaderH6Element.text(tooltipHeaderText);
-      $divElement.append($tooltipHeaderH6Element.parent());
       $divElement.append($tooltipTextElement.parent());
 
-      var $clone;
-
-      if (tipHeader)
-      {
-        $("<span class='wb-icon-x-alt2 float-right tooltip-close'></span>").
-            prependTo($tooltipHeader);
-
-        $clone = $divElement.clone();
-
-        $clone.find(".wb-icon-x-alt2").on("click", function (e)
-        {
-          tipHeader.tooltipster("hide");
-          e.preventDefault();
-        });
-      }
-      else
-      {
-        $clone = $divElement.clone(true, true);
-      }
+      var $clone = $divElement.clone();
 
       return $clone;
     }
+
+
+    /**
+     * Obtain the tooltip header, with markup, for the given markup text and the
+     * given header.  This will return a jQuery object representing the content.
+     *
+     * @param tooltipHeaderText
+     * @returns {jQuery}
+     */
+    function getHeader(tooltipHeaderText, tooltipID)
+    {
+      var $divEl =
+          $("<div class=''></div>");
+
+      var $spanEl = $('<span class="text-info"></span>');
+      $spanEl.text(tooltipHeaderText);
+
+      var buttonID = tooltipID + "_close";
+      var $buttonEl = $('<div id="' + buttonID + '" class="glyphicon glyphicon-remove-circle popover-blue popover-right"></div>');
+
+      $divEl.append($spanEl);
+      $divEl.append($buttonEl);
+
+      return $divEl.clone(true, true);
+    }
+
+
 
     /**
      * Obtain the text with markup for the tooltip body, from the NameResolver
@@ -123,7 +130,8 @@
     $.extend(this,
              {
                "extractResolverValue": extractResolverValue,
-               "getContent": getContent
+               "getContent": getContent,
+               "getHeader": getHeader
              });
 
   }

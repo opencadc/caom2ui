@@ -108,10 +108,12 @@ abstract class AbstractSearchFormPage extends AbstractTestWebPage
     {
         final String inputID = inputElement.getAttribute("id");
         final String detailElementID = inputID + "_details";
-        summonTooltip(detailElementID);
+        //TODO: uncomment when tooltip implementation is complete
+        //summonTooltip(detailElementID);
         showInputField(inputID);
         sendKeys(inputElement, value);
-        closeTooltip();
+        //TODO: uncomment when tooltip implementation is complete
+        //closeTooltip();
     }
 
     void clearInputValue(final String inputID) throws Exception
@@ -121,7 +123,8 @@ abstract class AbstractSearchFormPage extends AbstractTestWebPage
         if (inputElement.isDisplayed())
         {
             sendKeys(inputElement, "");
-            hideInputField(inputID);
+            //TODO: uncomment when tooltip implementation is complete
+            //hideInputField(inputID);
         }
         else
         {
@@ -143,10 +146,13 @@ abstract class AbstractSearchFormPage extends AbstractTestWebPage
             verifyFormInputError(inputID);
         }
 
+        //TODO: uncomment when tooltip implementation is complete
+        /*
         final String itemLocator = "//details[@id='" + (inputID + "_details")
                                    + "']/summary/span[contains(@class,'search_criteria_label_contents')]";
 
         waitForTextPresent(By.xpath(itemLocator), expectedMessage);
+        */
     }
 
     void verifyFormInputMessageMatches(final String inputID, final boolean errorExpected,

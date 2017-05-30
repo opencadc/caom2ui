@@ -437,7 +437,8 @@ function DataTrain(_modelDataSource, _autoInitFlag)
     var label = document.createElement("label");
     if (_self.pageLanguage === "fr")
     {
-      label.className = "advanced_search_hierarchy_select_div_label";
+      // label.className = "advanced_search_hierarchy_select_div_label";
+      label.className = "control-label";
     }
 
     var labelSpanFieldName = document.createElement("span");

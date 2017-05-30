@@ -123,6 +123,11 @@ div.align-middle.column-picker-icon
   height: 22px;
 }
 
+.file-form-control
+{
+  height: auto;
+}
+
 /* Pager and Grid items. */
 .ui-icon
 {
@@ -193,6 +198,10 @@ div.align-middle.column-picker-icon
 {
   padding-left: 0;
   padding-right: 0;
+}
+
+.search_criteria_label {
+  width:100%;
 }
 
 
@@ -308,6 +317,7 @@ div.align-middle.column-picker-icon
   height: auto;
 }
 
+
 [class*="target_name_resolution_status"]
 {
   margin-left: -0.5em;
@@ -376,7 +386,7 @@ a.advanced_search_tooltip_example, a.advanced_search_tooltip_example:visited
   /*border: solid 1px #aaa;*/
   white-space: nowrap;
   font-size: 1em;
-  letter-spacing: 1.2em;
+  /*letter-spacing: 1.2em;*/
   /*line-height: .6em;*/
   overflow: hidden;
   /*width: 615px;*/
@@ -467,10 +477,88 @@ span.slick-column-picker-button:hover
 }
 
 /* Addition styles for bare theme */
-div#wb-core.base {
-  padding-top: 50px;
-}
+/*div#wb-core.base {*/
+  /*padding-top: 50px;*/
+/*}*/
 
 canvas.aladin-imageCanvas {
   background-color: rgba(255, 255, 255, 0.8);
 }
+
+
+/* CSS for defining widths of Addtional Constraints colums - 5 and 7 count wide */
+div.search-category {
+  height: 100%;
+}
+
+div.search-category div.panel {
+  height: 100%;
+}
+
+.advanced_search_data_train .col-md-1 select,
+.advanced_search_data_train .col-sm-1 select,
+.advanced_search_data_train .col-lg-1 select {
+  width: 100%;
+}
+
+.advanced_search_data_train .col-md-1 label,
+.advanced_search_data_train .col-sm-1 label,
+.advanced_search_data_train .col-lg-1 label {
+  display: block;
+  letter-spacing: normal;
+}
+
+@media (min-width: 768px) {
+  .advanced_search_data_train .col-md-1,
+  .advanced_search_data_train .col-sm-1,
+  .advanced_search_data_train .col-lg-1 {
+    width: 100%;
+    *width: 100%;
+  }
+}
+
+@media (min-width: 992px) {
+  .advanced_search_data_train.seven-col .col-md-1,
+  .advanced_search_data_train.seven-col .col-sm-1,
+  .advanced_search_data_train.seven-col .col-lg-1 {
+    width: 14.285714285714285714285714285714%;
+    *width: 14.285714285714285714285714285714%;
+  }
+}
+
+@media (min-width: 992px) {
+  .advanced_search_data_train.five-col .col-md-1,
+  .advanced_search_data_train.five-col .col-sm-1,
+  .advanced_search_data_train.five-col .col-lg-1 {
+    width: 20%;
+    *width: 20%;
+  }
+}
+
+
+/* Bootstrap Glyphicon and Popover styling */
+
+.popover-blue {
+  color:mediumblue;
+}
+
+.popover-right {
+  float:right;
+}
+
+.popover {
+  max-width: 500px;
+  min-width: 500px;
+}
+
+.popover-info {
+  margin-top:10px;
+  margin-bottom:10px;
+  color:mediumblue;
+}
+
+.glyphicon-question-sign, .glyphicon-remove-circle:hover
+{
+  cursor: pointer;
+}
+

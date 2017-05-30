@@ -84,9 +84,8 @@
     <li role="presentation">
       <a href="#adql" aria-controls="adql" role="tab"
          data-toggle="tab">ADQL</a></li>
-    <li role="presentation" class="disabled hidden" disabled="disabled">
-      <a href="#results" aria-controls="results" class="disabled"
-         disabled="disabled"
+    <li role="presentation">
+      <a href="#results" aria-controls="results"
          role="tab" data-toggle="tab">Results</a></li>
   </ul>
 
@@ -116,11 +115,58 @@
               <div class="panel-heading">Observation constraints</div>
               <div class="panel-body">
                 <div class="form-group">
+                  <label for="observationID" class="col-sm-4 control-label">Observation
+                    ID</label>
+                  <div class="col-sm-8">
+                    <input type="text" class="form-control" id="observationID"
+                           placeholder="Text">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="piName" class="col-sm-4 control-label">P.I. Name</label>
+                  <div class="col-sm-8">
+                    <input type="text" class="form-control" id="piName"
+                           placeholder="Text">
+                  </div>
+                </div>
+                <div class="form-group">
                   <label for="proposalID" class="col-sm-4 control-label">Proposal
                     ID</label>
                   <div class="col-sm-8">
                     <input type="text" class="form-control" id="proposalID"
                            placeholder="Text">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="proposalTitle" class="col-sm-4 control-label">Proposal Title</label>
+                  <div class="col-sm-8">
+                    <input type="text" class="form-control" id="proposalTitle"
+                           placeholder="Text">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="proposalKeywords" class="col-sm-4 control-label">Proposal Keywords</label>
+                  <div class="col-sm-8">
+                    <input type="text" class="form-control" id="proposalKeywords"
+                           placeholder="Text">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="dataReleaseDate" class="col-sm-4 control-label">Data Release Date</label>
+                  <div class="col-sm-8">
+                    <input type="text" class="form-control" id="dataReleaseDate"
+                           placeholder="Text">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="sel1" class="col-sm-4 control-label">Select list:</label>
+                  <div class="col-sm-8">
+                    <select class="form-control" id="sel1">
+                      <option>Science and Calibration data</option>
+                      <option>selection 2</option>
+                      <option>selection 3</option>
+                      <option>selection 4</option>
+                    </select>
                   </div>
                 </div>
               </div>
@@ -132,10 +178,24 @@
               <div class="panel-body">
                 <div class="form-group">
                   <label for="target"
-                         class="col-sm-2 control-label">Target</label>
-                  <div class="col-sm-10">
+                         class="col-sm-3 control-label">Target</label>
+                  <div class="col-sm-9">
                     <input type="text" class="form-control" id="target"
                            placeholder="RA/Dec or Target name">
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="pixelScale" class="col-sm-3 control-label">Pixel Scale</label>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" id="pixelScale"
+                           placeholder="RA/Dec or Target name">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="col-sm-2"></div>
+                  <div class="col-sm-10 checkbox">
+                    <label><input type="checkbox" value="">Do Spatial Cutout</label>
                   </div>
                 </div>
               </div>
@@ -146,17 +206,25 @@
               <div class="panel-heading">Temporal constraints</div>
               <div class="panel-body">
                 <div class="form-group">
-                  <label for="date" class="col-sm-4 control-label">Date</label>
+                  <label for="observationDate" class="col-sm-4 control-label">Observation Date</label>
                   <div class="col-sm-8">
-                    <input type="date" class="form-control" id="date"
+                    <input type="date" class="form-control" id="observationDate"
                            placeholder="Calendar Date or MJD">
                   </div>
                 </div>
                 <div class="form-group">
-                  <label for="exposure"
-                         class="col-sm-4 control-label">Exposure</label>
+                  <label for="integrationTime"
+                         class="col-sm-4 control-label">Integration Time</label>
                   <div class="col-sm-8">
-                    <input type="date" class="form-control" id="exposure"
+                    <input type="date" class="form-control" id="integrationTime"
+                           placeholder="Time span">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="timeSpan"
+                         class="col-sm-4 control-label">Time Span</label>
+                  <div class="col-sm-8">
+                    <input type="date" class="form-control" id="timeSpan"
                            placeholder="Time span">
                   </div>
                 </div>
@@ -168,10 +236,44 @@
               <div class="panel-heading">Spectral constraints</div>
               <div class="panel-body">
                 <div class="form-group">
-                  <label for="bandwidth" class="col-sm-3 control-label">Bandwidth</label>
+                  <label for="spectralCoverage" class="col-sm-3 control-label">Spectral Coverage</label>
                   <div class="col-sm-9">
-                    <input type="text" class="form-control" id="bandwidth"
+                    <input type="text" class="form-control" id="spectralCoverage"
                            placeholder="Default unit is MHz">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="spectralSampling" class="col-sm-3 control-label">Spectral Sampling</label>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" id="spectralSampling"
+                           placeholder="Default unit is MHz">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="resolvingPower" class="col-sm-3 control-label">Resolving Power</label>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" id="resolvingPower"
+                           placeholder="Default unit is MHz">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="bandpassWidth" class="col-sm-3 control-label">Bandpass Width</label>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" id="bandpassWidth"
+                           placeholder="Default unit is MHz">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="restframeEnergy" class="col-sm-3 control-label">Rest-frame Energy</label>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" id="restframeEnergy"
+                           placeholder="Default unit is MHz">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="col-sm-2"></div>
+                  <div class="col-sm-10 checkbox">
+                    <label><input type="checkbox" value="">Do Spatial Cutout</label>
                   </div>
                 </div>
               </div>
@@ -206,8 +308,214 @@
         </div>
       </form>
     </div>
-    <div role="tabpanel" class="tab-pane" id="obscore_search"><h2>ObsCore
-      Search</h2></div>
+    <div role="tabpanel" class="tab-pane" id="obscore_search">
+
+
+
+
+
+        <h2>ObsCore
+          Search</h2>
+
+        <form id="obscore_search_form" method="post" action="#" class="form-horizontal">
+          <!--<div class="row">-->
+          <!--<div class="col-sm-12">-->
+          <!--<div class="btn-group">-->
+          <!--<button type="submit" class="btn btn-primary" value="Search">Search</button>-->
+          <!--</div>-->
+          <!--</div>-->
+          <!--</div>-->
+          <div class="col-sm-12 button-holder">
+            <button type="submit" class="btn btn-primary" value="Search">Search
+            </button>
+            <button type="reset" class="btn btn-default" value="Reset">Reset
+            </button>
+          </div>
+
+          <div class="row">
+            <div class="col-md-3 search-category">
+              <div class="panel panel-default">
+                <div class="panel-heading">Observation constraints</div>
+                <div class="panel-body">
+                  <div class="form-group">
+                    <label for="observationID" class="col-sm-4 control-label">Observation
+                      ID</label>
+                    <div class="col-sm-8">
+                      <input type="text" class="form-control" id="observtionID"
+                             placeholder="Text">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="piName" class="col-sm-4 control-label">P.I. Name</label>
+                    <div class="col-sm-8">
+                      <input type="text" class="form-control" id="piNae"
+                             placeholder="Text">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="proposalID" class="col-sm-4 control-label">Proposal
+                      ID</label>
+                    <div class="col-sm-8">
+                      <input type="text" class="form-control" id="propsalID"
+                             placeholder="Text">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="proposalTitle" class="col-sm-4 control-label">Proposal Title</label>
+                    <div class="col-sm-8">
+                      <input type="text" class="form-control" id="proposlTitle"
+                             placeholder="Text">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="proposalKeywords" class="col-sm-4 control-label">Proposal Keywords</label>
+                    <div class="col-sm-8">
+                      <input type="text" class="form-control" id="propsalKeywords"
+                             placeholder="Text">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="dataReleaseDate" class="col-sm-4 control-label">Data Release Date</label>
+                    <div class="col-sm-8">
+                      <input type="text" class="form-control" id="dataReeaseDate"
+                             placeholder="Text">
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3 search-category">
+              <div class="panel panel-default">
+                <div class="panel-heading">Spatial constraints</div>
+                <div class="panel-body">
+                  <div class="form-group">
+                    <label for="target"
+                           class="col-sm-3 control-label">Target</label>
+                    <div class="col-sm-9">
+                      <input type="text" class="form-control" id="taget"
+                             placeholder="RA/Dec or Target name">
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="pixelScale" class="col-sm-3 control-label">Pixel Scale</label>
+                    <div class="col-sm-9">
+                      <input type="text" class="form-control" id="pixeScale"
+                             placeholder="RA/Dec or Target name">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="col-sm-2"></div>
+                    <div class="col-sm-10 checkbox">
+                      <label><input type="checkbox" value="">Do Spatial Cutout</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3 search-category">
+              <div class="panel panel-default">
+                <div class="panel-heading">Temporal constraints</div>
+                <div class="panel-body">
+                  <div class="form-group">
+                    <label for="observationDate" class="col-sm-4 control-label">Observation Date</label>
+                    <div class="col-sm-8">
+                      <input type="date" class="form-control" id="observaionDate"
+                             placeholder="Calendar Date or MJD">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="integrationTime"
+                           class="col-sm-4 control-label">Integration Time</label>
+                    <div class="col-sm-8">
+                      <input type="date" class="form-control" id="integationTime"
+                             placeholder="Time span">
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3 search-category">
+              <div class="panel panel-default">
+                <div class="panel-heading">Spectral constraints</div>
+                <div class="panel-body">
+                  <div class="form-group">
+                    <label for="spectralCoverage" class="col-sm-3 control-label">Spectral Coverage</label>
+                    <div class="col-sm-9">
+                      <input type="text" class="form-control" id="spectraloverage"
+                             placeholder="Default unit is MHz">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="spectralSampling" class="col-sm-3 control-label">Spectral Sampling</label>
+                    <div class="col-sm-9">
+                      <input type="text" class="form-control" id="spectalSampling"
+                             placeholder="Default unit is MHz">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="resolvingPower" class="col-sm-3 control-label">Resolving Power</label>
+                    <div class="col-sm-9">
+                      <input type="text" class="form-control" id="resovingPower"
+                             placeholder="Default unit is MHz">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="bandpassWidth" class="col-sm-3 control-label">Bandpass Width</label>
+                    <div class="col-sm-9">
+                      <input type="text" class="form-control" id="bandpssWidth"
+                             placeholder="Default unit is MHz">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="restframeEnergy" class="col-sm-3 control-label">Rest-frame Energy</label>
+                    <div class="col-sm-9">
+                      <input type="text" class="form-control" id="restfrmeEnergy"
+                             placeholder="Default unit is MHz">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="col-sm-2"></div>
+                    <div class="col-sm-10 checkbox">
+                      <label><input type="checkbox" value="">Do Spatial Cutout</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12 search-category maintable hierarchy">
+              <div class="datatrain" style="width: 100%;">
+                <div class="panel panel-default">
+                  <div class="panel-heading">Additional constraints</div>
+
+                  <div class="panel-body">
+                    <div id="caom2@Herarchy"
+                         class="align-center advanced_search_data_train modelDataSource_caom2"
+                         data-utypes="Plane.energy.emBand/Observation.collection/Observation.instrument.name/Plane.energy.bandpassName/Plane.calibrationLevel/Plane.dataProductType/Observation.type">
+                      <span class="hidden hierarchy_utype"></span>
+                      <div class="hidden building" id="caom2_uilding">
+                        <span class="glyphicon glyphicon-refresh"></span>Loading...
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-12 button-holder">
+            <button type="submit" class="btn btn-primary" value="Search">Search
+            </button>
+            <button type="reset" class="btn btn-default" value="Reset">Reset
+            </button>
+          </div>
+        </form>
+
+
+</div>
     <div role="tabpanel" class="tab-pane disabled" disabled="disabled"
          id="adql"><h2>ADQL</h2></div>
     <div role="tabpanel" class="tab-pane disabled" disabled="disabled"

@@ -638,7 +638,7 @@
     var VALIDATOR_TIMER_DELAY = 500;
 
     var tooltipIconCSS = "advancedsearch-tooltip";
-    var initialTooltipIconCSS = "wb-icon-question";
+    var initialTooltipIconCSS = "glyphicon-question-sign";
     var hoverTooltipIconCSS = "wb-icon-question-alt";
 
     this.validator = new ca.nrc.cadc.search.Validator(this.configuration.options.validatorEndpoint,
@@ -930,88 +930,38 @@
       if (tipJSON && tipJSON.tipHTML)
       {
         var tipMarkup = tipJSON.tipHTML;
-        var tipsterPlacement;
-        var offsetX;
-
-        if (tipJSON.horizontalOffset)
-        {
-          offsetX = tipJSON.horizontalOffset;
-        }
-        else if ($liItem.hasClass("label_tooltip_right"))
-        {
-          tipsterPlacement = "right";
-          offsetX = -12;
-        }
-        else
-        {
-          tipsterPlacement = "left";
-          offsetX = 240;
-        }
 
         var offsetY = tipJSON.verticalOffset ? tipJSON.verticalOffset : 0;
 
-        var $ttIconImg = $("<span class=\"" + tooltipIconCSS + " " + initialTooltipIconCSS + " float-right\" />");
+        var $tooltipDiv = tooltipCreator.getContent(tipMarkup, tooltipHeaderText, null, null);
 
-        $liItem.find(".search_criteria_label_contents").before($ttIconImg);
+        var tooltipID = $liItem.attr("id");
+        var $tooltipHeaderDiv = tooltipCreator.getHeader(tooltipHeaderText, tooltipID);
 
-        var $tooltipDiv = tooltipCreator.getContent(tipMarkup, tooltipHeaderText, null, $ttIconImg);
-
-        var tipster = $ttIconImg.tooltipster({
-                                               interactive: true,
-                                               animation: "fade",
-                                               theme: "tooltipster-advanced-search",
-                                               content: $tooltipDiv,
-                                               maxWidth: 400,
-                                               arrow: false,
-                                               repositionOnResize: false,
-                                               repositionOnScroll: false,
-                                               position: tipsterPlacement,
-                                               offsetX: offsetX,
-                                               offsetY: offsetY,
-                                               onlyOne: true,
-                                               trigger: "custom"
-                                             });
-
-        if (inputID === "Plane.position.bounds")
-        {
-          this.targetTooltipsters = this.targetTooltipsters.concat(tipster);
-        }
-
-        $ttIconImg.hover(function (event)
-                         {
-                           var $thisSpan = $(event.target);
-
-                           $thisSpan.removeClass(initialTooltipIconCSS);
-                           $thisSpan.addClass(hoverTooltipIconCSS);
-
-                           return false;
-                         },
-                         function (event)
-                         {
-                           var $thisSpan = $(event.target);
-
-                           $thisSpan.removeClass(hoverTooltipIconCSS);
-                           $thisSpan.addClass(initialTooltipIconCSS);
-
-                           return false;
-                         });
-
-        $ttIconImg.on("click", function (e)
-        {
-          e.preventDefault();
-          $ttIconImg.tooltipster("show");
-
-          // Make them
-          // draggable.
-          $(".tooltipster-advanced-search").draggable(
-              {
-                handle: ".tooltip_header",
-                snap: true,
-                revert: false
-              });
-
-          return false;
+        $liItem.popover({
+          title:$tooltipHeaderDiv,
+          content:$tooltipDiv[0].innerHTML,
+          html: true,
+          placement: $liItem[0].dataset.placement
         });
+
+        // todo: can popovers be draggable?
+        // $ttIconImg.on("click", function (e)
+        // {
+        //   e.preventDefault();
+        //   $ttIconImg.tooltipster("show");
+        //
+        //   // Make them
+        //   // draggable.
+        //   $(".tooltipster-advanced-search").draggable(
+        //       {
+        //         handle: ".tooltip_header",
+        //         snap: true,
+        //         revert: false
+        //       });
+        //
+        //   return false;
+        // });
       }
     };
 
@@ -1022,17 +972,45 @@
     this.loadTooltips = function (jsonData)
     {
       var tooltipCreator = new ca.nrc.cadc.search.TooltipCreator();
-      this.$form.find("ul.search-constraints li").each(function (key, element)
+      this.$form.find('[data-toggle="popover"]').each(function (key, element)
                                                        {
                                                          var $liItem = $(element);
-                                                         var $tooltipHeader = $liItem.find("summary.search_criteria_label_container");
-                                                         var tooltipHeaderText = $tooltipHeader.text();
-                                                         var $searchInputItem = $liItem.find(".search_criteria_input:first");
-                                                         var inputID = $searchInputItem.attr("id");
-
-                                                         this.handleTooltipLoad(jsonData[inputID], tooltipCreator,
-                                                                                $liItem, inputID, tooltipHeaderText);
+                                                         this.handleTooltipLoad(jsonData[element.dataset.utype], tooltipCreator,
+                                                                                $liItem, element.dataset.utype, element.dataset.title);
                                                        }.bind(this));
+
+
+      // Manage closing popovers, and maintaining that only one is
+      // open at a time.
+      $(document).on('click', function (e) {
+        if ($(e.target).hasClass("glyphicon-remove-circle"))
+        {
+          $('[data-toggle="popover"],[data-original-title]').each(function ()
+          {
+            (($(this).popover('hide').data('bs.popover') || {}).inState || {}).click = false  // fix for BS 3.3.6
+          });
+        }
+
+        if ($(e.target).hasClass("glyphicon-question-sign"))
+        {
+          $('[data-toggle="popover"]').each(function ()
+          {
+
+            if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0)
+            {
+              (($(this).popover('hide').data('bs.popover')||{}).inState||{}).click = false  // fix for BS 3.3.6
+            }
+          });
+
+          // reposition popover so it doesn't cover input field for left-side display
+          if ($('.popover').hasClass("left"))
+          {
+            $('.popover').css("left","-480px");
+          }
+        }
+
+      });
+
     };
 
     /**

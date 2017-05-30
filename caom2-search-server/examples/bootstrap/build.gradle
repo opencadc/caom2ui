@@ -12,7 +12,8 @@ repositories {
 dependencies {
     compile 'log4j:log4j:1.2.+'
 
-    compile 'org.opencadc:caom2-search-server:[1.2.5, )'
+
+    compile 'org.opencadc:caom2-search-server:[1.2.7, )'
 
     providedCompile 'javax.servlet:javax.servlet-api:3.1.+'
     providedCompile 'javax.servlet:javax.servlet-api:3.0.+'
@@ -30,7 +31,8 @@ dependencies {
 
 ext {
     // Change this value to test other locations, such as Production or RC.
-    intTest_default_web_app_url = 'http://localhost:8080/search/'
+    intTest_default_web_app_url = 'http://localhost:8080/'
+    intTest_default_web_app_endpoint = '/archive-search/'
 
     intTest_user_name = 'CADCtest'
     intTest_user_password = 'sywymUL4'
@@ -42,6 +44,7 @@ ext {
 sourceCompatibility = 1.7
 
 group = 'org.opencadc'
-version = '1003'
+
+version = '1010'
 
 apply from: '../../../_shared.gradle'
