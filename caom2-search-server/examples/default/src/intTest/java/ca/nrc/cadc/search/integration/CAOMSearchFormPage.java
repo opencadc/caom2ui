@@ -90,6 +90,7 @@ public class CAOMSearchFormPage extends AbstractSearchFormPage
     static final By TARGET_FORM_GROUP = By.id("Plane.position.bounds_details");
     static final By TARGET_RESOLUTION_STATUS_ICON_BY = By.className("target_name_resolution_status");
     static final By TARGET_RESOLUTION_STATUS_GOOD_ICON_BY = By.className("target_ok");
+    static final By SSOIS_LINK_BY = By.id("ssois_link");
     static final String SPECTRAL_COVERAGE_INPUT_ID = "Plane.energy.bounds";
     static final String OBSERVATION_DATE_INPUT_ID = "Plane.time.bounds";
     static final String PIXEL_SCALE_INPUT_ID = "Plane.position.sampleSize";
@@ -128,6 +129,7 @@ public class CAOMSearchFormPage extends AbstractSearchFormPage
         waitForElementPresent(TARGET_INPUT);
         waitForElementPresent(By.id(SPECTRAL_COVERAGE_INPUT_ID));
         waitForElementPresent(By.id(OBSERVATION_DATE_INPUT_ID));
+        waitForElementPresent(SSOIS_LINK_BY);
 
         PageFactory.initElements(driver, this);
     }
@@ -187,31 +189,22 @@ public class CAOMSearchFormPage extends AbstractSearchFormPage
                                         + (ignoreCase ? " " : " not ") + "ignored)");
     }
 
-    boolean ssoisLinkLoads() throws Exception
+    void ssoisLinkLoads() throws Exception
     {
         click(TARGET_FORM_GROUP);
 
-        boolean linkLoads = false;
         // click on ssois link
         click(ssoisLink);
 
-        try {
-            String curWindowTitle = getCurrentWindowHandle();
+        String curWindowTitle = getCurrentWindowHandle();
 
-            String windowTitle = "Solar System Object Image Search - Canadian Astronomy Data Centre";
+        selectWindow("ssois_window");
+        waitForTextPresent(H1_HEADER, "Solar System Object Image Search");
 
-            selectWindow(windowTitle);
-            waitForTextPresent(H1_HEADER, "Solar System Object Image Search");
+        // Nav back to form
+        selectWindow(curWindowTitle);
 
-            // Nav back to form
-            selectWindow(curWindowTitle);
-
-        } catch (Exception e)
-        {
-            linkLoads = false;
-        }
-
-        return linkLoads;
+        selectWindow(curWindowTitle);
     }
 
 }
