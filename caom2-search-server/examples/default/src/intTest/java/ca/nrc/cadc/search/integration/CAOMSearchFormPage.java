@@ -75,18 +75,22 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.Select;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
 public class CAOMSearchFormPage extends AbstractSearchFormPage
 {
     private static final int DEFAULT_TIMEOUT_IN_SECONDS = 20;
+    private static final By H1_HEADER = By.cssSelector("h1");
 
     static final By DATA_TRAIN_LOCATOR = By.id("caom2@Hierarchy");
     static final By DATA_TRAIN_COLLECTION_MENU = By.id("Observation.collection");
     static final By TARGET_INPUT = By.id("Plane.position.bounds");
+    static final By TARGET_FORM_GROUP = By.id("Plane.position.bounds_details");
     static final By TARGET_RESOLUTION_STATUS_ICON_BY = By.className("target_name_resolution_status");
     static final By TARGET_RESOLUTION_STATUS_GOOD_ICON_BY = By.className("target_ok");
+    static final By SSOIS_LINK_BY = By.id("ssois_link");
     static final String SPECTRAL_COVERAGE_INPUT_ID = "Plane.energy.bounds";
     static final String OBSERVATION_DATE_INPUT_ID = "Plane.time.bounds";
     static final String PIXEL_SCALE_INPUT_ID = "Plane.position.sampleSize";
@@ -107,6 +111,9 @@ public class CAOMSearchFormPage extends AbstractSearchFormPage
     @FindBy(id = "Plane.time.bounds")
     WebElement observationDateInput;
 
+    @FindBy(id = "ssois_link")
+    WebElement ssoisLink;
+
 
     /**
      * Constructors need to be public for reflection to find them.
@@ -122,6 +129,7 @@ public class CAOMSearchFormPage extends AbstractSearchFormPage
         waitForElementPresent(TARGET_INPUT);
         waitForElementPresent(By.id(SPECTRAL_COVERAGE_INPUT_ID));
         waitForElementPresent(By.id(OBSERVATION_DATE_INPUT_ID));
+        waitForElementPresent(SSOIS_LINK_BY);
 
         PageFactory.initElements(driver, this);
     }
@@ -180,4 +188,23 @@ public class CAOMSearchFormPage extends AbstractSearchFormPage
         throw new IllegalStateException("No such element with value '" + value + "' (Case"
                                         + (ignoreCase ? " " : " not ") + "ignored)");
     }
+
+    void ssoisLinkLoads() throws Exception
+    {
+        click(TARGET_FORM_GROUP);
+
+        // click on ssois link
+        click(ssoisLink);
+
+        String curWindowTitle = getCurrentWindowHandle();
+
+        selectWindow("ssois_window");
+        waitForTextPresent(H1_HEADER, "Solar System Object Image Search");
+
+        // Nav back to form
+        selectWindow(curWindowTitle);
+
+        selectWindow(curWindowTitle);
+    }
+
 }
