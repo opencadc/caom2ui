@@ -75,16 +75,19 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.Select;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
 public class CAOMSearchFormPage extends AbstractSearchFormPage
 {
     private static final int DEFAULT_TIMEOUT_IN_SECONDS = 20;
+    private static final By H1_HEADER = By.cssSelector("h1");
 
     static final By DATA_TRAIN_LOCATOR = By.id("caom2@Hierarchy");
     static final By DATA_TRAIN_COLLECTION_MENU = By.id("Observation.collection");
     static final By TARGET_INPUT = By.id("Plane.position.bounds");
+    static final By TARGET_FORM_GROUP = By.id("Plane.position.bounds_details");
     static final By TARGET_RESOLUTION_STATUS_ICON_BY = By.className("target_name_resolution_status");
     static final By TARGET_RESOLUTION_STATUS_GOOD_ICON_BY = By.className("target_ok");
     static final String SPECTRAL_COVERAGE_INPUT_ID = "Plane.energy.bounds";
@@ -106,6 +109,9 @@ public class CAOMSearchFormPage extends AbstractSearchFormPage
 
     @FindBy(id = "Plane.time.bounds")
     WebElement observationDateInput;
+
+    @FindBy(id = "ssois_link")
+    WebElement ssoisLink;
 
 
     /**
@@ -180,4 +186,32 @@ public class CAOMSearchFormPage extends AbstractSearchFormPage
         throw new IllegalStateException("No such element with value '" + value + "' (Case"
                                         + (ignoreCase ? " " : " not ") + "ignored)");
     }
+
+    boolean ssoisLinkLoads() throws Exception
+    {
+        click(TARGET_FORM_GROUP);
+
+        boolean linkLoads = false;
+        // click on ssois link
+        click(ssoisLink);
+
+        try {
+            String curWindowTitle = getCurrentWindowHandle();
+
+            String windowTitle = "Solar System Object Image Search - Canadian Astronomy Data Centre";
+
+            selectWindow(windowTitle);
+            waitForTextPresent(H1_HEADER, "Solar System Object Image Search");
+
+            // Nav back to form
+            selectWindow(curWindowTitle);
+
+        } catch (Exception e)
+        {
+            linkLoads = false;
+        }
+
+        return linkLoads;
+    }
+
 }
