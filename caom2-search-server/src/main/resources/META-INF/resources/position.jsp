@@ -14,7 +14,6 @@
   final String name = utype + Shape1.VALUE;
   final String formName = utype + Shape1.NAME;
   final String resolverName = utype + Shape1.RESOLVER_VALUE;
-  final String detailsID = utype + "_details";
 %>
 
 
@@ -79,6 +78,16 @@
             </div>
         </div>
     </div>
+
+  <%--Link to SSOIS search for Mobile Objects--%>
+  <div class="text-center">
+    <span><strong>- <fmt:message key="OR_LABEL" bundle="${langBundle}"/> -</strong></span>
+  </div>
+
+  <div class="form-group">
+    <a href="http://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/ssois" target="_blank">
+      <fmt:message key="SSOIS_MOBILE_OBJECTS" bundle="${langBundle}"/></a>
+  </div>
 
     <input type="hidden" name="Form.name"
            value="targetList.targetList" />

@@ -414,7 +414,7 @@
         this.updateLists(e.target, false);
       }.bind(this);
 
-      select.className = "hierarchy_select";
+      select.className = "form-control hierarchy-select";
 
       containerElement.appendChild(label);
       containerElement.appendChild(select);

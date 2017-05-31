@@ -10,16 +10,10 @@
   // Conservative default.
   final int defaultMaxRowLimit = 10000;
   final String contentLanguage = request.getHeader("Content-Language");
-  final String requestHeaderLang = (contentLanguage == null)
-                                   ? "en" : contentLanguage;
+  final String requestHeaderLang = (contentLanguage == null) ? "en" : contentLanguage;
 
-//  final String downloadLink = "/downloadManager/download";
-
-  final int maxRowLimit =
-      configuration.lookupInt("org.opencadc.search.max-row-count",
-                              defaultMaxRowLimit);
-  final boolean showObsCoreTab =
-      configuration.lookupBoolean("org.opencadc.search.obs-core", true);
+  final int maxRowLimit = configuration.lookupInt("org.opencadc.search.max-row-count", defaultMaxRowLimit);
+  final boolean showObsCoreTab = configuration.lookupBoolean("org.opencadc.search.obs-core", true);
   final String tapSyncEndpoint = configuration.lookup("org.opencadc.search.tap-service-endpoint", "/search/tap/sync");
 %>
 
@@ -33,20 +27,6 @@
 
 <div class="container-fluid">
 
-<%--<div id="wb-skip">--%>
-  <%--<ul id="wb-tphp">--%>
-    <%--<li id="wb-skip1"><a href="#wb-cont">Skip to main content</a></li>--%>
-
-    <%--<!-- The wb-nav element is in the page footer. -->--%>
-    <%--<li id="wb-skip2"><a href="#wb-nav">Skip to secondary menu</a></li>--%>
-  <%--</ul>--%>
-<%--</div>--%>
-
-<%--<div id="wb-core" class="base">--%>
-<%--<div id="wb-core-in">--%>
-  <%--&lt;%&ndash;<c:import url="<%= maintenanceWarningURL %>" />&ndash;%&gt;--%>
-<%--<div id="wb-main" role="main">--%>
-<%--<div id="wb-main-in">--%>
 <%-- MainContentStart --%>
 
   <h1><fmt:message key="TITLE" bundle="${langBundle}"/></h1>
@@ -96,13 +76,13 @@
 
   <div class="tab-content">
       <!-- CAOM2 Search Query Tab -->
-      <c:import url="caom2_search.jsp?maxRowLimit=10000000"/>
+      <c:import url='<%= "caom2_search.jsp?maxRowLimit=" + maxRowLimit %>' />
 
       <!-- ObsCore Query Tab -->
-      <c:import url="obscore_search.jsp?maxRowLimit=10000000"/>
+      <c:import url='<%= "obscore_search.jsp?maxRowLimit=" + maxRowLimit %>' />
 
       <!-- Result Tab -->
-      <c:import url="results.jsp?maxRowLimit=10000000"/>
+      <c:import url='<%= "results.jsp?maxRowLimit=" + maxRowLimit %>' />
 
   <!-- Error Tab -->
   <div role="tabpanel" class="tab-pane" id="errorTableTab">

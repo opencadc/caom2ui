@@ -348,10 +348,9 @@ ul.ui-autocomplete {
   background-repeat: no-repeat;
 }
 
-select.hierarchy_select
+select.hierarchy-select
 {
-  background-color: #fff;
-  width: 100%;
+  padding: 6px 4px;
 }
 
 .download-options
