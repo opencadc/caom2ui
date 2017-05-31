@@ -54,6 +54,8 @@ public class CAOMSearchBrowserTest extends AbstractAdvancedSearchIntegrationTest
     {
         CAOMSearchFormPage searchFormPage = goTo(endpoint, null, CAOMSearchFormPage.class);
 
+        verifyTrue(searchFormPage.ssoisLinkLoads());
+
         searchFormPage.enterObservationID("692512");
         searchFormPage.enterTarget("210.05  54.3");
 
@@ -110,6 +112,8 @@ public class CAOMSearchBrowserTest extends AbstractAdvancedSearchIntegrationTest
         searchResultsPage.filterOnRA("18:03..18:07");
 
         searchResultsPage.includeHiddenColumn("caom2:Observation.target.keywords");
+
+        // Add click on SSOIS link.
 
         /*
         TODO - Complete for new Page Object model going forward.

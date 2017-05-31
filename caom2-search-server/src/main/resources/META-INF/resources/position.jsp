@@ -59,6 +59,15 @@
              title="<fmt:message key="TARGET_LIST_TOOLTIP" bundle="${langBundle}" />" />
       <span id="<%= utype %>_targetList_clear" class="wb-icon-eraser targetList_clear"></span>
     </div>
+
+    <%--Link to SSOIS search for Mobile Objects--%>
+    <div class="align-center margin-top-none margin-bottom-medium">
+      <span class="font-large">- <fmt:message key="OR_LABEL" bundle="${langBundle}"/> -</span>
+    </div>
+    <div class="align-left margin-top-none margin-bottom-medium">
+      <a id="ssois_link" href="http://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/ssois" target="ssois_window" class=""><fmt:message key="SSOIS_MOBILE_OBJECTS" bundle="${langBundle}"/></a>
+    </div>
+
     <input type="hidden" name="Form.name"
            value="targetList.targetList" />
     <input type="hidden"
