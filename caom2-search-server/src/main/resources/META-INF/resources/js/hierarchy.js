@@ -368,7 +368,7 @@
     {
       // Remove temporary div.
       var building = document.getElementById(this.uType + ".building");
-      building.className = (building.className.indexOf("invisible") >= 0) ? "" : "invisible";
+      building.className = (building.className.indexOf("hidden") >= 0) ? "" : "hidden";
     };
 
     /**
