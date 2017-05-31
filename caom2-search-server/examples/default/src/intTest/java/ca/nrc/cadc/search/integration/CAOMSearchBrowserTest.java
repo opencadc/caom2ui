@@ -57,7 +57,7 @@ public class CAOMSearchBrowserTest extends AbstractAdvancedSearchIntegrationTest
         verifyTrue(searchFormPage.ssoisLinkLoads());
 
         searchFormPage.enterObservationID("692512");
-        searchFormPage.enterTarget("210.05  54.3");
+        searchFormPage.enterValidTarget("210.05  54.3");
 
         searchFormPage.reset();
 
