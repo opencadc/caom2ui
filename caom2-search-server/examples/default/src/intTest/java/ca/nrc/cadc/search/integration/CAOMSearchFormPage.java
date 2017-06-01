@@ -111,6 +111,9 @@ public class CAOMSearchFormPage extends AbstractSearchFormPage
     @FindBy(id = "Plane.time.bounds")
     WebElement observationDateInput;
 
+    @FindBy(id = "ssois_link")
+    WebElement ssoisLink;
+
 
 
     /**
@@ -191,17 +194,15 @@ public class CAOMSearchFormPage extends AbstractSearchFormPage
     {
         click(TARGET_FORM_GROUP);
 
-        String curWindowTitle = getCurrentWindowHandle();
+        final String curWindowTitle = getCurrentWindowHandle();
 
         // click on ssois link
-        click(SSOIS_LINK_BY);
+        click(ssoisLink);
 
         selectWindow("ssois_window");
         waitForTextPresent(H1_HEADER, "Solar System Object Image Search");
 
         // Nav back to form
         selectWindow(curWindowTitle);
-
     }
-
 }
