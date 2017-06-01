@@ -133,12 +133,10 @@
       <img src="images/queryoverlay.gif" alt=""/>
       <br/>
                 <span id="overlay_status">
-                  <fmt:message key="EXECUTING_QUERY_LABEL"
-                               bundle="${langBundle}"/></span>
+                  <fmt:message key="EXECUTING_QUERY_LABEL" bundle="${langBundle}"/></span>
       <br/>
                 <span id="overlay_cancel">
-                  <input id="cancel_search" type="button" value="Cancel"
-                         class="btn"/>
+                  <input id="cancel_search" type="button" value="Cancel" class="btn"/>
                 </span>
     </div>
   </div>

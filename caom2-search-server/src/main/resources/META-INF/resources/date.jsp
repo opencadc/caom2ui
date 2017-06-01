@@ -29,7 +29,7 @@
 
 <div class="form-group">
 
-  <label for="${param.utype}" class="">
+  <label for="${param.utype}" class="control-label">
     <fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}"/>
   </label>
   <div data-toggle="popover"
