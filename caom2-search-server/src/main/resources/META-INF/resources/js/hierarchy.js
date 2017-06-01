@@ -385,7 +385,7 @@
       var label = document.createElement("label");
       if (this.pageLanguage === "fr")
       {
-        label.className = "advanced_search_hierarchy_select_div_label";
+        label.className = "advanced_search_hierarchy_select_div_label form-control";
       }
 
       var hidden = document.createElement("input");
