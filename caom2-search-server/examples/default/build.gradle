@@ -32,8 +32,8 @@ dependencies {
 
 ext {
     // Change this value to test other locations, such as Production or RC.
-    intTest_default_web_app_url = 'http://localhost:8080/'
-    intTest_default_web_app_endpoint = '/archive-search/'
+    intTest_default_web_app_url = 'http://mach319.cadc.dao.nrc.ca:8080/'
+    intTest_default_web_app_endpoint = '/search/'
 
     intTest_user_name = 'CADCtest'
     intTest_user_password = 'sywymUL4'
