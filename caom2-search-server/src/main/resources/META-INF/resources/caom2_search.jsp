@@ -1,9 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" session="false"
          pageEncoding="UTF-8" %>
 
-<%@ page import="ca.nrc.cadc.search.form.Enumerated" %>
-<%@ page import="ca.nrc.cadc.search.form.FormConstraint" %>
-
 <jsp:useBean id="job" scope="request" class="ca.nrc.cadc.uws.Job"/>
 <jsp:useBean id="errors" scope="request"
              class="ca.nrc.cadc.search.form.FormErrors"/>
@@ -13,10 +10,9 @@
 
 
 <div role="tabpanel" class="tab-pane active" id="queryFormTab">
-  <h2>CAOM-2</h2>
-  <form id="queryForm" name="queryForm" class=""
-        method="post" action="${pageContext.request.contextPath}/find"
-        enctype="multipart/form-data">
+
+  <form id="queryForm" name="queryForm" class="queryForm"
+        method="post" action="${pageContext.request.contextPath}/find" enctype="multipart/form-data">
 
     <!-- Used by VOView to sort the results. -->
     <input type="hidden" name="sort_column" value="Start Date"/>

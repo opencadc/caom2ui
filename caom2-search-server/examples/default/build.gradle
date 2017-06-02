@@ -45,7 +45,7 @@ ext {
 sourceCompatibility = 1.7
 
 group = 'org.opencadc'
-version = '1011'
+version = '1012'
 
 war {
     // Trying to fix static file caching on new build.

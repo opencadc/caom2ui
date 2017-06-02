@@ -466,6 +466,10 @@ span.slick-column-picker-button:hover
   /*font-size: 1.1em;*/
 }
 
+.nav-tabs {
+  margin-bottom: 15px;
+}
+
 .tabs li {
   border-bottom: inherit;
 }
