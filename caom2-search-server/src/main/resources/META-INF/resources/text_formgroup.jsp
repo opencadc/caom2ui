@@ -8,34 +8,28 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <%
-    final String utype = request.getParameter("utype");
-    final String enableAutocomplete = request.getParameter("enableAutocomplete");
-    final String formName = utype + Text.NAME;
-    String classes = "search_criteria_input width-100";
-//  if (utype.startsWith("Observation.proposal"))
-    if ((enableAutocomplete != null) && Boolean.parseBoolean(enableAutocomplete))
-    {
-        classes += " ui-autocomplete-input";
-    }
+  final String utype = request.getParameter("utype");
+  final String enableAutocomplete = request.getParameter("enableAutocomplete");
+  final String formName = utype + Text.NAME;
+  String classes = "form-control search_criteria_input";
+
+  if ((enableAutocomplete != null) && Boolean.parseBoolean(enableAutocomplete))
+  {
+    classes += " ui-autocomplete-input";
+  }
 %>
 
 <div class="form-group">
-    <label for="${param.utype}" class="control-label">
-        <fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}"/>
-    </label>
-    <div data-toggle="popover"
-         data-utype="${param.utype}"
-         data-placement="${param.tipSide}"
-         data-title="<fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}"/>"
-         class="glyphicon glyphicon-question-sign popover-blue popover-right">
-    </div>
-    <div>
-        <input type="text"
-               class="form-control search_criteria_input"
-               id="${param.utype}"
-               name="${param.utype}">
-    </div>
-    <input type="hidden"
-           name="<%= FormConstraint.FORM_NAME %>"
-           value="<%= formName %>"/>
+  <label for="${param.utype}" class="control-label">
+    <fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}"/>
+  </label>
+  <div data-toggle="popover" data-utype="${param.utype}" data-placement="${param.tipSide}"
+       data-title="<fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}"/>"
+       class="glyphicon glyphicon-question-sign popover-blue popover-right">
+  </div>
+  <div>
+    <input type="text" class="<%= classes %>" id="${param.utype}" name="${param.utype}">
+  </div>
+
+  <input type="hidden" name="<%= FormConstraint.FORM_NAME %>" value="<%= formName %>"/>
 </div>

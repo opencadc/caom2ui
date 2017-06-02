@@ -13,8 +13,8 @@
   final String enableAutocomplete = request.getParameter("enableAutocomplete");
   final String labelKey = utype + "_FORM_LABEL";
   final String formName = utype + Text.NAME;
-  String classes = "search_criteria_input width-100";
-//  if (utype.startsWith("Observation.proposal"))
+  String classes = "search_criteria_input";
+
   if ((enableAutocomplete != null) && Boolean.parseBoolean(enableAutocomplete))
   {
     classes += " ui-autocomplete-input";
@@ -22,7 +22,6 @@
 
   final String detailsID = utype + "_details";
 %>
-
 
 
 <li class="label_tooltip_<%= tipSide %>">
@@ -36,37 +35,8 @@
     </label>
 
     <div id="<%= utype %>_input_decorate">
-      <input type="text" class="<%= classes %>"
-             id="<%= utype %>"
-             name="<%= utype %>"
-             size="20"/>
+      <input type="text" class="<%= classes %>" id="<%= utype %>" name="<%= utype %>" size="20"/>
     </div>
-    <input type="hidden"
-           name="<%= FormConstraint.FORM_NAME %>"
-           value="<%= formName %>"/>
+    <input type="hidden" name="<%= FormConstraint.FORM_NAME %>" value="<%= formName %>"/>
   </details>
 </li>
-
-
-<%--<li class="label_tooltip_<%= tipSide %>">--%>
-  <%--<details id="<%= detailsID %>">--%>
-    <%--<summary class="search_criteria_label_container">--%>
-      <%--<span class="search_criteria_label <%= detailsID %>"><fmt:message key="<%= labelKey %>" bundle="${langBundle}"/></span>--%>
-      <%--<span class="search_criteria_label_contents color-accent"></span>--%>
-    <%--</summary>--%>
-    <%--<label for="<%= utype %>" class="wb-invisible">--%>
-      <%--<fmt:message key="<%= labelKey %>" bundle="${langBundle}"/>--%>
-    <%--</label>--%>
-
-    <%--<div id="<%= utype %>_input_decorate">--%>
-      <%--<input type="text" class="<%= classes %>"--%>
-             <%--id="<%= utype %>"--%>
-             <%--name="<%= utype %>"--%>
-             <%--size="20"/>--%>
-    <%--</div>--%>
-    <%--<input type="hidden"--%>
-           <%--name="<%= FormConstraint.FORM_NAME %>"--%>
-           <%--value="<%= formName %>"/>--%>
-  <%--</details>--%>
-<%--</li>--%>
-
