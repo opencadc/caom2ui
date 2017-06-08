@@ -9,8 +9,6 @@
 
 <%
   final String utype = request.getParameter("utype");
-  final String labelKey = utype + "_FORM_LABEL";
-  final String tipSide = request.getParameter("tipSide");
   final String name = utype + Shape1.VALUE;
   final String formName = utype + Shape1.NAME;
   final String resolverName = utype + Shape1.RESOLVER_VALUE;
@@ -39,7 +37,7 @@
         </div>
 
         <select size="1" name="<%= resolverName %>" title="<fmt:message key="RESOLVER_FORM_LABEL" bundle="${langBundle}" />"
-                id="<%= resolverName %>" class="form-control">
+                id="<%= resolverName %>" class="resolver-select form-control">
           <option value="ALL">
             <fmt:message key="ANY_RESOLVER_FORM_LABEL" bundle="${langBundle}" />
           </option>

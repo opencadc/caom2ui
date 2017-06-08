@@ -10,6 +10,7 @@
               "pageLanguage": "en",
               "autoInitFlag": true,
               "tapSyncEndpoint": "/search/tap/sync",
+              "targetResolverEndpoint": "/search/unitconversion",
               "tapProxyFlag": false,
               "packageEndpoint": "/search/package",
               "autocompleteEndpoint": "/search/unitconversion",
@@ -58,6 +59,7 @@
    * @param {String} [_options.previewsEndpoint="/search/preview"]   Relative URI endpoint to the Preview service.
    * @param {String} [_options.validatorEndpoint="/search/validate"]   Relative URI endpoint to the Validator service.
    * @param {String} [_options.autocompleteEndpoint="/search/unitconversion"]   Relative URI endpoint to the unit
+   * @param {String} [_options.targetResolverEndpoint="/search/unitconversion"]   Target resolver endpoint service
    *     conversion service.
    * @constructor
    */

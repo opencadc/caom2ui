@@ -40,6 +40,7 @@ import java.text.*;
 import java.util.Map;
 import java.util.TimeZone;
 
+import ca.nrc.cadc.net.NetUtil;
 import ca.nrc.cadc.search.parser.resolver.ResolverImpl;
 import ca.nrc.cadc.search.parser.resolver.TargetNameResolverClient;
 import org.json.JSONException;
@@ -173,7 +174,7 @@ public class UnitConversionServlet extends HttpServlet
             else if (uType.equals("Plane.position.bounds") ||
                      uType.equals("Char.SpatialAxis.Coverage.Support.Area"))
             {
-                writeTargetResolution(jsonWriter, value,
+                writeTargetResolution(jsonWriter, NetUtil.decode(value),
                                       (requestParameters.containsKey("resolver")
                                        ? requestParameters.get("resolver")[0]
                                        : "ALL"));
@@ -649,21 +650,16 @@ public class UnitConversionServlet extends HttpServlet
      * @return TargetData instance.
      * @throws TargetParserException If it cannot be resolved or parsed.
      */
-    protected TargetData resolveTarget(final String value,
-                                       final String resolverValue)
+    protected TargetData resolveTarget(final String value, final String resolverValue)
             throws TargetParserException
     {
-        final TargetNameResolverClient nameResolverClient =
-                new DefaultNameResolverClient();
-
-        final TargetParser targetParser =
-                new TargetParser(new ResolverImpl(nameResolverClient));
+        final TargetNameResolverClient nameResolverClient = new DefaultNameResolverClient();
+        final TargetParser targetParser = new TargetParser(new ResolverImpl(nameResolverClient));
         return targetParser.parse(value, resolverValue);
     }
 
     protected String getUType(final String path)
     {
-        return (path.contains("/") ? path.substring(path.indexOf("/") + 1)
-                                   : path);
+        return (path.contains("/") ? path.substring(path.indexOf("/") + 1) : path);
     }
 }

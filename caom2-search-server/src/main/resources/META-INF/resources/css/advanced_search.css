@@ -13,11 +13,6 @@
   font-style: italic;
 }
 
-select.resolver_select
-{
-  width: 229px;
-}
-
 .dialog-close, .tooltip-close
 {
   cursor: pointer;
@@ -194,14 +189,8 @@ div.align-middle.column-picker-icon
   background-color: white;
 }
 
-.search_criteria_input
-{
-  padding-left: 0;
-  padding-right: 0;
-}
-
 .search_criteria_label {
-  width:100%;
+  width: 100%;
 }
 
 /* Tooltip (Form) */
@@ -541,6 +530,13 @@ div.search-category div.panel {
 
 
 /* Bootstrap Glyphicon and Popover styling */
+
+.popover.resolver-popover {
+  top: -119px !important;
+  left: -210px !important;
+  max-width: 200px;
+  min-width: 200px;
+}
 
 .popover-blue {
   color:mediumblue;

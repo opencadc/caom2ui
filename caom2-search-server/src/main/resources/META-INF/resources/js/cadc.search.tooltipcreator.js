@@ -29,12 +29,10 @@
      */
     function getContent(tipHTML, tooltipHeaderText, tipClass, tipHeader)
     {
-      var $divElement =
-          $("<div class='module-tool module-simplify module-tool-tooltip'></div>");
+      var $divElement = $("<div class='module-tool module-simplify module-tool-tooltip'></div>");
       var $tooltipHeader = $("<div class='tooltip_header'></div>");
-      var $tooltipHeaderH6Element = $("<h6></h6>").appendTo($tooltipHeader);
-      var $tooltipTextElement =
-          $("<p>").appendTo("<div class='tooltip_text'></div>");
+      $("<h6></h6>").appendTo($tooltipHeader);
+      var $tooltipTextElement = $("<p>").appendTo("<div class='tooltip_text'></div>");
 
       if (tipClass)
       {
@@ -44,9 +42,7 @@
       $tooltipTextElement.html(tipHTML);
       $divElement.append($tooltipTextElement.parent());
 
-      var $clone = $divElement.clone();
-
-      return $clone;
+      return $divElement.clone();
     }
 
 
@@ -66,7 +62,8 @@
       $spanEl.text(tooltipHeaderText);
 
       var buttonID = tooltipID + "_close";
-      var $buttonEl = $('<div id="' + buttonID + '" class="glyphicon glyphicon-remove-circle popover-blue popover-right"></div>');
+      var $buttonEl = $('<div id="' + buttonID
+                        + '" class="glyphicon glyphicon-remove-circle popover-blue popover-right"></div>');
 
       $divEl.append($spanEl);
       $divEl.append($buttonEl);
@@ -102,16 +99,20 @@
         // make a string into a set of key-value pairs
         var resolverObject = {};
         var x = resolverResult.split('\n');
-        for (var field in x)
+        for (var f in x)
         {
-          var a = x[field].split(':')[0];
-          var b = x[field].split(':')[1];
-          resolverObject[a] = b.trim();
+          if (x.hasOwnProperty(f))
+          {
+            var xField = x[f];
+            var a = xField.split(':')[0];
+            var b = xField.split(':')[1];
+            resolverObject[a] = b.trim();
+          }
         }
 
         for (var field in resolverMap)
         {
-          if (resolverObject[field])
+          if (resolverObject.hasOwnProperty(field))
           {
             $(resolverMap[field]).text(resolverObject[field]);
           }
