@@ -6,16 +6,10 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib tagdir="/WEB-INF/tags/cadc" prefix="cadc" %>
 
-<%
-  final String name = request.getParameter("name");
-  final String labelKey = name + "_FORM_LABEL";
-  final String tipSide = request.getParameter("tipSide");
-  final String formName = name + "@Boolean";
-%>
 
 <div class="col-sm-12 label_tooltip_${param.tipSide}">
     <div class="form-group">
-        <cadc:checkbox checkboxName="<%= name %>" i18nKey="<%= labelKey %>" />
+        <cadc:checkbox checkboxName="${param.name}" i18nKey="${param.name}_FORM_LABEL" />
         <input type="hidden"
                name="<%= FormConstraint.FORM_NAME %>" >
     </div>
