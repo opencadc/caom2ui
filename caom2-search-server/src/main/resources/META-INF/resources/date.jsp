@@ -26,25 +26,21 @@
       utype + "_PRESET_PAST_MONTH_FORM_LABEL";
 %>
 
-<div data-toggle="popover"
-     data-placement="${param.tipSide}"
-     data-utype="${param.utype}"
-     data-title="<fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}"/>"
-     class="glyphicon glyphicon-question-sign popover-blue popover-right">
-</div>
+<div class="form-group">
+  <div data-toggle="popover"
+       data-placement="${param.tipSide}"
+       data-utype="${param.utype}"
+       data-title="<fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}"/>"
+       class="glyphicon glyphicon-question-sign popover-blue popover-right">
+  </div>
 
-<details id="${param.utype}_details">
-  <summary class="search_criteria_label_container">
-    <label for="${param.utype}" class="control-label">
-      <fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}"/>
-    </label>
-    <span class="search_criteria_label_contents color-accent"></span>
-  </summary>
-
-  <div class="form-group">
-
-
-
+  <details id="${param.utype}_details">
+    <summary class="search_criteria_label_container">
+      <label for="${param.utype}" class="control-label">
+        <fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}"/>
+      </label>
+      <span class="search_criteria_label_contents color-accent"></span>
+    </summary>
 
     <div id="${param.utype}_input_decorate">
       <input id="${param.utype}"
@@ -54,27 +50,27 @@
                     ui-form-input-validate
                     ui_unitconversion_input"/>
     </div>
-  </div>
 
-  <div class="text-center">
-    <span><strong>- <fmt:message key="OR_LABEL" bundle="${langBundle}"/> -</strong></span>
-  </div>
+    <div class="text-center">
+      <span><strong>- <fmt:message key="OR_LABEL" bundle="${langBundle}"/> -</strong></span>
+    </div>
 
-  <div class="form-group">
-    <label class="sub-label" for="${param.utype}_PRESET">
-      <fmt:message key="<%= presetLabelkey %>" bundle="${langBundle}"/>
-    </label>
-    <select size="1" id="${param.utype}_PRESET"
-            data-assoc-field="${param.utype}" name="<%= presetName %>"
-            class="form-control search_criteria_input ui_unitconversion_input preset-date width-100">
-      <option value=""></option>
-      <option value="<%= DatePreset.PAST_24_HOURS.name() %>"><fmt:message key="<%= presetPast24HoursLabelKey %>" bundle="${langBundle}"/></option>
-      <option value="<%= DatePreset.PAST_WEEK.name() %>"><fmt:message key="<%= presetPastWeekLabelKey %>" bundle="${langBundle}"/></option>
-      <option value="<%= DatePreset.PAST_MONTH.name() %>"><fmt:message key="<%= presetPastMonthLabelKey %>" bundle="${langBundle}"/></option>
-    </select>
-  </div>
-  <input type="hidden"
-         name="<%= FormConstraint.FORM_NAME %>"
-         value="<%= formName %>"/>
+    <div class="form-group">
+      <label class="sub-label" for="${param.utype}_PRESET">
+        <fmt:message key="<%= presetLabelkey %>" bundle="${langBundle}"/>
+      </label>
+      <select size="1" id="${param.utype}_PRESET"
+              data-assoc-field="${param.utype}" name="<%= presetName %>"
+              class="form-control search_criteria_input ui_unitconversion_input preset-date width-100">
+        <option value=""></option>
+        <option value="<%= DatePreset.PAST_24_HOURS.name() %>"><fmt:message key="<%= presetPast24HoursLabelKey %>" bundle="${langBundle}"/></option>
+        <option value="<%= DatePreset.PAST_WEEK.name() %>"><fmt:message key="<%= presetPastWeekLabelKey %>" bundle="${langBundle}"/></option>
+        <option value="<%= DatePreset.PAST_MONTH.name() %>"><fmt:message key="<%= presetPastMonthLabelKey %>" bundle="${langBundle}"/></option>
+      </select>
+    </div>
+    <input type="hidden"
+           name="<%= FormConstraint.FORM_NAME %>"
+           value="<%= formName %>"/>
 
-</details>
+  </details>
+</div>

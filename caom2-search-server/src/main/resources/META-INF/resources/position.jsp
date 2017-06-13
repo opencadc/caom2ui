@@ -14,31 +14,22 @@
   final String resolverName = utype + Shape1.RESOLVER_VALUE;
 %>
 
-<div data-toggle="popover"
-     data-utype="${param.utype}"
-     data-placement="${param.tipSide}"
-     data-title="<fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}"/>"
-     class="glyphicon glyphicon-question-sign popover-blue popover-right">
-</div>
+<div class="form-group">
+    <div data-toggle="popover"
+         data-utype="${param.utype}"
+         data-placement="${param.tipSide}"
+         data-title="<fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}"/>"
+         class="glyphicon glyphicon-question-sign popover-blue popover-right">
+    </div>
 
-<details id="${param.utype}_details">
-    <summary class="search_criteria_label_container">
-        <label for="${param.utype}" class="control-label">
-            <fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}"/>
-        </label>
-        <span class="search_criteria_label_contents color-accent"></span>
-    </summary>
-
-    <div>
+    <details id="${param.utype}_details">
+        <summary class="search_criteria_label_container">
+            <label for="${param.utype}" class="control-label">
+                <fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}"/>
+            </label>
+            <span class="search_criteria_label_contents color-accent"></span>
+        </summary>
         <div class="form-group">
-
-        <%--<label for="${param.utype}" class="control-label">--%>
-          <%--<fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}" />--%>
-        <%--</label>--%>
-
-
-
-
             <div>
                 <label for="<%= resolverName %>" class="sub-label">
                   <fmt:message key="RESOLVER_FORM_LABEL" bundle="${langBundle}" />
@@ -103,5 +94,5 @@
                name="<%= FormConstraint.FORM_NAME %>"
                value="<%= formName %>" />
 
-    </div>
-</details>
+    </details>
+</div>

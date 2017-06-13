@@ -1,0 +1,14 @@
+.checkbox {
+    margin-top:0px;
+}
+
+.search-constraints .form-group {
+    margin-bottom:0px;
+}
+
+.form-group summary:focus {
+    outline:none;
+}
+
+details[open] {
+    margin-bottom:10px;

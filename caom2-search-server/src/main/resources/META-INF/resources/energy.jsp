@@ -8,16 +8,11 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <%
-  final String utype = request.getParameter("utype");
-  final String name = utype + Energy.VALUE;
-  final String formName = utype + Energy.NAME;
-
+  final String name = request.getParameter("utype") + Energy.VALUE;
+  final String formName = request.getParameter("utype") + Energy.NAME;
 %>
 
 <div class="form-group">
-    <%--<label for="${param.utype}" class="control-label">--%>
-      <%--<fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}"/>--%>
-    <%--</label>--%>
     <div data-toggle="popover"
          data-utype="${param.utype}"
          data-placement="${param.tipSide}"
@@ -32,6 +27,7 @@
             </label>
             <span class="search_criteria_label_contents color-accent"></span>
         </summary>
+
         <div id="${param.utype}_input_decorate">
           <input id="${param.utype}"
                  name="<%= name %>" value="" size="20"
@@ -43,4 +39,5 @@
                value="<%= formName %>"/>
     </details>
 </div>
+
 

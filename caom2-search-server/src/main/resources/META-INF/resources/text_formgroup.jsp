@@ -31,9 +31,6 @@
       </label>
       <span class="search_criteria_label_contents color-accent"></span>
     </summary>
-    <%--<label for="${param.utype}" class="control-label">--%>
-      <%--<fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}"/>--%>
-    <%--</label>--%>
 
     <div>
       <input type="text" class="<%= classes %>" id="${param.utype}" name="${param.utype}">
