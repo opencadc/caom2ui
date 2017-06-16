@@ -567,9 +567,14 @@ div.search-category div.panel {
   cursor: pointer;
 }
 
-.results_url_modal {
+.results-url-modal {
   overflow-wrap: break-word;
   margin: 10px;
+}
+
+.query-overlay-loading {
+  display: block;
+  margin: auto;
 }
 
 

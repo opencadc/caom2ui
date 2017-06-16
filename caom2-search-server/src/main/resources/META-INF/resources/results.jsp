@@ -40,7 +40,7 @@
                     </span>
                 </div>
                 <div class="modal-body">
-                    <div id="bookmark_url_display" class="results_url_modal"></div>
+                    <div id="bookmark_url_display" class="results-url-modal"></div>
                 </div>
             </div>
         </div>
@@ -53,9 +53,7 @@
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                     <span id="overlay_status">
-                        <h4>
-                          <fmt:message key="COLUMN_MANAGER_HEADING_TEXT" bundle="${langBundle}"/>
-                        </h4>
+                        <h4><fmt:message key="COLUMN_MANAGER_HEADING_TEXT" bundle="${langBundle}"/></h4>
                     </span>
                 </div>
                 <div class="modal-body">

@@ -149,13 +149,14 @@
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                     <span id="overlay_status">
-                          <fmt:message key="EXECUTING_QUERY_LABEL" bundle="${langBundle}"/></span>
+                          <h4><fmt:message key="EXECUTING_QUERY_LABEL" bundle="${langBundle}"/></h4>
+                    </span>
                 </div>
                 <div class="modal-body">
-                    <img src="images/queryoverlay.gif" alt=""/>
+                    <img src="images/queryoverlay.gif" class="query-overlay-loading" alt=""/>
                 </div>
                 <div class="modal-footer">
-                    <button id="cancel_search" type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button id="cancel_search" type="button" class="btn btn-default btn-sm" data-dismiss="modal">Cancel</button>
                 </div>
             </div>
         </div>

@@ -47,6 +47,7 @@
     }
   });
 
+
   /**
    * The main AdvancedSearch application.
    *
@@ -678,7 +679,6 @@
       var onFormCancel = function ()
       {
         console.warn("Cancelling search.");
-        // queryOverlay.popup("close");
         queryOverlay.modal("hide");
       };
 
@@ -988,11 +988,9 @@
                                            resultsVOTV.getColumnFilters(),
                                            resultsVOTV.getUpdatedColumnSelects());
 
-                                       // todo: this needs to be a modal too
-                                         // q: how to set modal body dynamically?
-                                       // alert(serializer.getResultStateUrl());
                                        $("#bookmark_link").find('#bookmark_url_display').text(serializer.getResultStateUrl());
                                        $("#bookmark_link").modal("show");
+
                                      }.bind(this));
 
         resultsVOTV.setDisplayColumns([]);
@@ -1162,12 +1160,6 @@
           if (doSubmit && (!stringUtil.hasText(currentURI.getQueryValue("noexec"))
                            || (currentURI.getQueryValue("noexec") === "false")))
           {
-            // Initialize popup.
-              // this is a 'loading' popup that is replaced by the results
-              // tab after successful load.
-            // $('#queryOverlay').popup();
-              // todo: remove this code, or does the modal need to be triggered?
-
             // Execute the form submission.
             activeSearchForm.submit();
           }
@@ -1441,7 +1433,6 @@
      */
     this._postQuerySubmission = function (jobParams)
     {
-      // queryOverlay.popup("close");
       queryOverlay.modal("hide");
 
       var selectAllCheckbox = $("input[name='selectAllCheckbox']");
@@ -1567,7 +1558,6 @@
                           // Necessary at the end!
                           errorVOTV.refreshGrid();
 
-                          // queryOverlay.popup("close");
                           queryOverlay.modal("hide");
                         },
                         function (jqXHR, status, message)
@@ -1582,7 +1572,6 @@
       catch (e)
       {
         console.error("Found error! > " + e);
-        // queryOverlay.popup("close");
         queryOverlay.modal("hide");
       }
     };
