@@ -134,7 +134,6 @@
         function init()
         {
             // Start fresh each time.
-            selfColumnPicker.$target.empty();
 
             cadc.vot.picker.events.onSortAlphabetically.subscribe(function (event, args)
             {
@@ -245,8 +244,7 @@
             selfColumnPicker.$modal.find(".column_manager_columns").append(
                 $fluidContainer);
 
-            // todo: need bootstrap modal version of this event
-            selfColumnPicker.$modal.on("popupbeforeposition", function ()
+            $("#column_manager").on("show.bs.modal", function (e)
             {
                 initMenus();
             });
@@ -395,6 +393,7 @@
 
             selfColumnPicker.$availableItems.disableSelection();
             selfColumnPicker.$selectedItems.disableSelection();
+
         }
 
         /**
