@@ -1649,6 +1649,7 @@
     {
       event.preventDefault();
 
+      // todo: fix this to close bootstrap-ish tooltips
       this._closeAllTooltips();
 
       // Clear old session storage form_data.

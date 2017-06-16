@@ -89,7 +89,7 @@
 
 .slick-columnpicker-panel-link-label, .slick-columnpicker-panel-link-label:visited, .slick-columnpicker-panel-link-label:hover
 {
-  color: #0000dd;
+  color: #0022dd;
   cursor: pointer;
   font-family: Verdana, Arial, Helvetica, sans-serif;
   text-decoration: underline;
@@ -104,8 +104,13 @@
 #column_manager_container
 {
   overflow: hidden !important;
-  width: 583px;
 }
+
+.column_manager_buttons {
+  margin-right: 5px;
+  margin-top: 10px;
+}
+
 
 div.align-middle.column-picker-icon
 {
@@ -562,5 +567,9 @@ div.search-category div.panel {
   cursor: pointer;
 }
 
+.results_url_modal {
+  overflow-wrap: break-word;
+  margin: 10px;
+}
 
 

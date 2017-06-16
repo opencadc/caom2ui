@@ -678,7 +678,8 @@
       var onFormCancel = function ()
       {
         console.warn("Cancelling search.");
-        queryOverlay.popup("close");
+        // queryOverlay.popup("close");
+        queryOverlay.modal("hide");
       };
 
       caomSearchForm.subscribe(ca.nrc.cadc.search.events.onCancel, onFormCancel);
@@ -690,9 +691,8 @@
         {
           this._processResults(args.data, args.startDate, function ()
           {
-            // Perform a results tab link click here to simulate moving to the
-            // results tab.
-            $('#resultTableTab-link').click();
+            queryOverlay.modal("hide");
+            $("#resultTableTabLink").tab('show');
           });
         }
         else
@@ -787,7 +787,7 @@
               // ID of the sort column (Start Date).
               sortColumn: activeForm.getConfiguration().getDefaultSortColumnID(),
               sortDir: "desc",
-              topPanelHeight: 5,
+              topPanelHeight: 25,
               enableTextSelectionOnCells: true,
               gridResizable: false,
               rerenderOnResize: false,
@@ -823,7 +823,7 @@
                     showAllButtonText: $('#COLUMN_MANAGER_SHOW_ALL_BUTTON_TEXT').text(),
                     resetButtonText: $('#COLUMN_MANAGER_DEFAULT_COLUMNS_BUTTON_TEXT').text(),
                     orderAlphaButtonText: $('#COLUMN_MANAGER_ORDER_ALPHABETICALLY_BUTTON_TEXT').text(),
-                    dialogTriggerID: "slick-columnpicker-panel-change-column",
+                    dialogTriggerID: "change_column_button",
                     targetSelector: $('#column_manager_container').find('.column_manager_columns').first(),
                     position: {my: "right", at: "right bottom"},
                     closeDialogSelector: ".dialog-close",
@@ -987,7 +987,12 @@
                                            resultsVOTV.getResizedColumns(),
                                            resultsVOTV.getColumnFilters(),
                                            resultsVOTV.getUpdatedColumnSelects());
-                                       alert(serializer.getResultStateUrl());
+
+                                       // todo: this needs to be a modal too
+                                         // q: how to set modal body dynamically?
+                                       // alert(serializer.getResultStateUrl());
+                                       $("#bookmark_link").find('#bookmark_url_display').text(serializer.getResultStateUrl());
+                                       $("#bookmark_link").modal("show");
                                      }.bind(this));
 
         resultsVOTV.setDisplayColumns([]);
@@ -996,8 +1001,7 @@
         this._setDefaultColumns(resultsVOTV);
         this._setDefaultUnitTypes(resultsVOTV);
 
-        queryOverlay.find("#overlay_cancel").show();
-        queryOverlay.popup("open");
+        queryOverlay.modal("show");
       }.bind(this);
 
       caomSearchForm.subscribe(ca.nrc.cadc.search.events.onValid, onFormValid);
@@ -1020,6 +1024,7 @@
                                 {
                                   this._getActiveForm().cancel();
                                 }.bind(this));
+
 
       // End form setup.
     };
@@ -1158,7 +1163,10 @@
                            || (currentURI.getQueryValue("noexec") === "false")))
           {
             // Initialize popup.
-            $('#queryOverlay').popup();
+              // this is a 'loading' popup that is replaced by the results
+              // tab after successful load.
+            // $('#queryOverlay').popup();
+              // todo: remove this code, or does the modal need to be triggered?
 
             // Execute the form submission.
             activeSearchForm.submit();
@@ -1433,7 +1441,8 @@
      */
     this._postQuerySubmission = function (jobParams)
     {
-      queryOverlay.popup("close");
+      // queryOverlay.popup("close");
+      queryOverlay.modal("hide");
 
       var selectAllCheckbox = $("input[name='selectAllCheckbox']");
       selectAllCheckbox.prop("title", "Mark/Unmark all");
@@ -1558,7 +1567,8 @@
                           // Necessary at the end!
                           errorVOTV.refreshGrid();
 
-                          queryOverlay.popup("close");
+                          // queryOverlay.popup("close");
+                          queryOverlay.modal("hide");
                         },
                         function (jqXHR, status, message)
                         {
@@ -1572,7 +1582,8 @@
       catch (e)
       {
         console.error("Found error! > " + e);
-        queryOverlay.popup("close");
+        // queryOverlay.popup("close");
+        queryOverlay.modal("hide");
       }
     };
 

@@ -16,7 +16,7 @@
        data-placement="${param.tipSide}"
        data-title="<fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}"/>"
        style="float:right;"
-       class="glyphicon glyphicon-question-sign popover-blue">
+       class="advancedsearch-tooltip glyphicon glyphicon-question-sign popover-blue">
   </div>
 
   <details id="${param.utype}_details">

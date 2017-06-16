@@ -34,6 +34,7 @@
   <ul id="tabList" class="nav nav-tabs" role="tablist">
     <li role="presentation" class="active">
       <a href="#queryFormTab"
+         id="queryFormTabLink"
          aria-controls="queryFormTab"
          role="tab"
          data-toggle="tab"><fmt:message key="CAOM_QUERY_TAB_TITLE"
@@ -43,6 +44,7 @@
     { %>
     <li role="presentation">
       <a href="#obsCoreQueryFormTab"
+         id="obsCoreQueryFormTabLink"
          aria-controls="obsCoreQueryFormTab"
          role="tab"
          data-toggle="tab"><fmt:message key="OBSCORE_QUERY_TAB_TITLE"
@@ -50,22 +52,34 @@
     </li>
     <% } %>
     <li role="presentation">
-      <a href="#resultTableTab" aria-controls="resultTableTab" role="tab"
+      <a href="#resultTableTab"
+         id="resultTableTabLink"
+         aria-controls="resultTableTab"
+         role="tab"
          data-toggle="tab"><fmt:message key="RESULTS_TAB_TITLE"
                                              bundle="${langBundle}"/></a>
     </li>
     <li role="presentation">
-      <a href="#errorTableTab" aria-controls="errorTableTab" role="tab"
+      <a href="#errorTableTab"
+         id="errorTableTabLink"
+         aria-controls="errorTableTab"
+         role="tab"
          data-toggle="tab"><fmt:message key="ERROR_TAB_TITLE"
                                             bundle="${langBundle}"/></a>
     </li>
     <li role="presentation">
-      <a href="#queryTab" aria-controls="queryTab" role="tab"
+      <a href="#queryTab"
+         id="queryTabLink"
+         aria-controls="queryTab"
+         ole="tab"
          data-toggle="tab"><fmt:message key="ADQL_QUERY_TAB_TITLE"
                                        bundle="${langBundle}"/></a>
     </li>
     <li role="presentation">
-      <a href="#helpTab" aria-controls="helpTab" role="tab"
+      <a href="#helpTab"
+         id="helpTabLink"
+         aria-controls="helpTab"
+         role="tab"
          data-toggle="tab"> <fmt:message key="HELP_TAB_TITLE"
                                        bundle="${langBundle}"/></a>
     </li>
@@ -128,19 +142,24 @@
   </div>
   </div>
 
-  <div class="invisible">
-    <div id="queryOverlay" data-role="popup">
-      <img src="images/queryoverlay.gif" alt=""/>
-      <br/>
-                <span id="overlay_status">
-                  <fmt:message key="EXECUTING_QUERY_LABEL" bundle="${langBundle}"/></span>
-      <br/>
-                <span id="overlay_cancel">
-                  <input id="cancel_search" type="button" value="Cancel" class="btn"/>
-                </span>
+
+    <div class="modal fade" id="queryOverlay" role="dialog">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <span id="overlay_status">
+                          <fmt:message key="EXECUTING_QUERY_LABEL" bundle="${langBundle}"/></span>
+                </div>
+                <div class="modal-body">
+                    <img src="images/queryoverlay.gif" alt=""/>
+                </div>
+                <div class="modal-footer">
+                    <button id="cancel_search" type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-  </div>
 
           <div class="hidden" id="preloadthumbnails"></div>
 
@@ -203,7 +222,7 @@
           <script type="text/javascript"
                   src="cadcVOTV/javascript/slick.pager.js?version=@version@"></script>
           <script type="text/javascript"
-                  src="cadcVOTV/javascript/cadc.columnpicker.dialog.js?version=@version@"></script>
+                  src="cadcVOTV/javascript/cadc.columnpicker.modal.js?version=@version@"></script>
           <script type="text/javascript"
                   src="cadcVOTV/javascript/cadc.plugin.unitselection.js?version=@version@"></script>
           <script type="text/javascript"

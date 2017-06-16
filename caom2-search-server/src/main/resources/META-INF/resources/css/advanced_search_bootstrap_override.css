@@ -11,4 +11,9 @@
 }
 
 details[open] {
-    margin-bottom:10px;
+    margin-bottom: 10px;
+}
+
+.result-state-link {
+    float:right;
+}
