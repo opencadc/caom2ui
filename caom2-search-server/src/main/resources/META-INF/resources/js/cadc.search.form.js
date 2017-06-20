@@ -287,6 +287,11 @@
           order = allColumnIDs.indexOf("caom2:Plane.uri.downloadable");
           this._addFieldsForUType("caom2:Plane.uri.downloadable", ucd, unit, datatype, arraySize, description, order);
         }
+        else if (uType === "obscore:Curation.PublisherDID")
+        {
+            order = allColumnIDs.indexOf("obscore:Curation.PublisherDID.downloadable");
+            this._addFieldsForUType("obscore:Curation.PublisherDID.downloadable", ucd, unit, datatype, arraySize, description, order);
+        }
       }
 
       return rowData;
@@ -1648,7 +1653,6 @@
     {
       event.preventDefault();
 
-      // todo: fix this to close bootstrap-ish tooltips
       this._closeAllTooltips();
 
       // Clear old session storage form_data.

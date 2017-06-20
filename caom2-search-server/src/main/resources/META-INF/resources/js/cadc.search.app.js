@@ -154,10 +154,13 @@
      * return {ca.nrc.cadc.search.SearchForm|SearchForm}    Form instance.
      * @private
      */
-    this._getActiveForm = function ()
-    {
-        activeFormID = (this._getActiveTabID().toLowerCase().indexOf("obscore") > 0)
-            ? this.getObsCoreSearchForm().getID() : this.getCAOMSearchForm().getID();
+    this._getActiveForm = function () {
+      // could be a tab other than a form tab...
+        if (this._getActiveTabID().toLowerCase().indexOf("obscore") > 0) {
+          activeFormID = this.getObsCoreSearchForm().getID();
+        } else if (this._getActiveTabID().toLowerCase().indexOf("queryForm") > 0) {
+          activeFormID = this.getCAOMSearchForm().getID();
+        }
         
         return this.getCAOMSearchForm().isActive(activeFormID)
             ? this.getCAOMSearchForm() : this.getObsCoreSearchForm();
