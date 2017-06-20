@@ -333,7 +333,7 @@
         // Create either hidden or select input.
         var select;
         var containerElement = document.createElement("div");
-        containerElement.className = "text-left col-md-1";
+        containerElement.className = "text-left col-md-1 hierarchy";
 
         if (i === 0)
         {
@@ -414,7 +414,7 @@
         this.updateLists(e.target, false);
       }.bind(this);
 
-      select.className = "form-control hierarchy-select";
+      select.className = "form-control hierarchy_select";
 
       containerElement.appendChild(label);
       containerElement.appendChild(select);

@@ -156,14 +156,11 @@
      */
     this._getActiveForm = function ()
     {
-      if (!activeFormID)
-      {
         activeFormID = (this._getActiveTabID().toLowerCase().indexOf("obscore") > 0)
             ? this.getObsCoreSearchForm().getID() : this.getCAOMSearchForm().getID();
-      }
-
-      return (!activeFormID || this.getCAOMSearchForm().isActive(activeFormID))
-          ? this.getCAOMSearchForm() : this.getObsCoreSearchForm();
+        
+        return this.getCAOMSearchForm().isActive(activeFormID)
+            ? this.getCAOMSearchForm() : this.getObsCoreSearchForm();
     };
 
     /**

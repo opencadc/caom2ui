@@ -1067,7 +1067,6 @@
                                                                */
                                                               function (data)
                                                               {
-                                                                this._clearTargetNameResolutionTooltip();
 
                                                                 // Was input text cleared before the event arrived?
                                                                 if ($.trim($("input[id='" + id + "']").val()).length >
@@ -1506,21 +1505,10 @@
      */
     this._clearTargetNameResolutionStatus = function ()
     {
+      this._closeResolverPopover();
       this._clearTargetNameResolutionStatusOnly();
-
-      // Clear the resolution tooltip.
-      this._clearTargetNameResolutionTooltip();
     };
 
-    /**
-     * Remove the data from the target name resolution tooltip.
-     * @private
-     */
-    this._clearTargetNameResolutionTooltip = function ()
-    {
-      var $popover = this._getTargetNameResolutionStatusObject().popover();
-      $popover.data("content", "").data("bs.popover").setContent();
-    };
 
     /**
      * Attempt at cross-browser HTTPRequest creation.
@@ -1588,7 +1576,18 @@
     {
       var selector = "." + tooltipIconCSS;
       $(selector).popover("hide");
+
+      // This popover is associated with a stateful DOM element,
+      // close it explicitly
+      this._clearTargetNameResolutionStatus();
+
     };
+
+    this._closeResolverPopover = function()
+    {
+        var resolverPopover = $(".target_name_resolution_status");
+        resolverPopover.popover("hide");
+    }
 
     /**
      * Action to perform before form serialization begins.
@@ -1762,16 +1761,7 @@
             this.toggleDisabled($selectCriteria, false);
           }.bind(this));
 
-      this.$form.find("input.search_criteria_input").each(
-          function (key, value)
-          {
-            var $formItem = $(value);
-            $("label[for='" + $formItem.attr("id") +
-              "']").prev("summary").children("span.search_criteria_label_contents").text("");
-            this.toggleDisabled($formItem, false);
-            this.closeDetailsItem($formItem.parents("details"));
-          }.bind(this));
-
+      this._closeAllTooltips();
       this._clearTargetNameResolutionStatus();
       this._clearDisablingCheckboxes();
 
@@ -1780,9 +1770,24 @@
                                     $(this).val("");
                                   });
 
-      var firstSelect = $(".hierarchy select:eq(0)");
+      // This needs to be specific to the form
+      var firstSelect = $("#" + this.id + " .hierarchy select:eq(0)");
 
       $("input[name$='.DOWNLOADCUTOUT']").prop("checked", false);
+
+
+        this.$form.find("input.search_criteria_input").each(
+            function (key, value)
+            {
+                var $formItem = $(value);
+                $("label[for='" + $formItem.attr("id") +
+                    "']").prev("summary").children("span.search_criteria_label_contents").text("");
+                this.toggleDisabled($formItem, false);
+                this.closeDetailsItem($formItem.parents("details"));
+            }.bind(this));
+
+
+      this.clearErrors();
 
       // Convert to DOM Element object.
       var jsFirstSelect = document.getElementById(firstSelect.prop("id"));
@@ -1790,9 +1795,6 @@
       {
         this.dataTrain.updateLists(jsFirstSelect, true);
       }
-
-      this.clearErrors();
-      this._closeAllTooltips();
 
       this._trigger(ca.nrc.cadc.search.events.onReset, {});
     };
