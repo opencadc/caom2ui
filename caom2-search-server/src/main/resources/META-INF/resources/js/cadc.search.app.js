@@ -158,7 +158,7 @@
       // could be a tab other than a form tab...
         if (this._getActiveTabID().toLowerCase().indexOf("obscore") > 0) {
           activeFormID = this.getObsCoreSearchForm().getID();
-        } else if (this._getActiveTabID().toLowerCase().indexOf("queryForm") > 0) {
+        } else if (this._getActiveTabID().toLowerCase().indexOf("queryform") > 0) {
           activeFormID = this.getCAOMSearchForm().getID();
         }
         
