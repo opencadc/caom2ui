@@ -662,19 +662,19 @@
                                                     this._searchCriteriaChanged($(event.target));
                                                   }.bind(this));
 
-      $("input:file[id$='_targetList']").change(
-          function (event)
+      $currForm.find("input:file[id$='_targetList']").change(
+        function (event)
+        {
+          if ($(event.target).val() !== "")
           {
-            if ($(event.target).val() !== "")
-            {
-              $(".targetList_clear").show();
-              this.toggleDisabled($("input[id='" + this.targetNameFieldID + "']"), true);
-            }
-            else
-            {
-              this.toggleDisabled($("input[id='" + this.targetNameFieldID + "']"), false);
-            }
-          }.bind(this)).change();
+            $(".targetList_clear").show();
+            this.toggleDisabled($("#" + this.id + " input[id='" + this.targetNameFieldID + "']"), true);
+          }
+          else
+          {
+            this.toggleDisabled($("#" + this.id + " input[id='" + this.targetNameFieldID + "']"), false);
+          }
+        }.bind(this)).change();
 
       // Those items with associated fields that will be disabled as an 'OR'
       // field.
@@ -768,7 +768,7 @@
                                                                                     $checkbox.is(":checked"));
                                                  }.bind(this));
 
-      $("select.resolver_select").change(function (event)
+      $currForm.find("select.resolver_select").change(function (event)
                                          {
                                            var $resolverSelectName = $(event.target).prop("name");
                                            var $fieldID = $resolverSelectName
@@ -782,7 +782,7 @@
                                                 }.bind(this));
 
       // Prevent closing details when a value is present.
-      $("details[id$='_details'] summary").click(function (event)
+      $currForm.find("details[id$='_details'] summary").click(function (event)
                                                  {
                                                    var $detailsElement = $(this).parent("details");
                                                    var $inputElements =
@@ -1579,8 +1579,7 @@
      */
     this._closeAllTooltips = function ()
     {
-      var selector = "." + tooltipIconCSS;
-      $(selector).popover("hide");
+      this.$form.find("." + tooltipIconCSS).popover("hide");
 
       // This popover is associated with a stateful DOM element,
       // close it explicitly
@@ -1590,7 +1589,7 @@
 
     this._closeResolverPopover = function()
     {
-        var resolverPopover = $(".target_name_resolution_status");
+        var resolverPopover = this.$form.find(".target_name_resolution_status");
         resolverPopover.popover("hide");
     }
 
@@ -1602,7 +1601,7 @@
     {
       $("#UPLOAD").remove();
 
-      var inputFile = $("input:file[name='targetList']");
+      var inputFile = this.$form.find("input:file[name='targetList']");
 
       if ((inputFile.length > 0) && !inputFile.prop("disabled") && (inputFile.val() !== ""))
       {
@@ -1660,15 +1659,15 @@
 
       if (this._validate())
       {
-        var inputFile = $("input:file");
+        var inputFile = this.$form.find("input:file");
         var isUpload = (inputFile && (inputFile.val() !== ""));
-        this.toggleDisabled($("input[name='targetList']"), false);
+        this.toggleDisabled(this.$form.find("input[name='targetList']"), false);
 
         var netStart = (new Date()).getTime();
 
         try
         {
-          $("input." + this.configuration.getName() + "_selectlist").val(this.configuration.getSelectListString(false));
+            this.$form.find("input." + this.configuration.getName() + "_selectlist").val(this.configuration.getSelectListString(false));
         }
         catch (e)
         {
