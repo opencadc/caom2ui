@@ -108,12 +108,24 @@ abstract class AbstractSearchFormPage extends AbstractTestWebPage
     {
         final String inputID = inputElement.getAttribute("id");
         final String detailElementID = inputID + "_details";
-        //TODO: uncomment when tooltip implementation is complete
-        //summonTooltip(detailElementID);
+
+        summonTooltip(inputID);
         showInputField(inputID);
-        sendKeys(inputElement, value);
-        //TODO: uncomment when tooltip implementation is complete
-        //closeTooltip();
+        // todo: verify what else this function was doing and
+        // replace the function. Timing was too fast for
+        // ajax function issued on each keyUp by advanced search page,
+        // so action had to be slowed down (see for loop below)
+        // June 2017
+//        sendKeys(inputElement, value);
+
+        for (int i = 0; i < value.length(); i++)
+        {
+            inputElement.sendKeys(Character.toString(value.charAt(i)));
+            waitFor(150L);
+        }
+
+        closeTooltip(inputID);
+
     }
 
     void clearInputValue(final String inputID) throws Exception

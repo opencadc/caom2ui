@@ -97,7 +97,7 @@ public class FormInputBrowserTest extends AbstractAdvancedSearchIntegrationTest
         waitFor(2);
 
         verifyFormInput(caomSearchFormPage, CAOMSearchFormPage.OBSERVATION_DATE_INPUT_ID, "> 2010-09-22", false,
-                        "(>= 55441.0 MJD)");
+                        "(>= 55461.0 MJD)");
         verifyFormInput(caomSearchFormPage, CAOMSearchFormPage.OBSERVATION_DATE_INPUT_ID, "", false, "");
 
         verifyFormInput(caomSearchFormPage, "Plane.time.exposure", "2m..1h", false,
