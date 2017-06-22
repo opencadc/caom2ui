@@ -14,7 +14,7 @@
   final String resolverName = utype + Shape1.RESOLVER_VALUE;
 %>
 
-<div class="form-group">
+<div id="${param.utype}_formgroup"class="form-group">
     <div data-toggle="popover"
          data-utype="${param.utype}"
          data-placement="${param.tipSide}"

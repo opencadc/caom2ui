@@ -26,8 +26,9 @@
       utype + "_PRESET_PAST_MONTH_FORM_LABEL";
 %>
 
-<div class="form-group">
-  <div data-toggle="popover"
+<div id="${param.utype}_formgroup" class="form-group">
+  <div id="${param.utype}_tooltip"
+       data-toggle="popover"
        data-placement="${param.tipSide}"
        data-utype="${param.utype}"
        data-title="<fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}"/>"

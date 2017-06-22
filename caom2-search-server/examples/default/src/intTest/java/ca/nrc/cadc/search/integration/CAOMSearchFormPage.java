@@ -90,6 +90,7 @@ public class CAOMSearchFormPage extends AbstractSearchFormPage
     static final String SPECTRAL_COVERAGE_INPUT_ID = "Plane.energy.bounds";
     static final String OBSERVATION_DATE_INPUT_ID = "Plane.time.bounds";
     static final String PIXEL_SCALE_INPUT_ID = "Plane.position.sampleSize";
+    static final By RESET_BUTTON_SELECTOR = By.cssSelector("button[type=\"reset\"]");
 
 
     @FindBy(id = "caom2@Hierarchy")

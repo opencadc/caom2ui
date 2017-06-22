@@ -87,16 +87,17 @@ public class FormInputBrowserTest extends AbstractAdvancedSearchIntegrationTest
         verifyFormInput(caomSearchFormPage, CAOMSearchFormPage.SPECTRAL_COVERAGE_INPUT_ID, "", false, "");
 
 
+
         // Quantify the unit conversion values.
         verifyFormInput(caomSearchFormPage, CAOMSearchFormPage.PIXEL_SCALE_INPUT_ID, "0.02..0.05arcmin", false,
                         "(1.2..3.0 arcseconds)");
         verifyFormInput(caomSearchFormPage, CAOMSearchFormPage.PIXEL_SCALE_INPUT_ID, "", false, "");
 
-        resetForm();
+        resetForm(CAOMSearchFormPage.RESET_BUTTON_SELECTOR);
         waitFor(2);
 
         verifyFormInput(caomSearchFormPage, CAOMSearchFormPage.OBSERVATION_DATE_INPUT_ID, "> 2010-09-22", false,
-                        "(>= 55461.0 MJD)");
+                        "(>= 55441.0 MJD)");
         verifyFormInput(caomSearchFormPage, CAOMSearchFormPage.OBSERVATION_DATE_INPUT_ID, "", false, "");
 
         verifyFormInput(caomSearchFormPage, "Plane.time.exposure", "2m..1h", false,
@@ -151,4 +152,5 @@ public class FormInputBrowserTest extends AbstractAdvancedSearchIntegrationTest
             caomSearchFormPage.verifyFormInputMessage(inputID, false, expectedLabelMessage);
         }
     }
+
 }
