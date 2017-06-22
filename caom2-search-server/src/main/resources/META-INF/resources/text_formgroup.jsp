@@ -19,17 +19,22 @@
   }
 %>
 
-<div class="form-group">
-  <label for="${param.utype}" class="control-label">
-    <fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}"/>
-  </label>
+<div id="${param.utype}_formgroup" class="form-group">
   <div data-toggle="popover" data-utype="${param.utype}" data-placement="${param.tipSide}"
        data-title="<fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}"/>"
-       class="glyphicon glyphicon-question-sign popover-blue popover-right">
+       class="advancedsearch-tooltip glyphicon glyphicon-question-sign popover-blue popover-right">
   </div>
-  <div>
-    <input type="text" class="<%= classes %>" id="${param.utype}" name="${param.utype}">
-  </div>
+  <details id="${param.utype}_details">
+    <summary class="search_criteria_label_container">
+      <label for="${param.utype}"
+             class="control-label search_criteria_label"><fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}"/><span
+              class="search_criteria_label_contents color-accent"></span></label>
+    </summary>
 
-  <input type="hidden" name="<%= FormConstraint.FORM_NAME %>" value="<%= formName %>"/>
+    <div id="${param.utype}_input_decorate">
+      <input type="text" class="<%= classes %>" id="${param.utype}" name="${param.utype}">
+    </div>
+
+    <input type="hidden" name="<%= FormConstraint.FORM_NAME %>" value="<%= formName %>"/>
+  </details>
 </div>

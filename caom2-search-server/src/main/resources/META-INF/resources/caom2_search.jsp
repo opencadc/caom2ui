@@ -29,11 +29,13 @@
            value="<fmt:message key="MAX_ROW_LIMIT_WARNING" bundle="${langBundle}"/>"/>
 
     <div class="col-sm-12 button-holder">
-      <button type="submit" class="btn btn-primary submit-query"
+      <button type="submit"
+              class="btn btn-primary submit-query"
               value="<fmt:message key="SEARCH_BUTTON_LABEL" bundle="${langBundle}" />">
         <fmt:message key="SEARCH_BUTTON_LABEL" bundle="${langBundle}"/>
       </button>
-      <button type="reset" class="btn btn-default reset-query-form"
+      <button type="reset"
+              class="btn btn-default reset-query-form"
               value="<fmt:message key="RESET_BUTTON_LABEL" bundle="${langBundle}" />">
         <fmt:message key="RESET_BUTTON_LABEL" bundle="${langBundle}"/>
       </button>
@@ -115,7 +117,6 @@
         </div>
       </div>
 
-      <%--TODO: how do these go into the bootstrap form?--%>
       <div class="col-sm-12 resolver-result-tooltip">
         <strong><fmt:message key="RES_TARGET" bundle="${langBundle}"/></strong><br>
         <p class="resolver-result-target"></p>
@@ -134,16 +135,19 @@
       <c:import
           url="hierarchy.jsp?colcount=seven-col&utype=Plane.energy.emBand/Observation.collection/Observation.instrument.name/Plane.energy.bandpassName/Plane.calibrationLevel/Plane.dataProductType/Observation.type&modelDataSource=caom2"/>
 
-      <div class="col-sm-12 button-holder">
-        <button type="submit" class="btn btn-primary submit-query"
-                value="<fmt:message key="SEARCH_BUTTON_LABEL" bundle="${langBundle}" />">
-          <fmt:message key="SEARCH_BUTTON_LABEL" bundle="${langBundle}"/>
-        </button>
-        <button type="reset" class="btn btn-default reset-query-form"
-                value="<fmt:message key="RESET_BUTTON_LABEL" bundle="${langBundle}" />">
-          <fmt:message key="RESET_BUTTON_LABEL" bundle="${langBundle}"/>
-        </button>
-      </div>
+    </div>
+
+    <div class="col-sm-12 button-holder">
+      <button type="submit"
+              class="btn btn-primary submit-query"
+              value="<fmt:message key="SEARCH_BUTTON_LABEL" bundle="${langBundle}" />">
+        <fmt:message key="SEARCH_BUTTON_LABEL" bundle="${langBundle}"/>
+      </button>
+      <button type="reset"
+              class="btn btn-default reset-query-form"
+              value="reset">
+        <fmt:message key="RESET_BUTTON_LABEL" bundle="${langBundle}"/>
+      </button>
     </div>
 
   </form>

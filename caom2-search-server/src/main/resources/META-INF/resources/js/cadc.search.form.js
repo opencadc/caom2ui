@@ -287,6 +287,11 @@
           order = allColumnIDs.indexOf("caom2:Plane.uri.downloadable");
           this._addFieldsForUType("caom2:Plane.uri.downloadable", ucd, unit, datatype, arraySize, description, order);
         }
+        else if (uType === "obscore:Curation.PublisherDID")
+        {
+            order = allColumnIDs.indexOf("obscore:Curation.PublisherDID.downloadable");
+            this._addFieldsForUType("obscore:Curation.PublisherDID.downloadable", ucd, unit, datatype, arraySize, description, order);
+        }
       }
 
       return rowData;
@@ -657,19 +662,19 @@
                                                     this._searchCriteriaChanged($(event.target));
                                                   }.bind(this));
 
-      $("input:file[id$='_targetList']").change(
-          function (event)
+      $currForm.find("input:file[id$='_targetList']").change(
+        function (event)
+        {
+          if ($(event.target).val() !== "")
           {
-            if ($(event.target).val() !== "")
-            {
-              $(".targetList_clear").show();
-              this.toggleDisabled($("input[id='" + this.targetNameFieldID + "']"), true);
-            }
-            else
-            {
-              this.toggleDisabled($("input[id='" + this.targetNameFieldID + "']"), false);
-            }
-          }.bind(this)).change();
+            $(".targetList_clear").show();
+            this.toggleDisabled($("#" + this.id + " input[id='" + this.targetNameFieldID + "']"), true);
+          }
+          else
+          {
+            this.toggleDisabled($("#" + this.id + " input[id='" + this.targetNameFieldID + "']"), false);
+          }
+        }.bind(this)).change();
 
       // Those items with associated fields that will be disabled as an 'OR'
       // field.
@@ -763,7 +768,7 @@
                                                                                     $checkbox.is(":checked"));
                                                  }.bind(this));
 
-      $("select.resolver_select").change(function (event)
+      $currForm.find("select.resolver_select").change(function (event)
                                          {
                                            var $resolverSelectName = $(event.target).prop("name");
                                            var $fieldID = $resolverSelectName
@@ -777,7 +782,7 @@
                                                 }.bind(this));
 
       // Prevent closing details when a value is present.
-      $("details[id$='_details'] summary").click(function (event)
+      $currForm.find("details[id$='_details'] summary").click(function (event)
                                                  {
                                                    var $detailsElement = $(this).parent("details");
                                                    var $inputElements =
@@ -1067,7 +1072,6 @@
                                                                */
                                                               function (data)
                                                               {
-                                                                this._clearTargetNameResolutionTooltip();
 
                                                                 // Was input text cleared before the event arrived?
                                                                 if ($.trim($("input[id='" + id + "']").val()).length >
@@ -1127,9 +1131,9 @@
             elementID = id;
           }
 
-          var $label = this.$form.find("label[for='" + elementID +
-                                       "']").prev("summary").children("span.search_criteria_label_contents");
-          if ($label)
+          var $label =  this.$form.find("label[for='" + elementID + "'] .search_criteria_label_contents");
+
+            if ($label)
           {
             $label.empty();
             var searchCriteriaLabel = ((value !== "") && (JSON.stringify(data).indexOf("NaN") < 0)) ? data : "";
@@ -1180,8 +1184,8 @@
      */
     this._indicateInputPresence = function (hasValue, elementID, elementValue)
     {
-      var $label = this.$form.find("label[for='" + elementID + "']").prev("summary")
-          .children("span.search_criteria_label_contents");
+      var $label = this.$form.find("label[for='" + elementID + "'] .search_criteria_label_contents");
+
       if ($label.length > 0)
       {
         $label.empty();
@@ -1506,21 +1510,10 @@
      */
     this._clearTargetNameResolutionStatus = function ()
     {
+      this._closeResolverPopover();
       this._clearTargetNameResolutionStatusOnly();
-
-      // Clear the resolution tooltip.
-      this._clearTargetNameResolutionTooltip();
     };
 
-    /**
-     * Remove the data from the target name resolution tooltip.
-     * @private
-     */
-    this._clearTargetNameResolutionTooltip = function ()
-    {
-      var $popover = this._getTargetNameResolutionStatusObject().popover();
-      $popover.data("content", "").data("bs.popover").setContent();
-    };
 
     /**
      * Attempt at cross-browser HTTPRequest creation.
@@ -1586,9 +1579,19 @@
      */
     this._closeAllTooltips = function ()
     {
-      var selector = "." + tooltipIconCSS;
-      $(selector).popover("hide");
+      this.$form.find("." + tooltipIconCSS).popover("hide");
+
+      // This popover is associated with a stateful DOM element,
+      // close it explicitly
+      this._clearTargetNameResolutionStatus();
+
     };
+
+    this._closeResolverPopover = function()
+    {
+        var resolverPopover = this.$form.find(".target_name_resolution_status");
+        resolverPopover.popover("hide");
+    }
 
     /**
      * Action to perform before form serialization begins.
@@ -1598,7 +1601,7 @@
     {
       $("#UPLOAD").remove();
 
-      var inputFile = $("input:file[name='targetList']");
+      var inputFile = this.$form.find("input:file[name='targetList']");
 
       if ((inputFile.length > 0) && !inputFile.prop("disabled") && (inputFile.val() !== ""))
       {
@@ -1656,15 +1659,15 @@
 
       if (this._validate())
       {
-        var inputFile = $("input:file");
+        var inputFile = this.$form.find("input:file");
         var isUpload = (inputFile && (inputFile.val() !== ""));
-        this.toggleDisabled($("input[name='targetList']"), false);
+        this.toggleDisabled(this.$form.find("input[name='targetList']"), false);
 
         var netStart = (new Date()).getTime();
 
         try
         {
-          $("input." + this.configuration.getName() + "_selectlist").val(this.configuration.getSelectListString(false));
+            this.$form.find("input." + this.configuration.getName() + "_selectlist").val(this.configuration.getSelectListString(false));
         }
         catch (e)
         {
@@ -1761,16 +1764,7 @@
             this.toggleDisabled($selectCriteria, false);
           }.bind(this));
 
-      this.$form.find("input.search_criteria_input").each(
-          function (key, value)
-          {
-            var $formItem = $(value);
-            $("label[for='" + $formItem.attr("id") +
-              "']").prev("summary").children("span.search_criteria_label_contents").text("");
-            this.toggleDisabled($formItem, false);
-            this.closeDetailsItem($formItem.parents("details"));
-          }.bind(this));
-
+      this._closeAllTooltips();
       this._clearTargetNameResolutionStatus();
       this._clearDisablingCheckboxes();
 
@@ -1779,9 +1773,23 @@
                                     $(this).val("");
                                   });
 
-      var firstSelect = $(".hierarchy select:eq(0)");
+      // This needs to be specific to the form
+      var firstSelect = $("#" + this.id + " .hierarchy select:eq(0)");
 
       $("input[name$='.DOWNLOADCUTOUT']").prop("checked", false);
+
+
+        this.$form.find("input.search_criteria_input").each(
+            function (key, value)
+            {
+                var $formItem = $(value);
+                this.$form.find("label[for='" + $formItem.attr("id") + "'] .search_criteria_label_contents").text("");
+                this.toggleDisabled($formItem, false);
+                this.closeDetailsItem($formItem.parents("details"));
+            }.bind(this));
+
+
+      this.clearErrors();
 
       // Convert to DOM Element object.
       var jsFirstSelect = document.getElementById(firstSelect.prop("id"));
@@ -1789,9 +1797,6 @@
       {
         this.dataTrain.updateLists(jsFirstSelect, true);
       }
-
-      this.clearErrors();
-      this._closeAllTooltips();
 
       this._trigger(ca.nrc.cadc.search.events.onReset, {});
     };

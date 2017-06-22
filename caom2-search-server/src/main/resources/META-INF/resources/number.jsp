@@ -7,31 +7,37 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <%
-  final String utype = request.getParameter("utype");
-  final String formName = utype + ca.nrc.cadc.search.form.Number.NAME;
+  final String formName = request.getParameter("utype") + ca.nrc.cadc.search.form.Number.NAME;
 %>
 
+<div class="form-group">
+  <div data-utype="${param.utype}"
+       data-toggle="popover"
+       data-placement="${param.tipSide}"
+       data-title="<fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}"/>"
+       style="float:right;"
+       class="advancedsearch-tooltip glyphicon glyphicon-question-sign popover-blue">
+  </div>
 
-  <div class="form-group tooltip-group">
+  <details id="${param.utype}_details">
+    <summary class="search_criteria_label_container">
+      <label for="${param.utype}"
+             class="control-label"><fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}"/><span
+              class="search_criteria_label_contents color-accent"></span>
+      </label>
 
-    <label for="${param.utype}" class="control-label">
-      <fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}"/>
-    </label>
-    <div data-utype="${param.utype}"
-         data-toggle="popover"
-         data-placement="${param.tipSide}"
-         data-title="<fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}"/>"
-         style="float:right;"
-         class="glyphicon glyphicon-question-sign popover-blue">
-    </div>
-    <div id="${param.utype}_input_decorate">
-      <input id="${param.utype}"
-             name="${param.utype}" value="" size="15"
-             type="text"
-             class="form-control search_criteria_input width-100 ui-form-input-validate ui_unitconversion_input" />
-    </div>
-    <input type="hidden"
-           name="<%= FormConstraint.FORM_NAME %>"
-           value="<%= formName %>"/>
+    </summary>
+
+      <div id="${param.utype}_input_decorate">
+        <input id="${param.utype}"
+               name="${param.utype}" value="" size="15"
+               type="text"
+               class="form-control search_criteria_input width-100 ui-form-input-validate ui_unitconversion_input" />
+      </div>
+      <input type="hidden"
+             name="<%= FormConstraint.FORM_NAME %>"
+             value="<%= formName %>"/>
+
+  </details>
 </div>
 

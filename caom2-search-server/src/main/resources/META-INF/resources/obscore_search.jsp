@@ -26,11 +26,13 @@
 
 
     <div class="col-sm-12 button-holder">
-      <button type="submit" class="btn btn-primary submit-query"
+      <button type="submit"
+              class="btn btn-primary submit-query"
               value="<fmt:message key="SEARCH_BUTTON_LABEL" bundle="${langBundle}" />">
         <fmt:message key="SEARCH_BUTTON_LABEL" bundle="${langBundle}"/>
       </button>
-      <button type="reset" class="btn btn-default reset-query-form"
+      <button type="reset"
+              class="btn btn-default reset-obscore-query-form"
               value="<fmt:message key="RESET_BUTTON_LABEL" bundle="${langBundle}" />">
         <fmt:message key="RESET_BUTTON_LABEL" bundle="${langBundle}"/>
       </button>
@@ -129,15 +131,32 @@
       <div class="clear"></div>
     </div>
 
+    <div class="col-sm-12 resolver-result-tooltip">
+      <strong><fmt:message key="RES_TARGET" bundle="${langBundle}"/></strong><br>
+      <p class="resolver-result-target"></p>
+      <strong><fmt:message key="RES_SERVICE" bundle="${langBundle}"/></strong><br>
+      <p class="resolver-result-service"></p>
+      <strong><fmt:message key="RES_COORDINATES" bundle="${langBundle}"/></strong><br>
+      <p class="resolver-result-coordinates"></p>
+      <strong><fmt:message key="RES_TYPE" bundle="${langBundle}"/></strong><br>
+      <p class="resolver-result-type"></p>
+      <strong><fmt:message key="RES_MORPHOLOGY" bundle="${langBundle}"/></strong><br>
+      <p class="resolver-result-morphology"></p>
+      <strong><fmt:message key="RES_TIME" bundle="${langBundle}"/></strong><br>
+      <p class="resolver-result-time"></p>
+    </div>
+
     <c:import
-        url="hierarchy.jsp?colcount=five-col&utype=DataID.Collection/Provenance.ObsConfig.Facility.name/Provenance.ObsConfig.Instrument.name/ObsDataset.calibLevel/ObsDataset.dataProductType&modelDataSource=obscore"/>
+            url="hierarchy.jsp?colcount=five-col&utype=DataID.Collection/Provenance.ObsConfig.Facility.name/Provenance.ObsConfig.Instrument.name/ObsDataset.calibLevel/ObsDataset.dataProductType&modelDataSource=obscore"/>
 
     <div class="col-sm-12 button-holder">
-      <button type="submit" class="btn btn-primary submit-query"
+      <button type="submit"
+              class="btn btn-primary submit-query"
               value="<fmt:message key="SEARCH_BUTTON_LABEL" bundle="${langBundle}" />">
         <fmt:message key="SEARCH_BUTTON_LABEL" bundle="${langBundle}"/>
       </button>
-      <button type="reset" class="btn btn-default reset-query-form"
+      <button type="reset"
+              class="btn btn-default reset-obscore-query-form"
               value="<fmt:message key="RESET_BUTTON_LABEL" bundle="${langBundle}" />">
         <fmt:message key="RESET_BUTTON_LABEL" bundle="${langBundle}"/>
       </button>

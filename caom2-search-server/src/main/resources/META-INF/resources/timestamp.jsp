@@ -12,30 +12,35 @@
 
 <c:set var="labelKey" value="${param.utype}_FORM_LABEL" />
 
-<div data-toggle="tooltip" data-placement="<%= tipSide %>"
-     title="<fmt:message key="<%= labelKey %>" bundle="${langBundle}"/>">
-<div class="form-group">
-    <label for="${param.utype}" class="control-label">
-      <fmt:message key="${labelKey}" bundle="${langBundle}"/></label>
+
+<div class="form-group data_release_date_panel">
     <div id="${param.utype}_tooltip"
          data-toggle="popover"
          data-placement="${param.tipSide}"
          data-title="<fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}"/>"
          class="glyphicon glyphicon-question-sign popover-blue popover-right">
     </div>
-    <div class="data_release_date_panel">
-      <cadc:checkbox checkboxName="${param.utype}@PublicTimestampFormConstraint.value"
+
+    <details id="${param.utype}_details">
+        <summary class="search_criteria_label_container">
+            <label for="${param.utype}"
+                   class="control-label"><fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}"/><span
+                        class="search_criteria_label_contents color-accent"></span></label>
+        </summary>
+
+        <cadc:checkbox checkboxName="${param.utype}@PublicTimestampFormConstraint.value"
                      i18nKey="PUBLIC_DATA_FLAG_FORM_LABEL"
                      disableTo="${param.utype}" />
 
-      <div id="${param.utype}_input_decorate">
+        <div id="${param.utype}_input_decorate">
         <input id="${param.utype}" name="${param.utype}" value="" size="20"
                type="text"
                class="form-control search_criteria_input width-100 ui-form-input-validate ui_unitconversion_input" />
-      </div>
-    </div>
+        </div>
 
-    <cadc:formName formName="${param.utype}@TimestampFormConstraint" />
-    <cadc:formName formName="${param.utype}@PublicTimestampFormConstraint" />
+        <cadc:formName formName="${param.utype}@TimestampFormConstraint" />
+        <cadc:formName formName="${param.utype}@PublicTimestampFormConstraint" />
+    </details>
 </div>
-</div>
+
+

@@ -89,7 +89,7 @@
 
 .slick-columnpicker-panel-link-label, .slick-columnpicker-panel-link-label:visited, .slick-columnpicker-panel-link-label:hover
 {
-  color: #0000dd;
+  color: #0022dd;
   cursor: pointer;
   font-family: Verdana, Arial, Helvetica, sans-serif;
   text-decoration: underline;
@@ -104,8 +104,13 @@
 #column_manager_container
 {
   overflow: hidden !important;
-  width: 583px;
 }
+
+.column_manager_buttons {
+  margin-right: 5px;
+  margin-top: 10px;
+}
+
 
 div.align-middle.column-picker-icon
 {
@@ -189,9 +194,6 @@ div.align-middle.column-picker-icon
   background-color: white;
 }
 
-.search_criteria_label {
-  width: 100%;
-}
 
 /* Tooltip (Form) */
 .tooltipster-advanced-search, .tooltipster-advanced-search-resolver, .tooltipster-observation-details
@@ -561,4 +563,15 @@ div.search-category div.panel {
 {
   cursor: pointer;
 }
+
+.results-url-modal {
+  overflow-wrap: break-word;
+  margin: 10px;
+}
+
+.query-overlay-loading {
+  display: block;
+  margin: auto;
+}
+
 
