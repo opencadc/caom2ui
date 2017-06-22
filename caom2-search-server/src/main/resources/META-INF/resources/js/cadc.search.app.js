@@ -780,7 +780,7 @@
               enableAsyncPostRender: true,
               fullWidthRows: false,
               pager: false,
-              headerRowHeight: 50,
+              headerRowHeight: 54,
               multiSelect: true,
               propagateEvents: true,
               leaveSpaceForNewRows: false,
