@@ -68,6 +68,8 @@
 
 package ca.nrc.cadc.tap;
 
+import ca.nrc.cadc.auth.AuthenticationUtil;
+import ca.nrc.cadc.auth.SSOCookieCredential;
 import ca.nrc.cadc.config.ApplicationConfiguration;
 import ca.nrc.cadc.net.HttpDownload;
 import ca.nrc.cadc.reg.client.RegistryClient;
@@ -77,6 +79,7 @@ import ca.nrc.cadc.uws.ExecutionPhase;
 import ca.nrc.cadc.uws.Job;
 import ca.nrc.cadc.web.ConfigurableServlet;
 
+import javax.security.auth.Subject;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.ServletResponse;
@@ -270,9 +273,16 @@ public class TAPServlet extends ConfigurableServlet
     {
         final Job j = new Job();
         final ParameterUtil parameterUtil = new ParameterUtil();
+        final Subject currentSubject = AuthenticationUtil.getCurrentSubject();
 
         j.setParameterList(new ArrayList<>(parameterUtil.asParameterSet(req)));
         j.setExecutionPhase(ExecutionPhase.PENDING);
+
+        if ((currentSubject != null) && !currentSubject.getPublicCredentials(SSOCookieCredential.class).isEmpty())
+        {
+            j.ownerSubject = currentSubject;
+        }
+
         return j;
     }
 }
