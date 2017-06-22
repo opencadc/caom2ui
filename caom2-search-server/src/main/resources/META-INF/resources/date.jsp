@@ -36,10 +36,9 @@
 
   <details id="${param.utype}_details">
     <summary class="search_criteria_label_container">
-      <label for="${param.utype}" class="control-label">
-        <fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}"/>
-      </label>
-      <span class="search_criteria_label_contents color-accent"></span>
+      <label for="${param.utype}" class="control-label"><fmt:message key="${param.utype}_FORM_LABEL"
+                     bundle="${langBundle}"/><span
+              class="search_criteria_label_contents color-accent"></span></label>
     </summary>
 
     <div id="${param.utype}_input_decorate">
@@ -56,8 +55,9 @@
     </div>
 
     <div class="form-group">
-      <label class="sub-label" for="${param.utype}_PRESET">
-        <fmt:message key="<%= presetLabelkey %>" bundle="${langBundle}"/>
+      <label class="sub-label"
+             for="${param.utype}_PRESET"><fmt:message key="<%= presetLabelkey %>" bundle="${langBundle}"/><span
+              class="search_criteria_label_contents color-accent"></span>
       </label>
       <select size="1" id="${param.utype}_PRESET"
               data-assoc-field="${param.utype}" name="<%= presetName %>"

@@ -1131,9 +1131,9 @@
             elementID = id;
           }
 
-          var $label = this.$form.find("label[for='" + elementID +
-                                       "']").prev("summary").children("span.search_criteria_label_contents");
-          if ($label)
+          var $label =  this.$form.find("label[for='" + elementID + "'] .search_criteria_label_contents");
+
+            if ($label)
           {
             $label.empty();
             var searchCriteriaLabel = ((value !== "") && (JSON.stringify(data).indexOf("NaN") < 0)) ? data : "";
@@ -1184,8 +1184,8 @@
      */
     this._indicateInputPresence = function (hasValue, elementID, elementValue)
     {
-      var $label = this.$form.find("label[for='" + elementID + "']").prev("summary")
-          .children("span.search_criteria_label_contents");
+      var $label = this.$form.find("label[for='" + elementID + "'] .search_criteria_label_contents");
+
       if ($label.length > 0)
       {
         $label.empty();
@@ -1783,8 +1783,7 @@
             function (key, value)
             {
                 var $formItem = $(value);
-                $("label[for='" + $formItem.attr("id") +
-                    "']").prev("summary").children("span.search_criteria_label_contents").text("");
+                this.$form.find("label[for='" + $formItem.attr("id") + "'] .search_criteria_label_contents").text("");
                 this.toggleDisabled($formItem, false);
                 this.closeDetailsItem($formItem.parents("details"));
             }.bind(this));

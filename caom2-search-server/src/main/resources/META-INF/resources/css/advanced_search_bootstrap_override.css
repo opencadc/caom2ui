@@ -17,3 +17,12 @@ details[open] {
 .result-state-link {
     float:right;
 }
+
+.color-accent {
+    color: #145e91;
+    font-weight: normal;
+}
+
+.search_criteria_label_contents {
+    margin-left: 5px;
+}

@@ -23,10 +23,9 @@
 
     <details id="${param.utype}_details">
         <summary class="search_criteria_label_container">
-            <label for="${param.utype}" class="control-label">
-                <fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}"/>
-            </label>
-            <span class="search_criteria_label_contents color-accent"></span>
+            <label for="${param.utype}"
+                   class="control-label"><fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}"/><span
+                        class="search_criteria_label_contents color-accent"></span></label>
         </summary>
 
         <cadc:checkbox checkboxName="${param.utype}@PublicTimestampFormConstraint.value"

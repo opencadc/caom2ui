@@ -24,15 +24,15 @@
 
     <details id="${param.utype}_details">
         <summary class="search_criteria_label_container">
-            <label for="${param.utype}" class="control-label">
-                <fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}"/>
-            </label>
-            <span class="search_criteria_label_contents color-accent"></span>
+            <label for="${param.utype}"
+                   class="control-label"><fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}"/><span
+                        class="search_criteria_label_contents color-accent"></span></label>
         </summary>
         <div class="form-group">
             <div>
-                <label for="<%= resolverName %>" class="sub-label">
-                  <fmt:message key="RESOLVER_FORM_LABEL" bundle="${langBundle}" />
+                <label for="<%= resolverName %>"
+                       class="sub-label"><fmt:message key="RESOLVER_FORM_LABEL" bundle="${langBundle}" /><span
+                            class="search_criteria_label_contents color-accent"></span>
                     <span class="italic margin-left-small"><fmt:message key="RESOLVER_FORM_LABEL_ADDENDUM" bundle="${langBundle}" /></span>
                 </label>
             </div>
@@ -67,9 +67,9 @@
 
         <div class="form-group">
             <div id="${param.utype}_targetList_fileInputDiv" class="">
-                <label for="${param.utype}_targetList" class="disabled" disabled>
-                    <fmt:message key="TARGET_LIST_FORM_LABEL" bundle="${langBundle}" />
-                </label>
+                <label for="${param.utype}_targetList"
+                       class="disabled" disabled><fmt:message key="TARGET_LIST_FORM_LABEL" bundle="${langBundle}" /><span
+                            class="search_criteria_label_contents color-accent"></span></label>
                 <div>
                   <input type="file" class="form-control file-form-control"
                          id="${param.utype}_targetList" name="targetList"

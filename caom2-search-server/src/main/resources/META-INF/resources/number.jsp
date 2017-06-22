@@ -21,10 +21,11 @@
 
   <details id="${param.utype}_details">
     <summary class="search_criteria_label_container">
-      <label for="${param.utype}" class="control-label">
-        <fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}"/>
+      <label for="${param.utype}"
+             class="control-label"><fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}"/><span
+              class="search_criteria_label_contents color-accent"></span>
       </label>
-      <span class="search_criteria_label_contents color-accent"></span>
+
     </summary>
 
       <div id="${param.utype}_input_decorate">

@@ -135,7 +135,7 @@ abstract class AbstractSearchFormPage extends AbstractTestWebPage
     void verifyFormInputError(final String inputID) throws Exception
     {
         waitForElementPresent(By.xpath("//div[@id='" + inputID
-                                       + "_input_decorate'][contains(@class,'form-attention')]"));
+                                       + "_input_decorate'][contains(@class,'has-error')]"));
     }
 
     void verifyFormInputMessage(final String inputID, final boolean errorExpected, final String expectedMessage)
