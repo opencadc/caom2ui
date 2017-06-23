@@ -77,17 +77,16 @@ public class FormInputBrowserTest extends AbstractAdvancedSearchIntegrationTest
         caomSearchFormPage.showInputField(CAOMSearchFormPage.OBSERVATION_DATE_INPUT_ID);
         caomSearchFormPage.select(By.id(CAOMSearchFormPage.OBSERVATION_DATE_INPUT_ID + "_PRESET"), "PAST_WEEK");
         //TODO: uncomment when tooltip implementation is complete
-        //caomSearchFormPage.verifyFormInputMessageMatches(CAOMSearchFormPage.OBSERVATION_DATE_INPUT_ID, false, "(.*)\\d\\.\\.\\d(.*)");
+        caomSearchFormPage.verifyFormInputMessageMatches(CAOMSearchFormPage.OBSERVATION_DATE_INPUT_ID, false, "(.*)\\d\\.\\.\\d(.*)");
 
         // Close it again.
         //TODO: uncomment when tooltip implementation is complete
-        //caomSearchFormPage.hideInputField(CAOMSearchFormPage.OBSERVATION_DATE_INPUT_ID);
+        caomSearchFormPage.hideInputField(CAOMSearchFormPage.OBSERVATION_DATE_INPUT_ID);
 
         verifyFormInput(caomSearchFormPage, CAOMSearchFormPage.SPECTRAL_COVERAGE_INPUT_ID, "aaa", true, null);
         verifyFormInput(caomSearchFormPage, CAOMSearchFormPage.SPECTRAL_COVERAGE_INPUT_ID, "", false, "");
 
-
-
+        
         // Quantify the unit conversion values.
         verifyFormInput(caomSearchFormPage, CAOMSearchFormPage.PIXEL_SCALE_INPUT_ID, "0.02..0.05arcmin", false,
                         "(1.2..3.0 arcseconds)");

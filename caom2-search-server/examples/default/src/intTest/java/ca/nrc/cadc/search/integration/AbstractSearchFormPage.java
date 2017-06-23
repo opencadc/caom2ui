@@ -68,7 +68,6 @@
 
 package ca.nrc.cadc.search.integration;
 
-import ca.nrc.cadc.util.StringUtil;
 import ca.nrc.cadc.web.selenium.AbstractTestWebPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -79,7 +78,7 @@ import org.openqa.selenium.support.PageFactory;
 
 abstract class AbstractSearchFormPage extends AbstractTestWebPage
 {
-    private static final String DETAILS_LOCATOR_XPATH = "//details[@id='%s']/summary/label/span";
+    private static final String DETAILS_LOCATOR_XPATH = "//details[@id='%s']";
     private static final String CONTENT_LOCATOR_XPATH = "//*[@id='%s']/summary/label/span";
 
     @FindBy(className = "submit-query")
@@ -135,8 +134,7 @@ abstract class AbstractSearchFormPage extends AbstractTestWebPage
         if (inputElement.isDisplayed())
         {
             sendKeys(inputElement, "");
-            //TODO: uncomment when tooltip implementation is complete
-            //hideInputField(inputID);
+            hideInputField(inputID);
         }
         else
         {
@@ -158,10 +156,7 @@ abstract class AbstractSearchFormPage extends AbstractTestWebPage
             verifyFormInputError(inputID);
         }
 
-        final String itemLocator = "//*[@id='" + inputID
-                + "_details']/summary/label/span[contains(@class,'search_criteria_label_contents')]";
-
-        final By contents = By.xpath(itemLocator);
+        final By contents = By.xpath(String.format(CONTENT_LOCATOR_XPATH, (inputID + "_details")));
 
         if (expectedMessage != "")
         {
@@ -177,15 +172,6 @@ abstract class AbstractSearchFormPage extends AbstractTestWebPage
         }
     }
 
-    void verifyFormInputMessageEmpty(final String inputID)
-            throws Exception
-    {
-
-        WebElement contents = find(By.xpath(String.format(CONTENT_LOCATOR_XPATH, (inputID + "_details"))));
-
-
-    }
-
 
     void verifyFormInputMessageMatches(final String inputID, final boolean errorExpected,
                                        final String messageRegex) throws Exception
@@ -195,17 +181,12 @@ abstract class AbstractSearchFormPage extends AbstractTestWebPage
             verifyFormInputError(inputID);
         }
 
-        final String itemLocator = "//details[@id='" + inputID
-                + "_details')]/summary/label/span[contains(@class,'search_criteria_label_contents')]";
-
-        verifyTextMatches(By.xpath(itemLocator), messageRegex);
+        verifyTextMatches(By.xpath(String.format(CONTENT_LOCATOR_XPATH, (inputID + "_details"))), messageRegex);
     }
 
     void hideInputBox(final String inputID) throws Exception
     {
-        final String xpath = "//details[@id='" + (inputID + "_details") + "']/summary/label/span";
-        click(By.xpath(xpath));
-
+        click(By.xpath(String.format(CONTENT_LOCATOR_XPATH, (inputID + "_details"))));
         waitForElementInvisible(By.id(inputID));
     }
 
