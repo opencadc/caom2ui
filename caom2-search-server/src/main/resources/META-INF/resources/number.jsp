@@ -10,7 +10,7 @@
   final String formName = request.getParameter("utype") + ca.nrc.cadc.search.form.Number.NAME;
 %>
 
-<div class="form-group">
+<div id="${param.utype}_formgroup" class="form-group">
   <div data-utype="${param.utype}"
        data-toggle="popover"
        data-placement="${param.tipSide}"

@@ -12,7 +12,7 @@
   final String formName = request.getParameter("utype") + Energy.NAME;
 %>
 
-<div class="form-group">
+<div id="${param.utype}_formgroup" class="form-group">
     <div data-toggle="popover"
          data-utype="${param.utype}"
          data-placement="${param.tipSide}"

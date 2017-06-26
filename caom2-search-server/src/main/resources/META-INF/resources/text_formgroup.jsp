@@ -20,7 +20,9 @@
 %>
 
 <div id="${param.utype}_formgroup" class="form-group">
-  <div data-toggle="popover" data-utype="${param.utype}" data-placement="${param.tipSide}"
+  <div data-toggle="popover"
+       data-utype="${param.utype}"
+       data-placement="${param.tipSide}"
        data-title="<fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}"/>"
        class="advancedsearch-tooltip glyphicon glyphicon-question-sign popover-blue popover-right">
   </div>

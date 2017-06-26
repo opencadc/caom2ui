@@ -32,8 +32,9 @@ dependencies {
 
 ext {
     // Change this value to test other locations, such as Production or RC.
-    intTest_default_web_app_url = 'http://demo.cadc-ccda.hia-iha.nrc-cnrc.gc.ca'
-    intTest_default_web_app_endpoint = '/search/'
+//    intTest_default_web_app_url = 'http://demo.cadc-ccda.hia-iha.nrc-cnrc.gc.ca'
+    intTest_default_web_app_url = 'http://jeevesh.cadc.dao.nrc.ca'
+    intTest_default_web_app_endpoint = '/AdvancedSearch/'
 
     intTest_user_name = 'CADCtest'
     intTest_user_password = 'sywymUL4'
@@ -45,7 +46,7 @@ ext {
 sourceCompatibility = 1.7
 
 group = 'org.opencadc'
-version = '2006'
+version = '2008'
 
 war {
     // Trying to fix static file caching on new build.

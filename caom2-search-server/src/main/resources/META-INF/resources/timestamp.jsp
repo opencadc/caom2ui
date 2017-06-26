@@ -13,12 +13,11 @@
 <c:set var="labelKey" value="${param.utype}_FORM_LABEL" />
 
 
-<div class="form-group data_release_date_panel">
-    <div id="${param.utype}_tooltip"
-         data-toggle="popover"
+<div id="${param.utype}_formgroup" class="form-group data_release_date_panel">
+    <div data-toggle="popover"
          data-placement="${param.tipSide}"
          data-title="<fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}"/>"
-         class="glyphicon glyphicon-question-sign popover-blue popover-right">
+         class="advancedsearch-tooltip glyphicon glyphicon-question-sign popover-blue popover-right">
     </div>
 
     <details id="${param.utype}_details">

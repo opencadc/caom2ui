@@ -936,8 +936,7 @@
 
         var $tooltipDiv = tooltipCreator.getContent(tipMarkup, tooltipHeaderText, null, null);
 
-        var tooltipID = $liItem.attr("id");
-        var $tooltipHeaderDiv = tooltipCreator.getHeader(tooltipHeaderText, tooltipID);
+        var $tooltipHeaderDiv = tooltipCreator.getHeader(tooltipHeaderText, inputID);
 
         $liItem.popover({
                           title: $tooltipHeaderDiv,
