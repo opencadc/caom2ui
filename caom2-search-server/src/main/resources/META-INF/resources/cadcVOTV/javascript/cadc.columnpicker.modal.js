@@ -237,12 +237,13 @@
 
 
             $mainContainer.append($selectedItemsContainer).
-            append($availableItemsContainer).
-            append(cadc.vot.picker.CLEAR_BLOCK);
+                append($availableItemsContainer).
+                append(cadc.vot.picker.CLEAR_BLOCK);
             $fluidContainer.append($mainContainer);
 
-            selfColumnPicker.$modal.find(".column_manager_columns").append(
-                $fluidContainer);
+            // Clear the dialog before appending new code
+            selfColumnPicker.$modal.find(".column_manager_columns").empty();
+            selfColumnPicker.$modal.find(".column_manager_columns").append($fluidContainer);
 
             $("#column_manager").on("show.bs.modal", function (e)
             {

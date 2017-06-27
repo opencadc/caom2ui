@@ -70,7 +70,7 @@ public class QuickSearchServlet extends HttpServlet
                                  final HttpServletResponse response)
             throws ServletException, IOException
     {
-        final String jspName = "/index.jsp";
+        final String jspName = "/META-INF/resources/login.jsp";
 
         // Forward to the index jsp.
         LOGGER.debug("redirecting to " + jspName);
