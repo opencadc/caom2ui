@@ -156,6 +156,8 @@
                 return false;
             });
 
+            // Clear the dialog before adding new content
+            selfColumnPicker.$modal.find(".column_manager_columns").empty();
 
             var $buttonHolder =
                 $("<form class='form-horizontal'></form>")
@@ -241,8 +243,6 @@
                 append(cadc.vot.picker.CLEAR_BLOCK);
             $fluidContainer.append($mainContainer);
 
-            // Clear the dialog before appending new code
-            selfColumnPicker.$modal.find(".column_manager_columns").empty();
             selfColumnPicker.$modal.find(".column_manager_columns").append($fluidContainer);
 
             $("#column_manager").on("show.bs.modal", function (e)
