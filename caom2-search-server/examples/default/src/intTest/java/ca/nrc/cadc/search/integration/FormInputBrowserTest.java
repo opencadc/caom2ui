@@ -58,11 +58,12 @@ public class FormInputBrowserTest extends AbstractAdvancedSearchIntegrationTest
     {
         final CAOMSearchFormPage caomSearchFormPage = goTo(endpoint, "", CAOMSearchFormPage.class);
 
-//        Observation Date.
+//      Observation Date.
         verifyFormInput(caomSearchFormPage, CAOMSearchFormPage.OBSERVATION_DATE_INPUT_ID, "BOG", true,
                         "Invalid: BOG");
         verifyFormInput(caomSearchFormPage, CAOMSearchFormPage.OBSERVATION_DATE_INPUT_ID, "", false,
                         "");
+
 
         // Spectral coverage.
         verifyFormInput(caomSearchFormPage, CAOMSearchFormPage.SPECTRAL_COVERAGE_INPUT_ID, "BOGUS", true, null);
@@ -86,7 +87,7 @@ public class FormInputBrowserTest extends AbstractAdvancedSearchIntegrationTest
         verifyFormInput(caomSearchFormPage, CAOMSearchFormPage.SPECTRAL_COVERAGE_INPUT_ID, "aaa", true, null);
         verifyFormInput(caomSearchFormPage, CAOMSearchFormPage.SPECTRAL_COVERAGE_INPUT_ID, "", false, "");
 
-        
+
         // Quantify the unit conversion values.
         verifyFormInput(caomSearchFormPage, CAOMSearchFormPage.PIXEL_SCALE_INPUT_ID, "0.02..0.05arcmin", false,
                         "(1.2..3.0 arcseconds)");

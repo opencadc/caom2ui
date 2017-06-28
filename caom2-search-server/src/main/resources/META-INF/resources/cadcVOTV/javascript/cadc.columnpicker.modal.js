@@ -156,6 +156,8 @@
                 return false;
             });
 
+            // Clear the dialog before adding new content
+            selfColumnPicker.$modal.find(".column_manager_columns").empty();
 
             var $buttonHolder =
                 $("<form class='form-horizontal'></form>")
@@ -237,12 +239,11 @@
 
 
             $mainContainer.append($selectedItemsContainer).
-            append($availableItemsContainer).
-            append(cadc.vot.picker.CLEAR_BLOCK);
+                append($availableItemsContainer).
+                append(cadc.vot.picker.CLEAR_BLOCK);
             $fluidContainer.append($mainContainer);
 
-            selfColumnPicker.$modal.find(".column_manager_columns").append(
-                $fluidContainer);
+            selfColumnPicker.$modal.find(".column_manager_columns").append($fluidContainer);
 
             $("#column_manager").on("show.bs.modal", function (e)
             {
