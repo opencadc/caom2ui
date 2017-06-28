@@ -19,7 +19,7 @@
 
 <%-- Request scope variables so they can be seen in the imported JSPs --%>
 <fmt:setLocale value="<%= requestHeaderLang %>" scope="request"/>
-<fmt:setBundle basename="AdvancedSearchBundle" var="langBundle" scope="request"/>
+<fmt:setBundle basename="Caom2SearchBundle" var="langBundle" scope="request"/>
 
 <c:import url="_page_header.html"/>
 
@@ -28,6 +28,7 @@
 <div class="container-fluid">
 
 <%-- MainContentStart --%>
+    <c:import url="../../../../../../../wwebui/AdvancedSearch/src/main/webapp/_topnav.jsp"/>
   <h1><fmt:message key="TITLE" bundle="${langBundle}"/></h1>
 
 
@@ -175,7 +176,7 @@
                     .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"cadcVOTV/css/aladin.min.css\" />")
                     .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"cadcVOTV/css/jquery-ui-1.11.4.min.css?version=@version@\" />")
                     .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"css/tooltipster.css?version=@version@\" />")
-                    .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"css/advanced_search.css?version=@version@\" />")
+                    .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"css/caom2_search.css?version=@version@\" />")
                     .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"cadcVOTV/css/slick.grid-frozen.css?version=@version@\" />")
                     .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"cadcVOTV/css/slick.pager.css?version=@version@\" />")
                     .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"cadcVOTV/css/cadc.columnpicker.dialog.css?version=@version@\"/>")
