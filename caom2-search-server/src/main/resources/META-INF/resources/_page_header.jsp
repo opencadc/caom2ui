@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <!--[if IE 7]>
-<html lang="en" class="no-js ie7"><![endif]-->
+<html lang="${param.lang}" class="no-js ie7"><![endif]-->
 <!--[if IE 8]>
-<html lang="en" class="no-js ie8"><![endif]-->
+<html lang="${param.lang}" class="no-js ie8"><![endif]-->
 <!--[if gt IE 8]><!-->
-<html lang="en" class="no-js">
+<html lang="${param.lang}" class="no-js">
   <!--<![endif]-->
 
   <head>
     <meta charset="utf-8"/>
 
-    <title>Archive Search</title>
+    <title><fmt:message key="TITLE" bundle="${langBundle}"/></title>
 
     <meta name="dcterms.creator"
           content="Government of Canada. National Research Council Canada"/>
@@ -48,7 +48,7 @@
     <!-- Bootstrap core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
     <link href="css/bootstrap-theme.min.css" rel="stylesheet" media="screen">
-    <link href="css/advanced_search_bootstrap_override.css" rel="stylesheet" media="screen">
+    <link href="css/caom2_search_bootstrap_override.css" rel="stylesheet" media="screen">
 
     <!-- CustomCSSStart -->
 

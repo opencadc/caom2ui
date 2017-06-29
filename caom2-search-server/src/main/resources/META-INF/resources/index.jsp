@@ -19,15 +19,16 @@
 
 <%-- Request scope variables so they can be seen in the imported JSPs --%>
 <fmt:setLocale value="<%= requestHeaderLang %>" scope="request"/>
-<fmt:setBundle basename="AdvancedSearchBundle" var="langBundle" scope="request"/>
+<fmt:setBundle basename="Caom2SearchBundle" var="langBundle" scope="request"/>
 
-<c:import url="_page_header.html"/>
+<c:import url='<%= "_page_header.jsp?lang=" + requestHeaderLang %>'/>
 
 <body>
 
 <div class="container-fluid">
 
 <%-- MainContentStart --%>
+    <c:import url="../../../../../../../wwebui/AdvancedSearch/src/main/webapp/_topnav.jsp"/>
   <h1><fmt:message key="TITLE" bundle="${langBundle}"/></h1>
 
 
@@ -156,7 +157,8 @@
                     <img src="images/queryoverlay.gif" class="query-overlay-loading" alt=""/>
                 </div>
                 <div class="modal-footer">
-                    <button id="cancel_search" type="button" class="btn btn-default btn-sm" data-dismiss="modal">Cancel</button>
+                    <button id="cancel_search" type="button" class="btn btn-default btn-sm" data-dismiss="modal"><fmt:message key="CANCEL_BUTTON_LABEL"
+                                                                                                                              bundle="${langBundle}"/></button>
                 </div>
             </div>
         </div>
@@ -175,7 +177,7 @@
                     .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"cadcVOTV/css/aladin.min.css\" />")
                     .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"cadcVOTV/css/jquery-ui-1.11.4.min.css?version=@version@\" />")
                     .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"css/tooltipster.css?version=@version@\" />")
-                    .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"css/advanced_search.css?version=@version@\" />")
+                    .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"css/caom2_search.css?version=@version@\" />")
                     .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"cadcVOTV/css/slick.grid-frozen.css?version=@version@\" />")
                     .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"cadcVOTV/css/slick.pager.css?version=@version@\" />")
                     .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"cadcVOTV/css/cadc.columnpicker.dialog.css?version=@version@\"/>")
