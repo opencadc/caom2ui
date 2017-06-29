@@ -5,6 +5,7 @@
       "nrc": {
         "cadc": {
           "search": {
+            "URI_MATCH_REGEX": /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/,
             "DETAILS_BASE_URL": "/caom2ui/view/",
             "CAOM2_RESOLVER_VALUE_KEY": "Plane.position.bounds@Shape1Resolver.value",
             "OBSCORE_RESOLVER_VALUE_KEY": "Char.SpatialAxis.Coverage.Support.Area@Shape1Resolver.value",
@@ -484,7 +485,7 @@
                 "width": 65,
                 "formatter": function (row, cell, value, columnDef)
                 {
-                  return formatCalibrationName(value, columnDef.utype);
+                  return formatDataType(value, columnDef.utype);
                 }
               },
               "caom2:Plane.calibrationLevel": {
@@ -1202,20 +1203,10 @@
     return $cellSpan.get(0).outerHTML;
   }
 
-  function getCalibrationLevelName(numericKey)
+  function formatDataType(value, utype)
   {
-    return (numericKey && ($.trim(numericKey).length > 0))
-        ? ca.nrc.cadc.search.datatrain.CALIBRATION_LEVEL_MAP[numericKey]
-        : null;
-  }
-
-  function formatCalibrationName(value, utype)
-  {
-    var levelName = getCalibrationLevelName(value);
-    var titleStringUtil = new org.opencadc.StringUtil();
-    var title = levelName ? titleStringUtil.sanitize("(" + value + ") " + levelName) : "";
-
-    return formatOutputHTML(value, utype, title);
+    var outputVal = ca.nrc.cadc.search.URI_MATCH_REGEX.test(value) ? (new cadc.web.util.URI(value).getHash()) : value;
+    return formatOutputHTML(outputVal, utype, value);
   }
 
   function formatOutputHTML(value, columnUType, title)

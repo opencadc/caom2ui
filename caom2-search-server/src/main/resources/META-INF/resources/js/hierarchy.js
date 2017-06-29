@@ -34,6 +34,7 @@
         "cadc": {
           "search": {
             "datatrain": {
+              "URI_MATCH_REGEX": /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/,
               "SELECT_DISPLAY_OPTION_COUNT": 12,
               "SPACER_CHAR": "&#9472;",
               /**
@@ -1005,11 +1006,13 @@
 
         var optionName;
 
-        if ((selectName.indexOf("dataProductType") >= 0)
-
-            && (optionValue === "null"))
+        if ((selectName.indexOf("dataProductType") >= 0) && (optionValue === "null"))
         {
           optionName = "Other";
+        }
+        else if (ca.nrc.cadc.search.datatrain.URI_MATCH_REGEX.test(optionValue))
+        {
+          optionName = new cadc.web.util.URI(optionValue).getHash();
         }
         else if ((selectName === "Plane.energy.emBand") && (optionValue === "null"))
         {
