@@ -21,7 +21,7 @@
 <fmt:setLocale value="<%= requestHeaderLang %>" scope="request"/>
 <fmt:setBundle basename="Caom2SearchBundle" var="langBundle" scope="request"/>
 
-<c:import url="_page_header.html"/>
+<c:import url='<%= "_page_header.jsp?lang=" + requestHeaderLang %>'/>
 
 <body>
 
@@ -157,7 +157,8 @@
                     <img src="images/queryoverlay.gif" class="query-overlay-loading" alt=""/>
                 </div>
                 <div class="modal-footer">
-                    <button id="cancel_search" type="button" class="btn btn-default btn-sm" data-dismiss="modal">Cancel</button>
+                    <button id="cancel_search" type="button" class="btn btn-default btn-sm" data-dismiss="modal"><fmt:message key="CANCEL_BUTTON_LABEL"
+                                                                                                                              bundle="${langBundle}"/></button>
                 </div>
             </div>
         </div>
