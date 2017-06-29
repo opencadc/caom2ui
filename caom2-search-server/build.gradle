@@ -14,7 +14,7 @@ dependencies {
     compile 'log4j:log4j:1.2.+'
     compile 'com.opencsv:opencsv:3.+'
     compile 'org.jdom:jdom2:2.+'
-    compile 'org.json:json:20160810'
+    compile 'org.json:json:20170516'
     compile 'org.opencadc:cadc-access-control:1.+'
     compile 'org.opencadc:cadc-uws:1.+'
     compile 'org.opencadc:cadc-web-util:[1.0.8, )'
@@ -28,7 +28,7 @@ dependencies {
     compile 'org.apache.httpcomponents:httpclient:4.+'
     compile 'commons-net:commons-net:3.+'
 
-    runtime 'org.postgresql:postgresql:42.0.0.jre7'
+    runtime 'org.postgresql:postgresql:42.1.1.jre7'
     runtime 'jstl:jstl:1.+'
 
     testCompile 'junit:junit:4.+'
@@ -40,4 +40,4 @@ sourceCompatibility = 1.7
 
 group = 'org.opencadc'
 
-version = '1.2.18'
+version = '1.2.19'
