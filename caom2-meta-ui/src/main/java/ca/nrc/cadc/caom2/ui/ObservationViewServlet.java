@@ -188,8 +188,7 @@ public class ObservationViewServlet extends HttpServlet
 
         final URIBuilder builder = new URIBuilder(repoURL.toURI());
 
-        final String metaServiceHost = applicationConfiguration.lookup(CAOM2META_SERVICE_HOST_PORT_PROPERTY_KEY,
-                                                                       DEFAULT_CAOM2META_SERVICE_HOST_PORT);
+        final String metaServiceHost = applicationConfiguration.lookup(CAOM2META_SERVICE_HOST_PORT_PROPERTY_KEY);
 
         if (StringUtil.hasText(metaServiceHost))
         {
