@@ -480,14 +480,6 @@ canvas.aladin-imageCanvas {
 
 
 /* CSS for defining widths of Addtional Constraints colums - 5 and 7 count wide */
-div.search-category {
-  height: 100%;
-}
-
-div.search-category div.panel {
-  height: 100%;
-}
-
 .advanced_search_data_train .col-md-1 select,
 .advanced_search_data_train .col-sm-1 select,
 .advanced_search_data_train .col-lg-1 select {
