@@ -249,8 +249,7 @@ public class ObservationViewServletTest
                 .andReturn(serviceURI).once();
 
         expect(mockConfiguration.lookup(
-                ObservationViewServlet.CAOM2META_SERVICE_HOST_PORT_PROPERTY_KEY,
-                ObservationViewServlet.DEFAULT_CAOM2META_SERVICE_HOST_PORT))
+                ObservationViewServlet.CAOM2META_SERVICE_HOST_PORT_PROPERTY_KEY))
                 .andReturn(ObservationViewServlet
                                    .DEFAULT_CAOM2META_SERVICE_HOST_PORT).once();
 
