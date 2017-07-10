@@ -80,8 +80,7 @@ import java.util.Map;
  */
 public class TAPSearcher implements Searcher
 {
-    private static final Logger LOGGER =
-            Logger.getLogger(TAPSearcher.class);
+    private static final Logger LOGGER = Logger.getLogger(TAPSearcher.class);
 
     private static final String CAOM2_RESOLVER_VALUE_KEY = "Plane.position.bounds@Shape1Resolver.value";
     private static final String CAOM2_TARGET_NAME_VALUE_KEY = "Plane.position.bounds@Shape1.value";
@@ -101,8 +100,7 @@ public class TAPSearcher implements Searcher
      * @param queryGenerator The generator to use to handle queries
      */
     public TAPSearcher(final SyncResponseWriter writer, final JobUpdater jobUpdater, final SyncTAPClient tapClient,
-                       final QueryGenerator queryGenerator)
-            throws PositionParserException
+                       final QueryGenerator queryGenerator) throws PositionParserException
     {
         this.syncResponseWriter = writer;
         this.jobUpdater = jobUpdater;
@@ -203,17 +201,14 @@ public class TAPSearcher implements Searcher
             final OutputStream outputStream = new ByteArrayOutputStream();
 
             // Run the TAP job to do the ADQL query.
-            queryTAP(serviceURI, createTAPJob(job, queryGenerator.generate(
-                    templates).toString()), outputStream);
+            queryTAP(serviceURI, createTAPJob(job, queryGenerator.generate(templates).toString()), outputStream);
 
             final String resultsURLValue = outputStream.toString();
             final URL tapResultsURL = new URL(resultsURLValue);
 
             jsonWriter.key("results_url").value(tapResultsURL.toExternalForm());
             jsonWriter.key("job_url").value(
-                    new URL(resultsURLValue.substring(0,
-                                                      resultsURLValue.indexOf("/run")))
-                            .toExternalForm());
+                    new URL(resultsURLValue.substring(0, resultsURLValue.indexOf("/run"))).toExternalForm());
             jsonWriter.key("run_id").value(job.getID());
 
             writeFormValueUnits(jsonWriter, formData);
@@ -243,20 +238,14 @@ public class TAPSearcher implements Searcher
      * @param jsonWriter The JSONWriter to append to.
      * @throws JSONException Any JSON Writing errors.
      */
-    private void writeUploadInfoJSON(final Job job, final JSONWriter jsonWriter)
-            throws JSONException
+    private void writeUploadInfoJSON(final Job job, final JSONWriter jsonWriter) throws JSONException
     {
         final List<Parameter> searchParameters = job.getParameterList();
 
-        final String rowCount =
-                ParameterUtil.findParameterValue(UploadResults.UPLOAD_ROW_COUNT,
-                                                 searchParameters);
-        final String errorCount =
-                ParameterUtil.findParameterValue(
-                        UploadResults.UPLOAD_ERROR_COUNT, searchParameters);
+        final String rowCount = ParameterUtil.findParameterValue(UploadResults.UPLOAD_ROW_COUNT, searchParameters);
+        final String errorCount = ParameterUtil.findParameterValue(UploadResults.UPLOAD_ERROR_COUNT, searchParameters);
 
-        final String uploadURLValue =
-                ParameterUtil.findParameterValue("UPLOAD", searchParameters);
+        final String uploadURLValue = ParameterUtil.findParameterValue("UPLOAD", searchParameters);
 
         if (StringUtil.hasText(rowCount))
         {
@@ -282,12 +271,9 @@ public class TAPSearcher implements Searcher
      * @param formData   The Form data containing the units.
      * @throws JSONException Any JSON writing errors.
      */
-    private void writeFormValueUnits(final JSONWriter jsonWriter,
-                                     final FormData formData)
-            throws JSONException
+    private void writeFormValueUnits(final JSONWriter jsonWriter, final FormData formData) throws JSONException
     {
-        final Map<String, String> formValueUnits =
-                formData.getFormValueUnits();
+        final Map<String, String> formValueUnits = formData.getFormValueUnits();
 
         jsonWriter.key("display_units").object();
 
@@ -306,8 +292,7 @@ public class TAPSearcher implements Searcher
      * @param jsonWriter The JSONWriter to write to.
      * @throws JSONException If anything goes wrong with writing JSON.
      */
-    private void writeResolverJSON(final Job job, final JSONWriter jsonWriter)
-            throws JSONException
+    private void writeResolverJSON(final Job job, final JSONWriter jsonWriter) throws JSONException
     {
         try
         {
@@ -456,8 +441,7 @@ public class TAPSearcher implements Searcher
             job.setErrorSummary(errorSummary);
             job.setExecutionPhase(ExecutionPhase.ERROR);
 
-            jobUpdater.setPhase(job.getID(), ExecutionPhase.EXECUTING,
-                                ExecutionPhase.ERROR, errorSummary, new Date());
+            jobUpdater.setPhase(job.getID(), ExecutionPhase.EXECUTING, ExecutionPhase.ERROR, errorSummary, new Date());
         }
         catch (Throwable oops)
         {
@@ -511,16 +495,12 @@ public class TAPSearcher implements Searcher
      */
     private Cutout getCutout(final Job job, final Templates templates)
     {
-        final List<SpatialSearch> spatialSearches =
-                templates.getSearchTemplates(SpatialSearch.class);
-        final List<IntervalSearch> spectralSearches =
-                templates.getSearchTemplates(IntervalSearch.class);
+        final List<SpatialSearch> spatialSearches = templates.getSearchTemplates(SpatialSearch.class);
+        final List<IntervalSearch> spectralSearches = templates.getSearchTemplates(IntervalSearch.class);
 
-        return new STCCutoutImpl((spatialSearches.isEmpty()
-                                  || !isSpatialCutoutSpecified(job))
+        return new STCCutoutImpl((spatialSearches.isEmpty() || !isSpatialCutoutSpecified(job))
                                  ? null : spatialSearches.get(0),
-                                 (spectralSearches.isEmpty()
-                                  || !isSpectralCutoutSpecified(job))
+                                 (spectralSearches.isEmpty() || !isSpectralCutoutSpecified(job))
                                  ? null : spectralSearches.get(0));
     }
 }
