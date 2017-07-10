@@ -90,11 +90,11 @@ public class AdvancedRunner implements JobRunner
     /**
      * Complete constructor.  Useful for testing.
      *
-     * @param _job        The AdvancedSearch Job.
-     * @param _jobUpdater The JobUpdater.
-     * @param _syncOutput The Syncronous writer output.
-     * @param _searcher   The base searcher.
-     * @param  tapServiceURI    The service URI
+     * @param _job          The AdvancedSearch Job.
+     * @param _jobUpdater   The JobUpdater.
+     * @param _syncOutput   The Syncronous writer output.
+     * @param _searcher     The base searcher.
+     * @param tapServiceURI The service URI
      */
     public AdvancedRunner(final Job _job, final JobUpdater _jobUpdater, final SyncOutput _syncOutput,
                           final Searcher _searcher, final URI tapServiceURI)
@@ -115,25 +115,21 @@ public class AdvancedRunner implements JobRunner
 //        If this is a QuickSearch query, the Job has target and optionally
 //        collection parameters.
         final List<Parameter> parameters = this.job.getParameterList();
-        final String target = RegexParameterUtil.findParameterValue("target",
-                                                                    parameters);
+        final String target = RegexParameterUtil.findParameterValue("target", parameters);
 
         if (StringUtil.hasText(target))
         {
             String SHAPE1_UTYPE = "Plane.position.bounds";
-            parameters.add(new Parameter(FormConstraint.FORM_NAME,
-                                         SHAPE1_UTYPE + Shape1.NAME));
+            parameters.add(new Parameter(FormConstraint.FORM_NAME, SHAPE1_UTYPE + Shape1.NAME));
             parameters.add(new Parameter(SHAPE1_UTYPE + Shape1.VALUE, target));
         }
 
-        final String collection =
-                RegexParameterUtil.findParameterValue("collection", parameters);
+        final String collection = RegexParameterUtil.findParameterValue("collection", parameters);
 
         if (StringUtil.hasText(collection))
         {
             String TEXT_UTYPE = "Observation.collection";
-            parameters.add(new Parameter(FormConstraint.FORM_NAME,
-                                         TEXT_UTYPE + Text.NAME));
+            parameters.add(new Parameter(FormConstraint.FORM_NAME, TEXT_UTYPE + Text.NAME));
             parameters.add(new Parameter(TEXT_UTYPE + Text.VALUE, collection));
         }
     }
@@ -173,15 +169,12 @@ public class AdvancedRunner implements JobRunner
             init();
             final String jobID = job.getID();
 
-            final ExecutionPhase ep =
-                    jobUpdater.setPhase(jobID, ExecutionPhase.QUEUED,
-                                        ExecutionPhase.EXECUTING,
-                                        currentDate());
+            final ExecutionPhase ep = jobUpdater.setPhase(jobID, ExecutionPhase.QUEUED, ExecutionPhase.EXECUTING,
+                                                          currentDate());
 
             if (!ExecutionPhase.EXECUTING.equals(ep))
             {
-                LOGGER.error(jobID
-                             + ": QUEUED -> EXECUTING [FAILED] -- DONE");
+                LOGGER.error(jobID + ": QUEUED -> EXECUTING [FAILED] -- DONE");
             }
             else
             {
@@ -195,10 +188,7 @@ public class AdvancedRunner implements JobRunner
                 {
                     searcher.search(job, tapServiceURI, wrapSyncOutput());
 
-                    jobUpdater.setPhase(jobID,
-                                        ExecutionPhase.EXECUTING,
-                                        ExecutionPhase.COMPLETED,
-                                        currentDate());
+                    jobUpdater.setPhase(jobID, ExecutionPhase.EXECUTING, ExecutionPhase.COMPLETED, currentDate());
                     LOGGER.info(jobID + ": EXECUTING -> COMPLETED [OK]");
                 }
 
@@ -207,8 +197,7 @@ public class AdvancedRunner implements JobRunner
         }
         catch (TransientException e)
         {
-            syncOutput.setResponseCode(
-                    HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            syncOutput.setResponseCode(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
             handleError(e, ErrorType.TRANSIENT);
         }
         catch (Throwable t)
@@ -243,8 +232,7 @@ public class AdvancedRunner implements JobRunner
     private void createSearcher() throws IOException, PositionParserException
     {
         final RegistryClient registryClient = new RegistryClient();
-        final SyncTAPClient tapClient = new DefaultSyncTAPClient(false,
-                                                                 registryClient);
+        final SyncTAPClient tapClient = new DefaultSyncTAPClient(false, registryClient);
 
         this.searcher = new TAPSearcher(
                 new SyncResponseWriterImpl(syncOutput),
@@ -330,27 +318,20 @@ public class AdvancedRunner implements JobRunner
 
     private void writeUploadError()
     {
-        final ErrorSummary errorSummary =
-                new ErrorSummary("Errors processing upload file",
-                                 ErrorType.FATAL);
+        final ErrorSummary errorSummary = new ErrorSummary("Errors processing upload file", ErrorType.FATAL);
         try
         {
-            jobUpdater.setPhase(job.getID(),
-                                ExecutionPhase.EXECUTING,
-                                ExecutionPhase.ERROR,
-                                errorSummary, currentDate());
-            final String uploadParameterValue =
-                    ParameterUtil.findParameterValue("UPLOAD",
-                                                     job.getParameterList());
+            jobUpdater.setPhase(job.getID(), ExecutionPhase.EXECUTING, ExecutionPhase.ERROR, errorSummary,
+                                currentDate());
+            final String uploadParameterValue = ParameterUtil.findParameterValue("UPLOAD",
+                                                                                 job.getParameterList());
 
             if (StringUtil.hasText(uploadParameterValue))
             {
-                final String[] uploadParameterItems =
-                        uploadParameterValue.split(",");
+                final String[] uploadParameterItems = uploadParameterValue.split(",");
                 final String output;
 
-                syncOutput.setResponseCode(
-                        HttpServletResponse.SC_NOT_ACCEPTABLE);
+                syncOutput.setResponseCode(HttpServletResponse.SC_NOT_ACCEPTABLE);
 
                 if (uploadParameterItems.length > 1)
                 {
@@ -369,10 +350,8 @@ public class AdvancedRunner implements JobRunner
         }
         catch (Throwable oops)
         {
-            LOGGER.error("failed to set final error status after "
-                         + "file upload error", oops);
-            syncOutput.setResponseCode(
-                    HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            LOGGER.error("failed to set final error status after file upload error", oops);
+            syncOutput.setResponseCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
 

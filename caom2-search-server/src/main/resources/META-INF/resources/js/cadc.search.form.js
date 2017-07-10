@@ -1600,7 +1600,7 @@
     {
       $("#UPLOAD").remove();
 
-      var inputFile = $("input:file[name='targetList']");
+      var inputFile = this.$form.find("input:file.target_upload");
 
       if ((inputFile.length > 0) && !inputFile.prop("disabled") && (inputFile.val() !== ""))
       {
@@ -1615,6 +1615,9 @@
         // Update the file input name with the value from the target list select.
         var resolver = $("select[id='Plane.position.bounds@Shape1Resolver.value']").val();
 
+        // Renaming the field is a terrible idea, but cloning it doesn't work in some browsers.
+        // jenkinsd 2017.07.10
+        //
         inputFile.prop("name", "targetList." + resolver);
       }
 

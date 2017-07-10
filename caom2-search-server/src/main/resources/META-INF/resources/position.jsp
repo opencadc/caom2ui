@@ -54,7 +54,7 @@
     <div id="<%= utype %>_targetList_fileInputDiv">
       <label for="<%= utype %>_targetList" class="wb-invisible">
         <fmt:message key="TARGET_LIST_FORM_LABEL" bundle="${langBundle}" /></label>
-      <input type="file" class="search_criteria_input"
+      <input type="file" class="search_criteria_input target_upload"
              id="<%= utype %>_targetList" name="targetList"
              title="<fmt:message key="TARGET_LIST_TOOLTIP" bundle="${langBundle}" />" />
       <span id="<%= utype %>_targetList_clear" class="wb-icon-eraser targetList_clear"></span>
