@@ -30,7 +30,6 @@
 <%-- MainContentStart --%>
   <h1><fmt:message key="TITLE" bundle="${langBundle}"/></h1>
 
-
   <ul id="tabList" class="nav nav-tabs" role="tablist">
     <li role="presentation" class="active">
       <a href="#queryFormTab"
