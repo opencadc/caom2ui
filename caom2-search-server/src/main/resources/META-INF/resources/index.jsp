@@ -28,9 +28,7 @@
 <div class="container-fluid">
 
 <%-- MainContentStart --%>
-    <c:import url="../../../../../../../wwebui/AdvancedSearch/src/main/webapp/_topnav.jsp"/>
   <h1><fmt:message key="TITLE" bundle="${langBundle}"/></h1>
-
 
   <ul id="tabList" class="nav nav-tabs" role="tablist">
     <li role="presentation" class="active">
