@@ -1,4 +1,4 @@
-### CAOM-2 Search interface v1.2.4 <a href="https://travis-ci.org/opencadc/caom2ui/caom2-search-server"><img src="https://travis-ci.org/opencadc/caom2ui.svg?branch=bootstrap" /></a>
+### CAOM-2 Search interface v2.1.7 <a href="https://travis-ci.org/opencadc/caom2ui/caom2-search-server"><img src="https://travis-ci.org/opencadc/caom2ui.svg?branch=bootstrap" /></a>
 
 This is the User Interface to perform complicated searches to a running [TAP](http://www.ivoa.net/documents/TAP/) web service.
 
@@ -8,10 +8,6 @@ Simply run
 `gradle clean build`
 
 To have a constructed JAR file in the `build/libs` directory that can be used to create a WAR to then be run in a Java Servlet Container.
-
-The current status uses an external server to supply static resources at CADC.  It relies on
-technologies ([Web Experience Toolkit](http://wet-boew.github.io/wet-boew-legacy/v3.1/index.html)), that are no longer supported.
-Efforts are underway to replace them with a much better (and modern) user experience.
 
 See the [index.jsp](src/main/resources/META-INF/resources/index.jsp) for properties to set, although it is very recommended to leave
 them as their defaults.
