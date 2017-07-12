@@ -1,3 +1,9 @@
+<%@ page import="ca.nrc.cadc.config.ApplicationConfiguration" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" session="false"
+         pageEncoding="UTF-8" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+
 <!DOCTYPE html>
 <!--[if IE 7]>
 <html lang="en" class="no-js ie7"><![endif]-->
