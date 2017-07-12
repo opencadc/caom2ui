@@ -383,10 +383,6 @@
     this._buildSelect = function (uType, containerElement)
     {
       var label = document.createElement("label");
-      if (this.pageLanguage === "fr")
-      {
-        label.className = "advanced_search_hierarchy_select_div_label form-control";
-      }
 
       var hidden = document.createElement("input");
       hidden.type = "hidden";
@@ -431,10 +427,21 @@
         "Collection": "Collection",
         "Instrument": "Instrument",
         "Filter": "Filtre",
-        "Calibration Level": "Niveau de calibration",
+        "Cal. Lev.": "Niveau de calibration",
         "Data Type": "Type de donnée",
-        "Observation Type": "Type d'observation"
+        "Obs. Type": "Type d'observation"
       }
+    };
+
+    this.getFrenchDataTrainObscoreHeaderMap = function ()
+    {
+        return {
+            "obs_collection": "obs_collection",
+            "facility_name": "facility_name",
+            "instrument_name": "instrument_name",
+            "calib_level": "calib_level",
+            "dataproduct_type": "dataproduct_type"
+        }
     };
 
     /**
