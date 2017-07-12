@@ -27,7 +27,6 @@ dependencies {
     compile 'org.opencadc:cadc-vosi:1.+'
     compile 'org.apache.httpcomponents:httpclient:4.+'
     compile 'commons-net:commons-net:3.+'
-
     runtime 'org.postgresql:postgresql:42.0.0.jre7'
     runtime 'jstl:jstl:1.+'
 
@@ -38,4 +37,4 @@ dependencies {
 
 sourceCompatibility = 1.7
 group = 'org.opencadc'
-version = '2.1.4'
+version = '2.1.7'

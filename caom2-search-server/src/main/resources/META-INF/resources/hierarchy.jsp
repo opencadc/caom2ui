@@ -12,7 +12,6 @@
     <div class="panel-heading">
       <fmt:message key="DATA_ACQUISITION_LABEL" bundle="${langBundle}"/></div>
     <div class="panel-body">
-      <%--<div class="form-group">--%>
       <div id="${param.modelDataSource}@Hierarchy"
            class="width-100 text-align advanced_search_data_train modelDataSource_${param.modelDataSource} ${param.colcount}"
            data-utypes="${param.utype}">
@@ -22,7 +21,6 @@
           <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span> <fmt:message key="LOADING_MESSAGE" bundle="${langBundle}"/>
         </div>
       </div>
-      <%--</div>--%>
     </div>
     <div class="clear"></div>
   </div>
