@@ -1,3 +1,5 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
 plugins {
     id 'maven'
     id 'war'
@@ -44,9 +46,10 @@ ext {
 }
 
 sourceCompatibility = 1.7
-
 group = 'org.opencadc'
 version = '2008'
+
+apply from: '../../../_shared.gradle'
 
 war {
     // Trying to fix static file caching on new build.
@@ -58,5 +61,3 @@ war {
 
     archiveName = "search##" + project.version + ".war"
 }
-
-apply from: '../../../_shared.gradle'
