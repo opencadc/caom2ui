@@ -429,19 +429,13 @@
         "Filter": "Filtre",
         "Cal. Lev.": "Niveau de calibration",
         "Data Type": "Type de donnée",
-        "Obs. Type": "Type d'observation"
+        "Obs. Type": "Type d'observation",
+        "obs_collection": "obs_collection",
+        "facility_name": "facility_name",
+        "instrument_name": "instrument_name",
+        "calib_level": "calib_level",
+        "dataproduct_type": "dataproduct_type"
       }
-    };
-
-    this.getFrenchDataTrainObscoreHeaderMap = function ()
-    {
-        return {
-            "obs_collection": "obs_collection",
-            "facility_name": "facility_name",
-            "instrument_name": "instrument_name",
-            "calib_level": "calib_level",
-            "dataproduct_type": "dataproduct_type"
-        }
     };
 
     /**
