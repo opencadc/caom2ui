@@ -1,4 +1,4 @@
-version: '2'
+version: '3'
 services:
   proxy.cadc.dao.nrc.ca:
     image: nginx:alpine
@@ -50,4 +50,3 @@ services:
 # Create the network 'selenium' for which this system will run within.
 networks:
   selenium:
-    driver: 'bridge'
