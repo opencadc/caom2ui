@@ -97,8 +97,8 @@ public class SearchResultsPage extends AbstractTestWebPage
     private static final By FILTER_FILTER_BY = By.id("caom2:Plane.energy.bandpassName_filter");
     private static final By RA_FILTER_BY = By.id("caom2:Plane.position.bounds.cval1_filter");
     private static final By DEC_FILTER_BY = By.id("caom2:Plane.position.bounds.cval2_filter");
-    private static final By CHANGE_COLUMNS_BY = By.id("slick-columnpicker-panel-change-column");
-    private static final By CHANGE_COLUMNS_POPUP_BY = By.id("column_manager_container-popup");
+    private static final By CHANGE_COLUMNS_BY = By.id("change_column_button");
+    private static final By CHANGE_COLUMNS_POPUP_BY = By.id("column_manager");
     private static final String CHANGE_COLUMNS_AVAILABLE_COLUMNS_LIST_ID = "cadc_columnpicker_available_items";
     private static final By CHANGE_COLUMNS_AVAILABLE_COLUMNS_LIST_BY = By.id(CHANGE_COLUMNS_AVAILABLE_COLUMNS_LIST_ID);
     private static final String CHANGE_COLUMNS_SELECTED_COLUMNS_LIST_ID = "cadc_columnpicker_selected_items";
@@ -112,7 +112,7 @@ public class SearchResultsPage extends AbstractTestWebPage
     static final By GRID_HEADER_LABEL_LOCATOR = By.className("grid-header-label");
     static final String OBSERVATION_DETAILS_LINK_LOCATOR = "caom2:Observation.observationID_%d_observation_details";
     static final By FIRST_QUICKSEARCH_TARGET_LINK = By.cssSelector("a.quicksearch_link:nth-child(1)");
-    static final By QUERY_TAB_LOCATOR = By.id("queryFormTab-link");
+    static final By QUERY_TAB_LOCATOR = By.id("queryFormTabLink");
 
     // Switches between busy and transparent (idle).
     static final By GRID_HEADER_ICON = By.className("grid-header-icon");
@@ -158,7 +158,7 @@ public class SearchResultsPage extends AbstractTestWebPage
             // check that the drag-and-drop changed the ordinal of the column
             (new Actions(driver)).dragAndDrop(listItem, selectedColumnsListElement).build().perform();
             waitForElementVisible(selectedColumnsListElement.findElement(By.id(listItemID)));
-            click(changeColumnsPopupElement.findElement(By.cssSelector("span.dialog-close")));
+            click(changeColumnsPopupElement.findElement(By.id("column_manager_close")));
         }
     }
 

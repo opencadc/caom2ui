@@ -49,8 +49,7 @@ public class CAOMSearchBrowserTest extends AbstractAdvancedSearchIntegrationTest
     }
 
 
-    //TODO: uncomment when implementation is complete
-    //@Test
+    @Test
     public void searchCAOM() throws Exception
     {
         CAOMSearchFormPage searchFormPage = goTo(endpoint, null, CAOMSearchFormPage.class);
@@ -59,6 +58,7 @@ public class CAOMSearchBrowserTest extends AbstractAdvancedSearchIntegrationTest
         searchFormPage.enterTarget("210.05  54.3");
 
         searchFormPage.reset();
+
 
         final int index = searchFormPage.findDataTrainValueIndex(By.id("Observation.instrument.name"), "SPACER",
                                                                  false);
@@ -112,6 +112,19 @@ public class CAOMSearchBrowserTest extends AbstractAdvancedSearchIntegrationTest
 
         searchResultsPage.includeHiddenColumn("caom2:Observation.target.keywords");
 
+        // Nav back to query tab for next test
+        searchFormPage = searchResultsPage.queryTab();
+        searchFormPage.reset();
+
+        // Test login and logout
+        System.out.println("Test login");
+        searchFormPage = loginTest(searchFormPage);
+
+        System.out.println("Test logout");
+        searchFormPage = searchFormPage.doLogout();
+        verifyFalse(searchFormPage.isLoggedIn());
+
+        System.out.println("searchCAOM test complete.");
         /*
         TODO - Complete for new Page Object model going forward.
         TODO - jenkinsd 2016.02.16
@@ -219,4 +232,17 @@ public class CAOMSearchBrowserTest extends AbstractAdvancedSearchIntegrationTest
         logout();
         */
     }
+
+
+    private CAOMSearchFormPage loginTest(final CAOMSearchFormPage userPage) throws Exception
+    {
+        final CAOMSearchFormPage authPage = userPage.doLogin(getUsername(), getPassword());
+        verifyTrue(userPage.isLoggedIn());
+        System.out.println("logged in");
+
+        return authPage;
+    }
+
+
+
 }
