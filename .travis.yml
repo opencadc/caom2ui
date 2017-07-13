@@ -1,6 +1,5 @@
 env:
   DOCKER_COMPOSE_VERSION: 1.14.0
-  GRADLE_VERSION: 4.0.1
 language: java
 jdk:
 - oraclejdk8
@@ -8,9 +7,6 @@ sudo: required
 services:
 - docker
 before_install:
-- curl -fsSLO https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-all.zip
-- unzip gradle-${GRADLE_VERSION}-all.zip
-- export PATH=gradle-${GRADLE_VERSION}/bin:$PATH
 - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 - sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 - sudo apt-get update
