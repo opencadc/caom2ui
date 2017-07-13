@@ -9,9 +9,6 @@ services:
     volumes:
       - './default.conf:/etc/nginx/conf.d/default.conf'
       - './:/usr/share/nginx/html'
-    environment:
-      - NGINX_HOST=proxy.cadc.dao.nrc.ca
-      - NGINX_PORT=80
     depends_on:
       - archive-search.cadc.dao.nrc.ca
       - caom2-meta-ui.cadc.dao.nrc.ca
@@ -22,7 +19,7 @@ services:
     networks:
       - 'selenium'
   archive-search.cadc.dao.nrc.ca:
-    image: opencadc/archive-search:2.1
+    image: opencadc/archive-search:2.1.8
     ports:
       - '8080:8080'
       - '5555:5555'
