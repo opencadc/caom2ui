@@ -24,7 +24,7 @@ dependencies {
     providedCompile 'javax.servlet:javax.servlet-api:3.0.+'
 
     runtime 'commons-logging:commons-logging:1.+'
-    runtime 'org.postgresql:postgresql:42.0.0.jre7'
+    runtime 'org.postgresql:postgresql:42.1.1.jre7'
     runtime 'jstl:jstl:1.+'
 
     testCompile 'junit:junit:4.+'
@@ -36,10 +36,8 @@ dependencies {
 
 ext {
     // Change this value to test other locations, such as Production or RC.
-//    intTest_default_web_app_url = 'http://demo.cadc-ccda.hia-iha.nrc-cnrc.gc.ca'
-    intTest_default_web_app_url = 'http://jeevesh.cadc.dao.nrc.ca'
+    intTest_default_web_app_url = 'http://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca'
     intTest_default_web_app_endpoint = '/AdvancedSearch/'
-
     intTest_user_name = 'CADCtest'
     intTest_user_password = 'sywymUL4'
 
