@@ -21,7 +21,8 @@ script:
 - gradle -v
 - cd /usr/local
 - curl -LO https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-all.zip
-- ln -s gradle-${GRADLE_VERSION} gradle && export PATH=/usr/local/gradle/bin:$PATH
+- unzip gradle-${GRADLE_VERSION}-all.zip
+- export PATH=/usr/local/gradle-${GRADLE_VERSION}/bin:$PATH
 - cd caom2-meta-ui
 - gradle clean dockerize
 - cd ../caom2-search-server
