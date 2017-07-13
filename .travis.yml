@@ -17,6 +17,7 @@ before_install:
 - chmod +x docker-compose
 - sudo mv docker-compose /usr/local/bin
 script:
+- gradle -v
 - cd caom2-meta-ui
 - gradle clean dockerize
 - cd ../caom2-search-server
