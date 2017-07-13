@@ -198,6 +198,8 @@ abstract class AbstractSearchFormPage extends AbstractTestWebPage
 
         waitForElementPresent(tooltipIconTriggerBy);
         click(tooltipIconTriggerBy);
+        waitForElementVisible(By.className("popover"));
+        waitForElementClickable(By.id(baseID + "_close"));
     }
 
     void closeTooltip(final String baseID) throws Exception
