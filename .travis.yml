@@ -20,7 +20,7 @@ before_install:
 script:
 - gradle -v
 - cd /usr/local
-- curl -L https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-all.zip
+- curl -LO https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-all.zip
 - ln -s gradle-${GRADLE_VERSION} gradle && export PATH=/usr/local/gradle/bin:$PATH
 - cd caom2-meta-ui
 - gradle clean dockerize
