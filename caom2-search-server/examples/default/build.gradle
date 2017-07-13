@@ -42,7 +42,7 @@ ext {
     intTest_user_password = 'sywymUL4'
 
     // Modify this to your liking!
-    docker_image_name = 'opencadc/archive-search:' + libVersion
+    docker_image_name = 'opencadc/archive-search:SNAPSHOT-' + libVersion
 }
 
 sourceCompatibility = 1.7
