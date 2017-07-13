@@ -3,6 +3,7 @@ env:
 language: java
 jdk:
 - oraclejdk8
+dist: trusty
 sudo: required
 services:
 - docker
@@ -12,16 +13,13 @@ before_install:
 - sudo apt-get update
 - sudo apt-get -y install docker-ce
 - sudo rm /usr/local/bin/docker-compose
-- curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname
-  -s`-`uname -m` > docker-compose
-- chmod +x docker-compose
-- sudo mv docker-compose /usr/local/bin
-script:
+- curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
+- chmod +x docker-compose && sudo mv docker-compose /usr/local/bin
+- docker-compose -v
 - gradle -v
-- cd caom2-meta-ui
-- gradle clean dockerize
-- cd ../caom2-search-server
-- gradle clean install
+script:
+- cd caom2-meta-ui && gradle clean dockerize
+- cd ../caom2-search-server && gradle clean install
 - cd examples/default
 - gradle clean dockerize
 - cd ../_int_test_
