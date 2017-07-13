@@ -8,6 +8,9 @@ sudo: required
 services:
 - docker
 before_install:
+- curl -fsSL -o /usr/local/gradle-${GRADLE_VERSION}-all.zip https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-all.zip
+- unzip -d /usr/local /usr/local/gradle-${GRADLE_VERSION}-all.zip
+- export PATH=/usr/local/gradle-${GRADLE_VERSION}/bin:$PATH
 - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 - sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 - sudo apt-get update
@@ -18,11 +21,6 @@ before_install:
 - chmod +x docker-compose
 - sudo mv docker-compose /usr/local/bin
 script:
-- gradle -v
-- cd /usr/local
-- curl -LO https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-all.zip
-- unzip gradle-${GRADLE_VERSION}-all.zip
-- export PATH=/usr/local/gradle-${GRADLE_VERSION}/bin:$PATH
 - cd caom2-meta-ui
 - gradle clean dockerize
 - cd ../caom2-search-server
