@@ -39,8 +39,7 @@
          data-toggle="tab"><fmt:message key="CAOM_QUERY_TAB_TITLE"
                                            bundle="${langBundle}"/></a>
     </li>
-    <% if (showObsCoreTab)
-    { %>
+    <% if (showObsCoreTab) { %>
     <li role="presentation">
       <a href="#obsCoreQueryFormTab"
          id="obsCoreQueryFormTabLink"
@@ -70,7 +69,7 @@
       <a href="#queryTab"
          id="queryTabLink"
          aria-controls="queryTab"
-         ole="tab"
+         role="tab"
          data-toggle="tab"><fmt:message key="ADQL_QUERY_TAB_TITLE"
                                        bundle="${langBundle}"/></a>
     </li>
@@ -127,7 +126,7 @@
   </div>
 
   <!-- Query Tab -->
-  <div id="queryTab" class="wet-boew-prettify lang-sql tab-pane" role="tabpanel">
+  <div id="queryTab" class="lang-sql tab-pane" role="tabpanel">
     <div id="query_holder">
       <h3 class="wb-invisible">ADQL Query</h3>
       <pre class="prettyprint lang-sql"><code id="query" class="lang-sql"></code></pre>
@@ -191,8 +190,6 @@
                   src="js/jquery.form.js?version=@version@"></script>
           <script type="text/javascript" charset="utf-8"
                   src="cadcVOTV/javascript/aladin.js?version=@version@"></script>
-          <script type="text/javascript"
-                  src="wet/javascript/polyfills/detailssummary-min.js?version=@version@"></script>
           <script type="text/javascript"
                   src="cadcVOTV/javascript/jquery-ui-1.11.4.min.js?version=@version@"></script>
 

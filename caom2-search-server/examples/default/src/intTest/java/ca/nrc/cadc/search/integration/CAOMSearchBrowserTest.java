@@ -49,8 +49,7 @@ public class CAOMSearchBrowserTest extends AbstractAdvancedSearchIntegrationTest
     }
 
 
-    //TODO: uncomment when implementation is complete
-    //@Test
+    @Test
     public void searchCAOM() throws Exception
     {
         CAOMSearchFormPage searchFormPage = goTo(endpoint, null, CAOMSearchFormPage.class);
@@ -59,6 +58,7 @@ public class CAOMSearchBrowserTest extends AbstractAdvancedSearchIntegrationTest
         searchFormPage.enterTarget("210.05  54.3");
 
         searchFormPage.reset();
+
 
         final int index = searchFormPage.findDataTrainValueIndex(By.id("Observation.instrument.name"), "SPACER",
                                                                  false);
@@ -111,6 +111,12 @@ public class CAOMSearchBrowserTest extends AbstractAdvancedSearchIntegrationTest
         searchResultsPage.filterOnRA("18:03..18:07");
 
         searchResultsPage.includeHiddenColumn("caom2:Observation.target.keywords");
+
+        // Nav back to query tab for next test
+        searchFormPage = searchResultsPage.queryTab();
+        searchFormPage.reset();
+
+        System.out.println("searchCAOM test complete.");
 
         /*
         TODO - Complete for new Page Object model going forward.

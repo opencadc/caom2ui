@@ -69,6 +69,7 @@
 package ca.nrc.cadc.search.integration;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -91,6 +92,15 @@ public class CAOMSearchFormPage extends AbstractSearchFormPage
     static final String OBSERVATION_DATE_INPUT_ID = "Plane.time.bounds";
     static final String PIXEL_SCALE_INPUT_ID = "Plane.position.sampleSize";
     static final By RESET_BUTTON_SELECTOR = By.cssSelector("button[type=\"reset\"]");
+
+    private static final By ACCESS_ACTIONS_DROPDOWN_BY = By.cssSelector("a.access-actions");
+    private static final By LOGIN_DROPDOWN_BY = By.cssSelector("a.login-form");
+    private static final By USERNAME_INPUT_BY = By.id("as-username");
+    private static final By PASSWORD_INPUT_BY = By.id("as-password");
+    private static final By LOGIN_SUBMIT_BUTTON_BY = By.id("submitLogin");
+    private static final By LOGOUT_LINK_BY = By.id("as-logout");
+    private static final By DISPLAY_USERNAME = By.className("auth-username");
+
 
 
     @FindBy(id = "caom2@Hierarchy")
@@ -181,4 +191,41 @@ public class CAOMSearchFormPage extends AbstractSearchFormPage
         throw new IllegalStateException("No such element with value '" + value + "' (Case"
                                         + (ignoreCase ? " " : " not ") + "ignored)");
     }
+
+
+    public CAOMSearchFormPage doLogin(String username, String password) throws Exception
+    {
+        click(LOGIN_DROPDOWN_BY);
+
+        waitForElementVisible(USERNAME_INPUT_BY);
+        waitForElementVisible(PASSWORD_INPUT_BY);
+
+        sendKeys(find(USERNAME_INPUT_BY), username);
+        sendKeys(find(PASSWORD_INPUT_BY), password);
+
+        click(find(LOGIN_SUBMIT_BUTTON_BY));
+
+        waitForElementInvisible(LOGIN_DROPDOWN_BY);
+
+        return new CAOMSearchFormPage(driver);
+    }
+
+    public CAOMSearchFormPage doLogout() throws Exception
+    {
+        waitForElementClickable(ACCESS_ACTIONS_DROPDOWN_BY);
+        click(ACCESS_ACTIONS_DROPDOWN_BY);
+
+        waitForElementClickable(LOGOUT_LINK_BY);
+        click(LOGOUT_LINK_BY);
+
+        waitForElementInvisible(DISPLAY_USERNAME);
+
+        return new CAOMSearchFormPage(driver);
+    }
+
+    boolean isLoggedIn() throws Exception
+    {
+        return isElementHidden(find(LOGIN_DROPDOWN_BY));
+    }
+
 }
