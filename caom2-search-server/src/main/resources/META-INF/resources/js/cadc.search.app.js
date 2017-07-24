@@ -1738,10 +1738,6 @@
 
                             this._postQuerySubmission({upload_url: json.upload_url});
 
-                            var message = buildPanelMessage(startDate, netEnd, loadStart, loadEnd);
-
-                            $("#results-grid-footer").find(".grid-footer-label").text(message);
-
                             // Necessary at the end!
                             resultsVOTV.refreshGrid();
                           }.bind(this),

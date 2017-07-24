@@ -129,8 +129,5 @@
 
         </div>
         <div id="resultTable"></div>
-        <div id="results-grid-footer" class="grid-footer">
-            <span class="grid-footer-label"></span>
-        </div>
     </div>
 </div>
