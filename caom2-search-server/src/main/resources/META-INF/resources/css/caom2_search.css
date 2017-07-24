@@ -38,6 +38,18 @@
   height: 100px !important;
 }
 
+/* These need to be !important as jquery ui will override it as well as bootstrap */
+.slick-row .slick-cell a
+{
+  color:#337ab7; !important
+}
+
+.slick-row .slick-cell a:hover
+{
+  text-decoration: underline; !important
+}
+
+
 .grid-container
 {
   width: 1180px;
