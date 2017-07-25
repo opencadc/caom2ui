@@ -18,11 +18,6 @@
           content="National science infrastructure (NRC Herzberg, Programs in Astronomy and Astrophysics) - National Research Council Canada"/>
     <meta name="dcterms.issued" title="W3CDTF" content="2013-04-30"/>
 
-    <!--#if expr="$QUERY_STRING_UNESCAPED = /LAST_MOD=([0-9]{4}-[0-9]{2}-[0-9]{2})/" -->
-    <!--#set var="DCTERMS_LMOD" value="<meta name=\"dcterms.modified\" title=\"W3CDTF\" content=\"$1\" />" -->
-    <!--#echo encoding="none" var="DCTERMS_LMOD" -->
-    <!--#endif -->
-
     <meta name="dcterms.language" title="ISO639-2" content="eng"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <meta name="dcterms.contributor"
