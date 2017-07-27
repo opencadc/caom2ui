@@ -391,7 +391,52 @@
                         {
                           window.location.hash = $(this).find("a").first().attr("href");
                         });
+
+      this._initBackButtonHandling();
+
     };
+
+    /**
+     * Ensure back button navigates through tabs user (or app) has clicked through.
+     * @private
+     */
+
+    this._initBackButtonHandling = function()
+    {
+      // Add a hash of previous to the URL when a new tab is shown
+      $('a[data-toggle="tab"]').on('shown.bs.tab', function(e)
+                                            {
+                                              // Avoid duplication of history elements
+                                              $currentTarget = $(e.target);
+                                              $relatedTarget = $(e.relatedTarget);
+
+                                              if (($currentTarget.attr('href') != window.location.hash) &&
+                                                  ($currentTarget.attr('href') !== $relatedTarget.attr('href')) )
+                                              {
+                                                history.pushState(null, null, $currentTarget.attr('href'));
+                                              }
+
+                                            }
+      );
+
+      // Navigate to a tab when the history changes (back button is pressed)
+      window.addEventListener("popstate", function(e)
+                                          {
+                                            if (location.hash.length != 0)
+                                            {
+                                              $('[href="' + location.hash + '"]').tab('show');
+                                            }
+                                            else
+                                            {
+                                              $('.nav-tabs a:first').tab('show');
+                                            }
+                                          }
+      );
+
+      // Add hash to URL when search is completed & results tab loads
+
+
+    }
 
     /**
      * Remove empty or non-existent fields from the metadata.
