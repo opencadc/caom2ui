@@ -405,7 +405,7 @@
     {
       // Add a hash of previous to the URL when a new tab is shown
       $('a[data-toggle="tab"]').on('shown.bs.tab', function(e)
-                                            {=
+                                            {
                                               // Avoid duplication of history elements
                                               $currentTarget = $(e.target);
                                               $relatedTarget = $(e.relatedTarget);
