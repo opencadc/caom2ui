@@ -13,7 +13,7 @@ repositories {
     mavenLocal()
 }
 
-def libVersion = '2.1.8'
+def libVersion = '2.1.10'
 
 dependencies {
     compile 'log4j:log4j:1.2.+'
@@ -37,12 +37,12 @@ dependencies {
 ext {
     // Change this value to test other locations, such as Production or RC.
     intTest_default_web_app_url = 'http://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca'
-    intTest_default_web_app_endpoint = '/AdvancedSearch/'
+    intTest_default_web_app_endpoint = '/search/'
     intTest_user_name = 'CADCtest'
     intTest_user_password = 'sywymUL4'
 
     // Modify this to your liking!
-    docker_image_name = 'opencadc/archive-search:SNAPSHOT-' + libVersion
+    default_docker_image_name = 'opencadc/archive-search:' + libVersion
 }
 
 sourceCompatibility = 1.7
