@@ -35,4 +35,5 @@ after_success:
 - if [ "$(. ./can-deploy.sh)" != "DEPLOY" ]; then echo "Not deploying."; fi
 notifications:
   slack:
+    attachments: "*.png"
     secure: cZECco78mN3ZdEmLRSjH26KShRQV0awRRFp77HzFCttlcNPCPDn0o4vI0nW7Jqi5qBvPTYmaYLjcJah9+nvaJQnKnYZTNy0b4q9dch8h5456kiN4Tsi98yxxp5IMGgXoxHEBGiYvBnnqiL3RmoCH6Z2FifekO/36HyyMFSn5cwF/2lvyJp7lxq+sRQHcp4BjcPrR19nd54AIvoEtxfnjsIo6WIuQkBXuUaHOD+0qpR8nbT2cR5bP/h+Fq9tJH+/2HuLiGNzOH6rkMBCyqD57OTTffvgsfiw+TUcqhCKwDa3MbZG4SZfM8m6J8tjusC1YtuxHkSS+dcgxBLWwFx//y9gFHGuFExzW5AZTYlWf91kSD6TqtElN8FFvhIYGJ3j1XKDL3TgYbliTU/3cCVIeiCbZA/Hh/t5o6L/XZmQOiMbSCJGGHiyyg/nmltdLaxzOnHZr0sR4UeywQCMXQrK3U3X1qA3DeXTOzi6WoDHlKkqek8MsThLsCgGw39+tfVPYW0Jns+rnMtLeZSQ8maeJGrGAxi8b8UXHULIiuPljOZIYhyC4K32pqe60R0LnMuwURXGv3eozcrq9bixKd7IbqPSQc3+mrcTeVMuDiJ/P57KcbWRozES99Y7vhXkfVZ9cTjZXo4aexkvLEdVYUBulwOXXINRTKICzM1EPS9i3+Lk=
