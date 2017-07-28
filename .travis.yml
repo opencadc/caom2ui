@@ -1,6 +1,6 @@
 env:
   DOCKER_COMPOSE_VERSION: 1.14.0
-  CAOM2_SEARCH_SERVER_VERSION: 2.1.8
+  CAOM2_SEARCH_SERVER_VERSION: 2.1.10
 language: java
 jdk:
 - oraclejdk8
@@ -22,7 +22,7 @@ script:
 - cd caom2-meta-ui && gradle clean dockerize
 - cd ../caom2-search-server && gradle clean install
 - cd examples/default
-- gradle clean dockerize
+- gradle -i -Pdocker_image_name=opencadc/archive-search:SNAPSHOT clean dockerize
 - cd ../_int_test_
 - docker-compose up -d
 - docker ps -a
@@ -31,7 +31,7 @@ script:
   -PintTest_web_app_endpoint=/search/ intTestFirefox
 after_success:
 - if [ "$(. ./can-deploy.sh)" = "DEPLOY" ]; then docker login -u="$DOCKER_USERNAME"
-  -p="$DOCKER_PASSWORD"; docker tag opencadc/archive-search:SNAPSHOT-$CAOM2_SEARCH_SERVER_VERSION opencadc/archive-search:$CAOM2_SEARCH_SERVER_VERSION; docker push opencadc/archive-search-$CAOM2_SEARCH_SERVER_VERSION; fi
+  -p="$DOCKER_PASSWORD"; docker tag opencadc/archive-search:SNAPSHOT opencadc/archive-search:$CAOM2_SEARCH_SERVER_VERSION; docker push opencadc/archive-search-$CAOM2_SEARCH_SERVER_VERSION; fi
 - if [ "$(. ./can-deploy.sh)" != "DEPLOY" ]; then echo "Not deploying."; fi
 notifications:
   slack:
