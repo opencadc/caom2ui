@@ -1058,7 +1058,7 @@
                                                       $.ajax({
                                                                url: this.configuration.options.targetResolverEndpoint + "/" + id,
                                                                data: {
-                                                                 term: encodeURIComponent(value),
+                                                                 term: value,
                                                                  resolver: resolver.toLowerCase()
                                                                },
                                                                method: "GET",
@@ -1081,9 +1081,8 @@
                                                                     "id": id
                                                                   };
 
-                                                                  // no, check resolve status
-                                                                  if (!data.hasOwnProperty("error") ||
-                                                                      (data.error === ""))
+                                                                  // no, check resolve status return value
+                                                                  if ((data.resolveStatus === "GOOD"))
                                                                   {
                                                                     this._trigger(ca.nrc.cadc.search.events.onTargetNameResolved, arg);
                                                                   }

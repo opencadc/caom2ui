@@ -391,7 +391,49 @@
                         {
                           window.location.hash = $(this).find("a").first().attr("href");
                         });
+
+      this._initBackButtonHandling();
+
     };
+
+    /**
+     * Ensure back button navigates through tabs user (or app) has clicked through.
+     * @private
+     */
+
+    this._initBackButtonHandling = function()
+    {
+      // Add a hash of previous to the URL when a new tab is shown
+      $('a[data-toggle="tab"]').on('shown.bs.tab', function(e)
+                                            {
+                                              // Avoid duplication of history elements
+                                              $currentTarget = $(e.target);
+                                              $relatedTarget = $(e.relatedTarget);
+
+                                              if (($currentTarget.attr("href") !== window.location.hash) &&
+                                                  ($currentTarget.attr("href") !== $relatedTarget.attr("href")) )
+                                              {
+                                                history.pushState(null, null, $currentTarget.attr("href"));
+                                              }
+
+                                            }
+      );
+
+      // Navigate to a tab when the history changes (back button is pressed)
+      window.addEventListener("popstate", function(e)
+                                          {
+                                            if (location.hash.length != 0)
+                                            {
+                                              $('[href="' + location.hash + '"]').tab("show");
+                                            }
+                                            else
+                                            {
+                                              $(".nav-tabs a:first").tab("show");
+
+                                            }
+                                          }
+      );
+    }
 
     /**
      * Remove empty or non-existent fields from the metadata.
@@ -1737,10 +1779,6 @@
                             resultsVOTV.render();
 
                             this._postQuerySubmission({upload_url: json.upload_url});
-
-                            var message = buildPanelMessage(startDate, netEnd, loadStart, loadEnd);
-
-                            $("#results-grid-footer").find(".grid-footer-label").text(message);
 
                             // Necessary at the end!
                             resultsVOTV.refreshGrid();
