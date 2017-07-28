@@ -286,7 +286,9 @@
                                                     });
 
                                 searchApp.init();
+
                               });
+
           </script>
 
   <!-- Close off the wb-body -->
