@@ -419,8 +419,13 @@
                                             }
       );
 
-      // Navigate to a tab when the history changes (back button is pressed)
-      //window.addEventListener("popstate", function(e)
+      //// Navigate to a tab when the history changes (back button is pressed)
+      // TODO: leaving this in because the back button doesn't work to navigate through the tabs
+      // without something like this, but when 'Preview' is clicked, something about loading the
+      // new tab clears the location.hash.length, so coming into this piece of code means the tab
+      // switches to the first tab. :(
+      //var thisWindow = window;
+      //thisWindow.addEventListener("popstate", function(e)
       //                                    {
       //                                      if (location.hash.length != 0)
       //                                      {
@@ -433,6 +438,7 @@
       //                                      }
       //                                    }
       //);
+
     }
 
     /**
