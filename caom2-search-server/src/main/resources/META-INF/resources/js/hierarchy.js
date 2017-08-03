@@ -613,6 +613,12 @@
         {
           if (select.options[i].selected)
           {
+            // Make sure that 'All' is not selected when any other value
+            // is applied in a multi-select filter
+            //if (select.options[i].value === "")
+            //{
+            //  continue;
+            //}
             var option = select.options[i].value;
             selected[selected.length] = option;
 
@@ -982,12 +988,6 @@
       var name = title + "  (" + options.length + ")";
       var highlight = false;
       var isHighlighted = false;
-
-      if (this._arrayContains(selected, ""))
-      {
-        highlight = true;
-        isHighlighted = true;
-      }
 
       var selectName = $select.attr("name");
       var $allOption = this._createOption(name, "", false);
