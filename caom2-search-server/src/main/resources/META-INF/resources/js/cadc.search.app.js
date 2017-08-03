@@ -420,19 +420,19 @@
       );
 
       // Navigate to a tab when the history changes (back button is pressed)
-      window.addEventListener("popstate", function(e)
-                                          {
-                                            if (location.hash.length != 0)
-                                            {
-                                              $('[href="' + location.hash + '"]').tab("show");
-                                            }
-                                            else
-                                            {
-                                              $(".nav-tabs a:first").tab("show");
-
-                                            }
-                                          }
-      );
+      //window.addEventListener("popstate", function(e)
+      //                                    {
+      //                                      if (location.hash.length != 0)
+      //                                      {
+      //                                        $('[href="' + location.hash + '"]').tab("show");
+      //                                      }
+      //                                      else
+      //                                      {
+      //                                        $(".nav-tabs a:first").tab("show");
+      //
+      //                                      }
+      //                                    }
+      //);
     }
 
     /**
