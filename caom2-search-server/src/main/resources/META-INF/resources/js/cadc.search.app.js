@@ -410,10 +410,10 @@
                                               $currentTarget = $(e.target);
                                               $relatedTarget = $(e.relatedTarget);
 
-                                              if (($currentTarget.attr('href') != window.location.hash) &&
-                                                  ($currentTarget.attr('href') !== $relatedTarget.attr('href')) )
+                                              if (($currentTarget.attr("href") !== window.location.hash) &&
+                                                  ($currentTarget.attr("href") !== $relatedTarget.attr("href")) )
                                               {
-                                                history.pushState(null, null, $currentTarget.attr('href'));
+                                                history.pushState(null, null, $currentTarget.attr("href"));
                                               }
 
                                             }
@@ -424,18 +424,15 @@
                                           {
                                             if (location.hash.length != 0)
                                             {
-                                              $('[href="' + location.hash + '"]').tab('show');
+                                              $('[href="' + location.hash + '"]').tab("show");
                                             }
                                             else
                                             {
-                                              $('.nav-tabs a:first').tab('show');
+                                              $(".nav-tabs a:first").tab("show");
+
                                             }
                                           }
       );
-
-      // Add hash to URL when search is completed & results tab loads
-
-
     }
 
     /**

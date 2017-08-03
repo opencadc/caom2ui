@@ -106,6 +106,7 @@ abstract class AbstractSearchFormPage extends AbstractTestWebPage
     void enterInputValue(final WebElement inputElement, final String value) throws Exception
     {
         final String inputID = inputElement.getAttribute("id");
+        final String detailElementID = inputID + "_details";
 
         summonTooltip(inputID);
         showInputField(inputID);
@@ -157,17 +158,17 @@ abstract class AbstractSearchFormPage extends AbstractTestWebPage
 
         final By contents = By.xpath(String.format(CONTENT_LOCATOR_XPATH, (inputID + "_details")));
 
-        if ("".equals(expectedMessage))
+        if (expectedMessage != "")
         {
-            WebElement contentEl = find(contents);
-            if (!contentEl.getText().equals(""))
-            {
-                throw new Exception();
-            }
+            waitForTextPresent(contents, expectedMessage);
         }
         else
         {
-            waitForTextPresent(contents, expectedMessage);
+            WebElement contentEl = find(contents);
+            if (contentEl.getText().equals("") == false)
+            {
+                throw new Exception();
+            }
         }
     }
 
@@ -191,15 +192,12 @@ abstract class AbstractSearchFormPage extends AbstractTestWebPage
 
     void summonTooltip(final String baseID) throws Exception
     {
-        final By tooltipIconTriggerBy = By.xpath("//*[@id='" + baseID
+
+        final By tooltipIconTriggerBy = By.xpath("//div[@id='" + baseID
                                                  + "_formgroup']/div[contains(@class, 'advancedsearch-tooltip')]");
-        final By tooltipModal = By.xpath("//*[@id=\"" + baseID + "_formgroup\"]/div[2]");
 
         waitForElementPresent(tooltipIconTriggerBy);
         click(tooltipIconTriggerBy);
-        waitForElementPresent(tooltipModal);
-        waitForElementVisible(tooltipModal);
-        waitForElementClickable(By.id(baseID + "_close"));
     }
 
     void closeTooltip(final String baseID) throws Exception

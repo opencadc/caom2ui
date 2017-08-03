@@ -20,8 +20,19 @@ task copyWAR(type: Copy, dependsOn: war) {
     include '*.war'
 }
 
+def getDockerImageName() {
+    if (project.hasProperty('docker_image_name'))
+    {
+        return project.docker_image_name
+    }
+    else
+    {
+        return project.default_docker_image_name
+    }
+}
+
 task dockerize(type: Exec, dependsOn: [initDockerize, copyWAR]) {
-    commandLine 'docker', 'build', '-t', project.docker_image_name, '-f', './docker/Dockerfile', './docker/'
+    commandLine 'docker', 'build', '-t', getDockerImageName(), '-f', './docker/Dockerfile', './docker/'
 }
 
 sourceSets {
