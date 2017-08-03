@@ -613,12 +613,6 @@
         {
           if (select.options[i].selected)
           {
-            // Make sure that 'All' is not selected when any other value
-            // is applied in a multi-select filter
-            //if (select.options[i].value === "")
-            //{
-            //  continue;
-            //}
             var option = select.options[i].value;
             selected[selected.length] = option;
 
