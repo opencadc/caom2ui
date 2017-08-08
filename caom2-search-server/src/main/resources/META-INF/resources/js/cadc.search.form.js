@@ -1771,11 +1771,7 @@
                                     $(this).val("");
                                   });
 
-      // This needs to be specific to the form
-      var firstSelect = $("#" + this.id + " .hierarchy select:eq(0)");
-
       $("input[name$='.DOWNLOADCUTOUT']").prop("checked", false);
-
 
         this.$form.find("input.search_criteria_input").each(
             function (key, value)
@@ -1788,6 +1784,9 @@
 
 
       this.clearErrors();
+
+      // This needs to be specific to the form
+      var firstSelect = $("#" + this.id + " .hierarchy select:eq(0)");
 
       // Convert to DOM Element object.
       var jsFirstSelect = document.getElementById(firstSelect.prop("id"));
