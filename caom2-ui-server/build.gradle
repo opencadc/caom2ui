@@ -31,8 +31,6 @@ dependencies {
     compile 'org.apache.httpcomponents:httpclient:4.+'
     compile 'org.apache.commons:commons-configuration2:2.+'
 
-//    providedCompile 'javax.servlet:javax.servlet-api:3.1.+'
-//    providedCompile 'javax.servlet:javax.servlet-api:3.0.+'
     runtime 'jstl:jstl:1.+'
 
     testCompile 'junit:junit:4.+'
@@ -40,22 +38,7 @@ dependencies {
     testCompile 'org.easymock:easymock:3.+'
 }
 
-//ext {
-//    // Change this value to test other locations, such as Production or RC.
-//    intTest_default_web_app_url = 'http://localhost:8080/'
-//    intTest_default_web_app_endpoint = '/caom2ui/'
-//
-//    // Modify this to your liking!
-//    docker_image_name = 'opencadc/caom2-meta-ui'
-//}
-
 sourceCompatibility = '1.7'
 
 group = 'org.opencadc'
 version = '1.1.1'
-
-//war {
-//    archiveName = 'caom2ui##' + project.version + '.war'
-//}
-//
-//apply from: '../_shared.gradle'
