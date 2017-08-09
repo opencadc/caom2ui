@@ -983,12 +983,6 @@
       var highlight = false;
       var isHighlighted = false;
 
-      if (this._arrayContains(selected, ""))
-      {
-        highlight = true;
-        isHighlighted = true;
-      }
-
       var selectName = $select.attr("name");
       var $allOption = this._createOption(name, "", false);
       $select.append($allOption);
