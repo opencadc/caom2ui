@@ -13,7 +13,7 @@ repositories {
     mavenLocal()
 }
 
-def libVersion = '2.1.10'
+def libVersion = '2.1.13'
 
 dependencies {
     compile 'log4j:log4j:1.2.+'
@@ -24,7 +24,7 @@ dependencies {
     providedCompile 'javax.servlet:javax.servlet-api:3.0.+'
 
     runtime 'commons-logging:commons-logging:1.+'
-    runtime 'org.postgresql:postgresql:42.1.1.jre7'
+    runtime 'org.postgresql:postgresql:42.1.4.jre7'
     runtime 'jstl:jstl:1.+'
 
     testCompile 'junit:junit:4.+'
