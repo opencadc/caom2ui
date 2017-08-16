@@ -146,6 +146,11 @@ div.align-middle.column-picker-icon
   background-color: #fff;
 }
 
+.one-click-download-link {
+  padding-left: 4px;
+  vertical-align: middle;
+}
+
 .slick-cell
 {
   /* Uncomment this cursor style to enable text selection inside a cell. */

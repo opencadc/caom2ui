@@ -19,7 +19,7 @@ services:
     networks:
       - 'selenium'
   archive-search.cadc.dao.nrc.ca:
-    image: opencadc/archive-search:SNAPSHOT-2.1.8
+    image: opencadc/archive-search:SNAPSHOT
     ports:
       - '8080:8080'
       - '5555:5555'
