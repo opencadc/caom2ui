@@ -9,7 +9,7 @@ request.setAttribute("chunk", c);
 <c:import url="chunk.jsp">
 --%>
 
-<%@ page import="ca.nrc.cadc.caom2.ui.SS" %>
+<%@ page import="ca.nrc.cadc.caom2.ui.server.SS" %>
 
 <jsp:useBean id="chunk" scope="request" type="ca.nrc.cadc.caom2.Chunk"/>
 <jsp:useBean id="indent" scope="request" type="java.lang.Integer"/>

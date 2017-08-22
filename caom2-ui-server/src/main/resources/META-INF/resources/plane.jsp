@@ -10,7 +10,7 @@ request.setAttribute("plane", p);
 
 --%>
 <%@ page import="ca.nrc.cadc.caom2.Artifact" %>
-<%@ page import="ca.nrc.cadc.caom2.ui.SS" %>
+<%@ page import="ca.nrc.cadc.caom2.ui.server.SS" %>
 
 <jsp:useBean id="plane" scope="request" type="ca.nrc.cadc.caom2.Plane"/>
 <jsp:useBean id="indent" scope="request" type="java.lang.Integer"/>

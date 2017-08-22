@@ -10,7 +10,7 @@ request.setAttribute("part", p);
 --%>
 
 <%@ page import="ca.nrc.cadc.caom2.Chunk" %>
-<%@ page import="ca.nrc.cadc.caom2.ui.SS" %>
+<%@ page import="ca.nrc.cadc.caom2.ui.server.SS" %>
 
 <jsp:useBean id="part" scope="request" type="ca.nrc.cadc.caom2.Part"/>
 <jsp:useBean id="indent" scope="request" type="java.lang.Integer"/>

@@ -66,7 +66,7 @@
  ************************************************************************
  */
 
-package ca.nrc.cadc.caom2.ui;
+package ca.nrc.cadc.caom2.ui.server;
 
 import ca.nrc.cadc.auth.*;
 import ca.nrc.cadc.net.NetUtil;

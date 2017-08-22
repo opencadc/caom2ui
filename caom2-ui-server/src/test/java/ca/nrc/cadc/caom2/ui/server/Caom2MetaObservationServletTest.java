@@ -31,7 +31,7 @@
  ****  C A N A D I A N   A S T R O N O M Y   D A T A   C E N T R E  *****
  ************************************************************************
  */
-package ca.nrc.cadc.caom2.ui;
+package ca.nrc.cadc.caom2.ui.server;
 
 import ca.nrc.cadc.auth.AuthMethod;
 import ca.nrc.cadc.caom2.Algorithm;
@@ -57,7 +57,7 @@ import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 
 
-public class ObservationViewServletTest
+public class Caom2MetaObservationServletTest
 {
     private final HttpServletRequest mockRequest =
             createMock(HttpServletRequest.class);
@@ -69,14 +69,15 @@ public class ObservationViewServletTest
             createMock(HttpServletResponse.class);
     private final ApplicationConfiguration mockConfiguration =
             createMock(ApplicationConfiguration.class);
+    static final String DEFAULT_CAOM2META_SERVICE_HOST_PORT = "http://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca";
 
 
     @Test
     public void doGetNullURI() throws Exception
     {
         final Subject currentUser = new Subject();
-        final ObservationViewServlet testSubject =
-                new ObservationViewServlet()
+        final Caom2MetaObservationServlet testSubject =
+                new Caom2MetaObservationServlet()
                 {
                     /**
                      * Testers or subclasses can override this as needed.
@@ -115,8 +116,8 @@ public class ObservationViewServletTest
     public void doGetNullObservation() throws Exception
     {
         final Subject currentUser = new Subject();
-        final ObservationViewServlet testSubject =
-                new ObservationViewServlet()
+        final Caom2MetaObservationServlet testSubject =
+                new Caom2MetaObservationServlet()
                 {
                     /**
                      * Testers or subclasses can override this as needed.
@@ -193,12 +194,13 @@ public class ObservationViewServletTest
         };
 
         final URI serviceURI = URI.create("ivo://myhost.com/caom2-service");
-        final ObservationViewServlet.ReadAction mockObservationReader =
-                createMock(ObservationViewServlet.ReadAction.class);
+        final Caom2MetaObservationServlet.ReadAction mockObservationReader =
+                createMock(Caom2MetaObservationServlet.ReadAction.class);
         final URL repoURL = new URL("http://mysite.com/caom2ops/meta");
         final HttpDownload mockDownloader = createMock(HttpDownload.class);
-        final ObservationViewServlet testSubject =
-                new ObservationViewServlet(mockRegistryClient,
+
+        final Caom2MetaObservationServlet testSubject =
+                new Caom2MetaObservationServlet(mockRegistryClient,
                                            mockConfiguration)
                 {
                     /**
@@ -221,7 +223,7 @@ public class ObservationViewServletTest
                      */
                     @Override
                     HttpDownload getDownloader(URL url,
-                                               ObservationViewServlet.ReadAction readAction)
+                                               Caom2MetaObservationServlet.ReadAction readAction)
                     {
                         return mockDownloader;
                     }
@@ -243,20 +245,19 @@ public class ObservationViewServletTest
 
         expect(mockObservationReader.getObs()).andReturn(result).once();
 
-        expect(mockConfiguration.lookupServiceURI(
-                ObservationViewServlet.CAOM2META_SERVICE_URI_PROPERTY_KEY,
-                ObservationViewServlet.DEFAULT_CAOM2META_SERVICE_URI))
-                .andReturn(serviceURI).once();
+//        expect(mockConfiguration.lookupServiceURI(
+//                Caom2MetaObservationServlet.CAOM2META_SERVICE_URI_PROPERTY_KEY,
+//                Caom2MetaObservationServlet.CAOM2META_RESOURCE_ID))
+//                .andReturn(serviceURI).once();
 
-        expect(mockConfiguration.lookup(
-                ObservationViewServlet.CAOM2META_SERVICE_HOST_PORT_PROPERTY_KEY))
-                .andReturn(ObservationViewServlet
-                                   .DEFAULT_CAOM2META_SERVICE_HOST_PORT).once();
+//        expect(mockConfiguration.lookup(
+//                Caom2MetaObservationServlet.CAOM2META_SERVICE_HOST_PORT_PROPERTY_KEY))
+//                .andReturn(DEFAULT_CAOM2META_SERVICE_HOST_PORT).once();
 
-        expect(mockRegistryClient.getServiceURL(serviceURI,
-                                                Standards.CAOM2_OBS_20,
-                                                AuthMethod.ANON))
-            .andReturn(repoURL).once();
+//        expect(mockRegistryClient.getServiceURL(serviceURI,
+//                                                Standards.CAOM2_OBS_20,
+//                                                AuthMethod.ANON))
+//            .andReturn(repoURL).once();
 
         mockDownloader.run();
         expectLastCall().once();
@@ -279,6 +280,7 @@ public class ObservationViewServletTest
 
         replay(mockRequest, mockErrorDispatcher, mockDisplayDispatcher,
                mockResponse, mockRegistryClient, mockDownloader,
+
                mockObservationReader, mockConfiguration);
 
         testSubject.doGet(mockRequest, mockResponse);

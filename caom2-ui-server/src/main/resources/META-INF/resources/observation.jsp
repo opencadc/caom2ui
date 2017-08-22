@@ -5,7 +5,7 @@ This JSP page renders an HTML table with the Observation metadata.
 --%>
 
 <%@ page import="ca.nrc.cadc.caom2.Plane" %>
-<%@ page import="ca.nrc.cadc.caom2.ui.SS" %>
+<%@ page import="ca.nrc.cadc.caom2.ui.server.SS" %>
 
 
 <jsp:useBean id="obs" scope="request" type="ca.nrc.cadc.caom2.Observation"/>

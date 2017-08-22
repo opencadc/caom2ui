@@ -10,7 +10,7 @@ request.setAttribute("artifact", a);
 --%>
 
 <%@ page import="ca.nrc.cadc.caom2.Part" %>
-<%@ page import="ca.nrc.cadc.caom2.ui.SS" %>
+<%@ page import="ca.nrc.cadc.caom2.ui.server.SS" %>
 
 <jsp:useBean id="artifact" scope="request" type="ca.nrc.cadc.caom2.Artifact"/>
 <jsp:useBean id="indent" scope="request" type="java.lang.Integer"/>

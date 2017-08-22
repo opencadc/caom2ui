@@ -1,14 +1,13 @@
 
-package ca.nrc.cadc.caom2.ui;
+package ca.nrc.cadc.caom2.ui.server;
 
+import java.io.IOException;
 import java.text.DateFormat;
-import java.util.Date;
-import java.util.Iterator;
+import java.util.*;
 
 import ca.nrc.cadc.caom2.*;
 import ca.nrc.cadc.caom2.wcs.*;
 import ca.nrc.cadc.date.DateUtil;
-import java.util.Collection;
 
 
 /**
@@ -654,4 +653,5 @@ public class SS
             sb.append("<br>range: null ");
         }
     }
+
 }
