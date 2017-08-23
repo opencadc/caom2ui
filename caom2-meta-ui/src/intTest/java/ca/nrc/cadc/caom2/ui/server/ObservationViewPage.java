@@ -86,14 +86,6 @@ public class ObservationViewPage extends AbstractTestWebPage
     private static final int DEFAULT_TIMEOUT_IN_SECONDS = 20;
     private static Logger log = Logger.getLogger(ObservationViewPage.class);
 
-//    static final By DATA_TRAIN_LOCATOR = By.("caom2@Hierarchy");
-//
-//
-//
-//    @FindBy(id = "caom2@Hierarchy")
-//    WebElement dataTrain;
-
-
     /**
      * Constructors need to be public for reflection to find them.
      *

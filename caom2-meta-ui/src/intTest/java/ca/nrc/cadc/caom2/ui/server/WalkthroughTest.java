@@ -52,6 +52,7 @@ public class WalkthroughTest extends AbstractAdvancedSearchIntegrationTest
     @Test
     public void observationViewTest() throws Exception
     {
+        // TODO: need an observation that exists in dev, production and (beta?)
         ObservationViewPage observationViewPage = goTo(endpoint + "view/JCMT/scuba2_00049_20160410T133916", null, ObservationViewPage.class);
         verifyTrue(observationViewPage.isObsLoaded());
     }
