@@ -100,8 +100,8 @@ public class CaomRepoClient
 {
     private static final Logger log = Logger.getLogger(CaomRepoClient.class);
     public static final URI CAOM_REPO_RESOURCE_ID = URI.create("ivo://cadc.nrc.ca/caom2repo");
-    private static String CANT_GET_COLLECTIONS_LIST = "Unable to get collections list.";
-
+    private static String CANT_GET_COLLECTIONS_LIST = "Unable to get collection list.";
+    private static String CANT_GET_OBSERVATION_LIST = "Unable to get observation list.";
 
     private String getServiceUrlString()
             throws IOException
@@ -168,7 +168,7 @@ public class CaomRepoClient
             }
             else
             {
-                throw new IOException(CANT_GET_COLLECTIONS_LIST + " Response code:" + response);
+                throw new RuntimeException(CANT_GET_COLLECTIONS_LIST + " Response code:" + response);
             }
         }
         catch(IOException ex)
@@ -221,7 +221,7 @@ public class CaomRepoClient
             }
             else
             {
-                throw new IOException(CANT_GET_COLLECTIONS_LIST + " Response code:" + response);
+                throw new RuntimeException(CANT_GET_OBSERVATION_LIST + " Response code:" + response);
             }
 
             return obsUriList;
@@ -229,7 +229,7 @@ public class CaomRepoClient
         catch(IOException ex)
         {
             log.error("failed to get observation: ", ex);
-            throw new RuntimeException("CONFIG ERROR: failed to read CaomRepoConfig.properties", ex);
+            throw new RuntimeException("Failed to get observations list.", ex);
         }
         catch(ParseException pe)
         {

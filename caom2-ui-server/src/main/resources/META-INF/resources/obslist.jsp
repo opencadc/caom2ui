@@ -16,7 +16,7 @@
 <html>
 <head>
     <title>CAOM Observation</title>
-    <link rel="stylesheet" type="text/css" href="css/cadc.css"/>
+    <link rel="stylesheet" type="text/css" href="cadc.css"/>
 </head>
 
 <body>
@@ -47,7 +47,7 @@ for (ObsLink u : uris)
         <td><%= i++ %></td>
         <td><%= u.uri.getCollection() %></td>
         <td>
-            <a href="<%= u.uri.getCollection() %>/<%= u.uri.getObservationID() %>">
+            <a class="observationLink" href="<%= u.uri.getCollection() %>/<%= u.uri.getObservationID() %>">
             <%= u.uri.getObservationID() %>
             </a>
         </td>

@@ -8,7 +8,7 @@
 <html>
 <head>
     <title>CAOM Observation</title>
-    <link rel="stylesheet" type="text/css" href="css/cadc.css"/>
+    <link rel="stylesheet" type="text/css" href="cadc.css"/>
 </head>
 
 <body>
@@ -27,7 +27,7 @@ Note: You must be logged in to view observation metadata through this interface.
     {
 %>
     <p>
-        <b>list all observations:</b> <a href="list/<%= collection %>"><%= collection %></a>
+        <b>list all observations:</b> <a class="collectionLink" href="list/<%= collection %>"><%= collection %></a>
     </p>
 <%
     }
