@@ -87,7 +87,7 @@ public class DefaultSyncTAPClient implements SyncTAPClient
     private URL lookupServiceURL(final URI serviceURI) throws IOException, URISyntaxException
     {
         final URL serviceURL = registryClient.getServiceURL(serviceURI, Standards.TAP_SYNC_11, AuthMethod.ANON);
-        final String tapServiceHost = applicationConfiguration.lookup(TAP_SERVICE_HOST_PORT_PROPERTY_KEY);
+        final String tapServiceHost = applicationConfiguration.lookup(TAP_SERVICE_HOST_PORT_PROPERTY_KEY, "");
 
         final URIBuilder builder = new URIBuilder(serviceURL.toURI());
 

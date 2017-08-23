@@ -368,6 +368,7 @@
                   "caom2:Observation.uri",
                   "caom2:Observation.collection",
                   "caom2:Observation.observationID",
+                  "caom2:Plane.productID",
                   "caom2:Plane.position.bounds.cval1",
                   "caom2:Plane.position.bounds.cval2",
                   "caom2:Plane.time.bounds.lower",
@@ -381,7 +382,6 @@
                   "caom2:Plane.energy.bounds.upper",
                   "caom2:Observation.proposal.id",
                   "caom2:Observation.proposal.pi",
-                  "caom2:Plane.productID",
                   "caom2:Plane.dataRelease",
                   "caom2:Plane.position.bounds.area",
                   "caom2:Plane.position.bounds",
@@ -424,7 +424,7 @@
                 "unitTypes": {
                   "caom2:Plane.energy.restwav": "m"
 	              },
-                "size": 12
+                "size": 13
               },
               "ObsCore": {
                 "columns": [

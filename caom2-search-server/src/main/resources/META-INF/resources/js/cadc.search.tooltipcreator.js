@@ -29,12 +29,10 @@
      */
     function getContent(tipHTML, tooltipHeaderText, tipClass, tipHeader)
     {
-      var $divElement =
-          $("<div class='module-tool module-simplify module-tool-tooltip'></div>");
+      var $divElement = $("<div class='module-tool module-simplify module-tool-tooltip'></div>");
       var $tooltipHeader = $("<div class='tooltip_header'></div>");
-      var $tooltipHeaderH6Element = $("<h6></h6>").appendTo($tooltipHeader);
-      var $tooltipTextElement =
-          $("<p>").appendTo("<div class='tooltip_text'></div>");
+      $("<h6></h6>").appendTo($tooltipHeader);
+      var $tooltipTextElement = $("<p>").appendTo("<div class='tooltip_text'></div>");
 
       if (tipClass)
       {
@@ -42,32 +40,38 @@
       }
 
       $tooltipTextElement.html(tipHTML);
-      $tooltipHeaderH6Element.text(tooltipHeaderText);
-      $divElement.append($tooltipHeaderH6Element.parent());
       $divElement.append($tooltipTextElement.parent());
 
-      var $clone;
-
-      if (tipHeader)
-      {
-        $("<span class='wb-icon-x-alt2 float-right tooltip-close'></span>").
-            prependTo($tooltipHeader);
-
-        $clone = $divElement.clone();
-
-        $clone.find(".wb-icon-x-alt2").on("click", function (e)
-        {
-          tipHeader.tooltipster("hide");
-          e.preventDefault();
-        });
-      }
-      else
-      {
-        $clone = $divElement.clone(true, true);
-      }
-
-      return $clone;
+      return $divElement.clone();
     }
+
+
+    /**
+     * Obtain the tooltip header, with markup, for the given markup text and the
+     * given header.  This will return a jQuery object representing the content.
+     *
+     * @param tooltipHeaderText
+     * @returns {jQuery}
+     */
+    function getHeader(tooltipHeaderText, tooltipID)
+    {
+      var $divEl =
+          $("<div class=''></div>");
+
+      var $spanEl = $('<span class="text-info"></span>');
+      $spanEl.text(tooltipHeaderText);
+
+      var buttonID = tooltipID + "_close";
+      var $buttonEl = $('<div id="' + buttonID
+                        + '" class="glyphicon glyphicon-remove-circle popover-blue popover-right"></div>');
+
+      $divEl.append($spanEl);
+      $divEl.append($buttonEl);
+
+      return $divEl.clone(true, true);
+    }
+
+
 
     /**
      * Obtain the text with markup for the tooltip body, from the NameResolver
@@ -95,16 +99,20 @@
         // make a string into a set of key-value pairs
         var resolverObject = {};
         var x = resolverResult.split('\n');
-        for (var field in x)
+        for (var f in x)
         {
-          var a = x[field].split(':')[0];
-          var b = x[field].split(':')[1];
-          resolverObject[a] = b.trim();
+          if (x.hasOwnProperty(f))
+          {
+            var xField = x[f];
+            var a = xField.split(':')[0];
+            var b = xField.split(':')[1];
+            resolverObject[a] = b.trim();
+          }
         }
 
         for (var field in resolverMap)
         {
-          if (resolverObject[field])
+          if (resolverObject.hasOwnProperty(field))
           {
             $(resolverMap[field]).text(resolverObject[field]);
           }
@@ -123,7 +131,8 @@
     $.extend(this,
              {
                "extractResolverValue": extractResolverValue,
-               "getContent": getContent
+               "getContent": getContent,
+               "getHeader": getHeader
              });
 
   }

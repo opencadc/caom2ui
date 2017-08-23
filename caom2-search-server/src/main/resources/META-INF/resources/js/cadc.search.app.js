@@ -10,6 +10,7 @@
               "pageLanguage": "en",
               "autoInitFlag": true,
               "tapSyncEndpoint": "/search/tap/sync",
+              "targetResolverEndpoint": "/search/unitconversion",
               "tapProxyFlag": false,
               "packageEndpoint": "/search/package",
               "autocompleteEndpoint": "/search/unitconversion",
@@ -46,6 +47,7 @@
     }
   });
 
+
   /**
    * The main AdvancedSearch application.
    *
@@ -58,6 +60,7 @@
    * @param {String} [_options.previewsEndpoint="/search/preview"]   Relative URI endpoint to the Preview service.
    * @param {String} [_options.validatorEndpoint="/search/validate"]   Relative URI endpoint to the Validator service.
    * @param {String} [_options.autocompleteEndpoint="/search/unitconversion"]   Relative URI endpoint to the unit
+   * @param {String} [_options.targetResolverEndpoint="/search/unitconversion"]   Target resolver endpoint service
    *     conversion service.
    * @constructor
    */
@@ -151,16 +154,16 @@
      * return {ca.nrc.cadc.search.SearchForm|SearchForm}    Form instance.
      * @private
      */
-    this._getActiveForm = function ()
-    {
-      if (!activeFormID)
-      {
-        activeFormID = (this._getActiveTabID().toLowerCase().indexOf("obscore") > 0)
-            ? this.getObsCoreSearchForm().getID() : this.getCAOMSearchForm().getID();
-      }
-
-      return (!activeFormID || this.getCAOMSearchForm().isActive(activeFormID))
-          ? this.getCAOMSearchForm() : this.getObsCoreSearchForm();
+    this._getActiveForm = function () {
+      // could be a tab other than a form tab...
+        if (this._getActiveTabID().toLowerCase().indexOf("obscore") > 0) {
+          activeFormID = this.getObsCoreSearchForm().getID();
+        } else if (this._getActiveTabID().toLowerCase().indexOf("queryform") > 0) {
+          activeFormID = this.getCAOMSearchForm().getID();
+        }
+        
+        return this.getCAOMSearchForm().isActive(activeFormID)
+            ? this.getCAOMSearchForm() : this.getObsCoreSearchForm();
     };
 
     /**
@@ -388,7 +391,55 @@
                         {
                           window.location.hash = $(this).find("a").first().attr("href");
                         });
+
+      this._initBackButtonHandling();
+
     };
+
+    /**
+     * Ensure back button navigates through tabs user (or app) has clicked through.
+     * @private
+     */
+
+    this._initBackButtonHandling = function()
+    {
+      // Add a hash of previous to the URL when a new tab is shown
+      $('a[data-toggle="tab"]').on('shown.bs.tab', function(e)
+                                            {
+                                              // Avoid duplication of history elements
+                                              $currentTarget = $(e.target);
+                                              $relatedTarget = $(e.relatedTarget);
+
+                                              if (($currentTarget.attr("href") !== window.location.hash) &&
+                                                  ($currentTarget.attr("href") !== $relatedTarget.attr("href")) )
+                                              {
+                                                history.pushState(null, null, $currentTarget.attr("href"));
+                                              }
+
+                                            }
+      );
+
+      //// Navigate to a tab when the history changes (back button is pressed)
+      // TODO: leaving this in because the back button doesn't work to navigate through the tabs
+      // without something like this, but when 'Preview' is clicked, something about loading the
+      // new tab clears the location.hash.length, so coming into this piece of code means the tab
+      // switches to the first tab. :(
+      //var thisWindow = window;
+      //thisWindow.addEventListener("popstate", function(e)
+      //                                    {
+      //                                      if (location.hash.length != 0)
+      //                                      {
+      //                                        $('[href="' + location.hash + '"]').tab("show");
+      //                                      }
+      //                                      else
+      //                                      {
+      //                                        $(".nav-tabs a:first").tab("show");
+      //
+      //                                      }
+      //                                    }
+      //);
+
+    }
 
     /**
      * Remove empty or non-existent fields from the metadata.
@@ -676,7 +727,7 @@
       var onFormCancel = function ()
       {
         console.warn("Cancelling search.");
-        queryOverlay.popup("close");
+        queryOverlay.modal("hide");
       };
 
       caomSearchForm.subscribe(ca.nrc.cadc.search.events.onCancel, onFormCancel);
@@ -688,9 +739,8 @@
         {
           this._processResults(args.data, args.startDate, function ()
           {
-            // Perform a results tab link click here to simulate moving to the
-            // results tab.
-            $('#resultTableTab-link').click();
+            queryOverlay.modal("hide");
+            $("#resultTableTabLink").tab('show');
           });
         }
         else
@@ -778,14 +828,14 @@
               enableAsyncPostRender: true,
               fullWidthRows: false,
               pager: false,
-              headerRowHeight: 50,
+              headerRowHeight: 54,
               multiSelect: true,
               propagateEvents: true,
               leaveSpaceForNewRows: false,
               // ID of the sort column (Start Date).
               sortColumn: activeForm.getConfiguration().getDefaultSortColumnID(),
               sortDir: "desc",
-              topPanelHeight: 5,
+              topPanelHeight: 25,
               enableTextSelectionOnCells: true,
               gridResizable: false,
               rerenderOnResize: false,
@@ -821,7 +871,7 @@
                     showAllButtonText: $('#COLUMN_MANAGER_SHOW_ALL_BUTTON_TEXT').text(),
                     resetButtonText: $('#COLUMN_MANAGER_DEFAULT_COLUMNS_BUTTON_TEXT').text(),
                     orderAlphaButtonText: $('#COLUMN_MANAGER_ORDER_ALPHABETICALLY_BUTTON_TEXT').text(),
-                    dialogTriggerID: "slick-columnpicker-panel-change-column",
+                    dialogTriggerID: "change_column_button",
                     targetSelector: $('#column_manager_container').find('.column_manager_columns').first(),
                     position: {my: "right", at: "right bottom"},
                     closeDialogSelector: ".dialog-close",
@@ -985,7 +1035,10 @@
                                            resultsVOTV.getResizedColumns(),
                                            resultsVOTV.getColumnFilters(),
                                            resultsVOTV.getUpdatedColumnSelects());
-                                       alert(serializer.getResultStateUrl());
+
+                                       $("#bookmark_link").find('#bookmark_url_display').text(serializer.getResultStateUrl());
+                                       $("#bookmark_link").modal("show");
+
                                      }.bind(this));
 
         resultsVOTV.setDisplayColumns([]);
@@ -994,8 +1047,7 @@
         this._setDefaultColumns(resultsVOTV);
         this._setDefaultUnitTypes(resultsVOTV);
 
-        queryOverlay.find("#overlay_cancel").show();
-        queryOverlay.popup("open");
+        queryOverlay.modal("show");
       }.bind(this);
 
       caomSearchForm.subscribe(ca.nrc.cadc.search.events.onValid, onFormValid);
@@ -1018,6 +1070,7 @@
                                 {
                                   this._getActiveForm().cancel();
                                 }.bind(this));
+
 
       // End form setup.
     };
@@ -1155,9 +1208,6 @@
           if (doSubmit && (!stringUtil.hasText(currentURI.getQueryValue("noexec"))
                            || (currentURI.getQueryValue("noexec") === "false")))
           {
-            // Initialize popup.
-            $('#queryOverlay').popup();
-
             // Execute the form submission.
             activeSearchForm.submit();
           }
@@ -1431,7 +1481,7 @@
      */
     this._postQuerySubmission = function (jobParams)
     {
-      queryOverlay.popup("close");
+      queryOverlay.modal("hide");
 
       var selectAllCheckbox = $("input[name='selectAllCheckbox']");
       selectAllCheckbox.prop("title", "Mark/Unmark all");
@@ -1556,7 +1606,7 @@
                           // Necessary at the end!
                           errorVOTV.refreshGrid();
 
-                          queryOverlay.popup("close");
+                          queryOverlay.modal("hide");
                         },
                         function (jqXHR, status, message)
                         {
@@ -1570,7 +1620,7 @@
       catch (e)
       {
         console.error("Found error! > " + e);
-        queryOverlay.popup("close");
+        queryOverlay.modal("hide");
       }
     };
 
@@ -1735,10 +1785,6 @@
                             resultsVOTV.render();
 
                             this._postQuerySubmission({upload_url: json.upload_url});
-
-                            var message = buildPanelMessage(startDate, netEnd, loadStart, loadEnd);
-
-                            $("#results-grid-footer").find(".grid-footer-label").text(message);
 
                             // Necessary at the end!
                             resultsVOTV.refreshGrid();

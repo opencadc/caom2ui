@@ -10,535 +10,156 @@
   // Conservative default.
   final int defaultMaxRowLimit = 10000;
   final String contentLanguage = request.getHeader("Content-Language");
-  final String requestHeaderLang = (contentLanguage == null)
-                                   ? "en" : contentLanguage;
+  final String requestHeaderLang = (contentLanguage == null) ? "en" : contentLanguage;
 
-  final String downloadLink = "/downloadManager/download";
-
-  final int maxRowLimit =
-      configuration.lookupInt("org.opencadc.search.max-row-count",
-                              defaultMaxRowLimit);
-  final boolean showObsCoreTab =
-      configuration.lookupBoolean("org.opencadc.search.obs-core", true);
-  final String tapSyncEndpoint = configuration.lookup("org.opencadc.search.tap-service-endpoint", "/tap/sync");
+  final int maxRowLimit = configuration.lookupInt("org.opencadc.search.max-row-count", defaultMaxRowLimit);
+  final boolean showObsCoreTab = configuration.lookupBoolean("org.opencadc.search.obs-core", true);
+  final String tapSyncEndpoint = configuration.lookup("org.opencadc.search.tap-service-endpoint", "/search/tap/sync");
 %>
 
 <%-- Request scope variables so they can be seen in the imported JSPs --%>
 <fmt:setLocale value="<%= requestHeaderLang %>" scope="request"/>
-<fmt:setBundle basename="AdvancedSearchBundle" var="langBundle" scope="request"/>
+<fmt:setBundle basename="Caom2SearchBundle" var="langBundle" scope="request"/>
 
-<c:import url="_page_header.html"/>
+<c:import url='<%= "_page_header.jsp?lang=" + requestHeaderLang %>'/>
 
 <body>
 
-<!-- Always include wb-body at the top, even though it's not ended until the footer. -->
-<div id="wb-body">
+<div class="container-fluid">
 
-  <div id="wb-skip">
-    <ul id="wb-tphp">
-      <li id="wb-skip1"><a href="#wb-cont">Skip to main content</a></li>
+<%-- MainContentStart --%>
+  <h1><fmt:message key="TITLE" bundle="${langBundle}"/></h1>
 
-      <!-- The wb-nav element is in the page footer. -->
-      <li id="wb-skip2"><a href="#wb-nav">Skip to secondary menu</a></li>
-    </ul>
+  <ul id="tabList" class="nav nav-tabs" role="tablist">
+    <li role="presentation" class="active">
+      <a href="#queryFormTab"
+         id="queryFormTabLink"
+         aria-controls="queryFormTab"
+         role="tab"
+         data-toggle="tab"><fmt:message key="CAOM_QUERY_TAB_TITLE"
+                                           bundle="${langBundle}"/></a>
+    </li>
+    <% if (showObsCoreTab) { %>
+    <li role="presentation">
+      <a href="#obsCoreQueryFormTab"
+         id="obsCoreQueryFormTabLink"
+         aria-controls="obsCoreQueryFormTab"
+         role="tab"
+         data-toggle="tab"><fmt:message key="OBSCORE_QUERY_TAB_TITLE"
+                                                  bundle="${langBundle}"/></a>
+    </li>
+    <% } %>
+    <li role="presentation">
+      <a href="#resultTableTab"
+         id="resultTableTabLink"
+         aria-controls="resultTableTab"
+         role="tab"
+         data-toggle="tab"><fmt:message key="RESULTS_TAB_TITLE"
+                                             bundle="${langBundle}"/></a>
+    </li>
+    <li role="presentation">
+      <a href="#errorTableTab"
+         id="errorTableTabLink"
+         aria-controls="errorTableTab"
+         role="tab"
+         data-toggle="tab"><fmt:message key="ERROR_TAB_TITLE"
+                                            bundle="${langBundle}"/></a>
+    </li>
+    <li role="presentation">
+      <a href="#queryTab"
+         id="queryTabLink"
+         aria-controls="queryTab"
+         role="tab"
+         data-toggle="tab"><fmt:message key="ADQL_QUERY_TAB_TITLE"
+                                       bundle="${langBundle}"/></a>
+    </li>
+    <li role="presentation">
+      <a href="#helpTab"
+         id="helpTabLink"
+         aria-controls="helpTab"
+         role="tab"
+         data-toggle="tab"> <fmt:message key="HELP_TAB_TITLE"
+                                       bundle="${langBundle}"/></a>
+    </li>
+  </ul>
+
+
+    <%--todo: maxRowLimit needs to be fed in here properly--%>
+
+  <div class="tab-content">
+      <!-- CAOM2 Search Query Tab -->
+      <c:import url='<%= "caom2_search.jsp?maxRowLimit=" + maxRowLimit %>' />
+
+      <!-- ObsCore Query Tab -->
+      <c:import url='<%= "obscore_search.jsp?maxRowLimit=" + maxRowLimit %>' />
+
+      <!-- Result Tab -->
+      <c:import url='<%= "results.jsp?maxRowLimit=" + maxRowLimit %>' />
+
+  <!-- Error Tab -->
+  <div role="tabpanel" class="tab-pane" id="errorTableTab">
+    <div class="grid-container">
+      <div id="error-grid-header" class="grid-header">
+        <span class="grid-header-label"></span>
+      </div>
+      <div id="errorTable"></div>
+    </div>
+    <div id="errorTooltipColumnPickerHolder">
+      <div class="tooltip columnpicker">
+        <h3>Add/remove displayed columns</h3>
+        <span class="tooltipColumnPickerHelpText">
+          Drag &amp; drop columns above or below the red bar, move the red bar
+          itself or click on the checkboxes.
+        </span>
+        <br/>
+        <br/>
+
+        <h3>Reorder columns</h3>
+        <span class="tooltipColumnPickerHelpText">
+          Drag &amp; drop the columns or drag &amp; drop the column headers
+          directly in the results table.
+        </span>
+
+        <div class="tooltip_content"></div>
+      </div>
+    </div>
   </div>
 
-  <div id="wb-core" class="base">
-    <div id="wb-core-in">
-      <%--<c:import url="<%= maintenanceWarningURL %>" />--%>
-      <div id="wb-main" role="main">
-        <div id="wb-main-in">
-          <%-- MainContentStart --%>
+  <!-- Query Tab -->
+  <div id="queryTab" class="lang-sql tab-pane" role="tabpanel">
+    <div id="query_holder">
+      <h3 class="wb-invisible">ADQL Query</h3>
+      <pre class="prettyprint lang-sql"><code id="query" class="lang-sql"></code></pre>
+    </div>
+  </div>
 
-          <h1 id="wb-cont"><fmt:message key="TITLE" bundle="${langBundle}"/></h1>
+  <!-- Help Tab -->
+  <div role="tabpanel" class="tab-pane" id="helpTab" >
+    <c:import url="_help.jsp"/>
+  </div>
+  </div>
+  </div>
 
-          <div id="tabContainer"
-               class="wet-boew-tabbedinterface auto-height-none">
-            <ul id="tabList" class="tabs">
-              <li class="default tab">
-                <a href="#queryFormTab"><fmt:message key="CAOM_QUERY_TAB_TITLE"
-                                                     bundle="${langBundle}"/></a>
-              </li>
-              <% if (showObsCoreTab)
-              { %>
-              <li class="tab">
-                <a href="#obsCoreQueryFormTab"><fmt:message key="OBSCORE_QUERY_TAB_TITLE"
-                                                            bundle="${langBundle}"/></a>
-              </li>
-              <% } %>
-              <li class="tab">
-                <a href="#resultTableTab"><fmt:message key="RESULTS_TAB_TITLE"
-                                                       bundle="${langBundle}"/></a>
-              </li>
-              <li class="tab">
-                <a href="#errorTableTab"><fmt:message key="ERROR_TAB_TITLE"
-                                                      bundle="${langBundle}"/></a>
-              </li>
-              <li class="tab">
-                <a href="#queryTab"><fmt:message key="ADQL_QUERY_TAB_TITLE"
-                                                 bundle="${langBundle}"/></a>
-              </li>
-              <li class="tab">
-                <a href="#helpTab"> <fmt:message key="HELP_TAB_TITLE"
-                                                 bundle="${langBundle}"/></a>
-              </li>
-            </ul>
-            <div class="tabs-panel">
-              <!-- CAOM2 Query Tab -->
-              <div id="queryFormTab">
-                <form id="queryForm" name="queryForm" class="queryForm advanced_search_form"
-                      method="post" action="${pageContext.request.contextPath}/find"
-                      enctype="multipart/form-data">
 
-                  <!-- Used by VOView to sort the results. -->
-                  <input type="hidden" name="sort_column" value="Start Date"/>
-                  <input type="hidden" name="sort_order" value="descending"/>
-
-                  <!-- Used by AdvancedSearch to pass to TAP. -->
-                  <input type="hidden" name="formName" value="adsform"/>
-                  <input type="hidden" name="SelectList" class="CAOM2_selectlist"/>
-                  <input type="hidden" name="MaxRecords" value="<%= maxRowLimit %>"/>
-                  <input type="hidden" name="format" value="csv"/>
-
-                  <!-- Used by AdvancedSearch to pass to VOTV. -->
-                  <input type="hidden" id="max_row_limit_warning"
-                         value="<fmt:message key="MAX_ROW_LIMIT_WARNING" bundle="${langBundle}"/>"/>
-
-                  <div class="equalize margin-top-large margin-bottom-none">
-                    <div class="span-3 row-start form-inline">
-                      <input type="submit"
-                             value="<fmt:message key="SEARCH_BUTTON_LABEL" bundle="${langBundle}" />"
-                             data-rel="popup" data-dismissible="false"
-                             data-position-to="window" data-inline="true"
-                             data-transition="pop" data-corners="true" data-shadow="true"
-                             data-iconshadow="true" data-wrapperels="span" data-theme="c"
-                             aria-haspopup="true" aria-owns="queryOverlay"
-                             class="submit-query button button-accent ui-btn"/>
-                      <input type="reset" data-role="none"
-                             value="<fmt:message key="RESET_BUTTON_LABEL" bundle="${langBundle}" />"
-                             class="reset-query-form button ui-btn"/>
-                    </div>
-                    <div class="span-5 row-end"></div>
-                    <div class="clear"></div>
-                  </div>
-
-                  <div class="span-8 margin-top-none margin-bottom-none clarify-message">
-                    <fmt:message key="TOOLTIP_CLARIFICATION_MESSAGE_PREFIX" bundle="${langBundle}"/>&nbsp;<span
-                      class="wb-icon-question"></span><fmt:message key="TOOLTIP_CLARIFICATION_MESSAGE_SUFFIX"
-                                                                   bundle="${langBundle}"/>
-                  </div>
-
-                  <div class="equalize">
-                    <div class="span-2 row-start">
-                      <div class="module">
-                        <h2 class="background-accent"><fmt:message
-                            key="OBSERVATION_CONSTRAINT_LABEL" bundle="${langBundle}"/></h2>
-                        <ul class="list-bullet-none indent-small search-constraints">
-
-                          <c:import
-                              url="text.jsp?utype=Observation.observationID&tipSide=right"/>
-                          <c:import
-                              url="text.jsp?utype=Observation.proposal.pi&tipSide=right&enableAutocomplete=true"/>
-                          <c:import
-                              url="text.jsp?utype=Observation.proposal.id&tipSide=right&enableAutocomplete=true"/>
-                          <c:import
-                              url="text.jsp?utype=Observation.proposal.title&tipSide=right&enableAutocomplete=true"/>
-                          <c:import
-                              url="text.jsp?utype=Observation.proposal.keywords&tipSide=right"/>
-                          <c:import
-                              url="timestamp.jsp?utype=Plane.dataRelease&tipSide=right"/>
-                          <c:import
-                              url="_pulldown.jsp?utype=Observation.intent&tipSide=right"/>
-
-                        </ul>
-                      </div>
-                    </div>
-                    <div class="span-2">
-                      <div class="module">
-                        <h2 class="background-accent"><fmt:message
-                            key="SPATIAL_CONSTRAINT_LABEL" bundle="${langBundle}"/></h2>
-                        <ul class="list-bullet-none indent-small search-constraints">
-
-                          <c:import
-                              url="position.jsp?utype=Plane.position.bounds&tipSide=right"/>
-                          <c:import
-                              url="number.jsp?utype=Plane.position.sampleSize&tipSide=right"/>
-                          <c:import
-                              url="boolean.jsp?name=Plane.position.DOWNLOADCUTOUT&tipSide=right"/>
-
-                        </ul>
-                      </div>
-                    </div>
-                    <div class="span-2">
-                      <div class="module">
-                        <h2 class="background-accent"><fmt:message key="TIME_CONSTRAINT_LABEL"
-                                                                   bundle="${langBundle}"/></h2>
-                        <ul class="list-bullet-none indent-small search-constraints">
-
-                          <c:import
-                              url="date.jsp?utype=Plane.time.bounds&tipSide=left"/>
-                          <c:import
-                              url="number.jsp?utype=Plane.time.exposure&tipSide=left"/>
-                          <c:import
-                              url="number.jsp?utype=Plane.time.bounds.width&tipSide=left"/>
-
-                        </ul>
-                      </div>
-                    </div>
-                    <div class="span-2 row-end">
-                      <div class="module">
-                        <h2 class="background-accent"><fmt:message
-                            key="SPECTRAL_CONSTRAINT_LABEL" bundle="${langBundle}"/></h2>
-                        <ul class="list-bullet-none indent-small search-constraints">
-
-                          <c:import
-                              url="energy.jsp?utype=Plane.energy.bounds&tipSide=left"/>
-                          <c:import
-                              url="number.jsp?utype=Plane.energy.sampleSize&tipSide=left"/>
-                          <c:import
-                              url="number.jsp?utype=Plane.energy.resolvingPower&tipSide=left"/>
-                          <c:import
-                              url="number.jsp?utype=Plane.energy.bounds.width&tipSide=left"/>
-                          <c:import
-                              url="number.jsp?utype=Plane.energy.restwav&tipSide=left"/>
-                          <c:import
-                              url="boolean.jsp?name=Plane.energy.DOWNLOADCUTOUT&tipSide=left"/>
-
-                        </ul>
-                      </div>
-                    </div>
-                    <div class="clear"></div>
-                  </div>
-
-                  <div class="resolver-result-tooltip">
-                    <strong><fmt:message key="RES_TARGET" bundle="${langBundle}"/></strong><br>
-                    <p class="resolver-result-target"></p>
-                    <strong><fmt:message key="RES_SERVICE" bundle="${langBundle}"/></strong><br>
-                    <p class="resolver-result-service"></p>
-                    <strong><fmt:message key="RES_COORDINATES" bundle="${langBundle}"/></strong><br>
-                    <p class="resolver-result-coordinates"></p>
-                    <strong><fmt:message key="RES_TYPE" bundle="${langBundle}"/></strong><br>
-                    <p class="resolver-result-type"></p>
-                    <strong><fmt:message key="RES_MORPHOLOGY" bundle="${langBundle}"/></strong><br>
-                    <p class="resolver-result-morphology"></p>
-                    <strong><fmt:message key="RES_TIME" bundle="${langBundle}"/></strong><br>
-                    <p class="resolver-result-time"></p>
-                  </div>
-
-                  <c:import
-                      url="hierarchy.jsp?utype=Plane.energy.emBand/Observation.collection/Observation.instrument.name/Plane.energy.bandpassName/Plane.calibrationLevel/Plane.dataProductType/Observation.type&modelDataSource=caom2"/>
-
-                  <div class="equalize margin-top-large margin-bottom-none">
-                    <div class="span-3 row-start form-inline">
-                      <input type="submit"
-                             value="<fmt:message key="SEARCH_BUTTON_LABEL" bundle="${langBundle}" />"
-                             data-rel="popup" data-dismissible="false"
-                             data-position-to="window" data-inline="true"
-                             data-transition="pop" data-corners="true" data-shadow="true"
-                             data-iconshadow="true" data-wrapperels="span" data-theme="c"
-                             aria-haspopup="true" aria-owns="queryOverlay"
-                             class="submit-query button button-accent ui-btn"/>
-                      <input type="reset" data-role="none"
-                             value="<fmt:message key="RESET_BUTTON_LABEL" bundle="${langBundle}" />"
-                             class="reset-query-form button ui-btn"/>
-                    </div>
-                    <div class="span-5 row-end"></div>
-                    <div class="clear"></div>
-                  </div>
-
-                </form>
-              </div>
-
-              <!-- ObsCore Query Tab -->
-              <div id="obsCoreQueryFormTab">
-                <form id="obscoreQueryForm" name="obscoreQueryForm" class="queryForm"
-                      method="post" action="${pageContext.request.contextPath}/find"
-                      enctype="multipart/form-data">
-
-                  <!-- Used by VOView to sort the results. -->
-                  <input type="hidden" name="sort_column" value="t_min"/>
-                  <input type="hidden" name="sort_order" value="descending"/>
-                  <input type="hidden" name="formName" value="adsform"/>
-
-                  <!-- Used by AdvancedSearch to pass to TAP. -->
-                  <input type="hidden" name="SelectList" class="ObsCore_selectlist"/>
-                  <input type="hidden" name="MaxRecords" value="<%= maxRowLimit %>"/>
-                  <input type="hidden" name="format" value="csv"/>
-
-                  <div class="equalize margin-top-large margin-bottom-none">
-                    <div class="span-3 row-start form-inline">
-                      <input type="submit"
-                             value="<fmt:message key="SEARCH_BUTTON_LABEL" bundle="${langBundle}" />"
-                             data-rel="popup" data-dismissible="false"
-                             data-position-to="window" data-inline="true"
-                             data-transition="pop" data-corners="true" data-shadow="true"
-                             data-iconshadow="true" data-wrapperels="span" data-theme="c"
-                             aria-haspopup="true" aria-owns="queryOverlay"
-                             class="submit-obscore-query button button-accent ui-btn"/>
-                      <input type="reset" data-role="none"
-                             value="<fmt:message key="RESET_BUTTON_LABEL" bundle="${langBundle}" />"
-                             class="reset-obscore-query-form button ui-btn"/>
-                    </div>
-                    <div class="span-5 row-end"></div>
-                    <div class="clear"></div>
-                  </div>
-
-                  <div class="equalize">
-                    <div class="span-2 row-start">
-                      <div class="module">
-                        <h2 class="background-accent"><fmt:message
-                            key="OBSERVATION_CONSTRAINT_LABEL" bundle="${langBundle}"/></h2>
-                        <ul class="list-bullet-none indent-small search-constraints">
-
-                          <c:import
-                              url="text.jsp?utype=DataID.observationID&tipSide=right"/>
-                          <c:import
-                              url="text.jsp?utype=Target.Name&tipSide=right"/>
-                          <c:import
-                              url="timestamp.jsp?utype=Curation.releaseDate&tipSide=right"/>
-
-                        </ul>
-                      </div>
-                    </div>
-
-                    <div class="span-2">
-                      <div class="module">
-                        <h2 class="background-accent"><fmt:message
-                            key="SPATIAL_CONSTRAINT_LABEL" bundle="${langBundle}"/></h2>
-
-                        <ul class="list-bullet-none indent-small search-constraints">
-
-                          <c:import
-                              url="position.jsp?utype=Char.SpatialAxis.Coverage.Support.Area&tipSide=right"/>
-                          <c:import
-                              url="number.jsp?utype=Char.SpatialAxis.Coverage.Bounds.Extent.diameter&tipSide=right"/>
-                          <c:import
-                              url="number.jsp?utype=Char.SpatialAxis.Resolution.refval.value&tipSide=right"/>
-                          <c:import
-                              url="number.jsp?utype=Char.SpatialAxis.numBins1&tipSide=right"/>
-                          <c:import
-                              url="number.jsp?utype=Char.SpatialAxis.numBins2&tipSide=right"/>
-                          <c:import
-                              url="boolean.jsp?name=Char.SpatialAxis.DOWNLOADCUTOUT&tipSide=right"/>
-
-                        </ul>
-                      </div>
-                    </div>
-
-                    <div class="span-2">
-                      <div class="module">
-                        <h2 class="background-accent">
-                          <fmt:message key="TIME_POLARIZATION_CONSTRAINT_LABEL"
-                                       bundle="${langBundle}"/></h2>
-                        <ul class="list-bullet-none indent-small search-constraints">
-
-                          <c:import
-                              url="date.jsp?utype=Char.TimeAxis.Coverage.Bounds.Limits&tipSide=left"/>
-                          <c:import
-                              url="number.jsp?utype=Char.TimeAxis.Coverage.Support.Extent&tipSide=left"/>
-                          <c:import
-                              url="number.jsp?utype=Char.TimeAxis.Resolution.refval.value&tipSide=left"/>
-                          <c:import
-                              url="number.jsp?utype=Char.TimeAxis.numBins&tipSide=left"/>
-                          <c:import
-                              url="text.jsp?utype=Char.PolarizationAxis.stateList&tipSide=left"/>
-                          <c:import
-                              url="number.jsp?utype=Char.PolarizationAxis.numBins&tipSide=left"/>
-
-                        </ul>
-                      </div>
-                    </div>
-
-                    <div class="span-2 row-end">
-                      <div class="module">
-                        <h2 class="background-accent">
-                          <fmt:message key="SPECTRAL_CONSTRAINT_LABEL"
-                                       bundle="${langBundle}"/></h2>
-                        <ul class="list-bullet-none indent-small search-constraints">
-
-                          <c:import
-                              url="energy.jsp?utype=Char.SpectralAxis.Coverage.Bounds.Limits&tipSide=left"/>
-                          <c:import
-                              url="number.jsp?utype=Char.SpectralAxis.Resolution.ResolPower.refval&tipSide=left"/>
-                          <c:import
-                              url="number.jsp?utype=Char.SpectralAxis.numBins&tipSide=left"/>
-                          <c:import
-                              url="boolean.jsp?name=Char.SpectralAxis.DOWNLOADCUTOUT&tipSide=left"/>
-
-                        </ul>
-                      </div>
-                    </div>
-                    <div class="clear"></div>
-                  </div>
-
-                  <c:import
-                      url="hierarchy.jsp?utype=DataID.Collection/Provenance.ObsConfig.Facility.name/Provenance.ObsConfig.Instrument.name/ObsDataset.calibLevel/ObsDataset.dataProductType&modelDataSource=obscore"/>
-
-                  <div class="equalize margin-top-large margin-bottom-none">
-                    <div class="span-3 row-start form-inline">
-                      <input type="submit"
-                             value="<fmt:message key="SEARCH_BUTTON_LABEL" bundle="${langBundle}" />"
-                             data-rel="popup" data-dismissible="false"
-                             data-position-to="window" data-inline="true"
-                             data-transition="pop" data-corners="true" data-shadow="true"
-                             data-iconshadow="true" data-wrapperels="span" data-theme="c"
-                             aria-haspopup="true" aria-owns="queryOverlay"
-                             class="submit-obscore-query button button-accent ui-btn"/>
-                      <input type="reset" data-role="none"
-                             value="<fmt:message key="RESET_BUTTON_LABEL" bundle="${langBundle}" />"
-                             class="reset-obscore-query-form button ui-btn"/>
-                    </div>
-                    <div class="span-5 row-end"></div>
-                    <div class="clear"></div>
-                  </div>
-
-                </form>
-              </div>
-
-              <!-- Result Tab -->
-              <div id="resultTableTab">
-  <span class="votable_link_label">
-    <fmt:message key="FULL_VOTABLE_LINK_LABEL" bundle="${langBundle}"/></span>
-                <a href="#" class="votable_link_votable link_idle">VOTable</a>
-                <a href="#" class="votable_link_csv link_idle">CSV</a>
-                <a href="#" class="votable_link_tsv link_idle">TSV</a>
-
-                <span class="result-state">
-    <a href="#" id="results_bookmark" class="result-state-link link_idle">
-        <fmt:message key="RESULT_STATE_LINK_LABEL" bundle="${langBundle}"/>
-    </a>
-  </span>
-
-                <!-- Dialog to contain the column manager. -->
-                <div class="wb-invisible">
-                  <span id="COLUMN_MANAGER_SHOW_ALL_BUTTON_TEXT" class="wb-invisible i18n"><fmt:message
-                      key="COLUMN_MANAGER_SHOW_ALL_BUTTON_TEXT" bundle="${langBundle}"/></span>
-                  <span id="COLUMN_MANAGER_DEFAULT_COLUMNS_BUTTON_TEXT" class="wb-invisible i18n"><fmt:message
-                      key="COLUMN_MANAGER_DEFAULT_COLUMNS_BUTTON_TEXT" bundle="${langBundle}"/></span>
-                  <span id="COLUMN_MANAGER_ORDER_ALPHABETICALLY_BUTTON_TEXT" class="wb-invisible i18n"><fmt:message
-                      key="COLUMN_MANAGER_ORDER_ALPHABETICALLY_BUTTON_TEXT" bundle="${langBundle}"/></span>
-                  <div id="column_manager_container" data-role="popup" data-theme="b"
-                       class="column_manager_container ui-content">
-                    <span class="wb-icon-x-alt2 float-right dialog-close"></span>
-                    <h3><fmt:message key="COLUMN_MANAGER_HEADING_TEXT" bundle="${langBundle}"/></h3>
-                    <span class="tooltipColumnPickerHelpText">
-        <fmt:message key="COLUMN_MANAGER_HELP_TEXT" bundle="${langBundle}"/></span>
-                    <div class="column_manager_columns"></div>
-                  </div>
+    <div class="modal fade" id="queryOverlay" role="dialog">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <span id="overlay_status">
+                          <h4><fmt:message key="EXECUTING_QUERY_LABEL" bundle="${langBundle}"/></h4>
+                    </span>
                 </div>
-
-                <%-- Aladin Lite container. --%>
-                <div id="aladin-lite" style="height: 250px;width: 1180px;"></div>
-
-                <div class="grid-container">
-                  <div id="cadcvotv-empty-results-message"
-                       class="cadcvotv-empty-results-message">
-                    <strong><fmt:message key="NO_RESULTS_RETURNED" bundle="${langBundle}"/></strong>
-                  </div>
-                  <div id="results-grid-header" class="grid-header">
-                    <form id="downloadForm" name="downloadForm" class="form-horizontal"
-                          action="<%= downloadLink %>" method="POST" target="DOWNLOAD">
-                      <input type="hidden" name="fragment" id="runId" value=""/>
-                      <span id="NO_OBSERVATIONS_SELECTED_MESSAGE" class="wb-invisible">
-            <fmt:message key="NO_OBSERVATIONS_SELECTED_MESSAGE" bundle="${langBundle}"/>
-        </span>
-                      <span class="grid-header-icon-span">
-          <img class="margin-bottom-none margin-left-none margin-right-none align-middle grid-header-icon"
-               src="cadcVOTV/images/transparent-20.png"/>
-        </span>
-                      <span>
-          <button type="submit" id="downloadFormSubmit" form="downloadForm" class="button button-accent">
-            <fmt:message key="DOWNLOAD_BUTTON_LABEL" bundle="${langBundle}"/>
-          </button>
-        </span>
-                      <span class="grid-header-label"></span>
-
-                      <!-- Here to prepopulate the change column button -->
-                      <span class='slick-columnpicker-panel-change-column-holder'>
-          <a href="#column_manager_container"
-             id="slick-columnpicker-panel-change-column"
-             name='slick-columnpicker-panel-change-column'
-             data-rel="popup" data-position-to="window"
-             data-inline="true" data-dismissible="false"
-             class="button slick-columnpicker-panel-change-column-label ui-link button-add"><fmt:message
-              key="COLUMN_MANAGER_BUTTON_LABEL" bundle="${langBundle}"/></a>
-        </span>
-
-                      <!-- The Visualize button to enable AladinLite. -->
-                      <span class='slick-visualize-holder'>
-          <a href="#" id="slick-visualize" name='slick-visualize'
-             class="button slick-visualize-label ui-link button-add"
-             data-open="<fmt:message key="RESULTS_VISUALIZE_BUTTON_LABEL" bundle="${langBundle}"/>"
-             data-close="<fmt:message key="CLOSE_BUTTON_LABEL" bundle="${langBundle}" />"><fmt:message
-              key="RESULTS_VISUALIZE_BUTTON_LABEL" bundle="${langBundle}"/></a>
-        </span>
-                    </form>
-                  </div>
-                  <div id="resultTable"></div>
-                  <div id="results-grid-footer" class="grid-footer">
-                    <span class="grid-footer-label"></span>
-                  </div>
+                <div class="modal-body">
+                    <img src="images/queryoverlay.gif" class="query-overlay-loading" alt=""/>
                 </div>
-              </div>
-
-              <!-- Error Tab -->
-              <div id="errorTableTab">
-                <div class="grid-container">
-                  <div id="error-grid-header" class="grid-header">
-                    <span class="grid-header-label"></span>
-                  </div>
-                  <div id="errorTable"></div>
+                <div class="modal-footer">
+                    <button id="cancel_search" type="button" class="btn btn-default btn-sm" data-dismiss="modal"><fmt:message key="CANCEL_BUTTON_LABEL"
+                                                                                                                              bundle="${langBundle}"/></button>
                 </div>
-                <div id="errorTooltipColumnPickerHolder">
-                  <div class="tooltip columnpicker">
-                    <h3>Add/remove displayed columns</h3>
-                    <span class="tooltipColumnPickerHelpText">
-        Drag &amp; drop columns above or below the red bar, move the red bar
-        itself or click on the checkboxes.
-      </span>
-                    <br/>
-                    <br/>
-
-                    <h3>Reorder columns</h3>
-                    <span class="tooltipColumnPickerHelpText">
-        Drag &amp; drop the columns or drag &amp; drop the column headers
-        directly in the results table.
-      </span>
-
-                    <div class="tooltip_content"></div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Query Tab -->
-              <div id="queryTab" class="wet-boew-prettify lang-sql">
-                <div id="query_holder">
-                  <h3 class="wb-invisible">ADQL Query</h3>
-                  <pre class="prettyprint lang-sql"><code id="query" class="lang-sql"></code></pre>
-                </div>
-              </div>
-
-              <!-- Help Tab -->
-              <div id="helpTab">
-                <c:import url="_help.jsp"/>
-              </div>
             </div>
-          </div>
-
-          <div class="wb-invisible">
-            <div id="queryOverlay" data-role="popup">
-              <img src="images/queryoverlay.gif" alt=""/>
-              <br/>
-              <span id="overlay_status">
-                <fmt:message key="EXECUTING_QUERY_LABEL"
-                             bundle="${langBundle}"/></span>
-              <br/>
-              <span id="overlay_cancel">
-                <input id="cancel_search" type="button" value="Cancel"
-                       class="button"/>
-              </span>
-            </div>
-          </div>
+        </div>
+    </div>
 
           <div class="hidden" id="preloadthumbnails"></div>
 
@@ -553,7 +174,7 @@
                     .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"cadcVOTV/css/aladin.min.css\" />")
                     .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"cadcVOTV/css/jquery-ui-1.11.4.min.css?version=@version@\" />")
                     .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"css/tooltipster.css?version=@version@\" />")
-                    .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"css/advanced_search.css?version=@version@\" />")
+                    .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"css/caom2_search.css?version=@version@\" />")
                     .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"cadcVOTV/css/slick.grid-frozen.css?version=@version@\" />")
                     .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"cadcVOTV/css/slick.pager.css?version=@version@\" />")
                     .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"cadcVOTV/css/cadc.columnpicker.dialog.css?version=@version@\"/>")
@@ -562,14 +183,13 @@
               });
           </script>
 
+            <script type="application/javascript" src="js/bootstrap.min.js"></script>
           <script type="text/javascript"
                   src="cadcVOTV/javascript/jquery.event.drag-2.2.min.js?version=@version@"></script>
           <script type="text/javascript"
                   src="js/jquery.form.js?version=@version@"></script>
           <script type="text/javascript" charset="utf-8"
                   src="cadcVOTV/javascript/aladin.js?version=@version@"></script>
-          <script type="text/javascript"
-                  src="wet/javascript/polyfills/detailssummary-min.js?version=@version@"></script>
           <script type="text/javascript"
                   src="cadcVOTV/javascript/jquery-ui-1.11.4.min.js?version=@version@"></script>
 
@@ -600,7 +220,7 @@
           <script type="text/javascript"
                   src="cadcVOTV/javascript/slick.pager.js?version=@version@"></script>
           <script type="text/javascript"
-                  src="cadcVOTV/javascript/cadc.columnpicker.dialog.js?version=@version@"></script>
+                  src="cadcVOTV/javascript/cadc.columnpicker.modal.js?version=@version@"></script>
           <script type="text/javascript"
                   src="cadcVOTV/javascript/cadc.plugin.unitselection.js?version=@version@"></script>
           <script type="text/javascript"
@@ -646,6 +266,7 @@
           <script type="text/javascript"
                   src="js/hierarchy.js?version=@version@"></script>
 
+
           <script type="text/javascript">
             $(document).ready(function ()
                               {
@@ -665,15 +286,11 @@
                                                     });
 
                                 searchApp.init();
+
                               });
+
           </script>
 
-        </div>
-      </div>
-
-      <!-- noindex -->
-    </div>
-  </div>
   <!-- Close off the wb-body -->
 </div>
 

@@ -1,4 +1,4 @@
-version: '2'
+version: '3'
 services:
   proxy.cadc.dao.nrc.ca:
     image: nginx:alpine
@@ -8,10 +8,7 @@ services:
       - 'selenium'
     volumes:
       - './default.conf:/etc/nginx/conf.d/default.conf'
-      - './:/usr/share/nginx/html'
-    environment:
-      - NGINX_HOST=proxy.cadc.dao.nrc.ca
-      - NGINX_PORT=80
+      - './_ROOT_:/usr/share/nginx/html'
     depends_on:
       - archive-search.cadc.dao.nrc.ca
       - caom2-meta-ui.cadc.dao.nrc.ca
@@ -22,7 +19,7 @@ services:
     networks:
       - 'selenium'
   archive-search.cadc.dao.nrc.ca:
-    image: opencadc/archive-search
+    image: opencadc/archive-search:SNAPSHOT
     ports:
       - '8080:8080'
       - '5555:5555'
@@ -50,4 +47,3 @@ services:
 # Create the network 'selenium' for which this system will run within.
 networks:
   selenium:
-    driver: 'bridge'
