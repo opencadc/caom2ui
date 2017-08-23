@@ -1589,7 +1589,7 @@
     {
         var resolverPopover = this.$form.find(".target_name_resolution_status");
         resolverPopover.popover("hide");
-    }
+    };
 
     /**
      * Action to perform before form serialization begins.
