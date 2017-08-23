@@ -84,7 +84,7 @@
           </div>
 
           <div class="form-group">
-            <a id="ssois_link" href="http://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/ssois" target="_blank">
+            <a id="ssois_link" href="http://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/ssois" target="ssois_window">
               <fmt:message key="SSOIS_MOBILE_OBJECTS" bundle="${langBundle}"/></a>
           </div>
 
