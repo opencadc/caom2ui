@@ -71,7 +71,6 @@ package ca.nrc.cadc.web;
 import ca.nrc.cadc.auth.HTTPIdentityManager;
 import ca.nrc.cadc.auth.IdentityManager;
 import ca.nrc.cadc.config.ApplicationConfiguration;
-import ca.nrc.cadc.auth.AuthenticationUtil;
 import ca.nrc.cadc.caom2.CAOMQueryGenerator;
 import ca.nrc.cadc.caom2.ObsCoreQueryGenerator;
 import ca.nrc.cadc.date.DateUtil;
@@ -92,7 +91,6 @@ import ca.nrc.cadc.uws.server.impl.PostgresJobPersistence;
 import ca.nrc.cadc.uws.web.JobCreator;
 import org.apache.commons.fileupload.FileUploadException;
 
-import javax.security.auth.Subject;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -101,7 +99,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URI;
-import java.security.PrivilegedExceptionAction;
 import java.util.*;
 
 

@@ -9,34 +9,34 @@
 
 <%
   final String utype = request.getParameter("utype");
-  final String tipSide = request.getParameter("tipSide");
   final String enableAutocomplete = request.getParameter("enableAutocomplete");
-  final String labelKey = utype + "_FORM_LABEL";
   final String formName = utype + Text.NAME;
-  String classes = "search_criteria_input";
+  String classes = "form-control search_criteria_input";
 
   if ((enableAutocomplete != null) && Boolean.parseBoolean(enableAutocomplete))
   {
     classes += " ui-autocomplete-input";
   }
-
-  final String detailsID = utype + "_details";
 %>
 
-
-<li class="label_tooltip_<%= tipSide %>">
-  <details id="<%= detailsID %>">
+<div id="${param.utype}_formgroup" class="form-group">
+  <div data-toggle="popover"
+       data-utype="${param.utype}"
+       data-placement="${param.tipSide}"
+       data-title="<fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}"/>"
+       class="advancedsearch-tooltip glyphicon glyphicon-question-sign popover-blue popover-right">
+  </div>
+  <details id="${param.utype}_details">
     <summary class="search_criteria_label_container">
-      <span class="search_criteria_label <%= detailsID %>"><fmt:message key="<%= labelKey %>" bundle="${langBundle}"/></span>
-      <span class="search_criteria_label_contents color-accent"></span>
+      <label for="${param.utype}"
+             class="control-label search_criteria_label"><fmt:message key="${param.utype}_FORM_LABEL" bundle="${langBundle}"/><span
+              class="search_criteria_label_contents color-accent"></span></label>
     </summary>
-    <label for="<%= utype %>" class="wb-invisible">
-      <fmt:message key="<%= labelKey %>" bundle="${langBundle}"/>
-    </label>
 
-    <div id="<%= utype %>_input_decorate">
-      <input type="text" class="<%= classes %>" id="<%= utype %>" name="<%= utype %>" size="20"/>
+    <div id="${param.utype}_input_decorate">
+      <input type="text" class="<%= classes %>" id="${param.utype}" name="${param.utype}">
     </div>
+
     <input type="hidden" name="<%= FormConstraint.FORM_NAME %>" value="<%= formName %>"/>
   </details>
-</li>
+</div>

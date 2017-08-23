@@ -334,7 +334,7 @@
         // Create either hidden or select input.
         var select;
         var containerElement = document.createElement("div");
-        containerElement.className = "align-left advanced_search_hierarchy_select_div";
+        containerElement.className = "text-left col-md-1 hierarchy";
 
         if (i === 0)
         {
@@ -369,7 +369,7 @@
     {
       // Remove temporary div.
       var building = document.getElementById(this.uType + ".building");
-      building.className = (building.className.indexOf("wb-invisible") >= 0) ? "" : "wb-invisible";
+      building.className = (building.className.indexOf("hidden") >= 0) ? "" : "hidden";
     };
 
     /**
@@ -384,10 +384,6 @@
     this._buildSelect = function (uType, containerElement)
     {
       var label = document.createElement("label");
-      if (this.pageLanguage === "fr")
-      {
-        label.className = "advanced_search_hierarchy_select_div_label";
-      }
 
       var hidden = document.createElement("input");
       hidden.type = "hidden";
@@ -415,7 +411,7 @@
         this.updateLists(e.target, false);
       }.bind(this);
 
-      select.className = "hierarchy_select";
+      select.className = "form-control hierarchy_select";
 
       containerElement.appendChild(label);
       containerElement.appendChild(select);
@@ -987,12 +983,6 @@
       var name = title + "  (" + options.length + ")";
       var highlight = false;
       var isHighlighted = false;
-
-      if (this._arrayContains(selected, ""))
-      {
-        highlight = true;
-        isHighlighted = true;
-      }
 
       var selectName = $select.attr("name");
       var $allOption = this._createOption(name, "", false);

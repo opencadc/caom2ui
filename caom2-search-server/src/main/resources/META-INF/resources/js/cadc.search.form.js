@@ -110,7 +110,9 @@
    * @param {String}  [_options.searchEndpoint="/search/find"]   Form submission endpoint.
    * @param {String}  [_options.validatorEndpoint="/search/validate"]   Form validator endpoint.
    * @param {String}  [_options.autocompleteEndpoint="/search/unitconversion"]   Autocomplete (units, Observation
-   *     constraint autocompletion) endpoint.
+   *                      constraint autocompletion) endpoint.
+   * @param {String}  [_options.targetResolverEndpoint="/cadc-target-resolver/find"]   Resolver endpoint
+   *
    * @constructor
    */
   function FormConfiguration(_config, _options)
@@ -284,6 +286,11 @@
         {
           order = allColumnIDs.indexOf("caom2:Plane.uri.downloadable");
           this._addFieldsForUType("caom2:Plane.uri.downloadable", ucd, unit, datatype, arraySize, description, order);
+        }
+        else if (uType === "obscore:Curation.PublisherDID")
+        {
+            order = allColumnIDs.indexOf("obscore:Curation.PublisherDID.downloadable");
+            this._addFieldsForUType("obscore:Curation.PublisherDID.downloadable", ucd, unit, datatype, arraySize, description, order);
         }
       }
 
@@ -631,21 +638,15 @@
     this.dataTrain = new ca.nrc.cadc.search.datatrain.DataTrain(this.configuration.getName().toLowerCase(),
                                                                 this.configuration.columnManager,
                                                                 {
-                                                                  tapSyncEndpoint:
-                                                                  this.configuration.options.tapSyncEndpoint
+                                                                  tapSyncEndpoint: this.configuration.options.tapSyncEndpoint
                                                                 });
 
     var VALIDATOR_TIMER_DELAY = 500;
 
     var tooltipIconCSS = "advancedsearch-tooltip";
-    var initialTooltipIconCSS = "wb-icon-question";
-    var hoverTooltipIconCSS = "wb-icon-question-alt";
 
     this.validator = new ca.nrc.cadc.search.Validator(this.configuration.options.validatorEndpoint,
                                                       VALIDATOR_TIMER_DELAY);
-
-    // Tooltip objects to keep track of.
-    this.targetTooltipsters = [];
 
     /**
      * Initialize this form.
@@ -661,19 +662,19 @@
                                                     this._searchCriteriaChanged($(event.target));
                                                   }.bind(this));
 
-      $("input:file[id$='_targetList']").change(
-          function (event)
+      $currForm.find("input:file[id$='_targetList']").change(
+        function (event)
+        {
+          if ($(event.target).val() !== "")
           {
-            if ($(event.target).val() !== "")
-            {
-              $(".targetList_clear").show();
-              this.toggleDisabled($("input[id='" + this.targetNameFieldID + "']"), true);
-            }
-            else
-            {
-              this.toggleDisabled($("input[id='" + this.targetNameFieldID + "']"), false);
-            }
-          }.bind(this)).change();
+            $(".targetList_clear").show();
+            this.toggleDisabled($("#" + this.id + " input[id='" + this.targetNameFieldID + "']"), true);
+          }
+          else
+          {
+            this.toggleDisabled($("#" + this.id + " input[id='" + this.targetNameFieldID + "']"), false);
+          }
+        }.bind(this)).change();
 
       // Those items with associated fields that will be disabled as an 'OR'
       // field.
@@ -767,7 +768,7 @@
                                                                                     $checkbox.is(":checked"));
                                                  }.bind(this));
 
-      $("select.resolver_select").change(function (event)
+      $currForm.find("select.resolver_select").change(function (event)
                                          {
                                            var $resolverSelectName = $(event.target).prop("name");
                                            var $fieldID = $resolverSelectName
@@ -781,7 +782,7 @@
                                                 }.bind(this));
 
       // Prevent closing details when a value is present.
-      $("details[id$='_details'] summary").click(function (event)
+      $currForm.find("details[id$='_details'] summary").click(function (event)
                                                  {
                                                    var $detailsElement = $(this).parent("details");
                                                    var $inputElements =
@@ -845,60 +846,29 @@
       // Bind the form's submission.
       $currForm.submit(this._formSubmit.bind(this));
 
-      this._getTargetNameResolutionStatusObject().tooltipster({
-                                                                arrow: false,
-                                                                theme: "tooltipster-advanced-search-resolver",
-                                                                position: "left",
-                                                                maxWidth: 170,
-                                                                offsetX: 230,
-                                                                trigger: "click",
-                                                                interactive: true,
-                                                                repositionOnResize: false,
-                                                                repositionOnScroll: false,
-                                                                onlyOne: false
-                                                              });
+      this._getTargetNameResolutionStatusObject().popover({
+                                                            html: true,
+                                                            placement: "auto left",
+                                                            template: "<div class=\"popover resolver-popover\" role=\"tooltip\"><h3 class=\"popover-title\"></h3><div class=\"popover-content\"></div></div>"
+                                                          });
 
-      this.subscribe(ca.nrc.cadc.search.events.onTargetNameResolved,
-
-                     /**
-                      *
-                      * @param event
-                      * @param {{data: {resolveValue}}} args
-                      */
-                     function (event, args)
-                     {
-                       var $targetNameResolutionStatus = this._getTargetNameResolutionStatusObject();
-                       var data = args.data;
-                       $targetNameResolutionStatus.addClass("target_ok");
-                       var tooltipCreator = new ca.nrc.cadc.search.TooltipCreator();
-                       tooltipCreator.extractResolverValue(data.resolveValue);
-                       var $resolverTooltip = this.$form.find(".resolver-result-tooltip");
-                       var $tooltipContainer = tooltipCreator.getContent($resolverTooltip.html(),
-                                                                         "", // title blank
-                                                                         "resolver-result-tooltip-text",
-                                                                         $targetNameResolutionStatus);
-
-                       $targetNameResolutionStatus.tooltipster("content", $tooltipContainer);
-                       $targetNameResolutionStatus.tooltipster("show");
-
-                       // Make them draggable.
-                       $(".tooltipster-advanced-search-resolver").draggable(
-                           {
-                             handle: ".tooltip_header",
-                             snap: true,
-                             revert: false
-                           });
-                     });
+      this.subscribe(ca.nrc.cadc.search.events.onTargetNameResolved, this.targetAccepted);
 
       this.subscribe(ca.nrc.cadc.search.events.onTargetNameUnresolved,
-                     function (event, args)
+                     function ()
                      {
                        var $targetNameResolutionStatus = this._getTargetNameResolutionStatusObject();
-                       var data = args.data;
+                       var resolverPopover = $targetNameResolutionStatus.data("bs.popover");
+
+                       resolverPopover.options.title = "";
+                       resolverPopover.options.content = "";
+                       resolverPopover.hide();
+                       resolverPopover.$tip.find(".popover-title").hide();
 
                        $targetNameResolutionStatus.addClass("target_not_found");
-                       this._decorate($targetNameResolutionStatus, $.parseJSON("{\"status\":\"" + data.resolveStatus
-                                                                               + "\"}"));
+                       this._decorate($targetNameResolutionStatus, {"status": "NOT_FOUND"});
+
+                       $targetNameResolutionStatus.removeClass("busy");
                      });
 
       this.dataTrain.init();
@@ -911,6 +881,37 @@
       {
         console.error("Error found.\n" + err);
       }
+    };
+
+    /**
+     * User entered target is acceptable; meaning it passes name resolution and/or coordinate parsing.
+     *
+     * @param {jQuery.Event|Event} event      The Event object.
+     * @param {{}} args   The argumements for this event.
+     * @param {{}} args.data    Data to display
+     * @param {boolean} [args.resolved=true]   Whether the resolver resolved a name.  This affects the tooltip being
+     * shown.
+     */
+    this.targetAccepted = function (event, args)
+    {
+      var $targetNameResolutionStatus = this._getTargetNameResolutionStatusObject();
+      $targetNameResolutionStatus.addClass("target_ok");
+      var tooltipCreator = new ca.nrc.cadc.search.TooltipCreator();
+      tooltipCreator.extractResolverValue(args.data.resolveValue);
+      var $resolverTooltip = this.$form.find(".resolver-result-tooltip");
+      var $tooltipContainer = tooltipCreator.getContent($resolverTooltip.html(),
+                                                        "", // title blank
+                                                        "resolver-result-tooltip-text",
+                                                        $targetNameResolutionStatus);
+      var $tooltipHeaderDiv = tooltipCreator.getHeader("Resolver output", "resolver-result");
+
+      var resolverPopover = $targetNameResolutionStatus.data("bs.popover");
+
+      resolverPopover.options.title = $tooltipHeaderDiv;
+      resolverPopover.options.content = $tooltipContainer[0].innerHTML;
+      resolverPopover.show();
+      resolverPopover.$tip.find(".popover-title").show();
+      $targetNameResolutionStatus.removeClass("busy");
     };
 
     /**
@@ -930,88 +931,37 @@
       if (tipJSON && tipJSON.tipHTML)
       {
         var tipMarkup = tipJSON.tipHTML;
-        var tipsterPlacement;
-        var offsetX;
-
-        if (tipJSON.horizontalOffset)
-        {
-          offsetX = tipJSON.horizontalOffset;
-        }
-        else if ($liItem.hasClass("label_tooltip_right"))
-        {
-          tipsterPlacement = "right";
-          offsetX = -12;
-        }
-        else
-        {
-          tipsterPlacement = "left";
-          offsetX = 240;
-        }
 
         var offsetY = tipJSON.verticalOffset ? tipJSON.verticalOffset : 0;
 
-        var $ttIconImg = $("<span class=\"" + tooltipIconCSS + " " + initialTooltipIconCSS + " float-right\" />");
+        var $tooltipDiv = tooltipCreator.getContent(tipMarkup, tooltipHeaderText, null, null);
 
-        $liItem.find(".search_criteria_label_contents").before($ttIconImg);
+        var $tooltipHeaderDiv = tooltipCreator.getHeader(tooltipHeaderText, inputID);
 
-        var $tooltipDiv = tooltipCreator.getContent(tipMarkup, tooltipHeaderText, null, $ttIconImg);
+        $liItem.popover({
+                          title: $tooltipHeaderDiv,
+                          content: $tooltipDiv[0].innerHTML,
+                          html: true,
+                          placement: $liItem[0].dataset.placement
+                        });
 
-        var tipster = $ttIconImg.tooltipster({
-                                               interactive: true,
-                                               animation: "fade",
-                                               theme: "tooltipster-advanced-search",
-                                               content: $tooltipDiv,
-                                               maxWidth: 400,
-                                               arrow: false,
-                                               repositionOnResize: false,
-                                               repositionOnScroll: false,
-                                               position: tipsterPlacement,
-                                               offsetX: offsetX,
-                                               offsetY: offsetY,
-                                               onlyOne: true,
-                                               trigger: "custom"
-                                             });
-
-        if (inputID === "Plane.position.bounds")
-        {
-          this.targetTooltipsters = this.targetTooltipsters.concat(tipster);
-        }
-
-        $ttIconImg.hover(function (event)
-                         {
-                           var $thisSpan = $(event.target);
-
-                           $thisSpan.removeClass(initialTooltipIconCSS);
-                           $thisSpan.addClass(hoverTooltipIconCSS);
-
-                           return false;
-                         },
-                         function (event)
-                         {
-                           var $thisSpan = $(event.target);
-
-                           $thisSpan.removeClass(hoverTooltipIconCSS);
-                           $thisSpan.addClass(initialTooltipIconCSS);
-
-                           return false;
-                         });
-
-        $ttIconImg.on("click", function (e)
-        {
-          e.preventDefault();
-          $ttIconImg.tooltipster("show");
-
-          // Make them
-          // draggable.
-          $(".tooltipster-advanced-search").draggable(
-              {
-                handle: ".tooltip_header",
-                snap: true,
-                revert: false
-              });
-
-          return false;
-        });
+        // todo: can popovers be draggable?
+        // $ttIconImg.on("click", function (e)
+        // {
+        //   e.preventDefault();
+        //   $ttIconImg.tooltipster("show");
+        //
+        //   // Make them
+        //   // draggable.
+        //   $(".tooltipster-advanced-search").draggable(
+        //       {
+        //         handle: ".tooltip_header",
+        //         snap: true,
+        //         revert: false
+        //       });
+        //
+        //   return false;
+        // });
       }
     };
 
@@ -1022,17 +972,50 @@
     this.loadTooltips = function (jsonData)
     {
       var tooltipCreator = new ca.nrc.cadc.search.TooltipCreator();
-      this.$form.find("ul.search-constraints li").each(function (key, element)
-                                                       {
-                                                         var $liItem = $(element);
-                                                         var $tooltipHeader = $liItem.find("summary.search_criteria_label_container");
-                                                         var tooltipHeaderText = $tooltipHeader.text();
-                                                         var $searchInputItem = $liItem.find(".search_criteria_input:first");
-                                                         var inputID = $searchInputItem.attr("id");
+      this.$form.find("[data-toggle=\"popover\"]").each(function (key, element)
+                                                        {
+                                                          var $liItem = $(element);
+                                                          this.handleTooltipLoad(jsonData[element.dataset.utype], tooltipCreator,
+                                                                                 $liItem, element.dataset.utype, element.dataset.title);
+                                                        }.bind(this));
 
-                                                         this.handleTooltipLoad(jsonData[inputID], tooltipCreator,
-                                                                                $liItem, inputID, tooltipHeaderText);
-                                                       }.bind(this));
+
+      // Manage closing popovers, and maintaining that only one is
+      // open at a time.
+      $(document).on("click", function (e)
+      {
+        if ($(e.target).hasClass("glyphicon-remove-circle"))
+        {
+          $("[data-toggle=\"popover\"],[data-original-title]").each(function ()
+                                                                    {
+                                                                      (($(this).popover("hide").data("bs.popover") ||
+                                                                      {}).inState || {}).click = false  // fix for BS
+                                                                                                        // 3.3.6
+                                                                    });
+        }
+
+        if ($(e.target).hasClass("glyphicon-question-sign"))
+        {
+          $("[data-toggle=\"popover\"]").each(function ()
+                                              {
+
+                                                if (!$(this).is(e.target) && $(this).has(e.target).length === 0 &&
+                                                    $(".popover").has(e.target).length === 0)
+                                                {
+                                                  (($(this).popover("hide").data("bs.popover") || {}).inState ||
+                                                  {}).click = false  // fix for BS 3.3.6
+                                                }
+                                              });
+
+          // reposition popover so it doesn't cover input field for left-side display
+          if ($(".popover").hasClass("left"))
+          {
+            $(".popover").css("left", "-480px");
+          }
+        }
+
+      });
+
     };
 
     /**
@@ -1048,6 +1031,8 @@
 
       if (id === this.targetNameFieldID)
       {
+        var resolver = this.$form.find("select.resolver-select option:selected").val();
+
         // input text field disabled implies file has been chosen
         if (!$("input[id='" + id + "']").prop("disabled"))
         {
@@ -1055,8 +1040,6 @@
         }
 
         this.toggleDisabled($("input[id='" + id + "_targetList']"), hasValue);
-
-        var resolver = this.$form.find("select.resolver_select option:selected").val();
 
         if (hasValue && (resolver !== "NONE"))
         {
@@ -1072,37 +1055,53 @@
 
                                                       $targetNameResolutionStatus.addClass("busy");
 
-                                                      $.getJSON(autocompleteURL, {term: value, resolver: resolver},
+                                                      $.ajax({
+                                                               url: this.configuration.options.targetResolverEndpoint + "/" + id,
+                                                               data: {
+                                                                 term: value,
+                                                                 resolver: resolver.toLowerCase()
+                                                               },
+                                                               method: "GET",
+                                                               dataType: "json"
+                                                             })
+                                                          .done(
+                                                              /**
+                                                               * @param {{}} data   Response JSON
+                                                               * @param {String}  data.resolveStatus  Status text.
+                                                               */
+                                                              function (data)
+                                                              {
 
-                                                                /**
-                                                                 * @param {{}} data   Response JSON
-                                                                 * @param {String}  data.resolveStatus  Status text.
-                                                                 */
-                                                                function (data)
+                                                                // Was input text cleared before the event arrived?
+                                                                if ($.trim($("input[id='" + id + "']").val()).length >
+                                                                    0)
                                                                 {
-                                                                  $targetNameResolutionStatus.removeClass("busy");
-                                                                  this._clearTargetNameResolutionTooltip();
+                                                                  var arg = {
+                                                                    "data": data,
+                                                                    "id": id
+                                                                  };
 
-                                                                  // Was input text cleared before the event arrived?
-                                                                  if ($.trim($("input[id='" + id + "']").val()).length >
-                                                                      0)
+                                                                  // no, check resolve status return value
+                                                                  if ((data.resolveStatus === "GOOD"))
                                                                   {
-                                                                    var arg = {
-                                                                      "data": data,
-                                                                      "id": id
-                                                                    };
-
-                                                                    // no, check resolve status
-                                                                    if (data.resolveStatus === "GOOD")
-                                                                    {
-                                                                      this._trigger(ca.nrc.cadc.search.events.onTargetNameResolved, arg);
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                      this._trigger(ca.nrc.cadc.search.events.onTargetNameUnresolved, arg);
-                                                                    }
+                                                                    this._trigger(ca.nrc.cadc.search.events.onTargetNameResolved, arg);
                                                                   }
-                                                                }.bind(this));
+                                                                  else
+                                                                  {
+                                                                    this._trigger(ca.nrc.cadc.search.events.onTargetNameUnresolved, arg);
+                                                                  }
+                                                                }
+                                                              }.bind(this)
+                                                          )
+                                                          .fail(function (jqXHR)
+                                                                {
+                                                                  if (jqXHR.status === 425)
+                                                                  {
+                                                                    this._trigger(ca.nrc.cadc.search.events.onTargetNameUnresolved,
+                                                                                  {"id": id, "target": value});
+                                                                  }
+                                                                }.bind(this)
+                                                          );
                                                     }.bind(this), 700);
         }
         else
@@ -1130,9 +1129,9 @@
             elementID = id;
           }
 
-          var $label = this.$form.find("label[for='" + elementID +
-                                       "']").prev("summary").children("span.search_criteria_label_contents");
-          if ($label)
+          var $label =  this.$form.find("label[for='" + elementID + "'] .search_criteria_label_contents");
+
+            if ($label)
           {
             $label.empty();
             var searchCriteriaLabel = ((value !== "") && (JSON.stringify(data).indexOf("NaN") < 0)) ? data : "";
@@ -1183,8 +1182,8 @@
      */
     this._indicateInputPresence = function (hasValue, elementID, elementValue)
     {
-      var $label = this.$form.find("label[for='" + elementID + "']").prev("summary")
-          .children("span.search_criteria_label_contents");
+      var $label = this.$form.find("label[for='" + elementID + "'] .search_criteria_label_contents");
+
       if ($label.length > 0)
       {
         $label.empty();
@@ -1304,11 +1303,11 @@
 
       if (!jsonError || $.isEmptyObject(jsonError))
       {
-        $inputParent.removeClass("form-attention");
+        $inputParent.removeClass("has-error");
       }
       else
       {
-        $inputParent.addClass("form-attention");
+        $inputParent.addClass("has-error");
       }
     };
 
@@ -1318,10 +1317,10 @@
      */
     this.clearErrors = function ()
     {
-      this.$form.find(".form-attention").each(function (key, value)
-                                              {
-                                                this._decorate($(value).find("input.search_criteria_input"), null);
-                                              }.bind(this));
+      this.$form.find(".has-error").each(function (key, value)
+                                         {
+                                           this._decorate($(value).find("input.search_criteria_input"), null);
+                                         }.bind(this));
     };
 
     /**
@@ -1509,20 +1508,10 @@
      */
     this._clearTargetNameResolutionStatus = function ()
     {
+      this._closeResolverPopover();
       this._clearTargetNameResolutionStatusOnly();
-
-      // Clear the resolution tooltip.
-      this._clearTargetNameResolutionTooltip();
     };
 
-    /**
-     * Remove the data from the target name resolution tooltip.
-     * @private
-     */
-    this._clearTargetNameResolutionTooltip = function ()
-    {
-      this._getTargetNameResolutionStatusObject().tooltipster("content", "");
-    };
 
     /**
      * Attempt at cross-browser HTTPRequest creation.
@@ -1588,8 +1577,18 @@
      */
     this._closeAllTooltips = function ()
     {
-      var selector = "." + tooltipIconCSS;
-      $(selector).tooltipster("hide");
+      this.$form.find("." + tooltipIconCSS).popover("hide");
+
+      // This popover is associated with a stateful DOM element,
+      // close it explicitly
+      this._clearTargetNameResolutionStatus();
+
+    };
+
+    this._closeResolverPopover = function()
+    {
+        var resolverPopover = this.$form.find(".target_name_resolution_status");
+        resolverPopover.popover("hide");
     };
 
     /**
@@ -1600,7 +1599,7 @@
     {
       $("#UPLOAD").remove();
 
-      var inputFile = this.$form.find("input:file.target_upload");
+      var inputFile = this.$form.find("input:file[name='targetList']");
 
       if ((inputFile.length > 0) && !inputFile.prop("disabled") && (inputFile.val() !== ""))
       {
@@ -1661,25 +1660,15 @@
 
       if (this._validate())
       {
-        this.subscribe(ca.nrc.cadc.search.events.onSubmitComplete,
-                       function ()
-                       {
-                         if (this.targetTooltipsters.length === 2)
-                         {
-                           this.targetTooltipsters[1].disable();
-                           this.targetTooltipsters[1].enable();
-                         }
-                       }.bind(this));
-
-        var inputFile = $("input:file");
+        var inputFile = this.$form.find("input:file");
         var isUpload = (inputFile && (inputFile.val() !== ""));
-        this.toggleDisabled($("input[name='targetList']"), false);
+        this.toggleDisabled(this.$form.find("input[name='targetList']"), false);
 
         var netStart = (new Date()).getTime();
 
         try
         {
-          $("input." + this.configuration.getName() + "_selectlist").val(this.configuration.getSelectListString(false));
+            this.$form.find("input." + this.configuration.getName() + "_selectlist").val(this.configuration.getSelectListString(false));
         }
         catch (e)
         {
@@ -1776,16 +1765,7 @@
             this.toggleDisabled($selectCriteria, false);
           }.bind(this));
 
-      this.$form.find("input.search_criteria_input").each(
-          function (key, value)
-          {
-            var $formItem = $(value);
-            $("label[for='" + $formItem.attr("id") +
-              "']").prev("summary").children("span.search_criteria_label_contents").text("");
-            this.toggleDisabled($formItem, false);
-            this.closeDetailsItem($formItem.parents("details"));
-          }.bind(this));
-
+      this._closeAllTooltips();
       this._clearTargetNameResolutionStatus();
       this._clearDisablingCheckboxes();
 
@@ -1794,9 +1774,22 @@
                                     $(this).val("");
                                   });
 
-      var firstSelect = $(".hierarchy select:eq(0)");
-
       $("input[name$='.DOWNLOADCUTOUT']").prop("checked", false);
+
+        this.$form.find("input.search_criteria_input").each(
+            function (key, value)
+            {
+                var $formItem = $(value);
+                this.$form.find("label[for='" + $formItem.attr("id") + "'] .search_criteria_label_contents").text("");
+                this.toggleDisabled($formItem, false);
+                this.closeDetailsItem($formItem.parents("details"));
+            }.bind(this));
+
+
+      this.clearErrors();
+
+      // This needs to be specific to the form
+      var firstSelect = $("#" + this.id + " .hierarchy select:eq(0)");
 
       // Convert to DOM Element object.
       var jsFirstSelect = document.getElementById(firstSelect.prop("id"));
@@ -1804,9 +1797,6 @@
       {
         this.dataTrain.updateLists(jsFirstSelect, true);
       }
-
-      this.clearErrors();
-      this._closeAllTooltips();
 
       this._trigger(ca.nrc.cadc.search.events.onReset, {});
     };

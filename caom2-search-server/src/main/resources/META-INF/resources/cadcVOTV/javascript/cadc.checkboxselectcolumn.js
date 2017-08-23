@@ -220,7 +220,7 @@
             "<a id='_one-click_" + thisID + "' href='" + linkURL + "'"
             + (_self.options.oneClickDownloadTitle
               ? " title='" + _self.options.oneClickDownloadTitle + "'": "")
-            + " class='no-propagate-event'><span class='wb-icon-drive-download margin-left-small no-propagate-event'></span></a>";
+            + " class='no-propagate-event'><span aria-hidden='true' class='glyphicon glyphicon-download-alt one-click-download-link no-propagate-event'></span></a>";
         }
 
         return cellOutput;
