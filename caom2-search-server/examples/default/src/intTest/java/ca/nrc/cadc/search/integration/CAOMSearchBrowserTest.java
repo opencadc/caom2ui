@@ -61,6 +61,7 @@ public class CAOMSearchBrowserTest extends AbstractAdvancedSearchIntegrationTest
 
         searchFormPage.reset();
 
+
         final int index = searchFormPage.findDataTrainValueIndex(By.id("Observation.instrument.name"), "SPACER",
                                                                  false);
 
@@ -113,7 +114,11 @@ public class CAOMSearchBrowserTest extends AbstractAdvancedSearchIntegrationTest
 
         searchResultsPage.includeHiddenColumn("caom2:Observation.target.keywords");
 
-        // Add click on SSOIS link.
+        // Nav back to query tab for next test
+        searchFormPage = searchResultsPage.queryTab();
+        searchFormPage.reset();
+
+        System.out.println("searchCAOM test complete.");
 
         /*
         TODO - Complete for new Page Object model going forward.

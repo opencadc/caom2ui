@@ -1,0 +1,28 @@
+.checkbox {
+    margin-top:0px;
+}
+
+.search-constraints .form-group {
+    margin-bottom:0px;
+}
+
+.form-group summary:focus {
+    outline:none;
+}
+
+details[open] {
+    margin-bottom: 10px;
+}
+
+.result-state-link {
+    float:right;
+}
+
+.color-accent {
+    color: #145e91;
+    font-weight: normal;
+}
+
+.search_criteria_label_contents {
+    margin-left: 5px;
+}

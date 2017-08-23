@@ -58,11 +58,12 @@ public class FormInputBrowserTest extends AbstractAdvancedSearchIntegrationTest
     {
         final CAOMSearchFormPage caomSearchFormPage = goTo(endpoint, "", CAOMSearchFormPage.class);
 
-//        Observation Date.
+//      Observation Date.
         verifyFormInput(caomSearchFormPage, CAOMSearchFormPage.OBSERVATION_DATE_INPUT_ID, "BOG", true,
                         "Invalid: BOG");
         verifyFormInput(caomSearchFormPage, CAOMSearchFormPage.OBSERVATION_DATE_INPUT_ID, "", false,
                         "");
+
 
         // Spectral coverage.
         verifyFormInput(caomSearchFormPage, CAOMSearchFormPage.SPECTRAL_COVERAGE_INPUT_ID, "BOGUS", true, null);
@@ -76,10 +77,11 @@ public class FormInputBrowserTest extends AbstractAdvancedSearchIntegrationTest
 
         caomSearchFormPage.showInputField(CAOMSearchFormPage.OBSERVATION_DATE_INPUT_ID);
         caomSearchFormPage.select(By.id(CAOMSearchFormPage.OBSERVATION_DATE_INPUT_ID + "_PRESET"), "PAST_WEEK");
-        caomSearchFormPage
-                .verifyFormInputMessageMatches(CAOMSearchFormPage.OBSERVATION_DATE_INPUT_ID, false, "(.*)\\d\\.\\.\\d(.*)");
+        //TODO: uncomment when tooltip implementation is complete
+        caomSearchFormPage.verifyFormInputMessageMatches(CAOMSearchFormPage.OBSERVATION_DATE_INPUT_ID, false, "(.*)\\d\\.\\.\\d(.*)");
 
         // Close it again.
+        //TODO: uncomment when tooltip implementation is complete
         caomSearchFormPage.hideInputField(CAOMSearchFormPage.OBSERVATION_DATE_INPUT_ID);
 
         verifyFormInput(caomSearchFormPage, CAOMSearchFormPage.SPECTRAL_COVERAGE_INPUT_ID, "aaa", true, null);
@@ -91,7 +93,7 @@ public class FormInputBrowserTest extends AbstractAdvancedSearchIntegrationTest
                         "(1.2..3.0 arcseconds)");
         verifyFormInput(caomSearchFormPage, CAOMSearchFormPage.PIXEL_SCALE_INPUT_ID, "", false, "");
 
-        resetForm();
+        resetForm(CAOMSearchFormPage.RESET_BUTTON_SELECTOR);
         waitFor(2);
 
         verifyFormInput(caomSearchFormPage, CAOMSearchFormPage.OBSERVATION_DATE_INPUT_ID, "> 2010-09-22", false,
@@ -150,4 +152,5 @@ public class FormInputBrowserTest extends AbstractAdvancedSearchIntegrationTest
             caomSearchFormPage.verifyFormInputMessage(inputID, false, expectedLabelMessage);
         }
     }
+
 }

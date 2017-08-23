@@ -103,7 +103,7 @@ public class DefaultSyncTAPClientTest extends AbstractUnitTest<DefaultSyncTAPCli
         final Job testJob = new Job();
 
         expect(mockConfiguration.lookup(
-                DefaultSyncTAPClient.TAP_SERVICE_HOST_PORT_PROPERTY_KEY))
+                DefaultSyncTAPClient.TAP_SERVICE_HOST_PORT_PROPERTY_KEY, ""))
                 .andReturn(null).once();
 
         expect(mockRegistryClient.getServiceURL(

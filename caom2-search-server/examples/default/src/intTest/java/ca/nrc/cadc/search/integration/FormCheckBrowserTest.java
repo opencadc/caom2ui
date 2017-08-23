@@ -48,6 +48,7 @@ public class FormCheckBrowserTest extends AbstractAdvancedSearchIntegrationTest
      *
      * @throws Exception        Any testing errors.
      */
+    //TODO: uncomment when implementation is complete
     @Test
     public void verifyForm() throws Exception
     {
@@ -62,13 +63,13 @@ public class FormCheckBrowserTest extends AbstractAdvancedSearchIntegrationTest
      */
     private void verifyTooltips(final CAOMSearchFormPage searchFormPage) throws Exception
     {
-        searchFormPage.summonTooltip("Plane.position.bounds_details");
-        searchFormPage.closeTooltip();
+        searchFormPage.summonTooltip("Plane.position.bounds");
+        searchFormPage.closeTooltip("Plane.position.bounds");
 
-        searchFormPage.summonTooltip("Plane.position.sampleSize_details");
-        searchFormPage.closeTooltip();
+        searchFormPage.summonTooltip("Plane.position.sampleSize");
+        searchFormPage.closeTooltip("Plane.position.sampleSize");
 
-        searchFormPage.summonTooltip("Plane.time.bounds_details");
-        searchFormPage.closeTooltip();
+//        searchFormPage.summonTooltip("Plane.time.bounds");
+//        searchFormPage.closeTooltip("Plane.time.bounds");
     }
 }

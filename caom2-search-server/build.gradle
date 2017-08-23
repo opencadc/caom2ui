@@ -17,7 +17,7 @@ dependencies {
     compile 'org.json:json:20170516'
     compile 'org.opencadc:cadc-access-control:1.+'
     compile 'org.opencadc:cadc-uws:1.+'
-    compile 'org.opencadc:cadc-web-util:[1.0.8, )'
+    compile 'org.opencadc:cadc-web-util:[1.0.9, )'
     compile 'org.opencadc:cadc-adql:1.+'
     compile 'org.opencadc:cadc-util:1.+'
     compile 'org.opencadc:cadc-dali:1.+'
@@ -37,7 +37,5 @@ dependencies {
 }
 
 sourceCompatibility = 1.7
-
 group = 'org.opencadc'
-
-version = '1.2.21'
+version = '2.1.13'
