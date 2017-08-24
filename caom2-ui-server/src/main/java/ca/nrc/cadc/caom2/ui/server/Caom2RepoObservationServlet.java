@@ -105,10 +105,8 @@ import java.util.List;
 
 public class Caom2RepoObservationServlet extends HttpServlet
 {
-    private final long serialVersionUID = -917406909288899339L;
+    private final long serialVersionUID = 201708242300L;
     private static Logger log = Logger.getLogger(Caom2RepoObservationServlet.class);
-    protected URI resourceID = null;
-    protected URI capabilityKey = null;
     protected RegistryClient registryClient;
     protected ApplicationConfiguration applicationConfiguration;
 
@@ -158,7 +156,6 @@ public class Caom2RepoObservationServlet extends HttpServlet
         this.applicationConfiguration = new ApplicationConfiguration(PROPERTIES_FILE_PATH);
 
         // Parse number of path elements first
-        // TODO: what about validating parameters?
         try
         {
             String requestType = getRequestType(request);

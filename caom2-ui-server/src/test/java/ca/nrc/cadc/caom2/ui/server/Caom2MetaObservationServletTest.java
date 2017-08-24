@@ -33,13 +33,11 @@
  */
 package ca.nrc.cadc.caom2.ui.server;
 
-import ca.nrc.cadc.auth.AuthMethod;
 import ca.nrc.cadc.caom2.Algorithm;
 import ca.nrc.cadc.caom2.Observation;
 import ca.nrc.cadc.caom2.ObservationURI;
 import ca.nrc.cadc.config.ApplicationConfiguration;
 import ca.nrc.cadc.net.HttpDownload;
-import ca.nrc.cadc.reg.Standards;
 import ca.nrc.cadc.reg.client.RegistryClient;
 import org.junit.Test;
 
