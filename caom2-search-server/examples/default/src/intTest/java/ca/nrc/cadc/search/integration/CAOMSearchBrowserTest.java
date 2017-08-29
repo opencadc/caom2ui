@@ -54,13 +54,10 @@ public class CAOMSearchBrowserTest extends AbstractAdvancedSearchIntegrationTest
     {
         CAOMSearchFormPage searchFormPage = goTo(endpoint, null, CAOMSearchFormPage.class);
 
-        searchFormPage.ssoisLinkLoads();
-
         searchFormPage.enterObservationID("692512");
         searchFormPage.enterValidTarget("210.05  54.3");
 
         searchFormPage.reset();
-
 
         final int index = searchFormPage.findDataTrainValueIndex(By.id("Observation.instrument.name"), "SPACER",
                                                                  false);
