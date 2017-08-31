@@ -125,7 +125,7 @@ public class BaseClient
     public BaseClient() {}
 
     /**
-     * Testers or subclasses can override this as needed.
+     * Place for testers to override.
      *
      * @return Subject instance.
      */
@@ -134,6 +134,11 @@ public class BaseClient
         return AuthenticationUtil.getCurrentSubject();
     }
 
+    /**
+     * Place for testers to override.
+     *
+     * @return URL instance.
+     */
     public URL getServiceURL()
     {
         try
