@@ -151,8 +151,8 @@ public class Caom2RepoClient extends BaseClient
      * Get list of observations for named collection. Limited to 100.
      * NOTE: when 'order' parameter is supported by underlying client call,
      * the latest 100 will be displayed
-     * @param collection
-     * @return
+     * @param collection: collection name
+     * @return list of ObsLink objects
      */
     public List<ObsLink> getObservations(String collection)
     {

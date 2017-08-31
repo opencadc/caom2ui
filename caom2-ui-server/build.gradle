@@ -2,6 +2,7 @@ plugins {
     id 'maven'
     id 'java'
     id 'maven-publish'
+    id 'com.jfrog.bintray' version '1.7.3'
 }
 
 repositories {
@@ -35,7 +36,8 @@ dependencies {
 
 }
 
+
 sourceCompatibility = '1.7'
 
 group = 'org.opencadc'
-version = '1.1.2'
+version = '1.1.1'
