@@ -1,0 +1,41 @@
+plugins {
+    id 'maven'
+    id 'java'
+    id 'maven-publish'
+}
+
+repositories {
+    jcenter()
+    mavenLocal()
+}
+
+dependencies {
+    compile 'log4j:log4j:1.2.+'
+    compile 'com.opencsv:opencsv:3.+'
+    compile 'org.jdom:jdom2:2.+'
+    compile 'org.json:json:20170516'
+
+    compile 'org.opencadc:cadc-access-control:1.+'
+    compile 'org.opencadc:cadc-uws:1.+'
+    compile 'org.opencadc:cadc-adql:1.+'
+    compile 'org.opencadc:cadc-util:1.+'
+    compile 'org.opencadc:cadc-web-util:1.+'
+    compile 'org.opencadc:cadc-dali:1.+'
+    compile 'org.opencadc:caom2:2.+'
+    compile 'org.opencadc:cadc-registry:1.+'
+    compile 'org.opencadc:caom2-repo-server:[2.3.3,)'
+    compile 'org.opencadc:cadc-vosi:1.+'
+    compile 'org.apache.httpcomponents:httpclient:4.+'
+    compile 'org.apache.commons:commons-configuration2:2.+'
+
+    runtime 'jstl:jstl:1.+'
+
+    testCompile 'junit:junit:4.+'
+    testCompile 'org.easymock:easymock:3.+'
+
+}
+
+sourceCompatibility = '1.7'
+
+group = 'org.opencadc'
+version = '1.1.2'

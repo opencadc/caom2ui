@@ -44,7 +44,7 @@
 
   <servlet>
     <servlet-name>obsview</servlet-name>
-    <servlet-class>ca.nrc.cadc.caom2.ui.ObservationViewServlet</servlet-class>
+    <servlet-class>ca.nrc.cadc.caom2.ui.server.Caom2MetaObservationServlet</servlet-class>
     <load-on-startup>2</load-on-startup>
   </servlet>
 
