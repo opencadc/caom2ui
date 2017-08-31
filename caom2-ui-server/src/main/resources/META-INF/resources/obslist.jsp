@@ -1,7 +1,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
 <%@ page import="java.util.List" %>
-<%@ page import="ca.nrc.cadc.caom2.ui.server.caom2repo.ObsLink" %>
+<%@ page import="ca.nrc.cadc.caom2.ui.server.client.ObsLink" %>
 <%@ page import="ca.nrc.cadc.caom2.ui.server.SS" %>
 
 <%

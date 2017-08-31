@@ -8,7 +8,7 @@
 *  National Research Council            Conseil national de recherches
 *  Ottawa, Canada, K1A 0R6              Ottawa, Canada, K1A 0R6
 *  All rights reserved                  Tous droits réservés
-*                                       
+*
 *  NRC disclaims any warranties,        Le CNRC dénie toute garantie
 *  expressed, implied, or               énoncée, implicite ou légale,
 *  statutory, of any kind with          de quelque nature que ce
@@ -31,10 +31,10 @@
 *  software without specific prior      de ce logiciel sans autorisation
 *  written permission.                  préalable et particulière
 *                                       par écrit.
-*                                       
+*
 *  This file is part of the             Ce fichier fait partie du projet
 *  OpenCADC project.                    OpenCADC.
-*                                       
+*
 *  OpenCADC is free software:           OpenCADC est un logiciel libre ;
 *  you can redistribute it and/or       vous pouvez le redistribuer ou le
 *  modify it under the terms of         modifier suivant les termes de
@@ -44,7 +44,7 @@
 *  either version 3 of the              : soit la version 3 de cette
 *  License, or (at your option)         licence, soit (à votre gré)
 *  any later version.                   toute version ultérieure.
-*                                       
+*
 *  OpenCADC is distributed in the       OpenCADC est distribué
 *  hope that it will be useful,         dans l’espoir qu’il vous
 *  but WITHOUT ANY WARRANTY;            sera utile, mais SANS AUCUNE
@@ -54,7 +54,7 @@
 *  PURPOSE.  See the GNU Affero         PARTICULIER. Consultez la Licence
 *  General Public License for           Générale Publique GNU Affero
 *  more details.                        pour plus de détails.
-*                                       
+*
 *  You should have received             Vous devriez avoir reçu une
 *  a copy of the GNU Affero             copie de la Licence Générale
 *  General Public License along         Publique GNU Affero avec
@@ -67,19 +67,54 @@
 ************************************************************************
 */
 
-package ca.nrc.cadc.caom2.ui.server.caom2repo;
+package ca.nrc.cadc.caom2.ui.server.client;
 
+import ca.nrc.cadc.caom2.Observation;
 import ca.nrc.cadc.caom2.ObservationURI;
+import ca.nrc.cadc.net.HttpDownload;
+import ca.nrc.cadc.reg.Standards;
+import org.apache.log4j.Logger;
 
-import java.util.Date;
+import javax.security.auth.Subject;
+import java.net.URI;
+import java.net.URL;
 
 /**
- *
- * @author pdowler
+ * Get observation information from caom2meta
+ * 
+ * @author hjeeves
  */
-public class ObsLink 
+public class Caom2MetaClient extends BaseClient
 {
-    public String type;
-    public ObservationURI uri;
-    public Date lastModified;
+    private static final Logger log = Logger.getLogger(Caom2MetaClient.class);
+
+    static final String CAOM2META_SERVICE_URI_PROPERTY_KEY = "org.opencadc.caom2ui.caom2ops-service-id";
+    static final URI CAOM2META_RESOURCE_ID = URI.create("ivo://cadc.nrc.ca/caom2ops");
+
+    public Caom2MetaClient() {
+        resourceId = CAOM2META_RESOURCE_ID;
+        propertyKey = CAOM2META_SERVICE_URI_PROPERTY_KEY;
+        standardsURI = Standards.CAOM2_OBS_20;
+        // Set path at a point where observation information is available
+    }
+
+    /**
+     * Download the Observation for the given URI.
+     * @param subject The Subject to download as.
+     * @param uri     The Observation URI.
+     * @return Observation instance.
+     */
+    public Observation getObservation(final Subject subject, final ObservationURI uri)
+    {
+        path = "?ID=" + uri.getURI().toString();
+        URL serviceURL = getServiceURL();
+
+        final ReadAction ra = getObservationReader();
+        final HttpDownload get = getDownloader(serviceURL, ra);
+
+        Subject.doAs(subject, new GetAction(get, uri));
+
+        return ra.getObs();
+    }
+
 }

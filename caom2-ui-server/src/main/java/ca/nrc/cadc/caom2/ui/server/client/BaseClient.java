@@ -67,174 +67,205 @@
 ************************************************************************
 */
 
-package ca.nrc.cadc.caom2.ui.server.caom2repo;
+package ca.nrc.cadc.caom2.ui.server.client;
 
 import ca.nrc.cadc.auth.AuthMethod;
 import ca.nrc.cadc.auth.AuthenticationUtil;
+import ca.nrc.cadc.caom2.Observation;
 import ca.nrc.cadc.caom2.ObservationURI;
+import ca.nrc.cadc.caom2.xml.ObservationParsingException;
+import ca.nrc.cadc.caom2.xml.ObservationReader;
+import ca.nrc.cadc.config.ApplicationConfiguration;
 import ca.nrc.cadc.date.DateUtil;
 import ca.nrc.cadc.net.HttpDownload;
-import ca.nrc.cadc.reg.Capabilities;
-import ca.nrc.cadc.reg.Capability;
-import ca.nrc.cadc.reg.Interface;
-import ca.nrc.cadc.reg.Standards;
+import ca.nrc.cadc.net.InputStreamWrapper;
 import ca.nrc.cadc.reg.client.RegistryClient;
+import ca.nrc.cadc.util.StringUtil;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.log4j.Logger;
 
 import javax.security.auth.Subject;
 import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.security.PrivilegedAction;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 /**
- * Get Collections Lists for display on first page of app.
- * 
+ *
  * @author hjeeves
  */
-public class CaomRepoClient
+public class BaseClient
 {
-    private static final Logger log = Logger.getLogger(CaomRepoClient.class);
-    public static final URI CAOM_REPO_RESOURCE_ID = URI.create("ivo://cadc.nrc.ca/caom2repo");
-    private static String CANT_GET_COLLECTIONS_LIST = "Unable to get collection list.";
-    private static String CANT_GET_OBSERVATION_LIST = "Unable to get observation list.";
+    private static final Logger log = Logger.getLogger(BaseClient.class);
+    protected URI resourceId;
+    protected URI standardsURI;
+    protected String path;
+    protected String propertyKey;
 
-    private String getServiceUrlString()
-            throws IOException
+    private static final String PROPERTIES_FILE_PATH = System.getProperty("user.home")
+            + "/config/org.opencadc.caom2ui.properties";
+
+    private static final String ERROR_MESSAGE_NOT_FOUND_FORBIDDEN =
+            "Observation with URI '%s' not found, or you are "
+                    + "forbidden from seeing it.  Please login and "
+                    + "try again. | l'Observation '%s' pas "
+                    + "trouvé, ou vous n'avez pas permission.  S'il "
+                    + "vous plaît connecter et essayez à nouveau.";
+
+
+    public BaseClient() {}
+
+    /**
+     * Testers or subclasses can override this as needed.
+     *
+     * @return Subject instance.
+     */
+    public Subject getCurrentSubject()
     {
-        String serviceURL;
+        return AuthenticationUtil.getCurrentSubject();
+    }
+
+    public URL getServiceURL()
+    {
         try
         {
-            // Discover caom2repo service URL
+            // Discover client service URL
+            Subject subject = getCurrentSubject();
             RegistryClient rc = new RegistryClient();
-            Subject subject = AuthenticationUtil.getCurrentSubject();
+            ApplicationConfiguration ac = new ApplicationConfiguration(PROPERTIES_FILE_PATH);
+
             AuthMethod authMethod = AuthenticationUtil.getAuthMethodFromCredentials(subject);
             if (authMethod == null)
             {
                 authMethod = AuthMethod.ANON;
             }
 
-            Capabilities caps = rc.getCapabilities(CAOM_REPO_RESOURCE_ID);
-            Capability dataCap = caps.findCapability(Standards.CAOM2REPO_OBS_23);
-            URI securityMethod = Standards.getSecurityMethod(authMethod);
-            Interface ifc = dataCap.findInterface(securityMethod);
-            if (ifc == null)
+
+            final URL repoURL = rc.getServiceURL(ac.lookupServiceURI(propertyKey, resourceId), standardsURI, authMethod);
+
+            final URIBuilder builder = new URIBuilder(repoURL.toExternalForm() + path);
+
+            final String metaServiceHost = ac.lookup(propertyKey);
+
+            if (StringUtil.hasText(metaServiceHost))
             {
-                throw new IllegalArgumentException("No interface for security method " + securityMethod);
+                final URI metaServiceURI = URI.create(metaServiceHost);
+
+                builder.setHost(metaServiceURI.getHost());
+                builder.setPort(metaServiceURI.getPort());
             }
-            serviceURL = ifc.getAccessURL().getURL().toString();
+
+            return builder.build().toURL();
         }
-        catch (IOException ioe)
+        catch (URISyntaxException | MalformedURLException urie)
         {
-            {
-                throw new IOException("Can't connect to caom2repo service: " + ioe.getMessage());
-            }
+            String errMsg = "Can't get service URL for resource " + resourceId.toString() + " " + standardsURI.toString();
+            log.error(errMsg);
+            throw new RuntimeException(errMsg, urie);
         }
 
-        return serviceURL;
-    }
-
-    /**
-     * Call caom2repo for list of collections.
-     * @return list of collections
-     */
-    public List<String> getCollections()
-        throws IOException
-    {
-        List<String> ret = new ArrayList<>();
-        try
-        {
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            String urlStr = getServiceUrlString();
-            URL url = new URL(urlStr);
-            HttpDownload get = new HttpDownload(url, bos);
-            get.run();
-
-            int response = get.getResponseCode();
-
-            if (response == 200)
-            {
-                String message = bos.toString().trim();
-                String[] lines = message.split("\\r?\\n");
-
-                for (int i = 0; i < lines.length; i++)
-                {
-                    ret.add(lines[i]);
-                }
-            }
-            else
-            {
-                throw new RuntimeException(CANT_GET_COLLECTIONS_LIST + " Response code:" + response);
-            }
-        }
-        catch(IOException ex)
-        {
-            throw new IOException(ex);
-        }
-        Collections.sort(ret);
-        return ret;
     }
 
 
     /**
-     * Get list of observations for named collection. Limited to 100.
-     * NOTE: when 'order' parameter is supported by underlying caom2repo call,
-     * the latest 100 will be displayed
-     * @param collection
-     * @return
+     * Place for testers to override.
+     *
+     * @return ReadAction instance.
      */
-    public List<ObsLink> getObservations(String collection)
+    public BaseClient.ReadAction getObservationReader()
     {
-        String dataSourceName = null;
-        List<ObsLink> obsUriList = new ArrayList<>();
-        try
+        return new BaseClient.ReadAction();
+    }
+
+    /**
+     * Obtain a new instance of a downloader.  Tests can override as needed.
+     *
+     * @param url        The URL to download from.
+     * @param readAction The read action to write to.
+     * @return HttpDownload instance.
+     */
+    public HttpDownload getDownloader(final URL url, final BaseClient.ReadAction readAction)
+    {
+        return new HttpDownload(url, readAction);
+    }
+
+
+    public class ReadAction implements InputStreamWrapper
+    {
+        private Observation obs;
+
+
+        public void read(final InputStream in) throws IOException
         {
-            String urlBase = getServiceUrlString();
-
-            URL collectionURL = new URL(urlBase + "/" + collection + "?maxrec=100&order=desc");
-
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            HttpDownload get = new HttpDownload(collectionURL, bos);
-            get.run();
-
-            int response = get.getResponseCode();
-
-            if (response == 200)
+            try
             {
-                String message = bos.toString().trim();
-                String[] lines = message.split("\\r?\\n");
+                final ObservationReader r = new ObservationReader(false);
+                this.obs = r.read(in);
+            }
+            catch (ObservationParsingException ex)
+            {
+                throw new RuntimeException(
+                        "Failed to read observation from /client | "
+                                + "Impossible d'obtenir l'observation de /client.");
+            }
+        }
 
-                for (int i = 0; i < lines.length; i++)
+        public Observation getObs()
+        {
+            return obs;
+        }
+    }
+
+
+    protected class GetAction implements PrivilegedAction<Void>
+    {
+        private final ObservationURI uri;
+        private final HttpDownload downloader;
+
+
+        GetAction(final HttpDownload downloader, final ObservationURI uri)
+        {
+            this.downloader = downloader;
+            this.uri = uri;
+        }
+
+        public Void run()
+        {
+            downloader.run();
+
+            final Throwable e = downloader.getThrowable();
+
+            if (e != null)
+            {
+                final String message;
+
+                if (e instanceof FileNotFoundException)
                 {
-                    String [] obsLinkData = lines[i].split("\\t");
-                    // Create a new ObsLink object from first 3 columns of each row
-                    ObsLink nextObs = new ObsLink();
-                    nextObs.type = "not set";
-                    nextObs.uri = new ObservationURI(obsLinkData[0], obsLinkData[1]);
-                    nextObs.lastModified = DateUtil.flexToDate(obsLinkData[2],DateUtil.getDateFormat(DateUtil.ISO8601_DATE_FORMAT_LOCAL,DateUtil.UTC));
-                    obsUriList.add(nextObs);
+                    message = ERROR_MESSAGE_NOT_FOUND_FORBIDDEN;
                 }
-            }
-            else
-            {
-                throw new RuntimeException(CANT_GET_OBSERVATION_LIST + " Response code:" + response);
+                else
+                {
+                    message = "Failed to get observation '%s' from '%s'. "
+                            + "| Impossible d'obtenir l'observation '%s' "
+                            + "de client.";
+                }
+
+                throw new RuntimeException(
+                        String.format(message, uri,
+                                downloader.getURL().toExternalForm(),
+                                uri));
             }
 
-            return obsUriList;
-        }
-        catch(IOException ex)
-        {
-            log.error("failed to get observation: ", ex);
-            throw new RuntimeException("Failed to get observations list.", ex);
-        }
-        catch(ParseException pe)
-        {
-            log.error("Unable to parse datestamp");
-            throw new RuntimeException("Unable to parse datestamp.", pe);
+            return null;
         }
     }
 

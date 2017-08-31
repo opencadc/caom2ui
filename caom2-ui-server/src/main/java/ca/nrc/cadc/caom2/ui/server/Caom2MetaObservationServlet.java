@@ -73,6 +73,7 @@ import ca.nrc.cadc.auth.AuthMethod;
 import ca.nrc.cadc.auth.AuthenticationUtil;
 import ca.nrc.cadc.caom2.Observation;
 import ca.nrc.cadc.caom2.ObservationURI;
+import ca.nrc.cadc.caom2.ui.server.client.Caom2MetaClient;
 import ca.nrc.cadc.caom2.xml.ObservationParsingException;
 import ca.nrc.cadc.caom2.xml.ObservationReader;
 import ca.nrc.cadc.config.ApplicationConfiguration;
@@ -105,10 +106,6 @@ public class Caom2MetaObservationServlet extends HttpServlet
 {
     private final long serialVersionUID = -917406909288899339L;
     private static Logger log = Logger.getLogger(Caom2MetaObservationServlet.class);
-    protected URI resourceID = null;
-    protected URI capabilityKey = null;
-    protected RegistryClient registryClient;
-    protected ApplicationConfiguration applicationConfiguration;
 
     private static final String ERROR_MESSAGE_NOT_FOUND_FORBIDDEN =
             "Observation with URI '%s' not found, or you are "
@@ -117,22 +114,12 @@ public class Caom2MetaObservationServlet extends HttpServlet
             + "trouvé, ou vous n'avez pas permission.  S'il "
             + "vous plaît connecter et essayez à nouveau.";
 
-    static final String CAOM2META_SERVICE_URI_PROPERTY_KEY = "org.opencadc.caom2ui.caom2ops-service-id";
-    static final String CAOM2META_SERVICE_HOST_PORT_PROPERTY_KEY = "org.opencadc.caom2ui.caom2ops-service-host-port";
-    static final URI CAOM2META_RESOURCE_ID = URI.create("ivo://cadc.nrc.ca/caom2ops");
-    private static final String PROPERTIES_FILE_PATH = System.getProperty("user.home")
-                                                       + "/config/org.opencadc.caom2ui.properties";
+
+    public  Caom2MetaClient metaClient = new Caom2MetaClient();
 
 
     public Caom2MetaObservationServlet()
     {
-        this(new RegistryClient(), new ApplicationConfiguration(PROPERTIES_FILE_PATH));
-    }
-
-    Caom2MetaObservationServlet(final RegistryClient registryClient, final ApplicationConfiguration applicationConfiguration)
-    {
-        this.registryClient = registryClient;
-        this.applicationConfiguration = applicationConfiguration;
     }
 
     /**
@@ -150,9 +137,7 @@ public class Caom2MetaObservationServlet extends HttpServlet
             throws ServletException, IOException
     {
         final long start = System.currentTimeMillis();
-
-        this.registryClient = new RegistryClient();
-        this.applicationConfiguration = new ApplicationConfiguration(PROPERTIES_FILE_PATH);
+        String errMsg = "";
 
         try
         {
@@ -160,10 +145,11 @@ public class Caom2MetaObservationServlet extends HttpServlet
             final ObservationURI uri = getURI(request);
             if (uri == null)
             {
-                // error handling
-                throw new RuntimeException(
-                        "Must specify collection/observationID in the path. | "
-                        + "Le chemain est incomplet.");
+                errMsg = "Must specify collection/observationID in the path. | "
+                        + "Le chemain est incomplet.";
+                log.error(errMsg);
+                request.setAttribute("errorMsg", errMsg);
+                forward(request, response, "/error.jsp");
             }
             else
             {
@@ -171,13 +157,14 @@ public class Caom2MetaObservationServlet extends HttpServlet
                 request.setAttribute("observationID", uri.getObservationID());
 
                 final Observation obs =
-                        getObservation(getCurrentSubject(), uri);
+                        metaClient.getObservation(metaClient.getCurrentSubject(), uri);
 
                 if (obs == null)
                 {
-                    throw new RuntimeException(
-                            String.format(ERROR_MESSAGE_NOT_FOUND_FORBIDDEN,
-                                          uri, uri));
+                    errMsg = String.format(ERROR_MESSAGE_NOT_FOUND_FORBIDDEN, uri, uri);
+                    log.error(errMsg);
+                    request.setAttribute("errorMsg", errMsg);
+                    forward(request, response, "/error.jsp");
                 }
                 else
                 {
@@ -185,11 +172,6 @@ public class Caom2MetaObservationServlet extends HttpServlet
                     forward(request, response, "/display.jsp");
                 }
             }
-        }
-        catch (NumberFormatException nex)
-        {
-            // no obsID == malformed request
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         }
         catch (RuntimeException oops)
         {
@@ -207,172 +189,8 @@ public class Caom2MetaObservationServlet extends HttpServlet
                          final HttpServletResponse response, final String path)
             throws ServletException, IOException
     {
-        final RequestDispatcher dispatcher = request.getRequestDispatcher(path);
-        dispatcher.forward(request, response);
-    }
-
-    /**
-     * Download the Observation for the given URI.
-     * @param subject The Subject to download as.
-     * @param uri     The Observation URI.
-     * @return Observation instance.
-     */
-    Observation getObservation(final Subject subject, final ObservationURI uri)
-    {
-        try
-        {
-            final URL serviceURL = getServiceURL(uri);
-
-            log.debug("GET " + serviceURL);
-
-            final ReadAction ra = getObservationReader();
-            final HttpDownload get = getDownloader(serviceURL, ra);
-
-            Subject.doAs(subject, new GetAction(get, uri));
-
-            return ra.getObs();
-        }
-        catch (IOException | URISyntaxException ex)
-        {
-            throw new RuntimeException(
-                    "BUG: failed to find cred service in registry");
-        }
-    }
-
-    // Default calls caom2ops, so add ID.
-    // Any other servlet that extends this would have to override this function to
-    // generate the correct url for calling it's endpoint
-    protected URL getServiceURL(final ObservationURI uri)
-            throws URISyntaxException, IOException
-    {
-        // Discover caom2repo service URL
-        Subject subject = AuthenticationUtil.getCurrentSubject();
-        AuthMethod authMethod = AuthenticationUtil.getAuthMethodFromCredentials(subject);
-        if (authMethod == null)
-        {
-            authMethod = AuthMethod.ANON;
-        }
-
-        final URL repoURL = registryClient.getServiceURL(applicationConfiguration.lookupServiceURI(
-                CAOM2META_SERVICE_URI_PROPERTY_KEY,CAOM2META_RESOURCE_ID), Standards.CAOM2_OBS_20, authMethod);
-
-        final URIBuilder builder = new URIBuilder(repoURL.toURI());
-
-        final String metaServiceHost = applicationConfiguration.lookup(CAOM2META_SERVICE_HOST_PORT_PROPERTY_KEY);
-
-        if (StringUtil.hasText(metaServiceHost))
-        {
-            final URI metaServiceURI = URI.create(metaServiceHost);
-
-            builder.setHost(metaServiceURI.getHost());
-            builder.setPort(metaServiceURI.getPort());
-        }
-
-        builder.addParameter("ID", uri.getURI().toString());
-
-        return builder.build().toURL();
-    }
-
-    /**
-     * Place for testers to override.
-     *
-     * @return ReadAction instance.
-     */
-    ReadAction getObservationReader()
-    {
-        return new ReadAction();
-    }
-
-    /**
-     * Obtain a new instance of a downloader.  Tests can override as needed.
-     *
-     * @param url        The URL to download from.
-     * @param readAction The read action to write to.
-     * @return HttpDownload instance.
-     */
-    HttpDownload getDownloader(final URL url, final ReadAction readAction)
-    {
-        return new HttpDownload(url, readAction);
-    }
-
-    /**
-     * Testers or subclasses can override this as needed.
-     *
-     * @return Subject instance.
-     */
-    Subject getCurrentSubject()
-    {
-        return AuthenticationUtil.getCurrentSubject();
-    }
-
-
-    private class GetAction implements PrivilegedAction<Void>
-    {
-        private final ObservationURI uri;
-        private final HttpDownload downloader;
-
-
-        GetAction(final HttpDownload downloader, final ObservationURI uri)
-        {
-            this.downloader = downloader;
-            this.uri = uri;
-        }
-
-        public Void run()
-        {
-            downloader.run();
-
-            final Throwable e = downloader.getThrowable();
-
-            if (e != null)
-            {
-                final String message;
-
-                if (e instanceof FileNotFoundException)
-                {
-                    message = ERROR_MESSAGE_NOT_FOUND_FORBIDDEN;
-                }
-                else
-                {
-                    message = "Failed to get observation '%s' from '%s'. "
-                              + "| Impossible d'obtenir l'observation '%s' "
-                              + "de caom2meta.";
-                }
-
-                throw new RuntimeException(
-                        String.format(message, uri,
-                                      downloader.getURL().toExternalForm(),
-                                      uri));
-            }
-
-            return null;
-        }
-    }
-
-    class ReadAction implements InputStreamWrapper
-    {
-        private Observation obs;
-
-
-        public void read(final InputStream in) throws IOException
-        {
-            try
-            {
-                final ObservationReader r = new ObservationReader(false);
-                this.obs = r.read(in);
-            }
-            catch (ObservationParsingException ex)
-            {
-                throw new RuntimeException(
-                        "Failed to read observation from /caom2meta | "
-                        + "Impossible d'obtenir l'observation de /caom2meta.");
-            }
-        }
-
-        Observation getObs()
-        {
-            return obs;
-        }
+            final RequestDispatcher dispatcher = request.getRequestDispatcher(path);
+            dispatcher.forward(request, response);
     }
 
 
