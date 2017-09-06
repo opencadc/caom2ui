@@ -204,9 +204,9 @@ abstract class AbstractSearchFormPage extends AbstractTestWebPage
     void closeTooltip(final String baseID) throws Exception
     {
         //*[@id="Plane.position.bounds_close"]
-        final By tooltipID = By.xpath("//*[@id=\"" + baseID + "_close\"");
-        final WebElement tooltipClose = find(tooltipID);
+        final By tooltipID = By.className("glyphicon-remove-circle");
         waitForElementPresent(tooltipID);
+        final WebElement tooltipClose = find(tooltipID);
         waitForElementVisible(tooltipClose);
         click(tooltipClose);
         waitForElementNotPresent(tooltipID);
