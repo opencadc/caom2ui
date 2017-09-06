@@ -202,9 +202,10 @@ abstract class AbstractSearchFormPage extends AbstractTestWebPage
 
     void closeTooltip(final String baseID) throws Exception
     {
-        String tooltipID = baseID + "_close";
-        click(By.id(tooltipID));
-        waitForElementNotPresent(By.id(tooltipID));
+        final By tooltipID = By.id(baseID + "_close");
+        final WebElement tooltipClose = find(tooltipID);
+        click(tooltipClose);
+        waitForElementNotPresent(tooltipID);
     }
 
 
