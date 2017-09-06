@@ -64,7 +64,7 @@ public class FormCheckBrowserTest extends AbstractAdvancedSearchIntegrationTest
     private void verifyTooltips(final CAOMSearchFormPage searchFormPage) throws Exception
     {
         searchFormPage.summonTooltip("Plane.position.bounds");
-        searchFormPage.closeTooltip("#Plane\\.position\\.bounds_close");
+        searchFormPage.closeTooltip("Plane.position.bounds");
 
         searchFormPage.summonTooltip("Plane.position.sampleSize");
         searchFormPage.closeTooltip("Plane.position.sampleSize");
