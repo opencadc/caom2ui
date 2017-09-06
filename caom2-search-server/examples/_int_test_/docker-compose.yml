@@ -38,6 +38,8 @@ services:
       - POSTGRES_PASSWORD=astr0query
   caom2-meta-ui.cadc.dao.nrc.ca:
     image: opencadc/caom2-meta-ui
+    ports:
+      - '5556:5555'
     networks:
       - 'selenium'
     environment:

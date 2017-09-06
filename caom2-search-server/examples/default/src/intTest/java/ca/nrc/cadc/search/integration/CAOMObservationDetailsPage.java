@@ -84,7 +84,7 @@ class CAOMObservationDetailsPage extends AbstractTestWebPage
         super(driver);
 
         selectWindow(WINDOW_ID);
-        waitForTextPresent(H1_HEADER, "Common Archive Observation Model (CAOM2)");
+        waitForTextPresent(H1_HEADER, "Common Archive Observation Model (CAOM");
     }
 
     void close() throws Exception
