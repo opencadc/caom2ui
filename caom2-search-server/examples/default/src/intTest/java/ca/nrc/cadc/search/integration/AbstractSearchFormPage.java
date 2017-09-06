@@ -74,6 +74,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 
 abstract class AbstractSearchFormPage extends AbstractTestWebPage
@@ -205,6 +206,8 @@ abstract class AbstractSearchFormPage extends AbstractTestWebPage
         //*[@id="Plane.position.bounds_close"]
         final By tooltipID = By.xpath("//*[@id=\"" + baseID + "_close\"");
         final WebElement tooltipClose = find(tooltipID);
+        waitForElementPresent(tooltipID);
+        waitForElementVisible(tooltipClose);
         click(tooltipClose);
         waitForElementNotPresent(tooltipID);
     }
