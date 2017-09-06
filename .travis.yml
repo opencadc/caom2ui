@@ -1,6 +1,6 @@
 env:
   DOCKER_COMPOSE_VERSION: 1.14.0
-  CAOM2_SEARCH_SERVER_VERSION: 2.1.10
+  CAOM2_SEARCH_SERVER_VERSION: 2.1.14
 language: java
 jdk:
 - oraclejdk8
