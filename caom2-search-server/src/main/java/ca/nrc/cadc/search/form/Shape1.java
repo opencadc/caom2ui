@@ -29,21 +29,17 @@ package ca.nrc.cadc.search.form;
 
 import ca.nrc.cadc.caom2.RangeSearch;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import ca.nrc.cadc.caom2.types.*;
 import ca.nrc.cadc.search.parser.resolver.ResolverImpl;
 import org.apache.log4j.Logger;
 
 import ca.nrc.cadc.caom2.SearchTemplate;
 import ca.nrc.cadc.caom2.SpatialSearch;
 import ca.nrc.cadc.caom2.TextSearch;
-import ca.nrc.cadc.caom2.types.Circle;
-import ca.nrc.cadc.caom2.types.Location;
-import ca.nrc.cadc.caom2.types.Point;
-import ca.nrc.cadc.caom2.types.Polygon;
-import ca.nrc.cadc.caom2.types.SegmentType;
-import ca.nrc.cadc.caom2.types.Shape;
-import ca.nrc.cadc.caom2.types.Vertex;
 import ca.nrc.cadc.search.ObsModel;
 import ca.nrc.cadc.search.parser.CoordSys;
 import ca.nrc.cadc.search.parser.Operand;
@@ -159,25 +155,29 @@ public class Shape1 extends AbstractFormConstraint implements SearchableFormCons
                 final Double decLower = normalizeDec(getDecRange().getLowerValue());
                 final Double decUpper = normalizeDec(getDecRange().getUpperValue());
 
-                final CaseInsensitiveStringComparator comparator =
-                        new CaseInsensitiveStringComparator();
+                final CaseInsensitiveStringComparator comparator = new CaseInsensitiveStringComparator();
                 if ((getCoordsys() != null) &&
                     ((comparator.compare(getCoordsys(), CoordSys.FK4.getValue()) == 0) ||
                      (comparator.compare(getCoordsys(), CoordSys.B1950.getValue()) == 0) ||
                      (comparator.compare(getCoordsys(), CoordSys.B1950_0.getValue()) == 0) ||
                      (comparator.compare(getCoordsys(), CoordSys.GAL.getValue()) == 0)))
                 {
-                    Polygon polygon = new Polygon();
-                    polygon.getVertices().add(new Vertex(raLower, decLower, SegmentType.MOVE));
-                    polygon.getVertices().add(new Vertex(raUpper, decLower, SegmentType.LINE));
-                    polygon.getVertices().add(new Vertex(raUpper, decUpper, SegmentType.LINE));
-                    polygon.getVertices().add(new Vertex(raLower, decUpper, SegmentType.LINE));
-                    polygon.getVertices().add(new Vertex(0.0, 0.0, SegmentType.CLOSE));
+                    final List<Point> vertexPoints = new ArrayList<>();
+                    final List<Vertex> vertices = new ArrayList<>();
+
+                    vertices.add(new Vertex(raLower, decLower, SegmentType.MOVE));
+                    vertices.add(new Vertex(raUpper, decLower, SegmentType.LINE));
+                    vertices.add(new Vertex(raUpper, decUpper, SegmentType.LINE));
+                    vertices.add(new Vertex(raLower, decUpper, SegmentType.LINE));
+                    vertices.add(new Vertex(0.0, 0.0, SegmentType.CLOSE));
+
+                    Collections.copy(vertexPoints, vertices);
+
+                    Polygon polygon = new Polygon(vertexPoints, new MultiPolygon(vertices));
 
                     Point2D point;
-                    for (int i = 0; i < polygon.getVertices().size(); i++)
+                    for (final Vertex vertex : vertices)
                     {
-                        final Vertex vertex = polygon.getVertices().get(i);
                         if (!SegmentType.CLOSE.equals(vertex.getType()))
                         {
                             if (comparator.compare(getCoordsys(), CoordSys.GAL.getValue()) == 0)
@@ -188,6 +188,7 @@ public class Shape1 extends AbstractFormConstraint implements SearchableFormCons
                             {
                                 point = wcscon.fk425(new Point2D.Double(vertex.cval1, vertex.cval2));
                             }
+
                             vertex.cval1 = point.getX();
                             vertex.cval2 = point.getY();
                         }

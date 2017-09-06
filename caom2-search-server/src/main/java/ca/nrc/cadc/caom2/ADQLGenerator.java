@@ -106,7 +106,7 @@ public class ADQLGenerator extends AbstractPersistenceService
             final Polygon poly = (Polygon) s.getPosition();
             sb.append("INTERSECTS( POLYGON('ICRS'");
 
-            for (final Vertex v : poly.getVertices())
+            for (final Vertex v : poly.getSamples().getVertices())
             {
                 if (v.getType() != SegmentType.CLOSE)
                 {
