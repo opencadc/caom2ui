@@ -37,6 +37,7 @@ import ca.nrc.cadc.auth.AuthMethod;
 import ca.nrc.cadc.net.NetUtil;
 import ca.nrc.cadc.reg.Standards;
 import ca.nrc.cadc.reg.client.RegistryClient;
+import org.apache.log4j.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -52,6 +53,7 @@ import java.net.URL;
 
 public class PreviewServlet extends HttpServlet
 {
+    private static final Logger LOGGER = Logger.getLogger(PreviewServlet.class);
     public static final String DATA_URI = "ivo://cadc.nrc.ca/data";
 
     private URL dataServiceURL;
@@ -86,6 +88,9 @@ public class PreviewServlet extends HttpServlet
             throws ServletException, IOException
     {
         final URL jobURL = createJobURL(req);
+
+        LOGGER.info("Retreving preview from " + jobURL.toExternalForm());
+
         final HttpURLConnection connection = connect(jobURL);
 
         connection.setDoInput(false);
