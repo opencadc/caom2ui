@@ -199,17 +199,18 @@ abstract class AbstractSearchFormPage extends AbstractTestWebPage
 
         waitForElementPresent(tooltipIconTriggerBy);
         click(tooltipIconTriggerBy);
+        waitForElementPresent(By.className("popover"));
+        waitForElementVisible(By.className("popover"));
     }
 
     void closeTooltip(final String baseID) throws Exception
     {
-        //*[@id="Plane.position.bounds_close"]
-        final By tooltipID = By.className("glyphicon-remove-circle");
-        waitForElementPresent(tooltipID);
-        final WebElement tooltipClose = find(tooltipID);
+        final By tooltipCloseLink = By.className("glyphicon-remove-circle");
+        waitForElementPresent(tooltipCloseLink);
+        final WebElement tooltipClose = find(tooltipCloseLink);
         waitForElementVisible(tooltipClose);
         click(tooltipClose);
-        waitForElementNotPresent(tooltipID);
+        waitForElementNotPresent(tooltipCloseLink);
     }
 
 
