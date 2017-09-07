@@ -103,16 +103,14 @@ abstract class AbstractSearchFormPage extends AbstractTestWebPage
         PageFactory.initElements(driver, this);
     }
 
-    void enterInputValue(final By inputBy, final String value) throws Exception
-    {
-        enterInputValue(find(inputBy), value);
-    }
-
     void enterInputValue(final WebElement inputElement, final String value) throws Exception
     {
         waitForElementVisible(inputElement);
         final String inputID = inputElement.getAttribute("id");
-        final String detailElementID = inputID + "_details";
+
+        System.out.println("*****");
+        System.out.println("Element ID:" + inputID);
+        System.out.println("*****");
 
         summonTooltip(inputID);
         showInputField(inputID);
@@ -198,8 +196,11 @@ abstract class AbstractSearchFormPage extends AbstractTestWebPage
 
     void summonTooltip(final String baseID) throws Exception
     {
-
         final By tooltipIconTriggerBy = By.xpath("//div[@id='" + baseID + "_formgroup']/div");
+
+        System.out.println("******");
+        System.out.println("Summoning: " + "//div[@id='" + baseID + "_formgroup']/div");
+        System.out.println("******");
 
         waitForElementPresent(tooltipIconTriggerBy);
         waitForElementVisible(tooltipIconTriggerBy);
