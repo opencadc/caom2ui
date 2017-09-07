@@ -108,11 +108,7 @@ abstract class AbstractSearchFormPage extends AbstractTestWebPage
         waitForElementVisible(inputElement);
         final String inputID = inputElement.getAttribute("id");
 
-        System.out.println("*****");
-        System.out.println("Element ID:" + inputID);
-        System.out.println("*****");
-
-        summonTooltip(inputID);
+//        summonTooltip(inputID);
         showInputField(inputID);
         // todo: verify what else this function was doing and
         // replace the function. Timing was too fast for
@@ -127,8 +123,7 @@ abstract class AbstractSearchFormPage extends AbstractTestWebPage
             waitFor(150L);
         }
 
-        closeTooltip(inputID);
-
+//        closeTooltip(inputID);
     }
 
     void clearInputValue(final String inputID) throws Exception
