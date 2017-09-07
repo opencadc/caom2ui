@@ -74,7 +74,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
-import org.openqa.selenium.support.ui.ExpectedConditions;
+
+import java.util.Objects;
 
 
 abstract class AbstractSearchFormPage extends AbstractTestWebPage
@@ -108,14 +109,8 @@ abstract class AbstractSearchFormPage extends AbstractTestWebPage
         waitForElementVisible(inputElement);
         final String inputID = inputElement.getAttribute("id");
 
-//        summonTooltip(inputID);
+        summonTooltip(inputID);
         showInputField(inputID);
-        // todo: verify what else this function was doing and
-        // replace the function. Timing was too fast for
-        // ajax function issued on each keyUp by advanced search page,
-        // so action had to be slowed down (see for loop below)
-        // June 2017
-//        sendKeys(inputElement, value);
 
         for (int i = 0; i < value.length(); i++)
         {
@@ -123,7 +118,7 @@ abstract class AbstractSearchFormPage extends AbstractTestWebPage
             waitFor(150L);
         }
 
-//        closeTooltip(inputID);
+        closeTooltip(inputID);
     }
 
     void clearInputValue(final String inputID) throws Exception
@@ -157,14 +152,14 @@ abstract class AbstractSearchFormPage extends AbstractTestWebPage
 
         final By contents = By.xpath(String.format(CONTENT_LOCATOR_XPATH, (inputID + "_details")));
 
-        if (expectedMessage != "")
+        if (!Objects.equals(expectedMessage, ""))
         {
             waitForTextPresent(contents, expectedMessage);
         }
         else
         {
             WebElement contentEl = find(contents);
-            if (contentEl.getText().equals("") == false)
+            if (!contentEl.getText().equals(""))
             {
                 throw new Exception();
             }

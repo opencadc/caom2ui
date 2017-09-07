@@ -58,6 +58,9 @@ public class FormInputBrowserTest extends AbstractAdvancedSearchIntegrationTest
     {
         final CAOMSearchFormPage caomSearchFormPage = goTo(endpoint, "", CAOMSearchFormPage.class);
 
+        Thread.sleep(3000);
+        caomSearchFormPage.reset();
+
 //      Observation Date.
         verifyFormInput(caomSearchFormPage, CAOMSearchFormPage.OBSERVATION_DATE_INPUT_ID, "BOG", true,
                         "Invalid: BOG");
