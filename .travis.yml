@@ -11,11 +11,13 @@ services:
 - docker
 before_install:
 - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-- sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+- sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu
+  $(lsb_release -cs) stable"
 - sudo apt-get update
 - sudo apt-get -y install docker-ce
 - sudo rm /usr/local/bin/docker-compose
-- curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
+- curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname
+  -s`-`uname -m` > docker-compose
 - chmod +x docker-compose && sudo mv docker-compose /usr/local/bin
 - docker-compose -v
 - gradle -v
@@ -33,10 +35,9 @@ script:
   -PintTest_web_app_endpoint=/search/ intTestFirefox
 after_success:
 - if [ "$(. ./can-deploy.sh)" = "DEPLOY" ]; then docker login -u="$DOCKER_USERNAME"
-  -p="$DOCKER_PASSWORD"; docker tag opencadc/archive-search:SNAPSHOT opencadc/archive-search:$CAOM2_SEARCH_SERVER_VERSION; docker push opencadc/archive-search-$CAOM2_SEARCH_SERVER_VERSION; fi
+  -p="$DOCKER_PASSWORD"; docker tag opencadc/archive-search:SNAPSHOT opencadc/archive-search:$CAOM2_SEARCH_SERVER_VERSION;
+  docker push opencadc/archive-search-$CAOM2_SEARCH_SERVER_VERSION; fi
 - if [ "$(. ./can-deploy.sh)" != "DEPLOY" ]; then echo "Not deploying."; fi
 notifications:
-  email:
-    attachments: "*.png"
-    recipients:
-      - djenkins.cadc@gmail.com
+  slack:
+    secure: RSshUvO+pKMZiUgAmCAvf9CtVEwxuV5p9480dNuQzDLY3AZHXrA3DIMF0IStKpNLVjQwWNWkIDOF9q8O9G+mBMOn9oeZncN8oduNcHG9OS/3Tj/Ij/CV5gJHyMM5hvUO8BnyK9RfpM5hivWv1NLopUhX0du3mpKokNluJXfmhpXWIsta8uqOvyHFr8ui1vqbDNFKChyyuGHEG9HOYtNoHpfODrF+RHVH9E+JisXbL9uADhyzYEpjd5Qt9E7fJX9qAtfBfe9baZ85lL+ovzx8nRu8mv7wbRUnt0bYurTZ1xV/dA9gopW9ioULEkNyNfYmFYCsb+XY8quMBHUYSRDBe8B2sBVFlmdAlPgVN8J1qaT7PmQwmJDIaDtwGOeZa/U+KhB9Z7/XRpBRpE/Y1tkO+L7qC7BuJcSi5usIBaG9Kx56OpN6IYJEUZaTCY+MZf8D/u8ujYzP/5Gv7xUX4ymGRpneoqPSC98Aj0dIIkhcrgin4ntMBXfo7SA90wb7eP9cV/59io3A/iW1MRvVyo9mZshnBCOQeffJfGZbRveSEHGoyZKGEjH7G6Mg1JfvvT87a2CDFeY6WWyDErbu+yYc4WpgsexVhS2qkNiCX0fSjQkvh8eGk+RAVa3iTNlJ7DNg9JmLyXgVrX3dXGWS6rd/XGgJiUfXAeBgwwH7f3aFD14=
