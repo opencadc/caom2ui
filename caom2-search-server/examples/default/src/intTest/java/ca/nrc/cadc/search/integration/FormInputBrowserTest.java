@@ -58,18 +58,11 @@ public class FormInputBrowserTest extends AbstractAdvancedSearchIntegrationTest
     {
         final CAOMSearchFormPage caomSearchFormPage = goTo(endpoint, "", CAOMSearchFormPage.class);
 
-        caomSearchFormPage.summonTooltip("Plane.position.bounds");
-        caomSearchFormPage.closeTooltip("Plane.position.bounds");
-
-        caomSearchFormPage.summonTooltip("Plane.position.sampleSize");
-        caomSearchFormPage.closeTooltip("Plane.position.sampleSize");
-
 //      Observation Date.
         verifyFormInput(caomSearchFormPage, CAOMSearchFormPage.OBSERVATION_DATE_INPUT_ID, "BOG", true,
                         "Invalid: BOG");
         verifyFormInput(caomSearchFormPage, CAOMSearchFormPage.OBSERVATION_DATE_INPUT_ID, "", false,
                         "");
-
 
         // Spectral coverage.
         verifyFormInput(caomSearchFormPage, CAOMSearchFormPage.SPECTRAL_COVERAGE_INPUT_ID, "BOGUS", true, null);
@@ -92,7 +85,6 @@ public class FormInputBrowserTest extends AbstractAdvancedSearchIntegrationTest
 
         verifyFormInput(caomSearchFormPage, CAOMSearchFormPage.SPECTRAL_COVERAGE_INPUT_ID, "aaa", true, null);
         verifyFormInput(caomSearchFormPage, CAOMSearchFormPage.SPECTRAL_COVERAGE_INPUT_ID, "", false, "");
-
 
         // Quantify the unit conversion values.
         verifyFormInput(caomSearchFormPage, CAOMSearchFormPage.PIXEL_SCALE_INPUT_ID, "0.02..0.05arcmin", false,
@@ -126,6 +118,10 @@ public class FormInputBrowserTest extends AbstractAdvancedSearchIntegrationTest
                         "(< 1.000E-7 metres)");
         verifyFormInput(caomSearchFormPage, "Plane.energy.bounds.width", "", false, "");
         //*/
+
+        verifyFormInput(caomSearchFormPage, "Plane.position.sampleSize", "10..20", false,
+                        "(10.0..20.0 arcseconds)");
+        verifyFormInput(caomSearchFormPage, "Plane.position.sampleSize", "", false, "");
     }
 
     private void verifyFormInput(final CAOMSearchFormPage caomSearchFormPage, final String inputID, final String entry,
