@@ -199,13 +199,13 @@ abstract class AbstractSearchFormPage extends AbstractTestWebPage
 
         waitForElementPresent(tooltipIconTriggerBy);
         click(tooltipIconTriggerBy);
-        waitForElementPresent(By.className("popover"));
-        waitForElementVisible(By.className("popover"));
+        waitForElementPresent(By.cssSelector("//*[contains(@class, 'popover')]"));
+        waitForElementVisible(By.cssSelector("//*[contains(@class, 'popover')]"));
     }
 
     void closeTooltip(final String baseID) throws Exception
     {
-        final By tooltipCloseLink = By.className("glyphicon-remove-circle");
+        final By tooltipCloseLink = By.cssSelector("//*[contains(@class, 'glyphicon-remove-circle')]");
         waitForElementPresent(tooltipCloseLink);
         final WebElement tooltipClose = find(tooltipCloseLink);
         waitForElementVisible(tooltipClose);
