@@ -199,8 +199,8 @@ abstract class AbstractSearchFormPage extends AbstractTestWebPage
         waitForElementPresent(tooltipIconTriggerBy);
         waitForElementVisible(tooltipIconTriggerBy);
         click(tooltipIconTriggerBy);
-        waitForElementPresent(By.cssSelector("//*[contains(@class, 'popover')]"));
-        waitForElementVisible(By.cssSelector("//*[contains(@class, 'popover')]"));
+        waitForElementPresent(By.xpath("//div[@id='" + baseID + "_formgroup']/div[2]"));
+        waitForElementVisible(By.xpath("//div[@id='" + baseID + "_formgroup']/div[2]"));
     }
 
     void closeTooltip(final String baseID) throws Exception
