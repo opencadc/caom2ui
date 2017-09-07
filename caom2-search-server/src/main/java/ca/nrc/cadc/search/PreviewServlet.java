@@ -93,8 +93,8 @@ public class PreviewServlet extends HttpServlet
 
         final HttpURLConnection connection = connect(jobURL);
 
-        connection.setDoInput(false);
-        connection.setDoOutput(true);
+        connection.setDoInput(true);
+        connection.setDoOutput(false);
         connection.setInstanceFollowRedirects(true);
 
         if (connection.getResponseCode() > 400)

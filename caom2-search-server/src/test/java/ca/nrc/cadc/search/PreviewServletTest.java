@@ -140,10 +140,10 @@ public class PreviewServletTest
             }
         });
 
-        mockHttpURLConnection.setDoInput(false);
+        mockHttpURLConnection.setDoInput(true);
         expectLastCall().once();
 
-        mockHttpURLConnection.setDoOutput(true);
+        mockHttpURLConnection.setDoOutput(false);
         expectLastCall().once();
 
         mockHttpURLConnection.setInstanceFollowRedirects(true);
