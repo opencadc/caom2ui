@@ -106,6 +106,7 @@ abstract class AbstractSearchFormPage extends AbstractTestWebPage
 
     void enterInputValue(final WebElement inputElement, final String value) throws Exception
     {
+        waitForElementVisible(inputElement);
         final String inputID = inputElement.getAttribute("id");
         final String detailElementID = inputID + "_details";
 

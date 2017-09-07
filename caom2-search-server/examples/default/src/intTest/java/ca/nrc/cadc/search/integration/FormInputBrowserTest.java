@@ -128,6 +128,7 @@ public class FormInputBrowserTest extends AbstractAdvancedSearchIntegrationTest
     {
         if (StringUtil.hasText(entry))
         {
+            caomSearchFormPage.waitForElementPresent(By.id(inputID));
             caomSearchFormPage.enterInputValue(find(By.id(inputID)), entry);
         }
         else
