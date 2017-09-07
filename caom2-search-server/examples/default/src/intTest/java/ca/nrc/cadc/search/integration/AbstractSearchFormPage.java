@@ -103,6 +103,10 @@ abstract class AbstractSearchFormPage extends AbstractTestWebPage
         PageFactory.initElements(driver, this);
     }
 
+    void enterInputValue(final By inputBy, final String value) throws Exception
+    {
+        enterInputValue(find(inputBy), value);
+    }
 
     void enterInputValue(final WebElement inputElement, final String value) throws Exception
     {
