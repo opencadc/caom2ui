@@ -118,7 +118,7 @@ abstract class AbstractSearchFormPage extends AbstractTestWebPage
             waitFor(150L);
         }
 
-        closeTooltip(inputID);
+        closeTooltip();
     }
 
     void clearInputValue(final String inputID) throws Exception
@@ -188,29 +188,16 @@ abstract class AbstractSearchFormPage extends AbstractTestWebPage
     {
         final By tooltipIconTriggerBy = By.xpath("//div[@id='" + baseID + "_formgroup']/div");
 
-        System.out.println("******");
-        System.out.println("Summoning: " + "//div[@id='" + baseID + "_formgroup']/div");
-        System.out.println("******");
-
         waitForElementPresent(tooltipIconTriggerBy);
         waitForElementVisible(tooltipIconTriggerBy);
 
-        final WebElement tooltipTrigger = find(tooltipIconTriggerBy);
-        System.out.println("Trigger is displayed: " + tooltipTrigger.isDisplayed());
-        System.out.println("Trigger classes: " + tooltipTrigger.getAttribute("class"));
-
         click(tooltipIconTriggerBy);
-
-        final WebElement tooltip = find(By.xpath("//div[@id='" + baseID + "_formgroup']/div[2]"));
-
-        System.out.println("Tooltip is displayed: " + tooltip.isDisplayed());
-        System.out.println("Tooltip classes: " + tooltip.getAttribute("class"));
 
         waitForElementPresent(By.xpath("//div[@id='" + baseID + "_formgroup']/div[2]"));
         waitForElementVisible(By.xpath("//div[@id='" + baseID + "_formgroup']/div[2]"));
     }
 
-    void closeTooltip(final String baseID) throws Exception
+    void closeTooltip() throws Exception
     {
         final By tooltipCloseLink = By.xpath("//*[contains(@class, 'glyphicon-remove-circle')]");
         waitForElementPresent(tooltipCloseLink);
