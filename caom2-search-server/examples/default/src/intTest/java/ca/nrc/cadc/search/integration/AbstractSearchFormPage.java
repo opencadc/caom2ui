@@ -216,7 +216,7 @@ abstract class AbstractSearchFormPage extends AbstractTestWebPage
 
     void closeTooltip(final String baseID) throws Exception
     {
-        final By tooltipCloseLink = By.cssSelector("//*[contains(@class, 'glyphicon-remove-circle')]");
+        final By tooltipCloseLink = By.xpath("//*[contains(@class, 'glyphicon-remove-circle')]");
         waitForElementPresent(tooltipCloseLink);
         final WebElement tooltipClose = find(tooltipCloseLink);
         waitForElementVisible(tooltipClose);
