@@ -194,10 +194,10 @@ abstract class AbstractSearchFormPage extends AbstractTestWebPage
     void summonTooltip(final String baseID) throws Exception
     {
 
-        final By tooltipIconTriggerBy = By.xpath("//div[@id='" + baseID
-                                                 + "_formgroup']/div[contains(@class, 'advancedsearch-tooltip')]");
+        final By tooltipIconTriggerBy = By.xpath("//div[@id='" + baseID + "_formgroup']/div");
 
         waitForElementPresent(tooltipIconTriggerBy);
+        waitForElementVisible(tooltipIconTriggerBy);
         click(tooltipIconTriggerBy);
         waitForElementPresent(By.cssSelector("//*[contains(@class, 'popover')]"));
         waitForElementVisible(By.cssSelector("//*[contains(@class, 'popover')]"));
