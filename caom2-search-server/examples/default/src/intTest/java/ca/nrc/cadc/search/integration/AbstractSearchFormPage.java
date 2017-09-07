@@ -198,7 +198,18 @@ abstract class AbstractSearchFormPage extends AbstractTestWebPage
 
         waitForElementPresent(tooltipIconTriggerBy);
         waitForElementVisible(tooltipIconTriggerBy);
+
+        final WebElement tooltipTrigger = find(tooltipIconTriggerBy);
+        System.out.println("Trigger is displayed: " + tooltipTrigger.isDisplayed());
+        System.out.println("Trigger classes: " + tooltipTrigger.getAttribute("class"));
+
         click(tooltipIconTriggerBy);
+
+        final WebElement tooltip = find(By.xpath("//div[@id='" + baseID + "_formgroup']/div[2]"));
+
+        System.out.println("Tooltip is displayed: " + tooltip.isDisplayed());
+        System.out.println("Tooltip classes: " + tooltip.getAttribute("class"));
+
         waitForElementPresent(By.xpath("//div[@id='" + baseID + "_formgroup']/div[2]"));
         waitForElementVisible(By.xpath("//div[@id='" + baseID + "_formgroup']/div[2]"));
     }
