@@ -48,6 +48,13 @@
                   var $cell = $(cellNode);
                   var planeURIValue = dataContext["caom2:Plane.uri"];
 
+                  /**
+                   * Create a link for a preview.
+                   *
+                   * @param {jQuery} $cell         The jQuery DOM element to add to.
+                   * @param {string|null} thumbnailURL  The URL for the thumbnail.  [Optional]
+                   * @return {*|HTMLElement}
+                   */
                   function createLink($cell, thumbnailURL)
                   {
                     // Clickable link to the preview page
@@ -63,20 +70,23 @@
 
                     $cell.empty().append($cellSpan);
 
-                    // Create the thumbnail tooltip
-                    var $thunbnailImage = $("<img />");
-                    $thunbnailImage.attr("id", observationID + "_256_preview");
-                    $thunbnailImage.attr("src", thumbnailURL);
-                    $thunbnailImage.addClass("image-actual");
+                    if (thumbnailURL && (thumbnailURL !== null))
+                    {
+                      // Create the thumbnail tooltip
+                      var $thunbnailImage = $("<img />");
+                      $thunbnailImage.attr("id", observationID + "_256_preview");
+                      $thunbnailImage.attr("src", thumbnailURL);
+                      $thunbnailImage.addClass("image-actual");
 
-                    $link.tooltipster({
-                                        interactive: true,
-                                        arrow: false,
-                                        content: $thunbnailImage,
-                                        theme: "tooltipster-preview-thumbnail",
-                                        position: "right",
-                                        onlyOne: true
-                                      });
+                      $link.tooltipster({
+                                          interactive: true,
+                                          arrow: false,
+                                          content: $thunbnailImage,
+                                          theme: "tooltipster-preview-thumbnail",
+                                          position: "right",
+                                          onlyOne: true
+                                        });
+                    }
 
                     return $link;
                   }
@@ -84,9 +94,11 @@
                   function insertPreviewLink(previewUrls, thumbnailUrls, collection, observationID, productID)
                   {
                     // Create the preview link
-                    if (thumbnailUrls.length > 0)
+                    if (previewUrls.length > 0)
                     {
-                      var $link = createLink($cell, thumbnailUrls[0]);
+                      var $link = createLink($cell,
+                                             ((thumbnailUrls !== null) && (thumbnailUrls.length > 0))
+                                                 ? thumbnailUrls[0] : null);
 
                       // Display the preview window
                       $link.click(function ()
@@ -199,6 +211,7 @@
                                    var errorMessageIndex;
                                    var semanticsIndex;
                                    var readableIndex = -1;
+                                   var contentTypeIndex;
                                    var fields = evaluator.evaluate("/VOTABLE/RESOURCE[@type='results']/TABLE/FIELD");
                                    for (var fieldIndex = 0, fl = fields.length; fieldIndex < fl; fieldIndex++)
                                    {
@@ -211,19 +224,28 @@
                                          accessUrlIndex = fieldIndex;
                                          break;
                                        }
+
                                        case "error_message":
                                        {
                                          errorMessageIndex = fieldIndex;
                                          break;
                                        }
+
                                        case "semantics":
                                        {
                                          semanticsIndex = fieldIndex;
                                          break;
                                        }
+
                                        case "readable":
                                        {
                                          readableIndex = fieldIndex;
+                                         break;
+                                       }
+
+                                       case "content_type":
+                                       {
+                                         contentTypeIndex = fieldIndex;
                                          break;
                                        }
                                      }
@@ -249,12 +271,13 @@
                                                        && tableDatas[readableIndex].textContent === "true");
                                        if (readable === true)
                                        {
+                                         var contentType = tableDatas[contentTypeIndex].textContent;
                                          var semantics = tableDatas[semanticsIndex].textContent;
                                          if (semantics === "http://www.openadc.org/caom2#thumbnail")
                                          {
                                            thumbnailUrls.push(tableDatas[accessUrlIndex].textContent);
                                          }
-                                         else if (semantics === "#preview")
+                                         else if ((semantics === "#preview") && (contentType.indexOf("image") >= 0))
                                          {
                                            previewUrls.push(tableDatas[accessUrlIndex].textContent);
                                          }
@@ -264,35 +287,41 @@
 
                                    // If datalink didn't provide thumbnail and preview URLs, create the urls and
                                    // check if they exist.
-                                   if (thumbnailUrls.length === 0)
+                                   if ((thumbnailUrls.length === 0) && (previewUrls.length === 0))
                                    {
                                      var thumbnailPreview = new ca.nrc.cadc.search.Preview(collection, observationID,
                                                                                            productID, 256, runID);
-                                     thumbnailPreview.getPreview(function (thumbnailURL)
-                                                                 {
-                                                                   var preview =
-                                                                       new ca.nrc.cadc.search.Preview(collection,
-                                                                                                      observationID,
-                                                                                                      productID, 1024,
-                                                                                                      runID);
 
-                                                                   preview.getPreview(
-                                                                       function (previewURL)
-                                                                       {
-                                                                         if (previewURL)
-                                                                         {
-                                                                           var $link = createLink($cell, thumbnailURL);
-                                                                           $link.attr("href", previewURL);
-                                                                           $link.attr("target", "_PREVIEW");
+                                     var addMainPreview = function(thumbnailURL)
+                                     {
+                                       var preview = new ca.nrc.cadc.search.Preview(collection, observationID,
+                                                                                    productID, 1024, runID);
 
-                                                                           var $previewImage = $("<img />");
-                                                                           $previewImage.prop("id", observationID +
-                                                                                                    "_256_preview");
-                                                                           $previewImage.prop("src", previewURL);
-                                                                           $previewImage.addClass("image-actual");
-                                                                         }
-                                                                       });
-                                                                 });
+                                       preview.getPreview(
+                                           function (previewURL)
+                                           {
+                                             if (previewURL)
+                                             {
+                                               var $link = createLink($cell, thumbnailURL);
+                                               $link.attr("href", previewURL);
+                                               $link.attr("target", "_PREVIEW");
+
+                                               var $previewImage = $("<img />");
+                                               $previewImage.prop("id", observationID +
+                                                                        "_256_preview");
+                                               $previewImage.prop("src", previewURL);
+                                               $previewImage.addClass("image-actual");
+                                             }
+                                           });
+                                     };
+
+                                     thumbnailPreview.getPreview(addMainPreview, function(status)
+                                     {
+                                       if (status === 404)
+                                       {
+                                         addMainPreview(null);
+                                       }
+                                     });
                                    }
                                    else
                                    {

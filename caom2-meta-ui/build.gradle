@@ -11,6 +11,13 @@ repositories {
     mavenLocal()
 }
 
+// Temporary measure until 2.3.4 is fully supported.
+configurations.all {
+    resolutionStrategy {
+        force 'org.opencadc:caom2:2.3.3'
+    }
+}
+
 dependencies {
     compile 'org.opencadc:caom2-ui-server:[1.1.1,)'
 

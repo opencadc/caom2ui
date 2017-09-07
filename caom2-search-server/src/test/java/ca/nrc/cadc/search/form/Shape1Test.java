@@ -404,8 +404,8 @@ public class Shape1Test
         assertNotNull("searchTemplate should not be null", searchTemplate);
         assertTrue("Should be an RangeSearch instance", searchTemplate instanceof RangeSearch);
         RangeSearch rangeSearch = (RangeSearch) searchTemplate;
-        assertTrue("Should be a Range instance", rangeSearch.getLowerRange() instanceof Range);
-        assertTrue("Should be a Range instance", rangeSearch.getUpperRange() instanceof Range);
+        assertNotNull("Should be a Range instance", rangeSearch.getLowerRange());
+        assertNotNull("Should be a Range instance", rangeSearch.getUpperRange());
     }
     
     @Test

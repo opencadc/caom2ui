@@ -243,8 +243,27 @@ public class ADQLGeneratorTest extends AbstractUnitTest<ADQLGenerator>
             // Good!
         }
 
-        final SpatialSearch spatialSearch2 = new SpatialSearch("TESTSS",
-                                                               new Polygon());
+        final SpatialSearch spatialSearch2 = new SpatialSearch("TESTSS", new Shape()
+        {
+            @Override
+            public Point getCenter()
+            {
+                return null;
+            }
+
+            @Override
+            public double getArea()
+            {
+                return 0;
+            }
+
+            @Override
+            public double getSize()
+            {
+                return 0;
+            }
+        });
+
         try
         {
             getTestSubject().toSQL(spatialSearch2, null, false);
