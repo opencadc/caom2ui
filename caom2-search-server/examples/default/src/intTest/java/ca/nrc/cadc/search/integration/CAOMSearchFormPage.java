@@ -82,7 +82,7 @@ import java.util.List;
 
 public class CAOMSearchFormPage extends AbstractSearchFormPage
 {
-    private static final int DEFAULT_TIMEOUT_IN_SECONDS = 20;
+    private static final int DEFAULT_TIMEOUT_IN_SECONDS = 25;
     private static final By H1_HEADER = By.cssSelector("h1");
 
     static final By DATA_TRAIN_LOCATOR = By.id("caom2@Hierarchy");
@@ -138,6 +138,7 @@ public class CAOMSearchFormPage extends AbstractSearchFormPage
         super(driver, DEFAULT_TIMEOUT_IN_SECONDS);
 
         waitForElementPresent(DATA_TRAIN_LOCATOR);
+        waitForElementPresent(DATA_TRAIN_COLLECTION_MENU);
         waitForElementPresent(TARGET_INPUT);
         waitForElementPresent(By.id(SPECTRAL_COVERAGE_INPUT_ID));
         waitForElementPresent(By.id(OBSERVATION_DATE_INPUT_ID));
