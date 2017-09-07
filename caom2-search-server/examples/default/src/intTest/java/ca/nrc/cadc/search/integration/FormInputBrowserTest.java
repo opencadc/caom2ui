@@ -58,6 +58,12 @@ public class FormInputBrowserTest extends AbstractAdvancedSearchIntegrationTest
     {
         final CAOMSearchFormPage caomSearchFormPage = goTo(endpoint, "", CAOMSearchFormPage.class);
 
+        caomSearchFormPage.summonTooltip("Plane.position.bounds");
+        caomSearchFormPage.closeTooltip("Plane.position.bounds");
+
+        caomSearchFormPage.summonTooltip("Plane.position.sampleSize");
+        caomSearchFormPage.closeTooltip("Plane.position.sampleSize");
+
 //      Observation Date.
         verifyFormInput(caomSearchFormPage, CAOMSearchFormPage.OBSERVATION_DATE_INPUT_ID, "BOG", true,
                         "Invalid: BOG");
