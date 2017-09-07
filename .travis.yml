@@ -2,6 +2,7 @@ env:
   DOCKER_COMPOSE_VERSION: 1.14.0
   CAOM2_SEARCH_SERVER_VERSION: 2.1.14
 language: java
+group: edge
 jdk:
 - oraclejdk8
 dist: trusty
