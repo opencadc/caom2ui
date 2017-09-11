@@ -90,8 +90,8 @@ import java.net.URL;
  */
 public class PackageServlet extends ConfigurableServlet
 {
-    static final String CAOM2PKG_SERVICE_URI_PROPERTY_KEY = "org.opencadc.search.caom2ops-service-id";
-    static final String CAOM2PKG_SERVICE_HOST_PORT_PROPERTY_KEY = "org.opencadc.search.caom2ops-service-host-port";
+    static final String CAOM2PKG_SERVICE_URI_PROPERTY_KEY = "org.opencadc.search.caom2pkg-service-id";
+    static final String CAOM2PKG_SERVICE_HOST_PORT_PROPERTY_KEY = "org.opencadc.search.caom2pkg-service-host-port";
     static final URI DEFAULT_CAOM2PKG_SERVICE_URI = URI.create("ivo://cadc.nrc.ca/caom2ops");
 
     /**

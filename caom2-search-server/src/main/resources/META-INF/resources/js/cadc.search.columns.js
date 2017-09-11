@@ -11,7 +11,7 @@
             "OBSCORE_RESOLVER_VALUE_KEY": "Char.SpatialAxis.Coverage.Support.Area@Shape1Resolver.value",
             "CAOM2_TARGET_NAME_VALUE_KEY": "Plane.position.bounds@Shape1.value",
             "DETAILS_CSS": "details_tooltip_link",
-            "DATALINK_URL_PREFIX": " /caom2ops/datalink",
+            "DATALINK_URL_PREFIX": " /search/datalink",
             "columns": {
               "OBSERVATION_URI_UTYPE": "caom2:Observation.uri",
               "OBSERVATION_ID_UTYPE": "caom2:Observation.observationID",
