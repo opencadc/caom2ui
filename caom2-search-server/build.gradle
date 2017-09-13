@@ -25,6 +25,7 @@ dependencies {
     compile 'org.opencadc:caom2-compute:[2.2.5, )'
     compile 'org.opencadc:cadc-registry:1.+'
     compile 'org.opencadc:cadc-vosi:1.+'
+    compile 'org.opencadc:caom2-search:2.+'
     compile 'org.apache.httpcomponents:httpclient:4.+'
     compile 'commons-net:commons-net:3.+'
 
@@ -38,4 +39,4 @@ dependencies {
 
 sourceCompatibility = 1.7
 group = 'org.opencadc'
-version = '2.1.18'
+version = '2.1.19'
