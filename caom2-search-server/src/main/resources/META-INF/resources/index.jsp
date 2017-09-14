@@ -14,8 +14,8 @@
 
   final int maxRowLimit = configuration.lookupInt("org.opencadc.search.max-row-count", defaultMaxRowLimit);
   final boolean showObsCoreTab = configuration.lookupBoolean("org.opencadc.search.obs-core", true);
-  final String tapSyncEndpoint = configuration.lookup("org.opencadc.search.tap-service-endpoint", "/search/tap/sync");
   final String applicationEndpoint = configuration.lookup("org.opencadc.search.app-service-endpoint", "/search");
+  final String tapSyncEndpoint = applicationEndpoint + "/tap/sync";
 %>
 
 <%-- Request scope variables so they can be seen in the imported JSPs --%>

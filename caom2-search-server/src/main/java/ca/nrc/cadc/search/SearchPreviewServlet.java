@@ -47,7 +47,6 @@ import javax.servlet.http.HttpServletRequest;
 public class SearchPreviewServlet extends PreviewServlet
 {
     static final String CAOM2LINK_SERVICE_URI_PROPERTY_KEY = "org.opencadc.search.caom2link-service-id";
-    static final String CAOM2LINK_SERVICE_HOST_PORT_PROPERTY_KEY = "org.opencadc.search.caom2link-service-host-port";
     static final URI DEFAULT_CAOM2LINK_SERVICE_URI = URI.create("ivo://cadc.nrc.ca/caom2ops");
 
     /**
@@ -63,9 +62,6 @@ public class SearchPreviewServlet extends PreviewServlet
                         CAOM2LINK_SERVICE_URI_PROPERTY_KEY,
                         DEFAULT_CAOM2LINK_SERVICE_URI),
                 Standards.DATALINK_LINKS_10, AuthMethod.COOKIE);
-        URI datalinkServiceURI =  getServiceID(
-                CAOM2LINK_SERVICE_URI_PROPERTY_KEY,
-                DEFAULT_CAOM2LINK_SERVICE_URI);
     }
 
 

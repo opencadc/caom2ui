@@ -295,8 +295,8 @@
                                                                                            productID, 256, runID);
 
                                      var addMainPreview = function (thumbnailURL) {
-                                       var preview = new ca.nrc.cadc.search.Preview(collection, observationID,
-                                                                                    productID, 1024, runID);
+                                     var preview = new ca.nrc.cadc.search.Preview(collection, observationID,
+                                                                                  productID, 1024, runID);
 
                                        preview.getPreview(
                                            function (previewURL) {
