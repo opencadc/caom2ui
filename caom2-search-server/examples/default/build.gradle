@@ -13,7 +13,7 @@ repositories {
     mavenLocal()
 }
 
-def libVersion = '2.1.14'
+def libVersion = '2.1.19'
 
 dependencies {
     compile 'log4j:log4j:1.2.+'
