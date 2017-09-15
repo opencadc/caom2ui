@@ -748,7 +748,7 @@
                   if (value)
                   {
                     var intValue = parseInt(value);
-                    searchValue["Plane.time.bounds"] = (intValue + ".." + (intValue + 1));
+                    searchValue["Plane.time.bounds.samples"] = (intValue + ".." + (intValue + 1));
                   }
 
                   return formatQuickSearchLink(value, searchValue, columnDef.utype, $(columnDef).data("unitValue"));
@@ -1243,7 +1243,7 @@
       var tipOutput;
 
       // Date columns only.
-      if (columnUType.indexOf("Plane.time.bounds") >= 0)
+      if (columnUType.indexOf("Plane.time.bounds.samples") >= 0)
       {
         var delimiter = (toUnit === "MJD") ? "." : " ";
         tipOutput = $link.text().split(delimiter)[0];

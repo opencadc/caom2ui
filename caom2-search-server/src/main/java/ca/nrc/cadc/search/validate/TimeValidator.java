@@ -39,8 +39,7 @@ import ca.nrc.cadc.util.StringUtil;
  */
 public class TimeValidator extends NumberValidator
 {
-    public TimeValidator(final String utype, final Number value,
-                         final String unit)
+    public TimeValidator(final String utype, final Number value, final String unit)
     {
         super(utype, value, unit);
     }
@@ -114,7 +113,7 @@ public class TimeValidator extends NumberValidator
         }
         else if (unit.matches("^[dD].*$"))
         {
-            d = value.doubleValue() 
+            d = value.doubleValue()
                 / (ObsModel.isAngleUtype(utype) ? 24.0 : 1.0);
         }
         else if (unit.matches("^[hH].*$"))
@@ -134,7 +133,7 @@ public class TimeValidator extends NumberValidator
             d = value.doubleValue();
         }
 
-        return d;  
+        return d;
     }
 
     /*
@@ -166,6 +165,6 @@ public class TimeValidator extends NumberValidator
             d = value.doubleValue();
         }
 
-        return d;  
+        return d;
     }
 }

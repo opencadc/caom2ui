@@ -270,7 +270,7 @@ public class FormDataTest extends AbstractUnitTest<FormData>
     {
         final String userEnteredValue = " > 1977-11-25";
         final Date formConstraint = new Date(userEnteredValue,
-                                             "Plane.time.bounds", null);
+                                             "Plane.time.bounds.samples", null);
 
         setTestSubject(new FormData());
 
