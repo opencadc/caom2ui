@@ -54,6 +54,9 @@ import static org.junit.Assert.*;
 public class FormValidationServletTest
         extends AbstractUnitTest<FormValidationServlet>
 {
+    private static final String CAOM2_TIME_FIELD = "Plane.time.bounds.samples";
+    private static final String CAOM2_ENERGY_FIELD = "Plane.energy.bounds.samples";
+
     private HttpServletRequest mockRequest =
             createMock(HttpServletRequest.class);
     private HttpServletResponse mockResponse =
@@ -149,14 +152,14 @@ public class FormValidationServletTest
         assertNotNull(formErrors);
         assertTrue("FormErrors should be empty", formErrors.get().isEmpty());
 
-        parameters.put("field", new String[]{"Plane.time.bounds"});
-        parameters.put("Plane.time.bounds", new String[]{"2013-10-02"});
+        parameters.put("field", new String[]{CAOM2_TIME_FIELD});
+        parameters.put(CAOM2_TIME_FIELD, new String[]{"2013-10-02"});
         formErrors = getTestSubject().getFormErrors(parameters);
         assertNotNull(formErrors);
         assertTrue("FormErrors should be empty", formErrors.get().isEmpty());
 
-        parameters.put("field", new String[]{"Plane.energy.bounds"});
-        parameters.put("Plane.energy.bounds", new String[]{"1.0"});
+        parameters.put("field", new String[]{CAOM2_ENERGY_FIELD});
+        parameters.put(CAOM2_ENERGY_FIELD, new String[]{"1.0"});
         formErrors = getTestSubject().getFormErrors(parameters);
         assertNotNull(formErrors);
         assertTrue("FormErrors should be empty", formErrors.get().isEmpty());
@@ -170,15 +173,15 @@ public class FormValidationServletTest
         assertTrue("FormErrors should not be empty",
                    formErrors.get().size() > 0);
 
-        parameters.put("field", new String[]{"Plane.time.bounds"});
-        parameters.put("Plane.time.bounds", new String[]{"qwerty"});
+        parameters.put("field", new String[]{CAOM2_TIME_FIELD});
+        parameters.put(CAOM2_TIME_FIELD, new String[]{"qwerty"});
         formErrors = getTestSubject().getFormErrors(parameters);
         assertNotNull(formErrors);
         assertTrue("FormErrors should not be empty",
                    formErrors.get().size() > 0);
 
-        parameters.put("field", new String[]{"Plane.energy.bounds"});
-        parameters.put("Plane.energy.bounds", new String[]{"qwerty"});
+        parameters.put("field", new String[]{CAOM2_ENERGY_FIELD});
+        parameters.put(CAOM2_ENERGY_FIELD, new String[]{"qwerty"});
         formErrors = getTestSubject().getFormErrors(parameters);
         assertNotNull(formErrors);
         assertTrue("FormErrors should not be empty",
@@ -213,11 +216,11 @@ public class FormValidationServletTest
         assertNotNull(form);
         assertTrue("", (form instanceof ca.nrc.cadc.search.form.Number));
 
-        form = getTestSubject().getFormConstraint("Plane.time.bounds", null);
+        form = getTestSubject().getFormConstraint(CAOM2_TIME_FIELD, null);
         assertNotNull(form);
         assertTrue("", (form instanceof ca.nrc.cadc.search.form.Date));
 
-        form = getTestSubject().getFormConstraint("Plane.energy.bounds", null);
+        form = getTestSubject().getFormConstraint(CAOM2_ENERGY_FIELD, null);
         assertNotNull(form);
         assertTrue("", (form instanceof Energy));
     }

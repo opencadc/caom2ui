@@ -132,19 +132,19 @@ public class ADQLGeneratorTest extends AbstractUnitTest<ADQLGenerator>
         }
 
         final IntervalSearch intervalSearch =
-                new IntervalSearch("Plane.energy.bounds", 88.0d, 888.0d, "m");
+                new IntervalSearch("Plane.energy.bounds.samples", 88.0d, 888.0d, "m");
         final String sql = getTestSubject().toSQL(intervalSearch, null,
                                                   false);
         assertEquals("SQL doesn't match.",
-                     "INTERSECTS( INTERVAL( 88.0, 888.0 ), Plane.energy_bounds ) = 1",
+                     "INTERSECTS( INTERVAL( 88.0, 888.0 ), Plane.energy_bounds_samples ) = 1",
                      sql);
 
         final IntervalSearch intervalSearch2 =
-                new IntervalSearch("Plane.energy.bounds", null, 888.0d, "m");
+                new IntervalSearch("Plane.energy.bounds.samples", null, 888.0d, "m");
         final String sql2 = getTestSubject().toSQL(intervalSearch2, null,
                                                    false);
         assertEquals("SQL doesn't match.",
-                     "INTERSECTS( INTERVAL( 0.0, 888.0 ), Plane.energy_bounds ) = 1",
+                     "INTERSECTS( INTERVAL( 0.0, 888.0 ), Plane.energy_bounds_samples ) = 1",
                      sql2);
     }
 
@@ -168,19 +168,19 @@ public class ADQLGeneratorTest extends AbstractUnitTest<ADQLGenerator>
         }
 
         final IntervalSearch intervalSearch =
-                new IntervalSearch("Plane.time.bounds", 88.0d, 888.0d, "s");
+                new IntervalSearch("Plane.time.bounds.samples", 88.0d, 888.0d, "s");
         final String sql = getTestSubject().toSQL(intervalSearch, null, false);
         assertEquals("SQL doesn't match.",
-                     "INTERSECTS( INTERVAL( 88.0, 888.0 ), Plane.time_bounds ) = 1",
+                     "INTERSECTS( INTERVAL( 88.0, 888.0 ), Plane.time_bounds_samples ) = 1",
                      sql);
 
 
         final IntervalSearch intervalSearch2 =
-                new IntervalSearch("Plane.time.bounds", 88.0d, null, "s");
+                new IntervalSearch("Plane.time.bounds.samples", 88.0d, null, "s");
         final String sql2 = getTestSubject()
                 .toSQL(intervalSearch2, null, false);
         assertEquals("SQL doesn't match.",
-                     String.format("INTERSECTS( INTERVAL( 88.0, %s ), Plane.time_bounds ) = 1",
+                     String.format("INTERSECTS( INTERVAL( 88.0, %s ), Plane.time_bounds_samples ) = 1",
                                    Double.MAX_VALUE),
                      sql2);
     }

@@ -55,8 +55,8 @@ import static org.junit.Assert.*;
 
 public class DateTest extends AbstractNumericFormConstraintTest<Date>
 {
-    private static final String TIME_UTYPE = "Plane.time.bounds";
-    private static final String TIME_PRESET_UTYPE = "Plane.time.bounds_PRESET";
+    private static final String TIME_UTYPE = "Plane.time.bounds.samples";
+    private static final String TIME_PRESET_UTYPE = "Plane.time.bounds.samples_PRESET";
 
     public static final TimeZone UTC = TimeZone.getTimeZone("UTC");
     public static final String START_DATE_STRING = "1977-11-25";

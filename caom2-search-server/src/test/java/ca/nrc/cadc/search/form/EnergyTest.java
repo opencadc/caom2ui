@@ -22,6 +22,7 @@ import static org.junit.Assert.*;
  */
 public class EnergyTest
 {
+    private static final String ENERGY_FIELD = "Plane.energy.bounds.samples";
     private static Logger log = Logger.getLogger(EnergyTest.class);
 
     static
@@ -49,7 +50,7 @@ public class EnergyTest
         boolean valid;
 
         formValue = null;
-        energy = new Energy(formValue, "Plane.energy.bounds");
+        energy = new Energy(formValue, ENERGY_FIELD);
         valid = energy.isValid(formErrors);
         log.debug("formValue[" + formValue + "] " + energy + " valid: " + valid);
         assertTrue(valid);
@@ -60,7 +61,7 @@ public class EnergyTest
         assertNull(energy.getFormValueUnit());
 
         formValue = "";
-        energy = new Energy(formValue, "Plane.energy.bounds");
+        energy = new Energy(formValue, ENERGY_FIELD);
         valid = energy.isValid(formErrors);
         log.debug("formValue[" + formValue + "] " + energy + " valid: " + valid);
         assertTrue(valid);
@@ -71,7 +72,7 @@ public class EnergyTest
         assertNull(energy.getFormValueUnit());
 
         formValue = "100";
-        energy = new Energy(formValue, "Plane.energy.bounds");
+        energy = new Energy(formValue, ENERGY_FIELD);
         valid = energy.isValid(formErrors);
         log.debug("formValue[" + formValue + "] " + energy + " valid: " + valid);
         assertTrue(valid);
@@ -83,7 +84,7 @@ public class EnergyTest
         assertEquals("m", energy.getFormValueUnit());
 
         formValue = "100mm";
-        energy = new Energy(formValue, "Plane.energy.bounds");
+        energy = new Energy(formValue, ENERGY_FIELD);
         valid = energy.isValid(formErrors);
         log.debug("formValue[" + formValue + "] " + energy + " valid: " + valid);
         assertTrue(valid);
@@ -94,7 +95,7 @@ public class EnergyTest
         assertEquals("mm", energy.getFormValueUnit());
 
         formValue = "100mm 2.0";
-        energy = new Energy(formValue, "Plane.energy.bounds");
+        energy = new Energy(formValue, ENERGY_FIELD);
         valid = energy.isValid(formErrors);
         log.debug("formValue[" + formValue + "] " + energy + " valid: " + valid);
         assertTrue(valid);
@@ -105,7 +106,7 @@ public class EnergyTest
         assertEquals("mm", energy.getFormValueUnit());
 
         formValue = "100..200";
-        energy = new Energy(formValue, "Plane.energy.bounds");
+        energy = new Energy(formValue, ENERGY_FIELD);
         valid = energy.isValid(formErrors);
         log.debug("formValue[" + formValue + "] " + energy + " valid: " + valid);
         assertTrue(valid);
@@ -117,7 +118,7 @@ public class EnergyTest
         assertEquals("m", energy.getFormValueUnit());
 
         formValue = "100..200mm";
-        energy = new Energy(formValue, "Plane.energy.bounds");
+        energy = new Energy(formValue, ENERGY_FIELD);
         valid = energy.isValid(formErrors);
         log.debug("formValue[" + formValue + "] " + energy + " valid: " + valid);
         assertTrue(valid);
@@ -128,7 +129,7 @@ public class EnergyTest
         assertEquals("mm", energy.getFormValueUnit());
 
         formValue = "100mm..200m 2.0";
-        energy = new Energy(formValue, "Plane.energy.bounds");
+        energy = new Energy(formValue, ENERGY_FIELD);
         valid = energy.isValid(formErrors);
         log.debug("formValue[" + formValue + "] " + energy + " valid: " + valid);
         assertTrue(valid);
@@ -139,7 +140,7 @@ public class EnergyTest
         assertNull(energy.getFormValueUnit());
 
         formValue = "100mm..200m";
-        energy = new Energy(formValue, "Plane.energy.bounds");
+        energy = new Energy(formValue, ENERGY_FIELD);
         valid = energy.isValid(formErrors);
         log.debug("formValue[" + formValue + "] " + energy + " valid: " + valid);
         assertTrue(valid);
@@ -149,7 +150,7 @@ public class EnergyTest
         //assertNull(energy.getTolerance());
 
         formValue = "100..200mm 2.0";
-        energy = new Energy(formValue, "Plane.energy.bounds");
+        energy = new Energy(formValue, ENERGY_FIELD);
         valid = energy.isValid(formErrors);
         log.debug("formValue[" + formValue + "] " + energy + " valid: " + valid);
         assertTrue(valid);
@@ -159,7 +160,7 @@ public class EnergyTest
         // TODO assertEquals(2.0, energy.getTolerance());
 
         formValue = "100mm..200m 2.0";
-        energy = new Energy(formValue, "Plane.energy.bounds");
+        energy = new Energy(formValue, ENERGY_FIELD);
         valid = energy.isValid(formErrors);
         log.debug("formValue[" + formValue + "] " + energy + " valid: " + valid);
         assertTrue(valid);
@@ -176,7 +177,7 @@ public class EnergyTest
     {
         log.debug("testBuildSearches()...");
 
-        String utype = "Plane.energy.bounds";
+        String utype = ENERGY_FIELD;
         String formValue;
         Double expectedLower;
         Double expectedUpper;
@@ -253,7 +254,7 @@ public class EnergyTest
     {
         log.debug("testUseMeter()...");
 
-        String utype = "Plane.energy.bounds";
+        String utype = ENERGY_FIELD;
         assertTrue("utype=" + utype + " should use meter", Energy
                 .useMeter(utype));
 

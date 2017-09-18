@@ -54,14 +54,15 @@ import ca.nrc.cadc.search.parser.TargetData;
 import ca.nrc.cadc.search.parser.exception.TargetParserException;
 import ca.nrc.cadc.util.Log4jInit;
 
+import static ca.nrc.cadc.search.UnitConversionServlet.CAOM2_ENERGY_FIELD;
+import static ca.nrc.cadc.search.UnitConversionServlet.CAOM2_TIME_FIELD;
+import static ca.nrc.cadc.search.UnitConversionServlet.CAOM2_TIME_PRESET_UTYPE;
 import static org.junit.Assert.*;
 
 
 public class UnitConversionServletTest
         extends AbstractUnitTest<UnitConversionServlet>
 {
-    private static final String TIME_PRESET_UTYPE = "Plane.time.bounds_PRESET";
-
     private StringWriter stringWriter = new StringWriter();
     private JSONWriter jsonWriter = new JSONWriter(stringWriter);
     private Map<String, String[]> parameters = new HashMap<>();
@@ -79,8 +80,8 @@ public class UnitConversionServletTest
     public void getUType()
     {
         setTestSubject(new UnitConversionServlet());
-        final String result = getTestSubject().getUType("/Plane.time.bounds");
-        assertEquals("Plane.time.bounds", result);
+        final String result = getTestSubject().getUType("/Plane.time.bounds.samples");
+        assertEquals(CAOM2_TIME_FIELD, result);
     }
 
     @Test
@@ -107,7 +108,7 @@ public class UnitConversionServletTest
 
         getTestSubject().writeDate(jsonWriter, formErrors,
                                    new Date(DatePreset.PAST_24_HOURS.name(),
-                                            TIME_PRESET_UTYPE, cal.getTime()));
+                                            CAOM2_TIME_PRESET_UTYPE, cal.getTime()));
 
         assertEquals("Wrong JSON Timestamp.",
                      "[\" (43471.133333..43472.133333 MJD)\"]",
@@ -134,7 +135,7 @@ public class UnitConversionServletTest
 
         resetDataMembers();
         getTestSubject()
-                .writeJSON("Plane.time.bounds", "> 2010-09-22", jsonWriter,
+                .writeJSON(CAOM2_TIME_FIELD, "> 2010-09-22", jsonWriter,
                            parameters);
         assertEquals("Test 3 - Should be MJD.",
                      "[\" (>= 55461.0 MJD)\"]",
@@ -143,7 +144,7 @@ public class UnitConversionServletTest
         // Test with spaces.
         resetDataMembers();
         getTestSubject()
-                .writeJSON("Plane.time.bounds", " > 2010-09-22", jsonWriter,
+                .writeJSON(CAOM2_TIME_FIELD, " > 2010-09-22", jsonWriter,
                            parameters);
         assertEquals("Test 3.5 - Should be MJD.",
                      "[\" (>= 55461.0 MJD)\"]",
@@ -166,7 +167,7 @@ public class UnitConversionServletTest
 
         resetDataMembers();
         getTestSubject()
-                .writeJSON("Plane.energy.bounds", "800nm", jsonWriter,
+                .writeJSON(CAOM2_ENERGY_FIELD, "800nm", jsonWriter,
                            parameters);
         assertEquals("Test 6 - Should be metres.",
                      "[\" (= 8.000E-7 metres)\"]",
@@ -174,7 +175,7 @@ public class UnitConversionServletTest
 
         resetDataMembers();
         getTestSubject()
-                .writeJSON("Plane.energy.bounds", "0.21m", jsonWriter,
+                .writeJSON(CAOM2_ENERGY_FIELD, "0.21m", jsonWriter,
                            parameters);
         assertEquals("Test 7 - Should be metres.",
                      "[\" (= 0.21 metres)\"]",
@@ -182,7 +183,7 @@ public class UnitConversionServletTest
 
         resetDataMembers();
         getTestSubject()
-                .writeJSON("Plane.energy.bounds", "300..400GHz", jsonWriter,
+                .writeJSON(CAOM2_ENERGY_FIELD, "300..400GHz", jsonWriter,
                            parameters);
         assertEquals("Test 8 - Should be metres.",
                      "[\" (7.495E-4..9.993E-4 metres)\"]",

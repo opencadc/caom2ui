@@ -92,8 +92,8 @@ public class CAOMSearchFormPage extends AbstractSearchFormPage
     static final By TARGET_RESOLUTION_STATUS_ICON_BY = By.className("target_name_resolution_status");
     static final By TARGET_RESOLUTION_STATUS_GOOD_ICON_BY = By.className("target_ok");
     static final By SSOIS_LINK_BY = By.id("ssois_link");
-    static final String SPECTRAL_COVERAGE_INPUT_ID = "Plane.energy.bounds";
-    static final String OBSERVATION_DATE_INPUT_ID = "Plane.time.bounds";
+    static final String SPECTRAL_COVERAGE_INPUT_ID = "Plane.energy.bounds.samples";
+    static final String OBSERVATION_DATE_INPUT_ID = "Plane.time.bounds.samples";
     static final String PIXEL_SCALE_INPUT_ID = "Plane.position.sampleSize";
     static final By RESET_BUTTON_SELECTOR = By.cssSelector("button[type=\"reset\"]");
 
@@ -116,10 +116,10 @@ public class CAOMSearchFormPage extends AbstractSearchFormPage
     @FindBy(id = "Plane.position.bounds")
     WebElement targetInput;
 
-    @FindBy(id = "Plane.energy.bounds")
+    @FindBy(id = "Plane.energy.bounds.samples")
     WebElement spectralCoverageInput;
 
-    @FindBy(id = "Plane.time.bounds")
+    @FindBy(id = "Plane.time.bounds.samples")
     WebElement observationDateInput;
 
     @FindBy(id = "ssois_link")
