@@ -74,6 +74,7 @@ import ca.nrc.cadc.caom2.Observation;
 import ca.nrc.cadc.caom2.ObservationURI;
 import ca.nrc.cadc.caom2.ui.server.client.Caom2RepoClient;
 import ca.nrc.cadc.caom2.ui.server.client.ObsLink;
+import ca.nrc.cadc.caom2.ui.server.client.ObservationUtil;
 import org.apache.log4j.Logger;
 
 import javax.servlet.RequestDispatcher;
@@ -103,10 +104,16 @@ public class Caom2RepoObservationServlet extends HttpServlet
     private static final int OBSERVATION_VIEW = 3;
     private static final int NOT_SUPPORTED = 0;
 
-    public Caom2RepoClient repoClient = new Caom2RepoClient();
+    private final Caom2RepoClient repoClient;
 
     public Caom2RepoObservationServlet()
     {
+        this(new Caom2RepoClient());
+    }
+
+    public Caom2RepoObservationServlet(Caom2RepoClient repoClient)
+    {
+        this.repoClient = repoClient;
     }
 
     /**
@@ -147,7 +154,7 @@ public class Caom2RepoObservationServlet extends HttpServlet
                 }
                 case OBSERVATION_VIEW:
                 {
-                    final ObservationURI uri = getURI(request);
+                    final ObservationURI uri = ObservationUtil.getURI(request);
                     final Observation obs =
                             repoClient.getObservation(repoClient.getCurrentSubject(), uri);
 
@@ -194,29 +201,6 @@ public class Caom2RepoObservationServlet extends HttpServlet
 
     }
 
-
-    private ObservationURI getURI(HttpServletRequest request)
-    {
-        String sid = request.getPathInfo();
-
-        if (sid != null)
-        {
-            sid = sid.substring(1, sid.length()); // strip leading /
-            final String[] parts = sid.split("/");
-
-            if (parts.length == 2)
-            {
-                log.debug("collection: " + parts[0] + " observationID: "
-                        + parts[1]);
-                return new ObservationURI(parts[0], parts[1]);
-            }
-        }
-
-        log.error("collection/observationID not found in path: " + sid);
-        return null;
-    }
-
-
     private int getRequestType(HttpServletRequest request)
     {
         String sid = request.getPathInfo();
@@ -227,23 +211,20 @@ public class Caom2RepoObservationServlet extends HttpServlet
             sid = sid.substring(1,sid.length()); // strip leading /
             String[] parts = sid.split("/");
 
-            if (parts != null)
+            if (parts.length == 1)
             {
-                if (parts.length == 1)
+                if (parts[0].isEmpty())
                 {
-                    if (parts[0].isEmpty())
-                    {
-                        requestType = COLLECTION_LIST;
-                    }
-                    else
-                    {
-                        requestType = OBSERVATION_LIST;
-                    }
+                    requestType = COLLECTION_LIST;
                 }
-                else if (parts.length == 2)
+                else
                 {
-                    requestType = OBSERVATION_VIEW;
+                    requestType = OBSERVATION_LIST;
                 }
+            }
+            else if (parts.length == 2)
+            {
+                requestType = OBSERVATION_VIEW;
             }
         }
         else
@@ -262,9 +243,9 @@ public class Caom2RepoObservationServlet extends HttpServlet
         if (sid != null)
         {
             sid = sid.substring(1,sid.length()); // strip leading /
-            String[] parts = sid.split("/");
+            final String[] parts = sid.split("/");
 
-            if (parts != null && parts.length == 1)
+            if (parts.length == 1)
             {
                 return parts[0];
             }
