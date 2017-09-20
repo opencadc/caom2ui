@@ -87,7 +87,7 @@
               key="TIME_CONSTRAINT_LABEL" bundle="${langBundle}"/></div>
           <div class="panel-body search-constraints">
             <c:import
-                url="date.jsp?utype=Plane.time.bounds&tipSide=left"/>
+                url="date.jsp?utype=Plane.time.bounds.samples&tipSide=left"/>
             <c:import
                 url="number.jsp?utype=Plane.time.exposure&tipSide=left"/>
             <c:import
@@ -102,7 +102,7 @@
               key="SPECTRAL_CONSTRAINT_LABEL" bundle="${langBundle}"/></div>
           <div class="panel-body search-constraints">
             <c:import
-                url="energy.jsp?utype=Plane.energy.bounds&tipSide=left"/>
+                url="energy.jsp?utype=Plane.energy.bounds.samples&tipSide=left"/>
             <c:import
                 url="number.jsp?utype=Plane.energy.sampleSize&tipSide=left"/>
             <c:import
