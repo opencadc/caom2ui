@@ -69,35 +69,19 @@
 
 package ca.nrc.cadc.caom2.ui.server;
 
-import ca.nrc.cadc.auth.AuthMethod;
-import ca.nrc.cadc.auth.AuthenticationUtil;
 import ca.nrc.cadc.caom2.Observation;
 import ca.nrc.cadc.caom2.ObservationURI;
 import ca.nrc.cadc.caom2.ui.server.client.Caom2MetaClient;
-import ca.nrc.cadc.caom2.xml.ObservationParsingException;
-import ca.nrc.cadc.caom2.xml.ObservationReader;
-import ca.nrc.cadc.config.ApplicationConfiguration;
-import ca.nrc.cadc.net.HttpDownload;
-import ca.nrc.cadc.net.InputStreamWrapper;
-import ca.nrc.cadc.reg.Standards;
-import ca.nrc.cadc.reg.client.RegistryClient;
-import ca.nrc.cadc.util.StringUtil;
-import org.apache.http.client.utils.URIBuilder;
+import ca.nrc.cadc.caom2.ui.server.client.ObservationUtil;
 import org.apache.log4j.Logger;
 
-import javax.security.auth.Subject;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.security.PrivilegedAction;
+
 
 /**
  * @author jeevesh
@@ -115,11 +99,17 @@ public class Caom2MetaObservationServlet extends HttpServlet
             + "vous plaît connecter et essayez à nouveau.";
 
 
-    public  Caom2MetaClient metaClient = new Caom2MetaClient();
+    private final Caom2MetaClient metaClient;
 
 
     public Caom2MetaObservationServlet()
     {
+        this(new Caom2MetaClient());
+    }
+
+    public Caom2MetaObservationServlet(Caom2MetaClient metaClient)
+    {
+        this.metaClient = metaClient;
     }
 
     /**
@@ -142,7 +132,7 @@ public class Caom2MetaObservationServlet extends HttpServlet
         try
         {
             // Parse the parameters given in the url.
-            final ObservationURI uri = getURI(request);
+            final ObservationURI uri = ObservationUtil.getURI(request);
             if (uri == null)
             {
                 errMsg = "Must specify collection/observationID in the path. | "
@@ -192,28 +182,4 @@ public class Caom2MetaObservationServlet extends HttpServlet
             final RequestDispatcher dispatcher = request.getRequestDispatcher(path);
             dispatcher.forward(request, response);
     }
-
-
-    private ObservationURI getURI(HttpServletRequest request)
-    {
-        String sid = request.getPathInfo();
-        log.debug("request.getPathInfo(): " + sid);
-
-        if (sid != null)
-        {
-            sid = sid.substring(1, sid.length()); // strip leading /
-            final String[] parts = sid.split("/");
-
-            if (parts.length == 2)
-            {
-                log.debug("collection: " + parts[0] + " observationID: "
-                          + parts[1]);
-                return new ObservationURI(parts[0], parts[1]);
-            }
-        }
-
-        log.debug("collection/observationID not found in path");
-        return null;
-    }
-
 }

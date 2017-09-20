@@ -12,7 +12,7 @@ repositories {
 }
 
 dependencies {
-    compile 'org.opencadc:caom2-ui-server:[1.1.1,)'
+    compile 'org.opencadc:caom2-ui-server:[1.1.2,)'
 
     providedCompile 'javax.servlet:javax.servlet-api:3.1.+'
     providedCompile 'javax.servlet:javax.servlet-api:3.0.+'
@@ -34,7 +34,7 @@ ext {
 sourceCompatibility = '1.7'
 
 group = 'ca.nrc.cadc'
-version = '1005'
+version = '1006'
 
 war {
     archiveName = 'caom2ui##' + project.version + '.war'
