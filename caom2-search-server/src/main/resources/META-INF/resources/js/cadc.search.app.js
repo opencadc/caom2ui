@@ -8,6 +8,7 @@
           "search": {
             "defaults": {
               "pageLanguage": "en",
+              "applicationEndpoint": "/search",
               "autoInitFlag": true,
               "tapSyncEndpoint": "/search/tap/sync",
               "targetResolverEndpoint": "/search/unitconversion",
@@ -17,6 +18,8 @@
               "validatorEndpoint": "/search/validate",
               "previewsEndpoint": "/search/preview",
               "searchEndpoint": "/search/find"
+            },
+            "services": {
             },
             "field_ignore": [
               "sort_column", "sort_order", "formName", "SelectList", "MaxRecords", "format", "Form.name"
@@ -62,6 +65,7 @@
    * @param {String} [_options.autocompleteEndpoint="/search/unitconversion"]   Relative URI endpoint to the unit
    * @param {String} [_options.targetResolverEndpoint="/search/unitconversion"]   Target resolver endpoint service
    *     conversion service.
+   * @param {String} [_options.applicationEndpoint="/search"]   Endpoint to this application 
    * @constructor
    */
   function AdvancedSearchApp(_options)
@@ -84,6 +88,19 @@
     var $queryCode = $("#query");
     var columnManager = new ca.nrc.cadc.search.columns.ColumnManager();
     var resultsVOTV;
+
+    var services = {
+      "autocompleteEndpoint": _options.autocompleteEndpoint,
+      "targetResolverEndpoint": _options.targetResolverEndpoint,
+      "tapSyncEndpoint": _options.tapSyncEndpoint,
+      "packageEndpoint": _options.packageEndpoint,
+      "validatorEndpoint": _options.validatorEndpoint,
+      "previewsEndpoint": _options.previewsEndpoint,
+      "searchEndpoint": _options.searchEndpoint,
+      "applicationEndpoint": _options.applicationEndpoint
+    }
+
+    $.extend(true, ca.nrc.cadc.search.services, services);
 
     this.options = $.extend({}, ca.nrc.cadc.search.defaults, _options);
 

@@ -119,11 +119,6 @@
   </servlet>
 
   <servlet>
-    <servlet-name>CAOM2Servlet</servlet-name>
-    <servlet-class>ca.nrc.cadc.caom2.CAOM2Servlet</servlet-class>
-  </servlet>
-
-  <servlet>
     <servlet-name>TAPServlet</servlet-name>
     <servlet-class>ca.nrc.cadc.tap.TAPServlet</servlet-class>
   </servlet>
@@ -146,6 +141,13 @@
   <servlet>
     <servlet-name>PreviewServlet</servlet-name>
     <servlet-class>ca.nrc.cadc.search.PreviewServlet</servlet-class>
+    <load-on-startup>4</load-on-startup>
+  </servlet>
+
+  <!-- DataLink Servlet -->
+  <servlet>
+    <servlet-name>DataLinkServlet</servlet-name>
+    <servlet-class>ca.nrc.cadc.search.SearchPreviewServlet</servlet-class>
     <load-on-startup>4</load-on-startup>
   </servlet>
 
@@ -225,6 +227,12 @@
   </servlet-mapping>
 
   <servlet-mapping>
+    <servlet-name>DataLinkServlet</servlet-name>
+    <url-pattern>/datalink/*</url-pattern>
+    <url-pattern>/datalink</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
     <servlet-name>ColumnUnitServlet</servlet-name>
     <url-pattern>/columnUnit</url-pattern>
   </servlet-mapping>
@@ -243,11 +251,6 @@
   <servlet-mapping>
     <servlet-name>TAPServlet</servlet-name>
     <url-pattern>/tap/*</url-pattern>
-  </servlet-mapping>
-
-  <servlet-mapping>
-    <servlet-name>CAOM2Servlet</servlet-name>
-    <url-pattern>/caom2ui/*</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>

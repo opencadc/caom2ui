@@ -28,7 +28,7 @@ services:
     depends_on:
       - uwspg.cadc.dao.nrc.ca
     environment:
-      - CATALINA_OPTS=-Dca.nrc.cadc.reg.client.RegistryClient.host=proxy.cadc.dao.nrc.ca -Dorg.opencadc.search.tap-service-host-port=http://proxy.cadc.dao.nrc.ca -Dorg.opencadc.search.tap-service-endpoint=/search/tap/sync -Dorg.opencadc.search.caom2ops-service-host-port=http://proxy.cadc.dao.nrc.ca -Dorg.opencadc.caom2ui.caom2ops-service-host-port=http://proxy.cadc.dao.nrc.ca
+      - CATALINA_OPTS=-Dca.nrc.cadc.reg.client.RegistryClient.host=proxy.cadc.dao.nrc.ca 
   uwspg.cadc.dao.nrc.ca:
     image: opencadc/uws_postgres
     networks:
@@ -43,7 +43,7 @@ services:
     networks:
       - 'selenium'
     environment:
-      - CATALINA_OPTS=-Dca.nrc.cadc.reg.client.RegistryClient.host=proxy.cadc.dao.nrc.ca -Dorg.opencadc.caom2ui.caom2ops-service-host-port=http://proxy.cadc.dao.nrc.ca
+      - CATALINA_OPTS=-Dca.nrc.cadc.reg.client.RegistryClient.host=proxy.cadc.dao.nrc.ca 
 
 
 # Create the network 'selenium' for which this system will run within.

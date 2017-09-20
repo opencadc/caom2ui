@@ -37,11 +37,12 @@ import ca.nrc.cadc.auth.AuthMethod;
 import ca.nrc.cadc.net.NetUtil;
 import ca.nrc.cadc.reg.Standards;
 import ca.nrc.cadc.reg.client.RegistryClient;
+import ca.nrc.cadc.web.ConfigurableServlet;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -50,11 +51,11 @@ import java.net.URI;
 import java.net.URL;
 
 
-public class PreviewServlet extends HttpServlet
+public class PreviewServlet extends ConfigurableServlet
 {
     public static final String DATA_URI = "ivo://cadc.nrc.ca/data";
 
-    private URL dataServiceURL;
+    protected URL dataServiceURL;
 
 
     /**
@@ -79,13 +80,12 @@ public class PreviewServlet extends HttpServlet
                                                            AuthMethod.COOKIE);
     }
 
-
     @Override
     protected void doGet(final HttpServletRequest req,
                          final HttpServletResponse resp)
             throws ServletException, IOException
     {
-        final URL jobURL = createJobURL(req);
+        final URL jobURL = this.createJobURL(req);
         final HttpURLConnection connection = connect(jobURL);
 
         connection.setDoInput(true);
