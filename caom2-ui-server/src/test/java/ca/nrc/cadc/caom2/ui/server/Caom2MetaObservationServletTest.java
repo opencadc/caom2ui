@@ -65,7 +65,7 @@ public class Caom2MetaObservationServletTest
     private final HttpServletResponse mockResponse =
             createMock(HttpServletResponse.class);
     private final ApplicationConfiguration mockConfiguration =
-        createMock(ApplicationConfiguration.class);
+            createMock(ApplicationConfiguration.class);
 
 
     @Test
@@ -112,9 +112,8 @@ public class Caom2MetaObservationServletTest
         replay(mockRequest, mockErrorDispatcher, mockDisplayDispatcher,
                mockResponse);
 
-        final Caom2MetaObservationServlet testSubject = new Caom2MetaObservationServlet();
+        final Caom2MetaObservationServlet testSubject = new Caom2MetaObservationServlet(testClient);
 
-        testSubject.metaClient = testClient;
         testSubject.doGet(mockRequest, mockResponse);
 
 
@@ -145,7 +144,7 @@ public class Caom2MetaObservationServletTest
                      */
                     @Override
                     public Observation getObservation(Subject subject,
-                                               ObservationURI uri)
+                                                      ObservationURI uri)
                     {
                         return null;
                     }
@@ -178,9 +177,8 @@ public class Caom2MetaObservationServletTest
                mockResponse);
 
 
-        final Caom2MetaObservationServlet testSubject = new Caom2MetaObservationServlet();
+        final Caom2MetaObservationServlet testSubject = new Caom2MetaObservationServlet(testClient);
 
-        testSubject.metaClient = testClient;
         testSubject.doGet(mockRequest, mockResponse);
 
         verify(mockRequest, mockErrorDispatcher, mockDisplayDispatcher,
@@ -231,7 +229,7 @@ public class Caom2MetaObservationServletTest
                      */
                     @Override
                     public HttpDownload getDownloader(URL url,
-                                               Caom2MetaClient.ReadAction readAction)
+                                                      Caom2MetaClient.ReadAction readAction)
                     {
                         return mockDownloader;
                     }
@@ -283,9 +281,8 @@ public class Caom2MetaObservationServletTest
                mockResponse, mockDownloader,
                mockObservationReader, mockConfiguration);
 
-        final Caom2MetaObservationServlet testSubject = new Caom2MetaObservationServlet();
+        final Caom2MetaObservationServlet testSubject = new Caom2MetaObservationServlet(testClient);
 
-        testSubject.metaClient = testClient;
         testSubject.doGet(mockRequest, mockResponse);
 
         verify(mockRequest, mockErrorDispatcher, mockDisplayDispatcher,

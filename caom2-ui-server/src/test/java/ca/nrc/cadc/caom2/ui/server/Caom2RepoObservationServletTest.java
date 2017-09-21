@@ -73,11 +73,6 @@ public class Caom2RepoObservationServletTest
             createMock(HttpServletResponse.class);
     private final ApplicationConfiguration mockConfiguration =
             createMock(ApplicationConfiguration.class);
-    private final Caom2RepoClient mockRepoClient =
-            createMock(Caom2RepoClient.class);
-    private final Observation mockObservation =
-            createMock(Observation.class);
-    static final String DEFAULT_CAOM2REPO_SERVICE_HOST_PORT = "http://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca";
 
 
     @Test
@@ -128,8 +123,7 @@ public class Caom2RepoObservationServletTest
                mockResponse);
 
         final Caom2RepoObservationServlet testSubject =
-                new Caom2RepoObservationServlet();
-        testSubject.repoClient = testClient;
+                new Caom2RepoObservationServlet(testClient);
         testSubject.doGet(mockRequest, mockResponse);
 
         verify(mockRequest, mockDisplayDispatcher,
@@ -187,8 +181,7 @@ public class Caom2RepoObservationServletTest
                 mockResponse);
 
         final Caom2RepoObservationServlet testSubject =
-                new Caom2RepoObservationServlet();
-        testSubject.repoClient = testClient;
+                new Caom2RepoObservationServlet(testClient);
         testSubject.doGet(mockRequest, mockResponse);
 
         verify(mockRequest, mockDisplayDispatcher,
@@ -246,9 +239,8 @@ public class Caom2RepoObservationServletTest
                 mockResponse);
 
 
-        final Caom2RepoObservationServlet testSubject = new Caom2RepoObservationServlet();
+        final Caom2RepoObservationServlet testSubject = new Caom2RepoObservationServlet(testClient);
 
-        testSubject.repoClient = testClient;
         testSubject.doGet(mockRequest, mockResponse);
 
         verify(mockRequest, mockErrorDispatcher, mockDisplayDispatcher,
@@ -353,9 +345,8 @@ public class Caom2RepoObservationServletTest
                 mockResponse, mockDownloader,
                 mockObservationReader, mockConfiguration);
 
-        final Caom2RepoObservationServlet testSubject = new Caom2RepoObservationServlet();
+        final Caom2RepoObservationServlet testSubject = new Caom2RepoObservationServlet(testClient);
 
-        testSubject.repoClient = testClient;
         testSubject.doGet(mockRequest, mockResponse);
 
         verify(mockRequest, mockErrorDispatcher, mockDisplayDispatcher,

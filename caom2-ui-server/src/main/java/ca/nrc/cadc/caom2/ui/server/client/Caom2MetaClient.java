@@ -86,7 +86,7 @@ import java.net.URL;
  */
 public class Caom2MetaClient extends BaseClient
 {
-    private static final Logger log = Logger.getLogger(Caom2MetaClient.class);
+    static final Logger LOGGER = Logger.getLogger(Caom2MetaClient.class);
 
     static final String CAOM2META_SERVICE_URI_PROPERTY_KEY = "org.opencadc.caom2ui.caom2ops-service-id";
     static final URI CAOM2META_RESOURCE_ID = URI.create("ivo://cadc.nrc.ca/caom2ops");
@@ -108,6 +108,8 @@ public class Caom2MetaClient extends BaseClient
     {
         path = "?ID=" + uri.getURI().toString();
         URL serviceURL = getServiceURL();
+
+        LOGGER.debug(String.format("Using service URL '%s'", serviceURL.toExternalForm()));
 
         final ReadAction ra = getObservationReader();
         final HttpDownload get = getDownloader(serviceURL, ra);

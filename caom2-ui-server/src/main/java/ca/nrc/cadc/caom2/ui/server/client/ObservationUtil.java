@@ -3,7 +3,7 @@
  *******************  CANADIAN ASTRONOMY DATA CENTRE  *******************
  **************  CENTRE CANADIEN DE DONNÉES ASTRONOMIQUES  **************
  *
- *  (c) 2015.                            (c) 2015.
+ *  (c) 2017.                            (c) 2017.
  *  Government of Canada                 Gouvernement du Canada
  *  National Research Council            Conseil national de recherches
  *  Ottawa, Canada, K1A 0R6              Ottawa, Canada, K1A 0R6
@@ -66,85 +66,30 @@
  ************************************************************************
  */
 
-package ca.nrc.cadc.search;
+package ca.nrc.cadc.caom2.ui.server.client;
 
-import ca.nrc.cadc.auth.AuthMethod;
-import ca.nrc.cadc.reg.Standards;
-import ca.nrc.cadc.reg.client.RegistryClient;
-import ca.nrc.cadc.web.ConfigurableServlet;
-import org.apache.http.client.utils.URIBuilder;
+import ca.nrc.cadc.caom2.ObservationURI;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 
 
-/**
- * Servlet to redirect a caller to the appropriate place for a single request
- * download of a single CAOM-2 URI.
- */
-public class PackageServlet extends ConfigurableServlet
+public final class ObservationUtil
 {
-    static final String CAOM2PKG_SERVICE_URI_PROPERTY_KEY = "org.opencadc.search.caom2pkg-service-id";
-    static final URI DEFAULT_CAOM2PKG_SERVICE_URI = URI.create("ivo://cadc.nrc.ca/caom2ops");
-
-    /**
-     * Only supported method.  This will accept an ID parameter in the request
-     * to query on.
-     *
-     * @param request               The HTTP Request.
-     * @param response              The HTTP Response.
-     * @throws ServletException     Servlet related errors.
-     * @throws IOException          Any other errors.
-     */
-    @Override
-    protected void doGet(final HttpServletRequest request,
-                         final HttpServletResponse response)
-            throws ServletException, IOException
+    public static ObservationURI getURI(final HttpServletRequest request)
     {
-        try
+        final String sid = request.getPathInfo();
+
+        if (sid != null)
         {
-            get(request, response, new RegistryClient());
-        }
-        catch (URISyntaxException e)
-        {
-            throw new IOException(e);
-        }
-    }
+            final String modifiedSID = sid.substring(1, sid.length()); // strip leading /
+            final String[] parts = modifiedSID.split("/");
 
-
-    /**
-     * Handle a GET request with the given Registry client to perform the
-     * lookup.
-     *
-     * @param request               The HTTP Request.
-     * @param response              The HTTP Response.
-     * @param registryClient        The RegistryClient to do lookups.
-     * @throws IOException          Any request access problems.
-     * @throws URISyntaxException   For uri issues.
-     */
-    void get(final HttpServletRequest request,
-             final HttpServletResponse response,
-             final RegistryClient registryClient)
-            throws IOException, URISyntaxException
-    {
-        final URL serviceURL = registryClient.getServiceURL(
-                getServiceID(
-                        CAOM2PKG_SERVICE_URI_PROPERTY_KEY,
-                        DEFAULT_CAOM2PKG_SERVICE_URI),
-                Standards.PKG_10, AuthMethod.COOKIE);
-
-        final URIBuilder builder = new URIBuilder(serviceURL.toURI());
-
-        for (final String IDValue : request.getParameterValues("ID"))
-        {
-            builder.addParameter("ID", IDValue);
+            if (parts.length == 2)
+            {
+                return new ObservationURI(parts[0], parts[1]);
+            }
         }
 
-        response.sendRedirect(builder.build().toURL().toExternalForm());
+        return null;
     }
 }

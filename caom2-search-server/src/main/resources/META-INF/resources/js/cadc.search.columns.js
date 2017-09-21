@@ -10,7 +10,7 @@
             "OBSCORE_RESOLVER_VALUE_KEY": "Char.SpatialAxis.Coverage.Support.Area@Shape1Resolver.value",
             "CAOM2_TARGET_NAME_VALUE_KEY": "Plane.position.bounds@Shape1.value",
             "DETAILS_CSS": "details_tooltip_link",
-            "DATALINK_URL_PREFIX": " /caom2ops/datalink",
+            "DATALINK_URL_SUFFIX": "/datalink",
             "columns": {
               "OBSERVATION_URI_UTYPE": "caom2:Observation.uri",
               "OBSERVATION_ID_UTYPE": "caom2:Observation.observationID",
@@ -191,7 +191,7 @@
 
                     // Get the thumbnails and previews from datalink
                     $.ajax({
-                             url: ca.nrc.cadc.search.DATALINK_URL_PREFIX,
+                             url: " " + ca.nrc.cadc.search.services.applicationEndpoint + ca.nrc.cadc.search.DATALINK_URL_SUFFIX,
                              dataType: "xml",
                              data: {
                                id: planeURIValue,
@@ -295,8 +295,8 @@
                                                                                            productID, 256, runID);
 
                                      var addMainPreview = function (thumbnailURL) {
-                                       var preview = new ca.nrc.cadc.search.Preview(collection, observationID,
-                                                                                    productID, 1024, runID);
+                                     var preview = new ca.nrc.cadc.search.Preview(collection, observationID,
+                                                                                  productID, 1024, runID);
 
                                        preview.getPreview(
                                            function (previewURL) {
@@ -748,7 +748,7 @@
                   if (value)
                   {
                     var intValue = parseInt(value);
-                    searchValue["Plane.time.bounds"] = (intValue + ".." + (intValue + 1));
+                    searchValue["Plane.time.bounds.samples"] = (intValue + ".." + (intValue + 1));
                   }
 
                   return formatQuickSearchLink(value, searchValue, columnDef.utype, $(columnDef).data("unitValue"));
@@ -1243,7 +1243,7 @@
       var tipOutput;
 
       // Date columns only.
-      if (columnUType.indexOf("Plane.time.bounds") >= 0)
+      if (columnUType.indexOf("Plane.time.bounds.samples") >= 0)
       {
         var delimiter = (toUnit === "MJD") ? "." : " ";
         tipOutput = $link.text().split(delimiter)[0];
