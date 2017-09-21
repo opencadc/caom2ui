@@ -1,5 +1,5 @@
 # caom2-meta-ui
-CAOM-2 web user interface for Observation details (1.1.2)
+CAOM-2 web user interface for Observation details (1.1.3)
 
 <a href="https://travis-ci.org/opencadc/caom2ui"><img src="https://travis-ci.org/opencadc/caom2ui.svg?branch=master" /></a>
 
@@ -10,7 +10,7 @@ The Meta UI will show a detailed tree-like view of Observations.
 The default configuration will use the CAOM-2 Meta service at CADC.
 
 ```
-docker run --name meta-ui -p 8080:8080 --rm opencadc/caom2-meta-ui:1.1.2
+docker run --name meta-ui -p 8080:8080 --rm opencadc/caom2-meta-ui:1.1.3
 ```
 
 ### Build your own Docker image
