@@ -15,6 +15,7 @@ dependencies {
     compile 'com.opencsv:opencsv:3.+'
     compile 'org.jdom:jdom2:2.+'
     compile 'org.json:json:20170516'
+    compile 'org.opencadc:caom2-search:2.+'
     compile 'org.opencadc:cadc-access-control:1.+'
     compile 'org.opencadc:cadc-uws:1.+'
     compile 'org.opencadc:cadc-web-util:[1.0.9, )'
