@@ -107,6 +107,7 @@ public class Caom2MetaObservationServlet extends HttpServlet
         this(new Caom2MetaClient());
     }
 
+
     public Caom2MetaObservationServlet(Caom2MetaClient metaClient)
     {
         this.metaClient = metaClient;
@@ -122,12 +123,11 @@ public class Caom2MetaObservationServlet extends HttpServlet
      * @throws ServletException If servlet exception.
      * @throws IOException      If IO exception.
      */
-    protected void doGet(final HttpServletRequest request,
-                         final HttpServletResponse response)
+    protected void doGet(final HttpServletRequest request, final HttpServletResponse response)
             throws ServletException, IOException
     {
         final long start = System.currentTimeMillis();
-        String errMsg = "";
+        final String errMsg;
 
         try
         {
