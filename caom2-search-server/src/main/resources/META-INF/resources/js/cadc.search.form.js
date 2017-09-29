@@ -768,7 +768,7 @@
                                                                                     $checkbox.is(":checked"));
                                                  }.bind(this));
 
-      $currForm.find("select.resolver_select").change(function (event)
+      $currForm.find("select.resolver-select").change(function (event)
                                          {
                                            var $resolverSelectName = $(event.target).prop("name");
                                            var $fieldID = $resolverSelectName
@@ -1612,12 +1612,12 @@
         this.$form.append(upload);
 
         // Update the file input name with the value from the target list select.
-        var resolver = $("select[id='Plane.position.bounds@Shape1Resolver.value']").val();
+        var resolverSelect = this.$form.find("select.resolver-select");
 
         // Renaming the field is a terrible idea, but cloning it doesn't work in some browsers.
         // jenkinsd 2017.07.10
         //
-        inputFile.prop("name", "targetList." + resolver);
+        inputFile.prop("name", "targetList." + resolverSelect.val());
       }
 
       // Save the form to sessionStorage.
