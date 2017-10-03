@@ -31,9 +31,11 @@
  ****  C A N A D I A N   A S T R O N O M Y   D A T A   C E N T R E  *****
  ************************************************************************
  */
+
 package ca.nrc.cadc.search;
 
 import ca.nrc.cadc.auth.AuthMethod;
+import ca.nrc.cadc.net.HttpDownload;
 import ca.nrc.cadc.net.NetUtil;
 import ca.nrc.cadc.reg.Standards;
 import ca.nrc.cadc.reg.client.RegistryClient;
@@ -43,28 +45,25 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import java.io.BufferedOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 
 
-public class PreviewServlet extends ConfigurableServlet
-{
+public class PreviewServlet extends ConfigurableServlet {
     public static final String DATA_URI = "ivo://cadc.nrc.ca/data";
 
-    protected URL dataServiceURL;
+    URL dataServiceURL;
 
 
     /**
      * Complete constructor.
      *
-     * @param dataServiceURL     The URL of the Data Web Service.
+     * @param dataServiceURL The URL of the Data Web Service.
      */
-    public PreviewServlet(final URL dataServiceURL)
-    {
+    public PreviewServlet(final URL dataServiceURL) {
         this.dataServiceURL = dataServiceURL;
     }
 
@@ -72,63 +71,41 @@ public class PreviewServlet extends ConfigurableServlet
      * Constructor to use the Registry Client to obtain the Data Web Service
      * location.
      */
-    public PreviewServlet()
-    {
+    public PreviewServlet() {
         final RegistryClient registryClient = new RegistryClient();
-        this.dataServiceURL = registryClient.getServiceURL(URI.create(DATA_URI),
-                                                           Standards.DATA_10,
-                                                           AuthMethod.COOKIE);
+        this.dataServiceURL = registryClient.getServiceURL(URI.create(DATA_URI), Standards.DATA_10, AuthMethod.COOKIE);
     }
 
     @Override
-    protected void doGet(final HttpServletRequest req,
-                         final HttpServletResponse resp)
-            throws ServletException, IOException
-    {
+    protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
         final URL jobURL = this.createJobURL(req);
-        final HttpURLConnection connection = connect(jobURL);
+        final OutputStream outputStream = new BufferedOutputStream(resp.getOutputStream());
 
-        connection.setDoInput(true);
-        connection.setDoOutput(false);
-        connection.setInstanceFollowRedirects(true);
+        try {
+            final HttpDownload download = new HttpDownload(jobURL, outputStream);
 
-        if (connection.getResponseCode() > 400)
-        {
-            resp.setStatus(connection.getResponseCode());
-        }
-        else
-        {
-            final OutputStream outputStream = resp.getOutputStream();
+            download.setFollowRedirects(true);
+            download.run();
 
-            resp.setContentType(connection.getContentType());
+            final int responseCode = download.getResponseCode();
 
-            try (final InputStream inputStream = connection.getInputStream())
-            {
-                final byte[] buffer = new byte[1024 * 8];
-                int bytesRead;
-
-                while ((bytesRead = inputStream.read(buffer)) >= 0)
-                {
-                    outputStream.write(buffer, 0, bytesRead);
-                }
+            if (responseCode > 400) {
+                resp.setStatus(responseCode);
             }
-            finally
-            {
-                outputStream.flush();
-            }
+        } finally {
+            outputStream.flush();
         }
     }
 
     /**
      * Form the URL for the job as based on the given parameter.
      *
-     * @param request           The HTTP Request.
-     * @return                  A URL instance.
-     * @throws IOException      If the URL cannot be created.
+     * @param request The HTTP Request.
+     * @return A URL instance.
+     * @throws IOException If the URL cannot be created.
      */
     protected URL createJobURL(final HttpServletRequest request)
-            throws IOException
-    {
+        throws IOException {
         final String path = request.getPathInfo();
         final URL currentDataServiceURL = getDataServiceURL();
         final URL jobURL = new URL(currentDataServiceURL + path);
@@ -139,43 +116,28 @@ public class PreviewServlet extends ConfigurableServlet
     /**
      * Encode the URL to be hit for the Preview.
      *
-     * @param url               The URL to encode the individual items for.
-     * @return                  URL encoded.
-     * @throws IOException      If the URL cannot be read or encoded.
+     * @param url The URL to encode the individual items for.
+     * @return URL encoded.
+     * @throws IOException If the URL cannot be read or encoded.
      */
-    private URL encodeURL(final URL url) throws IOException
-    {
+    private URL encodeURL(final URL url) throws IOException {
         final StringBuilder urlPathAndQueryString =
-                new StringBuilder(url.toExternalForm().length());
+            new StringBuilder(url.toExternalForm().length());
 
         final String[] pathItems = url.getPath().split("/");
 
-        for (final String s : pathItems)
-        {
+        for (final String s : pathItems) {
             urlPathAndQueryString.append(NetUtil.encode(s));
             urlPathAndQueryString.append("/");
         }
 
         urlPathAndQueryString.replace(urlPathAndQueryString.lastIndexOf("/"),
-                                      urlPathAndQueryString.length(), "");
+            urlPathAndQueryString.length(), "");
 
         return new URL(url, urlPathAndQueryString.toString());
     }
 
-    /**
-     * Open a connection to the given URL.  This is here to simplify testing.
-     *
-     * @param url               The URL to connect to.
-     * @return                  A connection to the given URL.
-     * @throws IOException      If anything went wrong.
-     */
-    protected HttpURLConnection connect(final URL url) throws IOException
-    {
-        return (HttpURLConnection) url.openConnection();
-    }
-
-    public URL getDataServiceURL()
-    {
+    URL getDataServiceURL() {
         return dataServiceURL;
     }
 }
