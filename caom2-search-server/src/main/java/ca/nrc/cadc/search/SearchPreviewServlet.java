@@ -46,8 +46,8 @@ import javax.servlet.http.HttpServletRequest;
 
 public class SearchPreviewServlet extends PreviewServlet
 {
-    static final String CAOM2LINK_SERVICE_URI_PROPERTY_KEY = "org.opencadc.search.caom2link-service-id";
-    static final URI DEFAULT_CAOM2LINK_SERVICE_URI = URI.create("ivo://cadc.nrc.ca/caom2ops");
+    private static final String CAOM2LINK_SERVICE_URI_PROPERTY_KEY = "org.opencadc.search.caom2link-service-id";
+    private static final URI DEFAULT_CAOM2LINK_SERVICE_URI = URI.create("ivo://cadc.nrc.ca/caom2ops");
 
     /**
      * Constructor to use the Registry Client to obtain the Data Web Service
