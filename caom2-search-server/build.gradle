@@ -18,7 +18,7 @@ dependencies {
     compile 'org.opencadc:caom2-search-lib:2.+'
     compile 'org.opencadc:cadc-access-control:1.+'
     compile 'org.opencadc:cadc-uws:1.+'
-    compile 'org.opencadc:cadc-web-util:[1.0.9, )'
+    compile 'org.opencadc:cadc-web-util:[1.0.11, )'
     compile 'org.opencadc:cadc-adql:1.+'
     compile 'org.opencadc:cadc-util:1.+'
     compile 'org.opencadc:cadc-dali:1.+'
@@ -29,7 +29,7 @@ dependencies {
     compile 'org.apache.httpcomponents:httpclient:4.+'
     compile 'commons-net:commons-net:3.+'
 
-    runtime 'org.postgresql:postgresql:42.1.1.jre7'
+    runtime 'org.postgresql:postgresql:42.1.4.jre7'
     runtime 'jstl:jstl:1.+'
 
     testCompile 'junit:junit:4.+'
@@ -39,4 +39,4 @@ dependencies {
 
 sourceCompatibility = 1.7
 group = 'org.opencadc'
-version = '2.3.3'
+version = '2.3.4'
