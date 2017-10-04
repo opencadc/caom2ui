@@ -68,15 +68,11 @@
 
 package ca.nrc.cadc.tap;
 
+import ca.nrc.cadc.auth.AuthMethod;
 import ca.nrc.cadc.auth.AuthenticationUtil;
-import ca.nrc.cadc.auth.SSOCookieCredential;
 import ca.nrc.cadc.config.ApplicationConfiguration;
-import ca.nrc.cadc.net.HttpDownload;
+import ca.nrc.cadc.reg.Standards;
 import ca.nrc.cadc.reg.client.RegistryClient;
-import ca.nrc.cadc.search.util.ParameterUtil;
-import ca.nrc.cadc.util.StringUtil;
-import ca.nrc.cadc.uws.ExecutionPhase;
-import ca.nrc.cadc.uws.Job;
 import ca.nrc.cadc.web.ConfigurableServlet;
 
 import javax.security.auth.Subject;
@@ -86,23 +82,18 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
-import java.util.ArrayList;
 
 
-public class TAPServlet extends ConfigurableServlet
-{
+public class TAPServlet extends ConfigurableServlet {
     private static final String TAP_SERVICE_URI_PROPERTY_KEY = "org.opencadc.search.tap-service-id";
     private static final URI DEFAULT_TAP_SERVICE_URI = URI.create("ivo://cadc.nrc.ca/tap");
 
-    public TAPServlet()
-    {
+    public TAPServlet() {
     }
 
-    TAPServlet(ApplicationConfiguration configuration)
-    {
+    TAPServlet(ApplicationConfiguration configuration) {
         super(configuration);
     }
 
@@ -110,40 +101,40 @@ public class TAPServlet extends ConfigurableServlet
     /**
      * Called by the server (via the <code>service</code> method) to
      * allow a servlet to handle a GET request.
-     *Overriding this method to support a GET request also
+     * Overriding this method to support a GET request also
      * automatically supports an HTTP HEAD request. A HEAD
      * request is a GET request that returns no body in the
      * response, only the request header fields.
-     *When overriding this method, read the request data,
+     * When overriding this method, read the request data,
      * write the response headers, get the response's writer or
      * output stream object, and finally, write the response data.
      * It's best to include content type and encoding. When using
      * a <code>PrintWriter</code> object to return the response,
      * set the content type before accessing the
      * <code>PrintWriter</code> object.
-     *The servlet container must write the headers before
+     * The servlet container must write the headers before
      * committing the response, because in HTTP the headers must be sent
      * before the response body.
-     *Where possible, set the Content-Length header (with the
+     * Where possible, set the Content-Length header (with the
      * {@link ServletResponse#setContentLength} method),
      * to allow the servlet container to use a persistent connection
      * to return its response to the client, improving performance.
      * The content length is automatically set if the entire response fits
      * inside the response buffer.
-     *When using HTTP 1.1 chunked encoding (which means that the response
+     * When using HTTP 1.1 chunked encoding (which means that the response
      * has a Transfer-Encoding header), do not set the Content-Length header.
-     *The GET method should be safe, that is, without
+     * The GET method should be safe, that is, without
      * any side effects for which users are held responsible.
      * For example, most form queries have no side effects.
      * If a client request is intended to change stored data,
      * the request should use some other HTTP method.
-     *The GET method should also be idempotent, meaning
+     * The GET method should also be idempotent, meaning
      * that it can be safely repeated. Sometimes making a
      * method safe also makes it idempotent. For example,
      * repeating queries is both safe and idempotent, but
      * buying a product online or modifying data is neither
      * safe nor idempotent.
-     *If the request is incorrectly formatted, <code>doGet</code>
+     * If the request is incorrectly formatted, <code>doGet</code>
      * returns an HTTP "Bad Request" message.
      *
      * @param req  an {@link HttpServletRequest} object that
@@ -160,9 +151,8 @@ public class TAPServlet extends ConfigurableServlet
      * @see ServletResponse#setContentType
      */
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
-    {
-        sendToTAP(req, resp, new RegistryClient(), true);
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        handleRequest(req, resp);
     }
 
     /**
@@ -172,28 +162,28 @@ public class TAPServlet extends ConfigurableServlet
      * data of unlimited length to the Web server a single time
      * and is useful when posting information such as
      * credit card numbers.
-     *When overriding this method, read the request data,
+     * When overriding this method, read the request data,
      * write the response headers, get the response's writer or output
      * stream object, and finally, write the response data. It's best
      * to include content type and encoding. When using a
      * <code>PrintWriter</code> object to return the response, set the
      * content type before accessing the <code>PrintWriter</code> object.
-     *The servlet container must write the headers before committing the
+     * The servlet container must write the headers before committing the
      * response, because in HTTP the headers must be sent before the
      * response body.
-     *Where possible, set the Content-Length header (with the
+     * Where possible, set the Content-Length header (with the
      * {@link ServletResponse#setContentLength} method),
      * to allow the servlet container to use a persistent connection
      * to return its response to the client, improving performance.
      * The content length is automatically set if the entire response fits
      * inside the response buffer.
-     *When using HTTP 1.1 chunked encoding (which means that the response
+     * When using HTTP 1.1 chunked encoding (which means that the response
      * has a Transfer-Encoding header), do not set the Content-Length header.
-     *This method does not need to be either safe or idempotent.
+     * This method does not need to be either safe or idempotent.
      * Operations requested through POST can have side effects for
      * which the user can be held accountable, for example,
      * updating stored data or buying items online.
-     *If the HTTP POST request is incorrectly formatted,
+     * If the HTTP POST request is incorrectly formatted,
      * <code>doPost</code> returns an HTTP "Bad Request" message.
      *
      * @param req  an {@link HttpServletRequest} object that
@@ -211,78 +201,30 @@ public class TAPServlet extends ConfigurableServlet
      * @see ServletResponse#setContentType
      */
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
-    {
-        sendToTAP(req, resp, new RegistryClient(), false);
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        handleRequest(req, resp);
     }
 
-
-    /**
-     * Create a job and query TAP.
-     *
-     * @param request            The HTTP Request.
-     * @param response           The HTTP Response.
-     * @param registryClient The registry client to lookup the service.
-     * @param followRedirectsFlag       Whether to follow redirects or not.
-     * @throws IOException If URL management fails.
-     */
-    private void sendToTAP(final HttpServletRequest request, final HttpServletResponse response,
-                           final RegistryClient registryClient, final boolean followRedirectsFlag)
-            throws IOException
-    {
-        final OutputStream outputStream = response.getOutputStream();
-        final String sourceURL = request.getParameter("tap_url");
-
-        if (StringUtil.hasText(sourceURL))
-        {
-            response.setContentType("text/csv");
-
-            final HttpDownload httpDownload = new HttpDownload(new URL(sourceURL), outputStream);
-            httpDownload.setFollowRedirects(true);
-            httpDownload.run();
-
-            response.setHeader("Content-Length", Long.toString(httpDownload.getContentLength()));
-        }
-        else
-        {
-            final Job job = createJob(request);
-            final SyncTAPClient syncTAPClient = new DefaultSyncTAPClient(followRedirectsFlag, registryClient);
-
-            execute(syncTAPClient, job, outputStream);
-        }
-    }
-
-    /**
-     * Used for testers to override.
-     *
-     * @param syncTAPClient The TAP Client.
-     * @param job           The Job to execute.
-     * @param outputStream  The Output Stream to write output to.
-     */
-    private void execute(final SyncTAPClient syncTAPClient, final Job job, final OutputStream outputStream)
-    {
-        syncTAPClient.execute(lookupServiceURI(), job, outputStream);
-    }
-
-    private URI lookupServiceURI()
-    {
-        return getServiceID(TAP_SERVICE_URI_PROPERTY_KEY, DEFAULT_TAP_SERVICE_URI);
-    }
-
-    private Job createJob(final HttpServletRequest req)
-    {
-        final Job j = new Job();
-        final ParameterUtil parameterUtil = new ParameterUtil();
+    private void handleRequest(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
+        final RegistryClient registryClient = getRegistryClient();
         final Subject currentSubject = AuthenticationUtil.getCurrentSubject();
+        final AuthMethod currentAuthMethod = AuthenticationUtil.getAuthMethod(currentSubject);
+        final URL serviceURL = registryClient.getServiceURL(lookupServiceURI(), Standards.TAP_SYNC_11, (currentAuthMethod == null) ? AuthMethod.ANON :
+            currentAuthMethod);
 
-        j.setParameterList(new ArrayList<>(parameterUtil.asParameterSet(req)));
-        j.setExecutionPhase(ExecutionPhase.PENDING);
+        response.sendRedirect(serviceURL.toExternalForm() + "?" + request.getQueryString());
+    }
 
-        if ((currentSubject != null) && !currentSubject.getPublicCredentials(SSOCookieCredential.class).isEmpty())
-        {
-            j.ownerSubject = currentSubject;
-        }
+    /**
+     * Testing can override at will.
+     *
+     * @return RegistryClient instance.  Never null.
+     */
+    RegistryClient getRegistryClient() {
+        return new RegistryClient();
+    }
 
-        return j;
+    private URI lookupServiceURI() {
+        return getServiceID(TAP_SERVICE_URI_PROPERTY_KEY, DEFAULT_TAP_SERVICE_URI);
     }
 }

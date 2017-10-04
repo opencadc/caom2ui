@@ -82,7 +82,7 @@ public class PreviewServlet extends ConfigurableServlet {
         final OutputStream outputStream = new BufferedOutputStream(resp.getOutputStream());
 
         try {
-            final HttpDownload download = new HttpDownload(jobURL, outputStream);
+            final HttpDownload download = createDownloader(jobURL, outputStream);
 
             download.setFollowRedirects(true);
             download.run();
@@ -95,6 +95,10 @@ public class PreviewServlet extends ConfigurableServlet {
         } finally {
             outputStream.flush();
         }
+    }
+
+    HttpDownload createDownloader(final URL url, final OutputStream outputStream) {
+        return new HttpDownload(url, outputStream);
     }
 
     /**
