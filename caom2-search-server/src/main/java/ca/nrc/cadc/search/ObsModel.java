@@ -222,7 +222,7 @@ public abstract class ObsModel
     private static final String[] ENERGY = new String[]
     {
         // CAOM2
-        "Plane.energy.bounds",
+        "Plane.energy.bounds.samples",
         "Plane.energy.bounds.width",
         "Plane.energy.bounds.cval1",
         "Plane.energy.bounds.cval2",
@@ -248,8 +248,8 @@ public abstract class ObsModel
     private static final String[] MJD_UTC = new String[]
     {
         // CAOM2
-        "Plane.time.bounds",
-        "Plane.time.bounds_PRESET",
+        "Plane.time.bounds.samples",
+        "Plane.time.bounds.samples_PRESET",
         "Plane.time.bounds.cval1",
         "Plane.time.bounds.cval2",
         // ObsCore

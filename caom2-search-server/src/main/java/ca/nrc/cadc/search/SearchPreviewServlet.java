@@ -2,7 +2,7 @@
  ************************************************************************
  ****  C A N A D I A N   A S T R O N O M Y   D A T A   C E N T R E  *****
  *
- * (c) 2014.                         (c) 2014.
+ * (c) 2011.                         (c) 2011.
  * National Research Council            Conseil national de recherches
  * Ottawa, Canada, K1A 0R6              Ottawa, Canada, K1A 0R6
  * All rights reserved                  Tous droits reserves
@@ -24,52 +24,57 @@
  *
  *
  * @author jenkinsd
- * 15/05/14 - 2:19 PM
+ * 12/1/11 - 8:51 AM
  *
  *
  *
  ****  C A N A D I A N   A S T R O N O M Y   D A T A   C E N T R E  *****
  ************************************************************************
  */
-package ca.nrc.cadc.search.integration;
+package ca.nrc.cadc.search;
 
-import org.junit.Test;
+import ca.nrc.cadc.auth.AuthMethod;
+import ca.nrc.cadc.reg.Standards;
+import ca.nrc.cadc.reg.client.RegistryClient;
+
+import java.io.IOException;
+import java.net.URI;
+import java.net.URL;
+
+import javax.servlet.http.HttpServletRequest;
 
 
-public class FormCheckBrowserTest extends AbstractAdvancedSearchIntegrationTest
+public class SearchPreviewServlet extends PreviewServlet
 {
-    public FormCheckBrowserTest() throws Exception
-    {
-        super();
-    }
+    private static final String CAOM2LINK_SERVICE_URI_PROPERTY_KEY = "org.opencadc.search.caom2link-service-id";
+    private static final URI DEFAULT_CAOM2LINK_SERVICE_URI = URI.create("ivo://cadc.nrc.ca/caom2ops");
 
     /**
-     * Verify the form page (Query Tab)'s items.
-     *
-     * @throws Exception        Any testing errors.
+     * Constructor to use the Registry Client to obtain the Data Web Service
+     * location.
      */
-    //TODO: uncomment when implementation is complete
-    @Test
-    public void verifyForm() throws Exception
+    public SearchPreviewServlet()
     {
-        final CAOMSearchFormPage caomSearchFormPage = goTo(endpoint, "", CAOMSearchFormPage.class);
-        verifyTooltips(caomSearchFormPage);
+    	super();
+        final RegistryClient registryClient = new RegistryClient();
+        this.dataServiceURL = registryClient.getServiceURL(
+                getServiceID(
+                        CAOM2LINK_SERVICE_URI_PROPERTY_KEY,
+                        DEFAULT_CAOM2LINK_SERVICE_URI),
+                Standards.DATALINK_LINKS_10, AuthMethod.COOKIE);
     }
 
+
     /**
-     * Ensure tooltips show, and stay open when values are typed in.
+     * Form the URL for the job as based on the given parameter.
      *
-     * @throws Exception        Any testing errors.
+     * @param request           The HTTP Request.
+     * @return                  A URL instance.
+     * @throws IOException      If the URL cannot be created.
      */
-    private void verifyTooltips(final CAOMSearchFormPage searchFormPage) throws Exception
+    protected URL createJobURL(final HttpServletRequest request)
+            throws IOException
     {
-        searchFormPage.summonTooltip("Plane.position.bounds");
-        searchFormPage.closeTooltip("Plane.position.bounds");
-
-        searchFormPage.summonTooltip("Plane.position.sampleSize");
-        searchFormPage.closeTooltip("Plane.position.sampleSize");
-
-//        searchFormPage.summonTooltip("Plane.time.bounds");
-//        searchFormPage.closeTooltip("Plane.time.bounds");
+        return new URL(getDataServiceURL() + "?" + request.getQueryString());
     }
 }

@@ -31,17 +31,19 @@
  ****  C A N A D I A N   A S T R O N O M Y   D A T A   C E N T R E  *****
  ************************************************************************
  */
+
 package ca.nrc.cadc.search;
 
 import org.junit.After;
 import org.junit.Test;
+
+import ca.nrc.cadc.net.HttpDownload;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.WriteListener;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.net.HttpURLConnection;
 import java.net.URL;
 
 import static org.easymock.EasyMock.*;
@@ -49,35 +51,29 @@ import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.assertEquals;
 
 
-public class PreviewServletTest
-{
+public class PreviewServletTest {
     private PreviewServlet testSubject;
 
     private HttpServletRequest mockRequest =
-            createMock(HttpServletRequest.class);
+        createMock(HttpServletRequest.class);
     private HttpServletResponse mockResponse =
-            createMock(HttpServletResponse.class);
+        createMock(HttpServletResponse.class);
 
     @After
-    public void tearDown() throws Exception
-    {
+    public void tearDown() throws Exception {
         setTestSubject(null);
     }
 
 
     @Test
-    public void doGet() throws Exception
-    {
+    public void doGet() throws Exception {
         final URL dataServiceURL = new URL("http://localhost/data");
 
-        final HttpURLConnection mockHttpURLConnection =
-                createMock(HttpURLConnection.class);
+        final HttpDownload mockHTTPDownload = createMock(HttpDownload.class);
         final OutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        final ServletOutputStream outputStream = new ServletOutputStream()
-        {
+        final ServletOutputStream outputStream = new ServletOutputStream() {
             @Override
-            public void write(int i) throws IOException
-            {
+            public void write(int i) throws IOException {
                 byteArrayOutputStream.write((byte) i);
             }
 
@@ -89,8 +85,7 @@ public class PreviewServletTest
              * @since Servlet 3.1
              */
             @Override
-            public boolean isReady()
-            {
+            public boolean isReady() {
                 return true;
             }
 
@@ -109,85 +104,60 @@ public class PreviewServletTest
              * @since Servlet 3.1
              */
             @Override
-            public void setWriteListener(WriteListener writeListener)
-            {
+            public void setWriteListener(WriteListener writeListener) {
 
             }
         };
 
         final byte[] data = new byte[10];
-        final InputStream inputStream = new ByteArrayInputStream(data);
 
-        for (int i = 0; i < data.length; i++)
-        {
+        for (int i = 0; i < data.length; i++) {
             data[i] = '8';
         }
 
-        setTestSubject(new PreviewServlet(dataServiceURL)
-        {
+        setTestSubject(new PreviewServlet(dataServiceURL) {
             @Override
-            protected URL createJobURL(HttpServletRequest request)
-                    throws IOException
-            {
-                return new URL("http://localhost/getPreview/project/getit");
-            }
-
-            @Override
-            protected HttpURLConnection connect(final URL url)
-                    throws IOException
-            {
-                return mockHttpURLConnection;
+            HttpDownload createDownloader(URL url, OutputStream outputStream) {
+                return mockHTTPDownload;
             }
         });
 
-        mockHttpURLConnection.setDoInput(true);
+        expect(getMockRequest().getPathInfo()).andReturn("/mypath").once();
+
+        mockHTTPDownload.setFollowRedirects(true);
         expectLastCall().once();
 
-        mockHttpURLConnection.setDoOutput(false);
+        mockHTTPDownload.run();
         expectLastCall().once();
 
-        mockHttpURLConnection.setInstanceFollowRedirects(true);
-        expectLastCall().once();
+        expect(mockHTTPDownload.getResponseCode()).andReturn(200).once();
 
-        expect(mockHttpURLConnection.getContentType()).andReturn("image/png").
-                once();
+        expect(getMockResponse().getOutputStream()).andReturn(outputStream).once();
 
-        expect(mockHttpURLConnection.getInputStream()).
-                andReturn(inputStream).once();
-
-        expect(mockHttpURLConnection.getResponseCode()).andReturn(200).once();
-
-        getMockResponse().setContentType("image/png");
-        expectLastCall().once();
-
-        expect(getMockResponse().getOutputStream()).andReturn(
-                outputStream).once();
-
-        replay(getMockRequest(), getMockResponse(), mockHttpURLConnection);
+        replay(getMockRequest(), getMockResponse(), mockHTTPDownload);
 
         getTestSubject().doGet(getMockRequest(), getMockResponse());
 
-        verify(getMockRequest(), getMockResponse(), mockHttpURLConnection);
+        verify(getMockRequest(), getMockResponse(), mockHTTPDownload);
     }
 
     @Test
-    public void createJobURL() throws Exception
-    {
+    public void createJobURL() throws Exception {
         final URL dataServiceURL = new URL("http://localhost/data/pub");
 
         setTestSubject(new PreviewServlet(dataServiceURL));
 
         expect(getMockRequest().getPathInfo()).andReturn(
-                "/COLLECTION/OBSID_PREV_256.JPG").once();
+            "/COLLECTION/OBSID_PREV_256.JPG").once();
 
         replay(getMockRequest());
 
         final URL expectedURL =
-                new URL("http", "localhost",
-                        "/data/pub/COLLECTION/OBSID_PREV_256.JPG");
+            new URL("http", "localhost",
+                "/data/pub/COLLECTION/OBSID_PREV_256.JPG");
         final URL url = getTestSubject().createJobURL(getMockRequest());
         assertEquals("Expected URL is not what was generated.", expectedURL,
-                     url);
+            url);
 
         verify(getMockRequest());
 
@@ -198,38 +168,34 @@ public class PreviewServletTest
         setTestSubject(new PreviewServlet(dataServiceURL));
 
         expect(getMockRequest().getPathInfo()).andReturn(
-                "/COLLECTION/OBSID_PREV 256.JPG").once();
+            "/COLLECTION/OBSID_PREV 256.JPG").once();
 
         replay(getMockRequest());
 
         final URL expectedURL2 =
-                new URL("http", "localhost",
-                        "/data/pub/COLLECTION/OBSID_PREV+256.JPG");
+            new URL("http", "localhost",
+                "/data/pub/COLLECTION/OBSID_PREV+256.JPG");
         final URL url2 = getTestSubject().createJobURL(getMockRequest());
         assertEquals("Expected URL is not what was generated.", expectedURL2,
-                     url2);
+            url2);
 
         verify(getMockRequest());
     }
 
 
-    public PreviewServlet getTestSubject()
-    {
+    public PreviewServlet getTestSubject() {
         return testSubject;
     }
 
-    public void setTestSubject(final PreviewServlet testSubject)
-    {
+    public void setTestSubject(final PreviewServlet testSubject) {
         this.testSubject = testSubject;
     }
 
-    public HttpServletRequest getMockRequest()
-    {
+    private HttpServletRequest getMockRequest() {
         return mockRequest;
     }
 
-    public HttpServletResponse getMockResponse()
-    {
+    private HttpServletResponse getMockResponse() {
         return mockResponse;
     }
 }

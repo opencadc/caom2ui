@@ -74,6 +74,7 @@ import ca.nrc.cadc.caom2.Observation;
 import ca.nrc.cadc.caom2.ObservationURI;
 import ca.nrc.cadc.caom2.ui.server.client.Caom2RepoClient;
 import ca.nrc.cadc.caom2.ui.server.client.ObsLink;
+import ca.nrc.cadc.caom2.ui.server.client.ObservationUtil;
 import org.apache.log4j.Logger;
 
 import javax.servlet.RequestDispatcher;
@@ -92,10 +93,10 @@ public class Caom2RepoObservationServlet extends HttpServlet
 
     private static final String ERROR_MESSAGE_NOT_FOUND_FORBIDDEN =
             "Observation with URI '%s' not found, or you are "
-                    + "forbidden from seeing it.  Please login and "
-                    + "try again. | l'Observation '%s' pas "
-                    + "trouvé, ou vous n'avez pas permission.  S'il "
-                    + "vous plaît connecter et essayez à nouveau.";
+            + "forbidden from seeing it.  Please login and "
+            + "try again. | l'Observation '%s' pas "
+            + "trouvé, ou vous n'avez pas permission.  S'il "
+            + "vous plaît connecter et essayez à nouveau.";
 
 
     private static final int COLLECTION_LIST = 1;
@@ -103,10 +104,16 @@ public class Caom2RepoObservationServlet extends HttpServlet
     private static final int OBSERVATION_VIEW = 3;
     private static final int NOT_SUPPORTED = 0;
 
-    public Caom2RepoClient repoClient = new Caom2RepoClient();
+    private final Caom2RepoClient repoClient;
 
     public Caom2RepoObservationServlet()
     {
+        this(new Caom2RepoClient());
+    }
+
+    public Caom2RepoObservationServlet(Caom2RepoClient repoClient)
+    {
+        this.repoClient = repoClient;
     }
 
     /**
@@ -147,7 +154,7 @@ public class Caom2RepoObservationServlet extends HttpServlet
                 }
                 case OBSERVATION_VIEW:
                 {
-                    final ObservationURI uri = getURI(request);
+                    final ObservationURI uri = ObservationUtil.getURI(request);
                     final Observation obs =
                             repoClient.getObservation(repoClient.getCurrentSubject(), uri);
 
@@ -160,8 +167,9 @@ public class Caom2RepoObservationServlet extends HttpServlet
                     }
                     else
                     {
-                        request.setAttribute("collection", uri.getCollection());
-                        request.setAttribute("observationID", uri.getObservationID());
+                        request.setAttribute("collection", (uri == null) ? "Unknown" : uri.getCollection());
+                        request.setAttribute("observationID", (uri == null) ? "Unknown"
+                                                                            : uri.getObservationID());
                         request.setAttribute("obs", obs);
                         forward(request, response, "/display.jsp");
                     }
@@ -180,7 +188,6 @@ public class Caom2RepoObservationServlet extends HttpServlet
         }
         catch (RuntimeException oops)
         {
-            Throwable cause = oops.getCause();
             log.error("unexpected runtime exception", oops);
             request.setAttribute("runtimeException", oops);
             request.setAttribute("errorMsg", oops.getMessage());
@@ -194,29 +201,6 @@ public class Caom2RepoObservationServlet extends HttpServlet
 
     }
 
-
-    private ObservationURI getURI(HttpServletRequest request)
-    {
-        String sid = request.getPathInfo();
-
-        if (sid != null)
-        {
-            sid = sid.substring(1, sid.length()); // strip leading /
-            final String[] parts = sid.split("/");
-
-            if (parts.length == 2)
-            {
-                log.debug("collection: " + parts[0] + " observationID: "
-                        + parts[1]);
-                return new ObservationURI(parts[0], parts[1]);
-            }
-        }
-
-        log.error("collection/observationID not found in path: " + sid);
-        return null;
-    }
-
-
     private int getRequestType(HttpServletRequest request)
     {
         String sid = request.getPathInfo();
@@ -224,26 +208,23 @@ public class Caom2RepoObservationServlet extends HttpServlet
 
         if (sid != null)
         {
-            sid = sid.substring(1,sid.length()); // strip leading /
+            sid = sid.substring(1, sid.length()); // strip leading /
             String[] parts = sid.split("/");
 
-            if (parts != null)
+            if (parts.length == 1)
             {
-                if (parts.length == 1)
+                if (parts[0].isEmpty())
                 {
-                    if (parts[0].isEmpty())
-                    {
-                        requestType = COLLECTION_LIST;
-                    }
-                    else
-                    {
-                        requestType = OBSERVATION_LIST;
-                    }
+                    requestType = COLLECTION_LIST;
                 }
-                else if (parts.length == 2)
+                else
                 {
-                    requestType = OBSERVATION_VIEW;
+                    requestType = OBSERVATION_LIST;
                 }
+            }
+            else if (parts.length == 2)
+            {
+                requestType = OBSERVATION_VIEW;
             }
         }
         else
@@ -261,16 +242,16 @@ public class Caom2RepoObservationServlet extends HttpServlet
 
         if (sid != null)
         {
-            sid = sid.substring(1,sid.length()); // strip leading /
-            String[] parts = sid.split("/");
+            sid = sid.substring(1, sid.length()); // strip leading /
+            final String[] parts = sid.split("/");
 
-            if (parts != null && parts.length == 1)
+            if (parts.length == 1)
             {
                 return parts[0];
             }
         }
 
-        String errMsg = "Collection name not found: "  + sid;
+        String errMsg = "Collection name not found: " + sid;
         log.error(errMsg);
         throw new RuntimeException(errMsg);
     }

@@ -82,6 +82,7 @@ import java.net.URI;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -93,7 +94,7 @@ import java.util.List;
 public class Caom2RepoClient extends BaseClient
 {
     private static final Logger log = Logger.getLogger(Caom2RepoClient.class);
-    public static final URI CAOM_REPO_RESOURCE_ID = URI.create("ivo://cadc.nrc.ca/caom2repo");
+    private static final URI CAOM_REPO_RESOURCE_ID = URI.create("ivo://cadc.nrc.ca/caom2repo");
     private static String CANT_GET_COLLECTIONS_LIST = "Unable to get collection list.";
     private static String CANT_GET_OBSERVATION_LIST = "Unable to get observation list.";
     static final String CAOM2REPO_SERVICE_URI_PROPERTY_KEY = "org.opencadc.caom2ui.client-service-id";
@@ -113,7 +114,6 @@ public class Caom2RepoClient extends BaseClient
     public List<String> getCollections()
     {
         List<String> ret = new ArrayList<>();
-        String errMsg = "";
 
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
@@ -129,15 +129,11 @@ public class Caom2RepoClient extends BaseClient
         {
             String message = bos.toString().trim();
             String[] lines = message.split("\\r?\\n");
-
-            for (int i = 0; i < lines.length; i++)
-            {
-                ret.add(lines[i]);
-            }
+            ret.addAll(Arrays.asList(lines));
         }
         else
         {
-            errMsg = CANT_GET_COLLECTIONS_LIST + " Response code: " + response;
+            final String errMsg = CANT_GET_COLLECTIONS_LIST + " Response code: " + response;
             log.error(errMsg);
             throw new RuntimeException(errMsg);
         }
@@ -156,13 +152,10 @@ public class Caom2RepoClient extends BaseClient
      */
     public List<ObsLink> getObservations(String collection)
     {
-        String dataSourceName = null;
-        String errMsg = "";
-        String urlStr = "";
-        List<ObsLink> obsUriList = new ArrayList<>();
+        final List<ObsLink> obsUriList = new ArrayList<>();
+
         try
         {
-
             path = "/" + collection + "?maxrec=100&order=desc";
             URL collectionURL = getServiceURL();
 
@@ -177,20 +170,23 @@ public class Caom2RepoClient extends BaseClient
                 String message = bos.toString().trim();
                 String[] lines = message.split("\\r?\\n");
 
-                for (int i = 0; i < lines.length; i++)
+                for (final String line : lines)
                 {
-                    String [] obsLinkData = lines[i].split("\\t");
+                    final String[] obsLinkData = line.split("\\t");
+
                     // Create a new ObsLink object from first 3 columns of each row
-                    ObsLink nextObs = new ObsLink();
+                    final ObsLink nextObs = new ObsLink();
+
                     nextObs.type = "not set";
                     nextObs.uri = new ObservationURI(obsLinkData[0], obsLinkData[1]);
-                    nextObs.lastModified = DateUtil.flexToDate(obsLinkData[2],DateUtil.getDateFormat(DateUtil.ISO8601_DATE_FORMAT_LOCAL,DateUtil.UTC));
+                    nextObs.lastModified = DateUtil.flexToDate(obsLinkData[2], DateUtil
+                            .getDateFormat(DateUtil.ISO8601_DATE_FORMAT_LOCAL, DateUtil.UTC));
                     obsUriList.add(nextObs);
                 }
             }
             else
             {
-                errMsg = CANT_GET_OBSERVATION_LIST + " Response code: " + response;
+                final String errMsg = CANT_GET_OBSERVATION_LIST + " Response code: " + response;
                 log.error(errMsg);
                 throw new RuntimeException(errMsg);
             }
@@ -199,7 +195,7 @@ public class Caom2RepoClient extends BaseClient
         }
         catch(ParseException pe)
         {
-            errMsg = CANT_GET_OBSERVATION_LIST + " Unable to parse datestamp for observation";
+            final String errMsg = CANT_GET_OBSERVATION_LIST + " Unable to parse datestamp for observation";
             log.error(errMsg);
             throw new RuntimeException(errMsg, pe);
         }

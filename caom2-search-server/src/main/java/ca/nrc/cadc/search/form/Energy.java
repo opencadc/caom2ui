@@ -137,7 +137,7 @@ public class Energy extends AbstractNumericFormConstraint
         // Update
         // Story 1502
         // Adding Rest Frequency follows the same logic.
-        return utype.equals("Plane.energy.bounds") ||
+        return utype.equals("Plane.energy.bounds.samples") ||
                utype.equals("Plane.energy.restwav") ||
                utype.equals("Char.SpectralAxis.Coverage.Bounds.Limits");
     }

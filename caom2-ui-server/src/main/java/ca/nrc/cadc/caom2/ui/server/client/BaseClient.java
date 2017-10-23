@@ -76,53 +76,46 @@ import ca.nrc.cadc.caom2.ObservationURI;
 import ca.nrc.cadc.caom2.xml.ObservationParsingException;
 import ca.nrc.cadc.caom2.xml.ObservationReader;
 import ca.nrc.cadc.config.ApplicationConfiguration;
-import ca.nrc.cadc.date.DateUtil;
 import ca.nrc.cadc.net.HttpDownload;
 import ca.nrc.cadc.net.InputStreamWrapper;
 import ca.nrc.cadc.reg.client.RegistryClient;
-import ca.nrc.cadc.util.StringUtil;
-import org.apache.http.client.utils.URIBuilder;
 import org.apache.log4j.Logger;
 
 import javax.security.auth.Subject;
-import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.PrivilegedAction;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+
 
 /**
- *
  * @author hjeeves
  */
-public class BaseClient
+public abstract class BaseClient
 {
-    private static final Logger log = Logger.getLogger(BaseClient.class);
-    protected URI resourceId;
-    protected URI standardsURI;
-    protected String path;
-    protected String propertyKey;
+    private static final Logger LOGGER = Logger.getLogger(BaseClient.class);
+    URI resourceId;
+    URI standardsURI;
+    String path;
+    String propertyKey;
 
     private static final String PROPERTIES_FILE_PATH = System.getProperty("user.home")
-            + "/config/org.opencadc.caom2ui.properties";
+                                                       + "/config/org.opencadc.caom2ui.properties";
 
     private static final String ERROR_MESSAGE_NOT_FOUND_FORBIDDEN =
             "Observation with URI '%s' not found, or you are "
-                    + "forbidden from seeing it.  Please login and "
-                    + "try again. | l'Observation '%s' pas "
-                    + "trouvé, ou vous n'avez pas permission.  S'il "
-                    + "vous plaît connecter et essayez à nouveau.";
+            + "forbidden from seeing it.  Please login and "
+            + "try again. | l'Observation '%s' pas "
+            + "trouvé, ou vous n'avez pas permission.  S'il "
+            + "vous plaît connecter et essayez à nouveau.";
 
 
-    public BaseClient() {}
+    BaseClient()
+    {
+    }
 
     /**
      * Place for testers to override.
@@ -154,27 +147,16 @@ public class BaseClient
                 authMethod = AuthMethod.ANON;
             }
 
+            final URL repoURL = rc
+                    .getServiceURL(ac.lookupServiceURI(propertyKey, resourceId), standardsURI, authMethod);
 
-            final URL repoURL = rc.getServiceURL(ac.lookupServiceURI(propertyKey, resourceId), standardsURI, authMethod);
-
-            final URIBuilder builder = new URIBuilder(repoURL.toExternalForm() + path);
-
-            final String metaServiceHost = ac.lookup(propertyKey);
-
-            if (StringUtil.hasText(metaServiceHost))
-            {
-                final URI metaServiceURI = URI.create(metaServiceHost);
-
-                builder.setHost(metaServiceURI.getHost());
-                builder.setPort(metaServiceURI.getPort());
-            }
-
-            return builder.build().toURL();
+            return new URL(repoURL.toExternalForm() + path);
         }
-        catch (URISyntaxException | MalformedURLException urie)
+        catch (MalformedURLException urie)
         {
-            String errMsg = "Can't get service URL for resource " + resourceId.toString() + " " + standardsURI.toString();
-            log.error(errMsg);
+            String errMsg = "Can't get service URL for resource " + resourceId.toString() + " " + standardsURI
+                    .toString();
+            LOGGER.error(errMsg);
             throw new RuntimeException(errMsg, urie);
         }
 
@@ -220,7 +202,7 @@ public class BaseClient
             {
                 throw new RuntimeException(
                         "Failed to read observation from /client | "
-                                + "Impossible d'obtenir l'observation de /client.");
+                        + "Impossible d'obtenir l'observation de /client.");
             }
         }
 
@@ -260,14 +242,14 @@ public class BaseClient
                 else
                 {
                     message = "Failed to get observation '%s' from '%s'. "
-                            + "| Impossible d'obtenir l'observation '%s' "
-                            + "de client.";
+                              + "| Impossible d'obtenir l'observation '%s' "
+                              + "de client.";
                 }
 
                 throw new RuntimeException(
                         String.format(message, uri,
-                                downloader.getURL().toExternalForm(),
-                                uri));
+                                      downloader.getURL().toExternalForm(),
+                                      uri));
             }
 
             return null;

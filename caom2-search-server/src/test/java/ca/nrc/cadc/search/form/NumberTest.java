@@ -197,7 +197,7 @@ public class NumberTest extends AbstractNumericFormConstraintTest<Number>
     @Test
     public void testIsValidEnergy() throws Exception
     {
-        String utype = "Plane.energy.bounds";
+        String utype = "Plane.energy.bounds.samples";
         String formValue;
         Double expectedLower;
         Double expectedUpper;

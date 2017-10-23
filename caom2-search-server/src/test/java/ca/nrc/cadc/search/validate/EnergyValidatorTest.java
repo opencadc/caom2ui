@@ -45,7 +45,7 @@ public class EnergyValidatorTest<V extends EnergyValidator> extends AbstractUnit
     @SuppressWarnings("unchecked")
     public void validate() throws Exception
     {
-        final String utype = "Plane.energy.bounds";
+        final String utype = "Plane.energy.bounds.samples";
 
         setTestSubject((V) new EnergyValidator(utype, null, null){});
         assertNull("Should be null.", getTestSubject().validate());

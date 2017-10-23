@@ -82,7 +82,7 @@ import java.util.List;
 
 public class CAOMSearchFormPage extends AbstractSearchFormPage
 {
-    private static final int DEFAULT_TIMEOUT_IN_SECONDS = 20;
+    private static final int DEFAULT_TIMEOUT_IN_SECONDS = 25;
     private static final By H1_HEADER = By.cssSelector("h1");
 
     static final By DATA_TRAIN_LOCATOR = By.id("caom2@Hierarchy");
@@ -92,8 +92,8 @@ public class CAOMSearchFormPage extends AbstractSearchFormPage
     static final By TARGET_RESOLUTION_STATUS_ICON_BY = By.className("target_name_resolution_status");
     static final By TARGET_RESOLUTION_STATUS_GOOD_ICON_BY = By.className("target_ok");
     static final By SSOIS_LINK_BY = By.id("ssois_link");
-    static final String SPECTRAL_COVERAGE_INPUT_ID = "Plane.energy.bounds";
-    static final String OBSERVATION_DATE_INPUT_ID = "Plane.time.bounds";
+    static final String SPECTRAL_COVERAGE_INPUT_ID = "Plane.energy.bounds.samples";
+    static final String OBSERVATION_DATE_INPUT_ID = "Plane.time.bounds.samples";
     static final String PIXEL_SCALE_INPUT_ID = "Plane.position.sampleSize";
     static final By RESET_BUTTON_SELECTOR = By.cssSelector("button[type=\"reset\"]");
 
@@ -116,10 +116,10 @@ public class CAOMSearchFormPage extends AbstractSearchFormPage
     @FindBy(id = "Plane.position.bounds")
     WebElement targetInput;
 
-    @FindBy(id = "Plane.energy.bounds")
+    @FindBy(id = "Plane.energy.bounds.samples")
     WebElement spectralCoverageInput;
 
-    @FindBy(id = "Plane.time.bounds")
+    @FindBy(id = "Plane.time.bounds.samples")
     WebElement observationDateInput;
 
     @FindBy(id = "ssois_link")
@@ -138,10 +138,12 @@ public class CAOMSearchFormPage extends AbstractSearchFormPage
         super(driver, DEFAULT_TIMEOUT_IN_SECONDS);
 
         waitForElementPresent(DATA_TRAIN_LOCATOR);
+        waitForElementPresent(DATA_TRAIN_COLLECTION_MENU);
         waitForElementPresent(TARGET_INPUT);
         waitForElementPresent(By.id(SPECTRAL_COVERAGE_INPUT_ID));
         waitForElementPresent(By.id(OBSERVATION_DATE_INPUT_ID));
         waitForElementPresent(SSOIS_LINK_BY);
+        waitForElementPresent(By.id("Observation.observationID"));
 
         PageFactory.initElements(driver, this);
     }

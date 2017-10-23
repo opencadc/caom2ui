@@ -13,13 +13,10 @@ repositories {
     mavenLocal()
 }
 
-//def libVersion = '2.1.13'
-def libVersion = '2.1.8'
-
 dependencies {
     compile 'log4j:log4j:1.2.+'
 
-    compile 'org.opencadc:caom2-search-server:' + libVersion
+    compile 'org.opencadc:caom2-search-server:[2.3.5, )'
 
     providedCompile 'javax.servlet:javax.servlet-api:3.1.+'
     providedCompile 'javax.servlet:javax.servlet-api:3.0.+'
@@ -38,17 +35,17 @@ dependencies {
 ext {
     // Change this value to test other locations, such as Production or RC.
     intTest_default_web_app_url = 'http://rc.cadc-ccda.hia-iha.nrc-cnrc.gc.ca'
-    intTest_default_web_app_endpoint = '/AdvancedSearch/'
+    intTest_default_web_app_endpoint = '/search/'
     intTest_user_name = 'CADCtest'
     intTest_user_password = 'sywymUL4'
 
     // Modify this to your liking!
-    default_docker_image_name = 'opencadc/archive-search:' + libVersion
+    default_docker_image_name = 'opencadc/archive-search:' + project.version
 }
 
 sourceCompatibility = 1.7
 group = 'org.opencadc'
-version = '2009'
+version = '2015'
 
 apply from: '../../../_shared.gradle'
 

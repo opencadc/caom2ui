@@ -75,6 +75,8 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 
+import java.util.Objects;
+
 
 abstract class AbstractSearchFormPage extends AbstractTestWebPage
 {
@@ -102,20 +104,13 @@ abstract class AbstractSearchFormPage extends AbstractTestWebPage
         PageFactory.initElements(driver, this);
     }
 
-
     void enterInputValue(final WebElement inputElement, final String value) throws Exception
     {
+        waitForElementVisible(inputElement);
         final String inputID = inputElement.getAttribute("id");
-        final String detailElementID = inputID + "_details";
 
         summonTooltip(inputID);
         showInputField(inputID);
-        // todo: verify what else this function was doing and
-        // replace the function. Timing was too fast for
-        // ajax function issued on each keyUp by advanced search page,
-        // so action had to be slowed down (see for loop below)
-        // June 2017
-//        sendKeys(inputElement, value);
 
         for (int i = 0; i < value.length(); i++)
         {
@@ -123,8 +118,7 @@ abstract class AbstractSearchFormPage extends AbstractTestWebPage
             waitFor(150L);
         }
 
-        closeTooltip(inputID);
-
+        closeTooltip();
     }
 
     void clearInputValue(final String inputID) throws Exception
@@ -158,14 +152,14 @@ abstract class AbstractSearchFormPage extends AbstractTestWebPage
 
         final By contents = By.xpath(String.format(CONTENT_LOCATOR_XPATH, (inputID + "_details")));
 
-        if (expectedMessage != "")
+        if (!Objects.equals(expectedMessage, ""))
         {
             waitForTextPresent(contents, expectedMessage);
         }
         else
         {
             WebElement contentEl = find(contents);
-            if (contentEl.getText().equals("") == false)
+            if (!contentEl.getText().equals(""))
             {
                 throw new Exception();
             }
@@ -192,19 +186,25 @@ abstract class AbstractSearchFormPage extends AbstractTestWebPage
 
     void summonTooltip(final String baseID) throws Exception
     {
-
-        final By tooltipIconTriggerBy = By.xpath("//div[@id='" + baseID
-                                                 + "_formgroup']/div[contains(@class, 'advancedsearch-tooltip')]");
+        final By tooltipIconTriggerBy = By.xpath("//div[@id='" + baseID + "_formgroup']/div");
 
         waitForElementPresent(tooltipIconTriggerBy);
+        waitForElementVisible(tooltipIconTriggerBy);
+
         click(tooltipIconTriggerBy);
+
+        waitForElementPresent(By.xpath("//div[@id='" + baseID + "_formgroup']/div[2]"));
+        waitForElementVisible(By.xpath("//div[@id='" + baseID + "_formgroup']/div[2]"));
     }
 
-    void closeTooltip(final String baseID) throws Exception
+    void closeTooltip() throws Exception
     {
-        String tooltipID = baseID + "_close";
-        click(By.id(tooltipID));
-        waitForElementNotPresent(By.id(tooltipID));
+        final By tooltipCloseLink = By.xpath("//*[contains(@class, 'glyphicon-remove-circle')]");
+        waitForElementPresent(tooltipCloseLink);
+        final WebElement tooltipClose = find(tooltipCloseLink);
+        waitForElementVisible(tooltipClose);
+        click(tooltipClose);
+        waitForElementNotPresent(tooltipCloseLink);
     }
 
 

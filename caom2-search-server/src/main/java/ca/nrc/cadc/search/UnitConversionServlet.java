@@ -70,6 +70,10 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class UnitConversionServlet extends HttpServlet
 {
+    static final String CAOM2_TIME_FIELD = "Plane.time.bounds.samples";
+    static final String CAOM2_ENERGY_FIELD = "Plane.energy.bounds.samples";
+    static final String CAOM2_TIME_PRESET_UTYPE = CAOM2_TIME_FIELD + "_PRESET";
+
     private static final DateFormat DATE_FORMATTER =
             DateUtil.getDateFormat(DateUtil.ISO_DATE_FORMAT,
                                    TimeZone.getTimeZone("UTC"));
@@ -165,11 +169,10 @@ public class UnitConversionServlet extends HttpServlet
                 writeNumericEnergy(new Number(value, uType), jsonWriter,
                                    formErrors);
             }
-            else if (uType.equals("Plane.energy.bounds")
+            else if (uType.equals(CAOM2_ENERGY_FIELD)
                      || uType.equals("Char.SpectralAxis.Coverage.Bounds.Limits"))
             {
-                writeNumericEnergy(new Energy(value, uType), jsonWriter,
-                                   formErrors);
+                writeNumericEnergy(new Energy(value, uType), jsonWriter, formErrors);
             }
             else if (uType.equals("Plane.position.bounds") ||
                      uType.equals("Char.SpatialAxis.Coverage.Support.Area"))
@@ -192,8 +195,8 @@ public class UnitConversionServlet extends HttpServlet
 
     private boolean isObservationDateUType(final String utype)
     {
-        return utype.equals("Plane.time.bounds")
-               || utype.equals("Plane.time.bounds_PRESET")
+        return utype.equals(CAOM2_TIME_FIELD)
+               || utype.equals(CAOM2_TIME_PRESET_UTYPE)
                || utype.startsWith("Char.TimeAxis.Coverage.Bounds.Limits");
     }
 

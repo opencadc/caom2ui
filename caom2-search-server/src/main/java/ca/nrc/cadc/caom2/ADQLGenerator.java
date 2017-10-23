@@ -17,8 +17,8 @@ import java.util.TreeMap;
  */
 public class ADQLGenerator extends AbstractPersistenceService
 {
-    private static final String CAOM2_ENERGY_UTYPE = "Plane.energy.bounds";
-    private static final String CAOM2_TIME_UTYPE = "Plane.time.bounds";
+    private static final String CAOM2_ENERGY_UTYPE = "Plane.energy.bounds.samples";
+    private static final String CAOM2_TIME_UTYPE = "Plane.time.bounds.samples";
     private static final String OBSCORE_ENERGY_UTYPE = "Char.SpectralAxis.Coverage.Bounds.Limits";
     private static final String OBSCORE_TIME_UTYPE = "Char.TemporalAxis.Coverage.Bounds.Limits";
 
@@ -106,7 +106,7 @@ public class ADQLGenerator extends AbstractPersistenceService
             final Polygon poly = (Polygon) s.getPosition();
             sb.append("INTERSECTS( POLYGON('ICRS'");
 
-            for (final Vertex v : poly.getVertices())
+            for (final Vertex v : poly.getSamples().getVertices())
             {
                 if (v.getType() != SegmentType.CLOSE)
                 {

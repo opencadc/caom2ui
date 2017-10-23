@@ -42,7 +42,7 @@ public class TimeValidatorTest extends AbstractUnitTest<TimeValidator>
     @Test
     public void validate() throws Exception
     {
-        final String utype = "Plane.time.bounds";
+        final String utype = "Plane.time.bounds.samples";
 
         setTestSubject(new TimeValidator(utype, null, null));
         assertNull("Should be null.", getTestSubject().validate());

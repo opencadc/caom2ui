@@ -8,15 +8,17 @@
           "search": {
             "defaults": {
               "pageLanguage": "en",
+              "applicationEndpoint": "/search",
               "autoInitFlag": true,
               "tapSyncEndpoint": "/search/tap/sync",
               "targetResolverEndpoint": "/search/unitconversion",
-              "tapProxyFlag": false,
               "packageEndpoint": "/search/package",
               "autocompleteEndpoint": "/search/unitconversion",
               "validatorEndpoint": "/search/validate",
               "previewsEndpoint": "/search/preview",
               "searchEndpoint": "/search/find"
+            },
+            "services": {
             },
             "field_ignore": [
               "sort_column", "sort_order", "formName", "SelectList", "MaxRecords", "format", "Form.name"
@@ -55,13 +57,13 @@
    * @param {String} [_options.pageLanguage="en"]   The language from the page.
    * @param {Boolean} [_options.autoInitFlag=true]   Whether to auto-initialize this application.
    * @param {String} [_options.tapSyncEndpoint="/search/tap/sync"]   Relative URI endpoint to the TAP service.
-   * @param {boolean} [_options.tapProxyFlag=false]   Flag to assume TAP endpoints are proxies.
    * @param {String} [_options.packageEndpoint="/search/package"]   Relative URI endpoint to the CAOM2 package service.
    * @param {String} [_options.previewsEndpoint="/search/preview"]   Relative URI endpoint to the Preview service.
    * @param {String} [_options.validatorEndpoint="/search/validate"]   Relative URI endpoint to the Validator service.
    * @param {String} [_options.autocompleteEndpoint="/search/unitconversion"]   Relative URI endpoint to the unit
    * @param {String} [_options.targetResolverEndpoint="/search/unitconversion"]   Target resolver endpoint service
    *     conversion service.
+   * @param {String} [_options.applicationEndpoint="/search"]   Endpoint to this application 
    * @constructor
    */
   function AdvancedSearchApp(_options)
@@ -84,6 +86,19 @@
     var $queryCode = $("#query");
     var columnManager = new ca.nrc.cadc.search.columns.ColumnManager();
     var resultsVOTV;
+
+    var services = {
+      "autocompleteEndpoint": _options.autocompleteEndpoint,
+      "targetResolverEndpoint": _options.targetResolverEndpoint,
+      "tapSyncEndpoint": _options.tapSyncEndpoint,
+      "packageEndpoint": _options.packageEndpoint,
+      "validatorEndpoint": _options.validatorEndpoint,
+      "previewsEndpoint": _options.previewsEndpoint,
+      "searchEndpoint": _options.searchEndpoint,
+      "applicationEndpoint": _options.applicationEndpoint
+    }
+
+    $.extend(true, ca.nrc.cadc.search.services, services);
 
     this.options = $.extend({}, ca.nrc.cadc.search.defaults, _options);
 
@@ -1761,8 +1776,7 @@
         }
 
         var activeForm = this._getActiveForm();
-        var url = (this.options.tapProxyFlag === true)
-            ? (this.options.tapSyncEndpoint + "?tap_url=" + encodeURIComponent(json.results_url)) : json.results_url;
+        var url = json.results_url;
         var buildInput = {
           url: url,
           type: $("input[name='format']").val(),
