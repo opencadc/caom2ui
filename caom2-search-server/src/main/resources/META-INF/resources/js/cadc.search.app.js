@@ -10,6 +10,7 @@
               "pageLanguage": "en",
               "applicationEndpoint": "/search",
               "autoInitFlag": true,
+              "enableOneClickDownload": true,
               "tapSyncEndpoint": "/search/tap/sync",
               "targetResolverEndpoint": "/search/unitconversion",
               "packageEndpoint": "/search/package",
@@ -862,7 +863,7 @@
               targetNodeSelector: "#resultTable",    // Shouldn't really be an
                                                      // option as it's mandatory!
               columnFilterPluginName: "suggest",
-              enableOneClickDownload: true,
+              enableOneClickDownload: this.options.enableOneClickDownload,
               oneClickDownloadTitle: oneClickDownloadTitle(),
               oneClickDownloadURL: this.options.packageEndpoint,
               oneClickDownloadURLColumnID: activeForm.getConfiguration().getDownloadAccessKey(),
