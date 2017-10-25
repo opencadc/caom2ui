@@ -31,8 +31,8 @@ script:
 - docker-compose up -d
 - docker ps -a
 - cd ../default
-#- gradle -i -PintTest_selenium_server_url=http://localhost:4444 -PintTest_web_app_url=http://proxy.cadc.dao.nrc.ca
-#  -PintTest_web_app_endpoint=/search/ intTestFirefox
+- gradle -i -PintTest_selenium_server_url=http://localhost:4444 -PintTest_web_app_url=http://proxy.cadc.dao.nrc.ca
+  -PintTest_web_app_endpoint=/search/ intTestFirefox
 after_success:
 - cd $TRAVIS_BUILD_DIR
 - if [ "$(. ./can-deploy.sh)" = "DEPLOY" ]; then docker login -u="$DOCKER_USERNAME"
