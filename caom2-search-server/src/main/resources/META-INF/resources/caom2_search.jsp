@@ -31,7 +31,7 @@
     <div class="col-sm-12 button-holder">
       <button type="submit"
               class="btn btn-primary submit-query"
-              value="<fmt:message key="SEARCH_BUTTON_LABEL" bundle="${langBundle}" />">
+              valcue="<fmt:message key="SEARCH_BUTTON_LABEL" bundle="${langBundle}" />">
         <fmt:message key="SEARCH_BUTTON_LABEL" bundle="${langBundle}"/>
       </button>
       <button type="reset"
@@ -39,6 +39,22 @@
               value="<fmt:message key="RESET_BUTTON_LABEL" bundle="${langBundle}" />">
         <fmt:message key="RESET_BUTTON_LABEL" bundle="${langBundle}"/>
       </button>
+      <!-- maqToggle = true means display this checkbox -->
+      <c:if test="${param.useMaq eq 'true'}" >
+          <input class="useMaq"
+                 type="checkbox"
+                 checked data-toggle="toggle"
+                  data-on="MAQ"
+                  data-off="MAQ Off">
+
+        <div data-toggle="popover"
+             data-utype="${param.utype}"
+             data-placement="${param.tipSide}"
+             data-title="<fmt:message key="MAQ_TOGGLE_LABEL" bundle="${langBundle}"/>"
+             class="advancedsearch-tooltip glyphicon glyphicon-question-sign popover-blue popover-right">
+        </div>
+
+      </c:if>
     </div>
 
     <div class="col-sm-12">
@@ -131,9 +147,9 @@
         <strong><fmt:message key="RES_TIME" bundle="${langBundle}"/></strong><br>
         <p class="resolver-result-time"></p>
       </div>
-
+      
       <c:import
-          url="hierarchy.jsp?colcount=seven-col&utype=Plane.energy.emBand/Observation.collection/Observation.instrument.name/Plane.energy.bandpassName/Plane.calibrationLevel/Plane.dataProductType/Observation.type&modelDataSource=caom2"/>
+          url="hierarchy.jsp?colcount=seven-col&utype=Plane.energy.emBand/Observation.collection/Observation.instrument.name/Plane.energy.bandpassName/Plane.calibrationLevel/Plane.dataProductType/Observation.type&modelDataSource=caom2&useMaq=${param.useMaq}" />
 
     </div>
 

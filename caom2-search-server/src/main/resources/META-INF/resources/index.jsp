@@ -15,6 +15,13 @@
   final int maxRowLimit = configuration.lookupInt("org.opencadc.search.max-row-count", defaultMaxRowLimit);
   final boolean showObsCoreTab = configuration.lookupBoolean("org.opencadc.search.obs-core", true);
   final String applicationEndpoint = configuration.lookup("org.opencadc.search.app-service-endpoint", "/search");
+  final String maqServiceId = configuration.lookup("org.opencadc.search.maq-tap-service-id","");
+
+  boolean useMaq = false;
+  if (maqServiceId != "")
+  {
+      useMaq = true;
+  }
   final String tapSyncEndpoint = applicationEndpoint + "/tap/sync";
 %>
 
@@ -89,10 +96,10 @@
 
   <div class="tab-content">
       <!-- CAOM2 Search Query Tab -->
-      <c:import url='<%= "caom2_search.jsp?maxRowLimit=" + maxRowLimit %>' />
+      <c:import url='<%= "caom2_search.jsp?maxRowLimit=" + maxRowLimit  + "&useMaq=" + useMaq %>' />
 
       <!-- ObsCore Query Tab -->
-      <c:import url='<%= "obscore_search.jsp?maxRowLimit=" + maxRowLimit %>' />
+      <c:import url='<%= "obscore_search.jsp?maxRowLimit=" + maxRowLimit  + "&useMaq=" + useMaq %>' />
 
       <!-- Result Tab -->
       <c:import url='<%= "results.jsp?maxRowLimit=" + maxRowLimit %>' />
@@ -183,8 +190,8 @@
                     .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"cadcVOTV/css/slick-default-theme.css?version=@version@\" />");
               });
           </script>
-
             <script type="application/javascript" src="js/bootstrap.min.js"></script>
+            <script type="application/javascript" src="js/bootstrap-toggle.min.js"></script>
           <script type="text/javascript"
                   src="cadcVOTV/javascript/jquery.event.drag-2.2.min.js?version=@version@"></script>
           <script type="text/javascript"
@@ -276,7 +283,8 @@
                                                                                "tapSyncEndpoint": "<%= tapSyncEndpoint %>",
                                                                                "pageLanguage": $("html").prop("lang"),
                                                                                "autoInitFlag": false,
-                                                                               "applicationEndpoint": "<%= applicationEndpoint %>"
+                                                                               "applicationEndpoint": "<%= applicationEndpoint %>",
+                                                                                "useMaq" : "<%= useMaq %>"
                                                                              });
 
                                 searchApp.subscribe(ca.nrc.cadc.search.events.onAdvancedSearchInit,

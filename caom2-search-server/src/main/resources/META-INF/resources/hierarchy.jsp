@@ -14,12 +14,14 @@
     <div class="panel-body">
       <div id="${param.modelDataSource}@Hierarchy"
            class="width-100 text-align advanced_search_data_train modelDataSource_${param.modelDataSource} ${param.colcount}"
-           data-utypes="${param.utype}">
+           data-utypes="${param.utyifpe}">
         <div class="hidden hierarchy_utype">${param.utype}</div>
+        <div class="hidden load_maq_data_train">${param.useMaq}</div>
 
         <div id="${param.utype}.building" class="loading">
           <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span> <fmt:message key="LOADING_MESSAGE" bundle="${langBundle}"/>
         </div>
+        <div class="${param.modelDataSource}_dtTableDiv"></div>
       </div>
     </div>
     <div class="clear"></div>

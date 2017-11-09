@@ -100,12 +100,16 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URI;
 import java.util.*;
+import org.apache.log4j.Logger;
 
 
 public class SearchJobServlet extends SyncServlet
 {
+    private static final Logger log  = Logger.getLogger(SearchJobServlet.class);
     private static final String TAP_SERVICE_URI_PROPERTY_KEY = "org.opencadc.search.tap-service-id";
+    private static final String ALT_TAP_SERVICE_URI_PROPERTY_KEY = "org.opencadc.search.maq-tap-service-id";
     private static final URI DEFAULT_TAP_SERVICE_URI = URI.create("ivo://cadc.nrc.ca/tap");
+    private static final URI ALTERNATE_TAP_SERVICE_URI = URI.create("ivo://cadc.nrc.ca/sc2tap");
 
     private JobManager jobManager;
     private JobUpdater jobUpdater;
@@ -315,12 +319,21 @@ public class SearchJobServlet extends SyncServlet
         jobUpdater.setPhase(auditJob.getID(), ExecutionPhase.PENDING, ExecutionPhase.QUEUED, currentDateUTC());
 
         // Create the TAP job to prepare to be executed.
+        // Check to see if this should return MAQ data
+
+        URI tapServiceURI = DEFAULT_TAP_SERVICE_URI;
+        String tapServiceKey = TAP_SERVICE_URI_PROPERTY_KEY;
+        if ((request.getParameter("USEMAQ") != null)
+                && (request.getParameter("USEMAQ").equals("true")) ) {
+            tapServiceURI = ALTERNATE_TAP_SERVICE_URI;
+            tapServiceKey = ALT_TAP_SERVICE_URI_PROPERTY_KEY;
+        }
+
         final JobRunner runner =
                 new AdvancedRunner(auditJob, jobUpdater, syncOutput,
                                    new TAPSearcher(new SyncResponseWriterImpl(syncOutput), jobUpdater, tapClient,
                                                    getQueryGenerator(auditJob)),
-                                   applicationConfiguration.lookupServiceURI(TAP_SERVICE_URI_PROPERTY_KEY,
-                                                                             DEFAULT_TAP_SERVICE_URI));
+                                   applicationConfiguration.lookupServiceURI(tapServiceKey, tapServiceURI));
 
         runner.run();
         response.setStatus(HttpServletResponse.SC_OK);

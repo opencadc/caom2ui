@@ -781,6 +781,13 @@
                                                   this._clearTargetList();
                                                 }.bind(this));
 
+
+      // TODO: what happens if this element isn't shown on the page?
+      // Will this fail silently?
+      $currForm.find(".useMaq").change(function(event) {
+                                                  this.dataTrain.setMaqMode(event.currentTarget.checked);
+                                                }.bind(this));
+
       // Prevent closing details when a value is present.
       $currForm.find("details[id$='_details'] summary").click(function (event)
                                                  {

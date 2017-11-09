@@ -75,6 +75,7 @@ import ca.nrc.cadc.reg.Standards;
 import ca.nrc.cadc.reg.client.RegistryClient;
 import ca.nrc.cadc.web.ConfigurableServlet;
 
+import ca.nrc.cadc.web.SearchJobServlet;
 import javax.security.auth.Subject;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -84,11 +85,15 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
+import org.apache.log4j.Logger;
 
 
 public class TAPServlet extends ConfigurableServlet {
+    private static final Logger log  = Logger.getLogger(TAPServlet.class);
     private static final String TAP_SERVICE_URI_PROPERTY_KEY = "org.opencadc.search.tap-service-id";
+    private static final String ALT_TAP_SERVICE_URI_PROPERTY_KEY = "org.opencadc.search.maq-tap-service-id";
     private static final URI DEFAULT_TAP_SERVICE_URI = URI.create("ivo://cadc.nrc.ca/tap");
+    private static final URI ALTERNATE_TAP_SERVICE_URI = URI.create("ivo://cadc.nrc.ca/sc2tap");
 
     public TAPServlet() {
     }
@@ -209,7 +214,7 @@ public class TAPServlet extends ConfigurableServlet {
         final RegistryClient registryClient = getRegistryClient();
         final Subject currentSubject = AuthenticationUtil.getCurrentSubject();
         final AuthMethod currentAuthMethod = AuthenticationUtil.getAuthMethod(currentSubject);
-        final URL serviceURL = registryClient.getServiceURL(lookupServiceURI(), Standards.TAP_SYNC_11, (currentAuthMethod == null) ? AuthMethod.ANON :
+        final URL serviceURL = registryClient.getServiceURL(lookupServiceURI(request), Standards.TAP_SYNC_11, (currentAuthMethod == null) ? AuthMethod.ANON :
             currentAuthMethod);
 
         response.sendRedirect(serviceURL.toExternalForm() + "?" + request.getQueryString());
@@ -224,7 +229,18 @@ public class TAPServlet extends ConfigurableServlet {
         return new RegistryClient();
     }
 
-    private URI lookupServiceURI() {
-        return getServiceID(TAP_SERVICE_URI_PROPERTY_KEY, DEFAULT_TAP_SERVICE_URI);
+    private URI lookupServiceURI(final HttpServletRequest request) {
+        // Create the TAP job to prepare to be executed.
+        // Check to see if this is an MAQ job
+        URI tapServiceURI = DEFAULT_TAP_SERVICE_URI;
+        String tapServiceKey = TAP_SERVICE_URI_PROPERTY_KEY;
+        String useAlt = request.getParameter("USEMAQ");
+        if ((request.getParameter("USEMAQ") != null)
+            && (request.getParameter("USEMAQ").equals("true")) ) {
+            log.info("USEMAQ passed in as true, polling MAQ for tap data.");
+            tapServiceURI = ALTERNATE_TAP_SERVICE_URI;
+            tapServiceKey = ALT_TAP_SERVICE_URI_PROPERTY_KEY;
+        }
+        return getServiceID(tapServiceKey, tapServiceURI);
     }
 }

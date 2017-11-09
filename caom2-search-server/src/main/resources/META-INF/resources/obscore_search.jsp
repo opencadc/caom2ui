@@ -36,6 +36,14 @@
               value="<fmt:message key="RESET_BUTTON_LABEL" bundle="${langBundle}" />">
         <fmt:message key="RESET_BUTTON_LABEL" bundle="${langBundle}"/>
       </button>
+      <!-- maqToggle = true means display this checkbox -->
+      <c:if test="${param.useMaq eq 'true'}" >
+        <input class="useMaq"
+               type="checkbox"
+               checked data-toggle="toggle"
+               data-on="MAQ"
+               data-off="MAQ Off">
+      </c:if>
     </div>
 
 
