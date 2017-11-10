@@ -23,6 +23,7 @@
     <input type="hidden" name="SelectList" class="CAOM2_selectlist"/>
     <input type="hidden" name="MaxRecords" value="${param.maxRowLimit}"/>
     <input type="hidden" name="format" value="csv"/>
+    <input type="hidden" name="useMaq" value="${param.useMaq}"/>
 
     <!-- Used by AdvancedSearch to pass to VOTV. -->
     <input type="hidden" id="max_row_limit_warning"

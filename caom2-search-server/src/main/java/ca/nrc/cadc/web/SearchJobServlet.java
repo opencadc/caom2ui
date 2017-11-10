@@ -323,8 +323,9 @@ public class SearchJobServlet extends SyncServlet
 
         URI tapServiceURI = DEFAULT_TAP_SERVICE_URI;
         String tapServiceKey = TAP_SERVICE_URI_PROPERTY_KEY;
-        if ((request.getParameter("USEMAQ") != null)
-                && (request.getParameter("USEMAQ").equals("true")) ) {
+        log.info("useMaq value: " + request.getParameter("useMaq"));
+        if ((request.getParameter("useMaq") != null)
+                && (request.getParameter("useMaq").equals("true")) ) {
             tapServiceURI = ALTERNATE_TAP_SERVICE_URI;
             tapServiceKey = ALT_TAP_SERVICE_URI_PROPERTY_KEY;
         }
