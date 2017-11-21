@@ -90,13 +90,9 @@ public class DefaultSyncTAPClientTest extends AbstractUnitTest<DefaultSyncTAPCli
     @Test
     public void execute() throws Exception
     {
-        final ApplicationConfiguration mockConfiguration =
-                createMock(ApplicationConfiguration.class);
-        final RegistryClient mockRegistryClient = createMock(
-                RegistryClient.class);
+        final RegistryClient mockRegistryClient = createMock(RegistryClient.class);
 
-        testSubject = new DefaultSyncTAPClient(mockConfiguration, false,
-                                               mockRegistryClient);
+        testSubject = new DefaultSyncTAPClient(false, mockRegistryClient);
 
         final URI testServiceURI = URI.create("ivo://www.site.com/tap/service");
         final OutputStream outputStream = new ByteArrayOutputStream();
@@ -108,10 +104,10 @@ public class DefaultSyncTAPClientTest extends AbstractUnitTest<DefaultSyncTAPCli
                 AuthMethod.ANON))
                 .andReturn(new URL("http://www.site.com/example/tap"));
 
-        replay(mockConfiguration, mockRegistryClient);
+        replay(mockRegistryClient);
 
         testSubject.execute(testServiceURI, testJob, outputStream);
 
-        verify(mockConfiguration, mockRegistryClient);
+        verify(mockRegistryClient);
     }
 }
