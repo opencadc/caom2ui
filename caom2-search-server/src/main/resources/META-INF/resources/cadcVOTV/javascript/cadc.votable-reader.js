@@ -72,7 +72,7 @@
 
           if (!stringValue || ($.trim(stringValue) == ""))
           {
-            num = Number.NaN;
+            num = null;
           }
           else if (cellDatatype.isFloatingPointNumeric())
           {
