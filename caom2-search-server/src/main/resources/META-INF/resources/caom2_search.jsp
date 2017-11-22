@@ -23,7 +23,7 @@
     <input type="hidden" name="SelectList" class="CAOM2_selectlist"/>
     <input type="hidden" name="MaxRecords" value="${param.maxRowLimit}"/>
     <input type="hidden" name="format" value="csv"/>
-    <input type="hidden" name="useMaq" value="${param.useMaq}"/>
+    <input type="hidden" class="useMaqValue" name="useMaq" value="${param.useMaq}"/>
 
     <!-- Used by AdvancedSearch to pass to VOTV. -->
     <input type="hidden" id="max_row_limit_warning"
@@ -40,13 +40,15 @@
               value="<fmt:message key="RESET_BUTTON_LABEL" bundle="${langBundle}" />">
         <fmt:message key="RESET_BUTTON_LABEL" bundle="${langBundle}"/>
       </button>
-      <!-- maqToggle = true means display this checkbox -->
+      <!-- useMaq = true means display this checkbox -->
       <c:if test="${param.useMaq eq 'true'}" >
           <input class="useMaq"
                  type="checkbox"
                  checked data-toggle="toggle"
-                  data-on="MAQ"
-                  data-off="MAQ Off">
+                 data-size="mini"
+                 data-onstyle="info"
+                 data-on="MAQ"
+                 data-off="MAQ Off">
 
         <div data-toggle="popover"
              data-utype="${param.utype}"

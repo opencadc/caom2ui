@@ -83,6 +83,9 @@
     var queryTab = $("#queryTab");
     var $tabContainer = $("#tabContainer");
 
+    // For controlling MAQ Switch triggering data train load
+    var isFirstLoad = true;
+
     // Text area containing the ADQL query.
     var $queryCode = $("#query");
     var columnManager = new ca.nrc.cadc.search.columns.ColumnManager();
@@ -291,10 +294,17 @@
           new ca.nrc.cadc.search.ObsCore.FormConfiguration(),
           this.options);
 
+      // this.options.useMaq is passed in from index.jsp, and denotes whether
+      // the toggle is being used at all
+      // - it'll have to be se
+      // todo: might be this is removed
+//      var useMaq = this.useMaqQuery();
+
       $.get(this.options.tapSyncEndpoint,
             {
               REQUEST: "doQuery",
               LANG: "ADQL",
+              USEMAQ: this.options.useMaq,
               QUERY: tapQuery,
               FORMAT: "votable"
             },
@@ -679,11 +689,15 @@
       {
         if (field.value && (ca.nrc.cadc.search.field_ignore.indexOf(field.name) < 0))
         {
-          parameters.push($activeFormObject.find("[name='" + field.name + "']").attr("id") + "="
-                          + encodeURIComponent(field.value.replace(/\%/g, '*')));
+          if (field.name === "useMaq")
+          {
+            parameters.push(field.name + '=' + field.value);
+          } else {
+            parameters.push($activeFormObject.find("[name='" + field.name + "']").attr("id") + "="
+                + encodeURIComponent(field.value.replace(/\%/g, '*')));
+          }
         }
       });
-
       return (parameters.length > 0) ? ("?" + parameters.join("&")) : "";
     };
 
@@ -1127,27 +1141,69 @@
       return targetTabID;
     };
 
+
+    this.getQueryFromURI = function ()
+    {
+        var currentURI = new cadc.web.util.currentURI();
+        return currentURI.getQuery();
+    };
+
+    this.getMaqParameterFromURI = function()
+    {
+        var maqValue = ""
+        if (this.options.useMaq === "true")
+        {
+          var currentQuery = this.getQueryFromURI();
+          if (currentQuery.useMaq != undefined)
+          {
+              maqValue = currentQuery.useMaq[0];
+          }
+        }
+        return maqValue;
+    };
+
+    this.useMaqQuery = function()
+    {
+        if (this.options.useMaq === "true")
+        {
+            // check switch value on current form
+            var activeSearchForm = this._getActiveForm();
+            return activeSearchForm.find(".useMaq").val();
+        }
+    };
+
     /**
      * Start this application.  This will check for a quick submission.
      */
     this.start = function ()
     {
       // After the series of columns (Data Train) has loaded, then proceed.
+      // TODO: with useMaq in a URL, if it's not handled explicitly prior to
+      // loading the data train, it could lead to an infinite loop of loading
+      // the data train. :(
       var postDataTrainLoad = function (_continue)
       {
-        var currentURI = new cadc.web.util.currentURI();
+        var activeSearchForm = this._getActiveForm()
+        // Enable the switch again (was disabled prior to data train load to
+        // make sure only one call is out at a time from this page
+        activeSearchForm.enableMaqToggle();
 
-        if (_continue)
+        if (_continue && isFirstLoad)
         {
-          var queryObject = currentURI.getQuery();
+          // Don't process the queryfrom the URL if this is not the first page load.
+          isFirstLoad = false;
 
-          // Work directly with the form object.
-          var activeSearchForm = this._getActiveForm();
+          var currentURI = new cadc.web.util.currentURI();
+          var queryObject =  currentURI.getQuery();
+
+          //// Work directly with the form object.
+          //var activeSearchForm = this._getActiveForm();
           var $submitForm = activeSearchForm.getForm();
           var doSubmit;
 
           if (JSON.stringify(queryObject) !== JSON.stringify({}))
           {
+
             // Update text fields.
             $.each(queryObject, function (qKey, qValue)
             {
@@ -1160,8 +1216,9 @@
                   activeSearchForm.setSelectValue(ca.nrc.cadc.search.CAOM2_TARGET_NAME_FIELD_ID, qKey,
                                                   decodeURIComponent(qValue.join()));
                 }
-                else
+                else if (qKey !== "useMaq")
                 {
+                  // useMaq has been handled prior to the data train being loaded
                   activeSearchForm.setInputValue(qKey, decodeURIComponent(qValue.join()));
                 }
 
@@ -1169,7 +1226,10 @@
               }
             });
 
-            $submitForm.find("input").change();
+            // TODO: what is this doing, as it toggles the MAQ switch
+            // Consider using a class on inputs to be toggled to exclude MAQ
+            // as well which has bad effects.
+            //$submitForm.find("input").change();
 
             // Update DataTrain
             var dtUType = $submitForm.find(".hierarchy_utype").text();
@@ -1206,6 +1266,7 @@
               if (dtSelectUtypeValues && (dtSelectUtypeValues.length > 0))
               {
                 var dtSelect = $submitForm.find("select[id='" + dtSelectUtype + "']");
+                // This can't happen until the data train is loaded.
                 if (dtSelect && activeSearchForm.setDataTrainValue($(dtSelect[0]), dtSelectUtypeValues))
                 {
                   doSubmit = true;
@@ -1320,8 +1381,10 @@
                                     obsCoreSearchForm.resetFields();
                                   });
 
-      caomSearchForm.init();
-      obsCoreSearchForm.init();
+      // pass in the useMaq flag here so it can be used
+      // to set the form toggle & load data train appropriately
+      caomSearchForm.init(this.getMaqParameterFromURI());
+      obsCoreSearchForm.init(this.getMaqParameterFromURI());
     };
 
     // End start method.

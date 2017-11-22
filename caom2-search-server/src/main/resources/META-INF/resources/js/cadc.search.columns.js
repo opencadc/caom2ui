@@ -189,6 +189,11 @@
 
                     var runID = $("#downloadForm").find("input[name='fragment']").val().substring(6);
 
+                    var useMaqDatalink = true;
+                    if ( ($("#resultsMaqEnabled") == "undefined") || $("#resultsMaqEnabled").hasClass("cadc-display-none") ) {
+                      useMaqDatalink = false;
+                    }
+
                     // Get the thumbnails and previews from datalink
                     $.ajax({
                              url: " " + ca.nrc.cadc.search.services.applicationEndpoint + ca.nrc.cadc.search.DATALINK_URL_SUFFIX,
@@ -196,7 +201,8 @@
                              data: {
                                id: planeURIValue,
                                request: "downloads-only",
-                               runid: runID
+                               runid: runID,
+                               useMaq: useMaqDatalink
                              },
                              statusCode: {
                                200: function (data) {
@@ -1209,6 +1215,7 @@
     return htmlFormat.format();
   }
 
+
   /**
    * Format the given utype value as a link for a quick search.
    *
@@ -1226,6 +1233,8 @@
     if ($output.text())
     {
       var currentURI = cadc.web.util.currentURI();
+      // Need to strip off tab # anchor tag...
+
 
       $.each(_searchItems, function (name, value) {
         currentURI.setQueryValue(name, encodeURIComponent(value));
@@ -1236,7 +1245,17 @@
 
       // Force open in a new window.  This MUST be set to _blank.
       $link.attr("target", "_blank");
-      $link.attr("href", currentURI.toString());
+
+      var useMaqStr = "&useMaq=";
+      if (($("#resultsMaqEnabled") == "undefined") || $("#resultsMaqEnabled").hasClass("cadc-display-none"))
+      {
+        useMaqStr += "false";
+      } else {
+        useMaqStr += "true";
+      }
+
+      var currentURIStr = currentURI.toString();
+      $link.attr("href", currentURIStr.substr(0,currentURIStr.indexOf('#')) + useMaqStr);
       $link.addClass("quicksearch_link");
       $link.text($output.text());
 

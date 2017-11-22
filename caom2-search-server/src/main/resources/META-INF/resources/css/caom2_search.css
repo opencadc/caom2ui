@@ -583,4 +583,8 @@ canvas.aladin-imageCanvas {
   margin: auto;
 }
 
+.cadc-display-none {
+    display: none;
+}
+
 

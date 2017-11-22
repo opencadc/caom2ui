@@ -245,6 +245,10 @@
       for (var i = 0, ul = uTypes.length; i < ul; i++)
       {
         var nextUType = uTypes[i];
+        if (nextUType === "useMaq")
+        {
+          continue;
+        }
         var colOpts = this._getColumnConfig(nextUType);
 
         if (colOpts.hasOwnProperty("tap_column_name"))

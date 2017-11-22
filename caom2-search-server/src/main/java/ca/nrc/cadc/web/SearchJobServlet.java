@@ -292,6 +292,7 @@ public class SearchJobServlet extends SyncServlet
             }
         };
 
+
         // Create the audit job.
         final Job auditJob = jobManager.create(jobCreator.create(request));
         auditJob.getParameterList().addAll(extraJobParameters);

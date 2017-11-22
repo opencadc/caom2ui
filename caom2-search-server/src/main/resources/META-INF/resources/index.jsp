@@ -102,7 +102,7 @@
       <c:import url='<%= "obscore_search.jsp?maxRowLimit=" + maxRowLimit  + "&useMaq=" + useMaq %>' />
 
       <!-- Result Tab -->
-      <c:import url='<%= "results.jsp?maxRowLimit=" + maxRowLimit %>' />
+      <c:import url='<%= "results.jsp?maxRowLimit=" + maxRowLimit + "&useMaq=" + useMaq %>' />
 
   <!-- Error Tab -->
   <div role="tabpanel" class="tab-pane" id="errorTableTab">
