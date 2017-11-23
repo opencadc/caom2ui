@@ -399,7 +399,7 @@
           }
         }
 
-        sanitizedFootprint = (footprintElements.length > 0) ? (POLYGON_SPLIT + footprintElements.join(" ")) : null;
+        sanitizedFootprint = (footprintElements.length > 0) ? (POLYGON_SPLIT + " " + footprintElements.join(" ")) : null;
       }
       else
       {
