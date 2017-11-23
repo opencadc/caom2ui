@@ -18,7 +18,6 @@
     }
   });
 
-
   /**
    *
    * Sample VOTable XML Document - Version 1.2 .
@@ -240,7 +239,7 @@
     _selfDatatype.datatypeValue = _datatypeValue || "";
 
     var stringTypes = ["varchar", "char", "adql:VARCHAR", "adql:CLOB",
-                       "adql:REGION"];
+                       "adql:REGION", "polygon", "point", "circle", "interval", "uri"];
     var integerTypes = ["int", "long", "short"];
     var floatingPointTypes = ["float", "double", "adql:DOUBLE", "adql:FLOAT"];
     var timestampTypes = ["timestamp", "adql:TIMESTAMP"];
@@ -300,7 +299,7 @@
       }
       return false;
     }
-
+  
     $.extend(this,
              {
                "getDatatypeValue": getDatatypeValue,
@@ -329,16 +328,17 @@
   function Field(_name, _id, _ucd, _utype, _unit, _xtype, __datatype,
                  _arraysize, _description, label)
   {
-    var INTERVAL_XTYPE_KEYWORD = "INTERVAL";
     var _selfField = this;
+    var INTERVAL_XTYPE_KEYWORD = "INTERVAL";
+    var types = set(__datatype, _xtype);
 
     _selfField.name = _name;
     _selfField.id = _id;
     _selfField.ucd = _ucd;
     _selfField.utype = _utype;
     _selfField.unit = _unit;
-    _selfField.xtype = _xtype;
-    _selfField.datatype = __datatype || new Datatype("VARCHAR");
+    _selfField.xtype = types._xt;
+    _selfField.datatype = types._dt;
     _selfField.arraysize = _arraysize;
     _selfField.description = _description;
     _selfField.label = label;
@@ -399,6 +399,37 @@
       return _selfField.arraysize;
     }
 
+    function set(_dtype, _xtype)
+    {
+      var dt, xt;
+      if (_xtype)
+      {
+        // xtype = 'polygon' | 'circle' | 'point' | 'interval' | 'uri'
+        // over-rides the datatype of 'double'
+        dt = new Datatype(_xtype);
+      }
+      else if (_dtype)
+      {
+        if (typeof _dtype === 'object' )
+        {
+	  dt = _dtype;
+	}
+        else
+        {
+          var stringUtil = new cadc.web.util.StringUtil(_dtype);
+	  if (stringUtil.contains(INTERVAL_XTYPE_KEYWORD))
+          {
+	    xt = INTERVAL_XTYPE_KEYWORD;
+          }
+          dt = new Datatype(_dtype);
+        }
+      }
+      else
+      {
+        dt = new Datatype("varchar");
+      }
+      return {_dt:dt, _xt:xt};
+    }
 
     $.extend(this,
              {

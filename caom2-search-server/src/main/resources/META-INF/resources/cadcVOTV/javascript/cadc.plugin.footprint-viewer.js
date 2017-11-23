@@ -361,7 +361,7 @@
             if (_self.fovBox.raRight === null || _self.fovBox.raRight > minRA) {
                 _self.fovBox.raRight = minRA;
             }
-
+            
             if (_self.fovBox.decTop === null || _self.fovBox.decTop < maxDec) {
                 _self.fovBox.decTop = maxDec;
             }
@@ -394,7 +394,7 @@
 
                 sanitizedFootprint =
                     footprintElements.length > 0
-                        ? POLYGON_SPLIT + footprintElements.join(' ')
+                        ? POLYGON_SPLIT + ' ' + footprintElements.join(' ')
                         : null;
             } else {
                 sanitizedFootprint = null;
