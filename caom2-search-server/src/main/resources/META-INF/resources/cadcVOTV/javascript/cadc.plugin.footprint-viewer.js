@@ -361,6 +361,10 @@
             if (_self.fovBox.raRight === null || _self.fovBox.raRight > minRA) {
                 _self.fovBox.raRight = minRA;
             }
+            
+            if (_self.fovBox.decTop === null || _self.fovBox.decTop < maxDec) {
+                _self.fovBox.decTop = maxDec;
+            }
 
             if (
                 _self.fovBox.decBottom === null ||
