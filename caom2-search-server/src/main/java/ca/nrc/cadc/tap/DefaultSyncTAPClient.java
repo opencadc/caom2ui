@@ -35,7 +35,6 @@ package ca.nrc.cadc.tap;
 
 
 import ca.nrc.cadc.auth.AuthMethod;
-import ca.nrc.cadc.config.ApplicationConfiguration;
 import ca.nrc.cadc.net.HttpPost;
 import ca.nrc.cadc.reg.Standards;
 import ca.nrc.cadc.reg.client.RegistryClient;
@@ -43,7 +42,6 @@ import ca.nrc.cadc.util.StringUtil;
 import ca.nrc.cadc.uws.Job;
 import ca.nrc.cadc.uws.JobAttribute;
 import ca.nrc.cadc.uws.Parameter;
-import ca.nrc.cadc.web.Configuration;
 
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.log4j.Logger;
@@ -65,20 +63,12 @@ public class DefaultSyncTAPClient implements SyncTAPClient
     private static final Logger LOGGER = Logger.getLogger(DefaultSyncTAPClient.class);
 
 
-    private final ApplicationConfiguration applicationConfiguration;
     private final boolean followToResults;
     private final RegistryClient registryClient;
 
 
     public DefaultSyncTAPClient(final boolean followToResults, final RegistryClient registryClient)
     {
-        this(new ApplicationConfiguration(Configuration.DEFAULT_CONFIG_FILE_PATH), followToResults, registryClient);
-    }
-
-    DefaultSyncTAPClient(ApplicationConfiguration applicationConfiguration,
-                         boolean followToResults, RegistryClient registryClient)
-    {
-        this.applicationConfiguration = applicationConfiguration;
         this.followToResults = followToResults;
         this.registryClient = registryClient;
     }
