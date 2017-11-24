@@ -535,7 +535,7 @@ Logger = {};
 
 Logger.log = function(action, params) {
     try {
-        var logUrl = "http://alasky.u-strasbg.fr/cgi/AladinLiteLogger/log.py";
+        var logUrl = "http://alasky.unistra.fr/cgi/AladinLiteLogger/log.py";
         var paramStr = "";
         if (params) {
             paramStr = JSON.stringify(params);
@@ -1971,1144 +1971,8 @@ Numbers.toSexagesimal = function(num, prec, plus) {
 		default:
 			return sign+Numbers.format(n, 1);
 	}
-}
-// Copyright 2013 - UDS/CNRS
-// The Aladin Lite program is distributed under the terms
-// of the GNU General Public License version 3.
-//
-// This file is part of Aladin Lite.
-//
-//    Aladin Lite is free software: you can redistribute it and/or modify
-//    it under the terms of the GNU General Public License as published by
-//    the Free Software Foundation, version 3 of the License.
-//
-//    Aladin Lite is distributed in the hope that it will be useful,
-//    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//    GNU General Public License for more details.
-//
-//    The GNU General Public License is available in COPYING file
-//    along with Aladin Lite.
-//
-
-
-
-CooConversion = (function() {
-
-    var CooConversion = {};
-    
-    CooConversion.GALACTIC_TO_J2000 = [
-       -0.0548755604024359,  0.4941094279435681, -0.8676661489811610,
-       -0.8734370902479237, -0.4448296299195045, -0.1980763734646737,
-       -0.4838350155267381,  0.7469822444763707,  0.4559837762325372 ];
-    
-    CooConversion.J2000_TO_GALACTIC = [
-        -0.0548755604024359, -0.873437090247923, -0.4838350155267381,
-         0.4941094279435681, -0.4448296299195045, 0.7469822444763707,
-        -0.8676661489811610, -0.1980763734646737, 0.4559837762325372 ];
-    
-    // adapted from www.robertmartinayers.org/tools/coordinates.html
-    // radec : array of ra, dec in degrees
-    // return coo in degrees
-    CooConversion.Transform = function( radec, matrix ) {// returns a radec array of two elements
-        radec[0] = radec[0]*Math.PI/180;
-        radec[1] = radec[1]*Math.PI/180;
-      var r0 = new Array ( 
-       Math.cos(radec[0]) * Math.cos(radec[1]),
-       Math.sin(radec[0]) * Math.cos(radec[1]),
-       Math.sin(radec[1]) );
-        
-     var s0 = new Array (
-       r0[0]*matrix[0] + r0[1]*matrix[1] + r0[2]*matrix[2], 
-       r0[0]*matrix[3] + r0[1]*matrix[4] + r0[2]*matrix[5], 
-       r0[0]*matrix[6] + r0[1]*matrix[7] + r0[2]*matrix[8] ); 
-     
-      var r = Math.sqrt ( s0[0]*s0[0] + s0[1]*s0[1] + s0[2]*s0[2] ); 
-    
-      var result = new Array ( 0.0, 0.0 );
-      result[1] = Math.asin ( s0[2]/r ); // New dec in range -90.0 -- +90.0 
-      // or use sin^2 + cos^2 = 1.0  
-      var cosaa = ( (s0[0]/r) / Math.cos(result[1] ) );
-      var sinaa = ( (s0[1]/r) / Math.cos(result[1] ) );
-      result[0] = Math.atan2 (sinaa,cosaa);
-      if ( result[0] < 0.0 ) result[0] = result[0] + 2*Math.PI;
-    
-        result[0] = result[0]*180/Math.PI;
-        result[1] = result[1]*180/Math.PI;
-      return result;
-    };
-    
-    // coo : array of lon, lat in degrees
-    CooConversion.GalacticToJ2000 = function(coo) {
-        return CooConversion.Transform(coo, CooConversion.GALACTIC_TO_J2000);
-    };
-    // coo : array of lon, lat in degrees
-    CooConversion.J2000ToGalactic = function(coo) {
-        return CooConversion.Transform(coo, CooConversion.J2000_TO_GALACTIC);
-    };
-    return CooConversion;
-})();
-// Copyright 2013 - UDS/CNRS
-// The Aladin Lite program is distributed under the terms
-// of the GNU General Public License version 3.
-//
-// This file is part of Aladin Lite.
-//
-//    Aladin Lite is free software: you can redistribute it and/or modify
-//    it under the terms of the GNU General Public License as published by
-//    the Free Software Foundation, version 3 of the License.
-//
-//    Aladin Lite is distributed in the hope that it will be useful,
-//    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//    GNU General Public License for more details.
-//
-//    The GNU General Public License is available in COPYING file
-//    along with Aladin Lite.
-//
-
-
-
-/******************************************************************************
- * Aladin Lite project
- * 
- * File Sesame.js
- * 
- * Author: Thomas Boch[CDS]
- * 
- *****************************************************************************/
-
-Sesame = (function() {
-    Sesame = {};
-    
-    Sesame.cache = {};
-
-    /** find RA, DEC for any target (object name or position)
-     *  if successful, callback is called with an object {ra: <ra-value>, dec: <dec-value>}
-     *  if not successful, errorCallback is called
-     */
-    Sesame.getTargetRADec = function(target, callback, errorCallback) {
-        if (!callback) {
-            return;
-        }
-        var isObjectName = /[a-zA-Z]/.test(target);
-
-        // try to parse as a position
-        if ( ! isObjectName) {
-            var coo = new Coo();
-
-            coo.parse(target);
-            if (callback) {
-                callback({ra: coo.lon, dec: coo.lat});
-            }
-        }
-        // ask resolution by Sesame
-        else {
-            Sesame.resolve(target,
-
-                           function(data) { // success callback
-                               callback({ra:  data.Target.Resolver.jradeg,
-                                         dec: data.Target.Resolver.jdedeg});
-                           },
-
-                           function(data) { // error callback
-                               if (errorCallback) {
-                                   errorCallback();
-                               }
-                           }
-                           );
-        }
-    };
-    
-    Sesame.resolve = function(objectName, callbackFunctionSuccess, callbackFunctionError) {
-        //var sesameUrl = "http://cdsportal.u-strasbg.fr/services/sesame?format=json";
-        var sesameUrl = "http://cds.u-strasbg.fr/cgi-bin/nph-sesame.jsonp?";
-        $.ajax({
-            url: sesameUrl ,
-            data: {"object": objectName},
-            method: 'GET',
-            dataType: 'jsonp',
-            success: function(data) {
-                if (data.Target && data.Target.Resolver && data.Target.Resolver) {
-                    callbackFunctionSuccess(data);
-                }
-                else {
-                    callbackFunctionError(data);
-                }
-            },
-            error: callbackFunctionError
-            });
-    };
-    
-    return Sesame;
-})();
-
-// Copyright 2013 - UDS/CNRS
-// The Aladin Lite program is distributed under the terms
-// of the GNU General Public License version 3.
-//
-// This file is part of Aladin Lite.
-//
-//    Aladin Lite is free software: you can redistribute it and/or modify
-//    it under the terms of the GNU General Public License as published by
-//    the Free Software Foundation, version 3 of the License.
-//
-//    Aladin Lite is distributed in the hope that it will be useful,
-//    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//    GNU General Public License for more details.
-//
-//    The GNU General Public License is available in COPYING file
-//    along with Aladin Lite.
-//
-
-
-
-/******************************************************************************
- * Aladin Lite project
- * 
- * File HealpixCache
- * 
- * Author: Thomas Boch[CDS]
- * 
- *****************************************************************************/
-
-// class holding some HEALPix computations for better performances
-//
-// it is made of :
-// - a static cache for HEALPix corners at nside=8 
-// - a dynamic cache for 
-HealpixCache = (function() {
-
-    var HealpixCache = {};
-    
-    HealpixCache.staticCache = {corners: {nside8: []}};
-    // TODO : utilisation du dynamicCache
-    HealpixCache.dynamicCache = {};
-    
-    HealpixCache.lastNside = 8;
-    
-    HealpixCache.hpxIdxCache = null;
-    
-    // TODO : conserver en cache le dernier résultat ?
-    
-    HealpixCache.init = function() {
-    	// pre-compute corners position for nside=8
-    	var hpxIdx = new HealpixIndex(8);
-    	hpxIdx.init();
-    	var npix = HealpixIndex.nside2Npix(8);
-    	for (var ipix=0; ipix<npix; ipix++) {
-    		HealpixCache.staticCache.corners.nside8[ipix] = hpxIdx.corners_nest(ipix, 1);
-    	}
-    	
-    	HealpixCache.hpxIdxCache = hpxIdx;
-    };
-    
-    HealpixCache.corners_nest = function(ipix, nside) {
-    	if (nside==8) {
-    		return HealpixCache.staticCache.corners.nside8[ipix];
-    	}
-    	
-    	if (nside != HealpixCache.lastNside) {
-    		HealpixCache.hpxIdxCache = new HealpixIndex(nside);
-    		HealpixCache.hpxIdxCache.init();
-    		HealpixCache.lastNside = nside;
-    	}
-    	
-    	return HealpixCache.hpxIdxCache.corners_nest(ipix, 1);
-    	
-    };
-    
-    return HealpixCache;
-})();
-	
-// Copyright 2013 - UDS/CNRS
-// The Aladin Lite program is distributed under the terms
-// of the GNU General Public License version 3.
-//
-// This file is part of Aladin Lite.
-//
-//    Aladin Lite is free software: you can redistribute it and/or modify
-//    it under the terms of the GNU General Public License as published by
-//    the Free Software Foundation, version 3 of the License.
-//
-//    Aladin Lite is distributed in the hope that it will be useful,
-//    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//    GNU General Public License for more details.
-//
-//    The GNU General Public License is available in COPYING file
-//    along with Aladin Lite.
-//
-
-
-
-
-/******************************************************************************
- * Aladin Lite project
- * 
- * File Utils
- * 
- * Author: Thomas Boch[CDS]
- * 
- *****************************************************************************/
-
-Utils = Utils || {};
-
-Utils.cssScale = undefined;
-// adding relMouseCoords to HTMLCanvasElement prototype (see http://stackoverflow.com/questions/55677/how-do-i-get-the-coordinates-of-a-mouse-click-on-a-canvas-element ) 
-function relMouseCoords(event){
-    var totalOffsetX = 0;
-    var totalOffsetY = 0;
-    var canvasX = 0;
-    var canvasY = 0;
-    var currentElement = this;
-   
-
-    if (event.offsetX) {
-        return {x: event.offsetX, y:event.offsetY};
-    } 
-    else {
-        if (!Utils.cssScale) {
-            var st = window.getComputedStyle(document.body, null);
-            var tr = st.getPropertyValue("-webkit-transform") ||
-                    st.getPropertyValue("-moz-transform") ||
-                    st.getPropertyValue("-ms-transform") ||
-                    st.getPropertyValue("-o-transform") ||
-                    st.getPropertyValue("transform");
-            var matrixRegex = /matrix\((-?\d*\.?\d+),\s*0,\s*0,\s*(-?\d*\.?\d+),\s*0,\s*0\)/;
-            var matches = tr.match(matrixRegex);
-            if (matches) {
-                Utils.cssScale = parseFloat(matches[1]);
-            }
-            else {
-                Utils.cssScale = 1;
-            }
-        }
-        var e = event;
-        var canvas = e.target;
-        // http://www.jacklmoore.com/notes/mouse-position/
-        var target = e.target || e.srcElement,
-        style = target.currentStyle || window.getComputedStyle(target, null),
-        borderLeftWidth = parseInt(style['borderLeftWidth'], 10),
-        borderTopWidth = parseInt(style['borderTopWidth'], 10),
-        rect = target.getBoundingClientRect(),
-        offsetX = e.clientX - borderLeftWidth - rect.left,
-        offsetY = e.clientY - borderTopWidth - rect.top;
-        return {x: parseInt(offsetX/Utils.cssScale), y: parseInt(offsetY/Utils.cssScale)};
-    }
-
-    // TODO : should we cache the value of scrollLeft/scrollTop to prevent a reflow ? (cf. http://www.phpied.com/rendering-repaint-reflowrelayout-restyle/ )
-    do {
-        totalOffsetX += currentElement.offsetLeft - currentElement.scrollLeft;
-        totalOffsetY += currentElement.offsetTop - currentElement.scrollTop;
-    }
-    while(currentElement = currentElement.offsetParent)
-        
-
-    // NB: Chrome seems to always use document.body.scrollTop whereas Firefox sometimes use document.documentElement.scrollTop
-    if (event.pageX) {
-        canvasX = event.pageX - totalOffsetX - (document.body.scrollLeft || document.documentElement.scrollLeft);
-        canvasY = event.pageY - totalOffsetY - (document.body.scrollTop || document.documentElement.scrollTop);
-    }
-    // if touch events
-    else {
-        canvasX = event.originalEvent.targetTouches[0].screenX - totalOffsetX - (document.body.scrollLeft || document.documentElement.scrollLeft);
-        canvasY = event.originalEvent.targetTouches[0].screenY - totalOffsetY - (document.body.scrollTop || document.documentElement.scrollTop);
-    }
-
-
-    
-
-    return {x: canvasX, y: canvasY};
-    //return {x: parseInt(canvasX/Utils.cssScale), y: parseInt(canvasY/Utils.cssScale)};
-}
-HTMLCanvasElement.prototype.relMouseCoords = relMouseCoords;
-
-
-
-//Function.prototype.bind polyfill from 
-//https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Function/bind
-if (!Function.prototype.bind) {
-    Function.prototype.bind = function (obj) {
-        // closest thing possible to the ECMAScript 5 internal IsCallable function
-        if (typeof this !== 'function') {
-            throw new TypeError('Function.prototype.bind - what is trying to be bound is not callable');
-        }
-
-        var slice = [].slice,
-        args = slice.call(arguments, 1),
-        self = this,
-        nop = function () { },
-        bound = function () {
-            return self.apply(this instanceof nop ? this : (obj || {}),
-                    args.concat(slice.call(arguments)));
-        };
-
-        bound.prototype = this.prototype;
-
-        return bound;
-    };
-}
-
-
-
-
-
-
-
-
-$ = $ || jQuery;
-
-/* source : http://stackoverflow.com/a/8764051 */
-$.urlParam = function(name, queryString){
-    if (queryString===undefined) {
-        queryString = location.search;
-    }
-	return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(queryString)||[,""])[1].replace(/\+/g, '%20'))||null;
 };
 
-/* source: http://stackoverflow.com/a/1830844 */
-Utils.isNumber = function(n) {
-  return !isNaN(parseFloat(n)) && isFinite(n);
-};
-
-Utils.isInt = function(n) {
-    return Utils.isNumber(n) && Math.floor(n)==n;
-};
-
-/* a debounce function, used to prevent multiple calls to the same function if less than delay seconds have passed */
-Utils.debounce = function(fn, delay) {
-    var timer = null;
-    return function () {
-      var context = this, args = arguments;
-      clearTimeout(timer);
-      timer = setTimeout(function () {
-        fn.apply(context, args);
-      }, delay);
-    };
-};
-
-
-/* A LRU cache, inspired by https://gist.github.com/devinus/409353#file-gistfile1-js */
-// TODO : utiliser le LRU cache pour les tuiles images
-Utils.LRUCache = function (maxsize) {
-    this._keys = [];
-    this._items = {};
-    this._expires = {};
-    this._size = 0;
-    this._maxsize = maxsize || 1024;
-};
-   
-Utils.LRUCache.prototype = {
-        set: function (key, value) {
-            var keys = this._keys,
-                items = this._items,
-                expires = this._expires,
-                size = this._size,
-                maxsize = this._maxsize;
-
-            if (size >= maxsize) { // remove oldest element when no more room
-                keys.sort(function (a, b) {
-                    if (expires[a] > expires[b]) return -1;
-                    if (expires[a] < expires[b]) return 1;
-                    return 0;
-                });
-
-                size--;
-                delete expires[keys[size]];
-                delete items[keys[size]];
-            }
-
-            keys[size] = key;
-            items[key] = value;
-            expires[key] = Date.now();
-            size++;
-
-            this._keys = keys;
-            this._items = items;
-            this._expires = expires;
-            this._size = size;
-        },
-
-        get: function (key) {
-            var item = this._items[key];
-            if (item) this._expires[key] = Date.now();
-            return item;
-        },
-        
-        keys: function() {
-            return this._keys;
-        }
-};
-
-////////////////////////////////////////////////////////////////////////////:
-
-// return the jquery ajax object configured with the requested parameters
-// by default, we use the proxy (safer, as we don't know if the remote server supports CORS)
-Utils.getAjaxObject = function(url, method, dataType, useProxy) {
-        if (useProxy!==false) {
-            useProxy = true;
-        }
-
-        if (useProxy===true) {
-            var urlToRequest = Aladin.JSONP_PROXY + '?url=' + encodeURIComponent(url);
-        }
-        else {
-            urlToRequest = url;
-        }
-        method = method || 'GET';
-        dataType = dataType || null;
-
-        return $.ajax({
-            url: urlToRequest,
-            method: method,
-            dataType: dataType
-        }); 
-};
-
-// Copyright 2013 - UDS/CNRS
-// The Aladin Lite program is distributed under the terms
-// of the GNU General Public License version 3.
-//
-// This file is part of Aladin Lite.
-//
-//    Aladin Lite is free software: you can redistribute it and/or modify
-//    it under the terms of the GNU General Public License as published by
-//    the Free Software Foundation, version 3 of the License.
-//
-//    Aladin Lite is distributed in the hope that it will be useful,
-//    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//    GNU General Public License for more details.
-//
-//    The GNU General Public License is available in COPYING file
-//    along with Aladin Lite.
-//
-
-
-
-/******************************************************************************
- * Aladin Lite project
- * 
- * File URLBuilder
- * 
- * Author: Thomas Boch[CDS]
- * 
- *****************************************************************************/
-
-
-URLBuilder = (function() {    
-
-    URLBuilder = {
-        buildSimbadCSURL: function(target, radiusDegrees) {
-            if (target && (typeof target  === "object")) {
-                if ('ra' in target && 'dec' in target) {
-                    var coo = new Coo(target.ra, target.dec, 7);
-                    target = coo.format('s');
-                }
-            }
-            return 'http://alasky.u-strasbg.fr/cgi/simbad-flat/simbad-cs.py?target=' + encodeURIComponent(target) + '&SR=' + radiusDegrees + '&format=votable&SRUNIT=deg&SORTBY=nbref';
-        },
-
-        buildNEDPositionCSURL: function(ra, dec, radiusDegrees) {
-                return 'http://nedwww.ipac.caltech.edu/cgi-bin/nph-objsearch?search_type=Near+Position+Search&of=xml_main&RA=' + ra + '&DEC=' + dec + '&SR=' + radiusDegrees;
-        },
-
-        buildNEDObjectCSURL: function(object, radiusDegrees) {
-                return 'http://ned.ipac.caltech.edu/cgi-bin/nph-objsearch?search_type=Near+Name+Search&radius=' + (60 * radiusDegrees) + '&of=xml_main&objname=' + object;
-        },
-
-        buildVizieRCSURL: function(vizCatId, target, radiusDegrees) {
-            if (target && (typeof target  === "object")) {
-                if ('ra' in target && 'dec' in target) {
-                    var coo = new Coo(target.ra, target.dec, 7);
-                    target = coo.format('s');
-                }
-            }
-            return 'http://vizier.u-strasbg.fr/viz-bin/votable?-source=' + vizCatId + '&-c=' + encodeURIComponent(target) + '&-out.max=999999&-c.rd=' + radiusDegrees;
-        },
-    
-
-    };
-
-    return URLBuilder;
-    
-})();
-
-// Copyright 2013 - UDS/CNRS
-// The Aladin Lite program is distributed under the terms
-// of the GNU General Public License version 3.
-//
-// This file is part of Aladin Lite.
-//
-//    Aladin Lite is free software: you can redistribute it and/or modify
-//    it under the terms of the GNU General Public License as published by
-//    the Free Software Foundation, version 3 of the License.
-//
-//    Aladin Lite is distributed in the hope that it will be useful,
-//    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//    GNU General Public License for more details.
-//
-//    The GNU General Public License is available in COPYING file
-//    along with Aladin Lite.
-//
-
-
-
-/******************************************************************************
- * Aladin Lite project
- * 
- * File MeasurementTable
- *
- * Graphic object showing measurement of a catalog
- * 
- * Author: Thomas Boch[CDS]
- * 
- *****************************************************************************/
-
-MeasurementTable = (function() {
-
-
-    // constructor
-    MeasurementTable = function(aladinLiteDiv) {
-        this.isShowing = false;
-
-        this.divEl = $('<div class="aladin-measurement-div"></div>');
-        
-        $(aladinLiteDiv).append(this.divEl);
-    }
-
-    // show measurement associated with a given source
-    MeasurementTable.prototype.showMeasurement = function(source) {
-        this.divEl.empty();
-        var header = '<thead><tr>';
-        var content = '<tr>';
-        for (key in source.data) {
-            header += '<th>' + key + '</th>';
-            content += '<td>' + source.data[key] + '</td>';
-        }
-        header += '</tr></thead>';
-        content += '</tr>';
-        this.divEl.append('<table>' + header + content + '</table>');
-        this.show();
-    };
-
-    MeasurementTable.prototype.show = function() {
-        this.divEl.show();
-    };
-    
-    MeasurementTable.prototype.hide = function() {
-        this.divEl.hide();
-    };
-    
-    
-    return MeasurementTable;
-})();
-
-// Copyright 2013 - UDS/CNRS
-// The Aladin Lite program is distributed under the terms
-// of the GNU General Public License version 3.
-//
-// This file is part of Aladin Lite.
-//
-//    Aladin Lite is free software: you can redistribute it and/or modify
-//    it under the terms of the GNU General Public License as published by
-//    the Free Software Foundation, version 3 of the License.
-//
-//    Aladin Lite is distributed in the hope that it will be useful,
-//    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//    GNU General Public License for more details.
-//
-//    The GNU General Public License is available in COPYING file
-//    along with Aladin Lite.
-//
-
-
-
-/******************************************************************************
- * Aladin Lite project
- * 
- * File Color
- * 
- * Author: Thomas Boch[CDS]
- * 
- *****************************************************************************/
-
-Color = (function() {
-
-
-    Color = {};
-    
-    Color.curIdx = 0;
-    Color.colors = ['#ff0000', '#0000ff', '#99cc00', '#ffff00','#000066', '#00ffff', '#9900cc', '#0099cc', '#cc9900', '#cc0099', '#00cc99', '#663333', '#ffcc9a', '#ff9acc', '#ccff33', '#660000', '#ffcc33', '#ff00ff', '#00ff00', '#ffffff'];
-
-    
-    Color.getNextColor = function() {
-        var c = Color.colors[Color.curIdx % (Color.colors.length)];
-        Color.curIdx++;
-        return c;
-    };
-
-    /** return most suited (ie readable) color for a label, given a background color
-     * bkgdColor: color, given as a 'rgb(<r value>, <g value>, <v value>)' . This is returned by $(<element>).css('background-color')
-     * 
-     * example call: Color.getLabelColorForBackground('rgb(3, 123, 42)')
-     * adapted from http://stackoverflow.com/questions/1855884/determine-font-color-based-on-background-color
-     */
-    Color.getLabelColorForBackground = function(rgbBkgdColor) {
-        var lightLabel = '#eee' 
-        var darkLabel = '#111' 
-        rgb = rgbBkgdColor.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
-        if (rgb==null) {
-            // we return the dark label color if we can't parse the color
-            return darkLabel
-        }
-        r = parseInt(rgb[1]);
-        g = parseInt(rgb[2]);
-        b = parseInt(rgb[3]);
-        
-        var d = 0;
-        // Counting the perceptive luminance - human eye favors green color... 
-        var a = 1 - ( 0.299 * r + 0.587 * g + 0.114 * b) / 255;
-
-        if (a < 0.5) {
-            return darkLabel; // bright color --> dark font
-        }
-        else {
-            return lightLabel; // dark color --> light font
-        }
-    };
-    
-    return Color;
-})();
-
-// Copyright 2013 - UDS/CNRS
-// The Aladin Lite program is distributed under the terms
-// of the GNU General Public License version 3.
-//
-// This file is part of Aladin Lite.
-//
-//    Aladin Lite is free software: you can redistribute it and/or modify
-//    it under the terms of the GNU General Public License as published by
-//    the Free Software Foundation, version 3 of the License.
-//
-//    Aladin Lite is distributed in the hope that it will be useful,
-//    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//    GNU General Public License for more details.
-//
-//    The GNU General Public License is available in COPYING file
-//    along with Aladin Lite.
-//
-
-
-
-/******************************************************************************
- * Aladin Lite project
- * 
- * File AladinUtils
- * 
- * Author: Thomas Boch[CDS]
- * 
- *****************************************************************************/
-AladinUtils = (function() {
-    return {
-    	/**
-    	 * passage de xy projection à xy dans la vue écran 
-    	 * @param x
-    	 * @param y
-    	 * @param width
-    	 * @param height
-    	 * @param largestDim largest dimension of the view
-    	 * @returns position in the view
-    	 */
-    	xyToView: function(x, y, width, height, largestDim, zoomFactor, round) {
-    	    if (round==undefined) {
-                // we round by default
-    	        round = true;
-    	    }
-
-    	    if (round) {
-    	        // we round the result for presumed performance gains
-    	        return {vx: AladinUtils.myRound(largestDim/2*(1+zoomFactor*x)-(largestDim-width)/2), vy: AladinUtils.myRound(largestDim/2*(1+zoomFactor*y)-(largestDim-height)/2)};
-
-    	    }
-    	    else {
-                return {vx: largestDim/2*(1+zoomFactor*x)-(largestDim-width)/2, vy: largestDim/2*(1+zoomFactor*y)-(largestDim-height)/2};
-    	    }
-    	},
-    	
-    	/**
-    	 * passage de xy dans la vue écran à xy projection
-    	 * @param vx
-    	 * @param vy
-    	 * @param width
-    	 * @param height
-    	 * @param largestDim
-    	 * @param zoomFactor
-    	 * @returns position in xy projection
-    	 */
-    	viewToXy: function(vx, vy, width, height, largestDim, zoomFactor) {
-    		return {x: ((2*vx+(largestDim-width))/largestDim-1)/zoomFactor, y: ((2*vy+(largestDim-height))/largestDim-1)/zoomFactor};
-    	},
-
-    	/**
-    	 * convert a 
-    	 * @returns position x,y in the view. Null if projection is impossible
-    	 */
-        radecToViewXy: function(ra, dec, currentProjection, currentFrame, width, height, largestDim, zoomFactor) {
-            var xy;
-            if (currentFrame!=CooFrameEnum.J2000) {
-                var lonlat = CooConversion.J2000ToGalactic([ra, dec]);
-                xy = currentProjection.project(lonlat[0], lonlat[1]);
-            }
-            else {
-                xy = currentProjection.project(ra, dec);
-            }
-            if (!xy) {
-                return null;
-            }
-            
-            return AladinUtils.xyToView(xy.X, xy.Y, width, height, largestDim, zoomFactor, false);
-        },
-
-    	
-    	myRound: function(a) {
-    		if (a<0) {
-    			return -1*( (-a) | 0);
-    		}
-    		else {
-    			return a | 0;
-    		}
-    	},
-    	
-    	
-    	
-    	/**
-    	 * tests whether a healpix pixel is visible or not
-    	 * @param pixCorners array of position (xy view) of the corners of the pixel
-    	 * @param viewW
-    	 */
-    	isHpxPixVisible: function(pixCorners, viewWidth, viewHeight) {
-    		for (var i = 0; i<pixCorners.length; i++) {
-    			if ( pixCorners[i].vx>=-20 && pixCorners[i].vx<(viewWidth+20) &&
-    				 pixCorners[i].vy>=-20 && pixCorners[i].vy<(viewHeight+20) ) {
-    				return true;
-    			}
-    		}
-    		return false;
-    	},
-    	
-    	ipixToIpix: function(npixIn, norderIn, norderOut) {
-    		var npixOut = [];
-    		if (norderIn>=norderOut) {
-    		}
-    	},
-        
-        getZoomFactorForAngle: function(angleInDegrees, projectionMethod) {
-            var p1 = {ra: 0, dec: 0};
-            var p2 = {ra: angleInDegrees, dec: 0};
-            var projection = new Projection(angleInDegrees/2, 0);
-            projection.setProjection(projectionMethod);
-            var p1Projected = projection.project(p1.ra, p1.dec);
-            var p2Projected = projection.project(p2.ra, p2.dec);
-           
-            var zoomFactor = 1/(p1Projected.X - p2Projected.Y);
-            return zoomFactor;
-        },
-
-        // grow array b of vx,vy view positions by *val* pixels
-        grow2: function(b, val) {
-            var j=0;
-            for ( var i=0; i<4; i++ ) {
-                if ( b[i]==null ) {
-                    j++;
-                }
-            }
-
-            if( j>1 ) {
-                return b;
-            }
-
-            var b1 = [];
-            for ( var i=0; i<4; i++ ) {
-                b1.push( {vx: b[i].vx, vy: b[i].vy} );
-            }
-    
-            for ( var i=0; i<2; i++ ) {
-                var a = i==1 ? 1 : 0;
-                var c = i==1 ? 3 : 2;
-
-                if ( b1[a]==null ) {
-                    var d,g;
-                    if ( a==0 || a==3 ) {
-                        d=1;
-                        g=2;
-                    }
-                    else {
-                        d=0;
-                        g=3;
-                    }
-                    b1[a] = {vx: (b1[d].vx+b1[g].vx)/2, vy: (b1[d].vy+b1[g].vy)/2};
-                }
-                if ( b1[c]==null ) {
-                    var d,g;
-                    if ( c==0 || c==3 ) {
-                        d=1;
-                        g=2;
-                    }
-                    else {
-                        d=0;
-                        g=3;
-                    }
-                    b1[c] = {vx: (b1[d].vx+b1[g].vx)/2, vy: (b1[d].vy+b1[g].vy)/2};
-                }
-                if( b1[a]==null || b1[c]==null ) {
-                    continue;
-                }
-
-                var angle = Math.atan2(b1[c].vy-b1[a].vy, b1[c].vx-b1[a].vx);
-                var chouilla = val*Math.cos(angle);
-                b1[a].vx -= chouilla;
-                b1[c].vx += chouilla;
-                chouilla = val*Math.sin(angle);
-                b1[a].vy-=chouilla;
-                b1[c].vy+=chouilla;
-            }
-            return b1;
-        }
- 
-    	
-    };
-})();
-
-// Copyright 2013 - UDS/CNRS
-// The Aladin Lite program is distributed under the terms
-// of the GNU General Public License version 3.
-//
-// This file is part of Aladin Lite.
-//
-//    Aladin Lite is free software: you can redistribute it and/or modify
-//    it under the terms of the GNU General Public License as published by
-//    the Free Software Foundation, version 3 of the License.
-//
-//    Aladin Lite is distributed in the hope that it will be useful,
-//    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//    GNU General Public License for more details.
-//
-//    The GNU General Public License is available in COPYING file
-//    along with Aladin Lite.
-//
-
-
-
-/******************************************************************************
- * Aladin Lite project
- * 
- * File CooFrameEnum
- * 
- * Author: Thomas Boch[CDS]
- * 
- *****************************************************************************/
- 
- ProjectionEnum = {
-    SIN: Projection.PROJ_SIN,
-    AITOFF:  Projection.PROJ_AITOFF
- };
-// Copyright 2013 - UDS/CNRS
-// The Aladin Lite program is distributed under the terms
-// of the GNU General Public License version 3.
-//
-// This file is part of Aladin Lite.
-//
-//    Aladin Lite is free software: you can redistribute it and/or modify
-//    it under the terms of the GNU General Public License as published by
-//    the Free Software Foundation, version 3 of the License.
-//
-//    Aladin Lite is distributed in the hope that it will be useful,
-//    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//    GNU General Public License for more details.
-//
-//    The GNU General Public License is available in COPYING file
-//    along with Aladin Lite.
-//
-
-
-
-/******************************************************************************
- * Aladin Lite project
- * 
- * File CooFrameEnum
- * 
- * Author: Thomas Boch[CDS]
- * 
- *****************************************************************************/
- 
-CooFrameEnum = (function() {
-
-    return {
-        J2000: "J2000",
-        GAL:  "Galactic"
-    };
- 
-})();
-
-// TODO : utiliser cette fonction partout où on reçoit une string frame en entrée
-CooFrameEnum.fromString = function(str, defaultValue) {
-    if (! str) {
-        return defaultValue ? defaultValue : null;
-    }
-    
-    str = str.toLowerCase().replace(/^\s+|\s+$/g, ''); // convert to lowercase and trim
-    
-    if (str.indexOf('j2000')==0 || str.indexOf('icrs')==0) {
-        return CooFrameEnum.J2000;
-    }
-    else if (str.indexOf('gal')==0) {
-        return CooFrameEnum.GAL;
-    }
-    else {
-        return defaultValue ? defaultValue : null;
-    }
-};
-
-/**
-returns a short name for 
-*/
-CooFrameEnum.shortName = function(frameValue) {
-    if (frameValue==CooFrameEnum.J2000) {
-        return 'J2000';
-    }
-    if (frameValue==CooFrameEnum.GAL) {
-        return 'GAL';
-    }
-
-    return null;
-};
-// Copyright 2013 - UDS/CNRS
-// The Aladin Lite program is distributed under the terms
-// of the GNU General Public License version 3.
-//
-// This file is part of Aladin Lite.
-//
-//    Aladin Lite is free software: you can redistribute it and/or modify
-//    it under the terms of the GNU General Public License as published by
-//    the Free Software Foundation, version 3 of the License.
-//
-//    Aladin Lite is distributed in the hope that it will be useful,
-//    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//    GNU General Public License for more details.
-//
-//    The GNU General Public License is available in COPYING file
-//    along with Aladin Lite.
-//
-
-
-
-/******************************************************************************
- * Aladin Lite project
- * 
- * File Downloader
- * Queue downloading for image elements
- * 
- * Author: Thomas Boch[CDS]
- * 
- *****************************************************************************/
-
-Downloader = (function() {
-	var NB_MAX_SIMULTANEOUS_DL = 4;
-	// TODO : le fading ne marche pas bien actuellement
-	var FADING_ENABLED = false;
-	var FADING_DURATION = 700; // in milliseconds
-	
-	
-	var Downloader = function(view) {
-		this.view = view; // reference to the view to be able to request redraw
-		this.nbDownloads = 0; // number of current downloads
-		this.dlQueue = []; // queue of items being downloaded
-        this.urlsInQueue = {};
-	};
-	
-	Downloader.prototype.requestDownload = function(img, url, cors) {
-        // first check if url already in queue
-        if (url in this.urlsInQueue)  {
-            return;
-        }
-		// put in queue
-		this.dlQueue.push({img: img, url: url, cors: cors});
-		this.urlsInQueue[url] = 1;
-		
-		this.tryDownload();
-	};
-	
-	// try to download next items in queue if possible
-	Downloader.prototype.tryDownload = function() {
-	    //if (this.dlQueue.length>0 && this.nbDownloads<NB_MAX_SIMULTANEOUS_DL) {
-		while (this.dlQueue.length>0 && this.nbDownloads<NB_MAX_SIMULTANEOUS_DL) {
-			this.startDownloadNext();
-		}
-	};
-	
-	Downloader.prototype.startDownloadNext = function() {
-		// get next in queue
-		var next = this.dlQueue.shift();
-		if ( ! next) {
-			return;
-		}
-
-		this.nbDownloads++;
-		var downloaderRef = this;
-		next.img.onload = function() {
-			downloaderRef.completeDownload(this, true); // in this context, 'this' is the Image
-		};
-			
-		next.img.onerror = function(e) {
-			downloaderRef.completeDownload(this, false); // in this context, 'this' is the Image
-		};
-		if (next.cors) {
-		    next.img.crossOrigin = 'anonymous';
-		}
-		
-		else {
-		    if (next.img.crossOrigin !== undefined) {
-		        delete next.img.crossOrigin;
-		    }
-		}
-		
-		
-		next.img.src = next.url;
-	};
-	
-	Downloader.prototype.completeDownload = function(img, success) {
-        delete this.urlsInQueue[img.src];
-		img.onerror = null;
-		img.onload = null;
-		this.nbDownloads--;
-		if (success) {
-			if (FADING_ENABLED) {
-				var now = new Date().getTime();
-				img.fadingStart = now;
-				img.fadingEnd = now + FADING_DURATION;
-			}
-			this.view.requestRedraw();
-		}
-		else {
-		    img.dlError = true;
-		}
-		
-		this.tryDownload();
-	};
-	
-	
-	
-	return Downloader;
-})();
 // Generated by CoffeeScript 1.6.3
 (function() {
   var Base, BinaryTable, CompressedImage, DataUnit, Decompress, FITS, HDU, Header, HeaderVerify, Image, ImageUtils, Parser, Table, Tabular, _ref, _ref1,
@@ -3188,6 +2052,13 @@ Downloader = (function() {
         xhr = new XMLHttpRequest();
         xhr.open('GET', this.arg);
         xhr.responseType = 'arraybuffer';
+
+        // the onerror handling has been added wrt the original fitsjs library as retrieved on the astrojs github repo
+        // if an error occurs, we return an empty object
+        xhr.onerror = function() {
+          _this.invoke(_this.callback, _this.opts);
+        }
+
         xhr.onload = function() {
           if (xhr.status !== 200) {
             _this.invoke(_this.callback, _this.opts);
@@ -4822,393 +3693,1850 @@ Downloader = (function() {
   this.astro.FITS.HDU = HDU;
 
 }).call(this);
+// Copyright 2013 - UDS/CNRS
+// The Aladin Lite program is distributed under the terms
+// of the GNU General Public License version 3.
+//
+// This file is part of Aladin Lite.
+//
+//    Aladin Lite is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, version 3 of the License.
+//
+//    Aladin Lite is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    The GNU General Public License is available in COPYING file
+//    along with Aladin Lite.
+//
+
+
+
+CooConversion = (function() {
+
+    var CooConversion = {};
+    
+    CooConversion.GALACTIC_TO_J2000 = [
+       -0.0548755604024359,  0.4941094279435681, -0.8676661489811610,
+       -0.8734370902479237, -0.4448296299195045, -0.1980763734646737,
+       -0.4838350155267381,  0.7469822444763707,  0.4559837762325372 ];
+    
+    CooConversion.J2000_TO_GALACTIC = [
+        -0.0548755604024359, -0.873437090247923, -0.4838350155267381,
+         0.4941094279435681, -0.4448296299195045, 0.7469822444763707,
+        -0.8676661489811610, -0.1980763734646737, 0.4559837762325372 ];
+    
+    // adapted from www.robertmartinayers.org/tools/coordinates.html
+    // radec : array of ra, dec in degrees
+    // return coo in degrees
+    CooConversion.Transform = function( radec, matrix ) {// returns a radec array of two elements
+        radec[0] = radec[0]*Math.PI/180;
+        radec[1] = radec[1]*Math.PI/180;
+      var r0 = new Array ( 
+       Math.cos(radec[0]) * Math.cos(radec[1]),
+       Math.sin(radec[0]) * Math.cos(radec[1]),
+       Math.sin(radec[1]) );
+        
+     var s0 = new Array (
+       r0[0]*matrix[0] + r0[1]*matrix[1] + r0[2]*matrix[2], 
+       r0[0]*matrix[3] + r0[1]*matrix[4] + r0[2]*matrix[5], 
+       r0[0]*matrix[6] + r0[1]*matrix[7] + r0[2]*matrix[8] ); 
+     
+      var r = Math.sqrt ( s0[0]*s0[0] + s0[1]*s0[1] + s0[2]*s0[2] ); 
+    
+      var result = new Array ( 0.0, 0.0 );
+      result[1] = Math.asin ( s0[2]/r ); // New dec in range -90.0 -- +90.0 
+      // or use sin^2 + cos^2 = 1.0  
+      var cosaa = ( (s0[0]/r) / Math.cos(result[1] ) );
+      var sinaa = ( (s0[1]/r) / Math.cos(result[1] ) );
+      result[0] = Math.atan2 (sinaa,cosaa);
+      if ( result[0] < 0.0 ) result[0] = result[0] + 2*Math.PI;
+    
+        result[0] = result[0]*180/Math.PI;
+        result[1] = result[1]*180/Math.PI;
+      return result;
+    };
+    
+    // coo : array of lon, lat in degrees
+    CooConversion.GalacticToJ2000 = function(coo) {
+        return CooConversion.Transform(coo, CooConversion.GALACTIC_TO_J2000);
+    };
+    // coo : array of lon, lat in degrees
+    CooConversion.J2000ToGalactic = function(coo) {
+        return CooConversion.Transform(coo, CooConversion.J2000_TO_GALACTIC);
+    };
+    return CooConversion;
+})();
+// Copyright 2013 - UDS/CNRS
+// The Aladin Lite program is distributed under the terms
+// of the GNU General Public License version 3.
+//
+// This file is part of Aladin Lite.
+//
+//    Aladin Lite is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, version 3 of the License.
+//
+//    Aladin Lite is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    The GNU General Public License is available in COPYING file
+//    along with Aladin Lite.
+//
+
+
+
 /******************************************************************************
  * Aladin Lite project
  * 
- * File MOC
- *
- * This class represents a MOC (Multi Order Coverage map) layer
+ * File Sesame.js
  * 
  * Author: Thomas Boch[CDS]
  * 
  *****************************************************************************/
 
-MOC = (function() {
-    MOC = function(options) {
-        this.order = undefined;
-        this._highResCells = {};
-        this._lowResCells = {};
-
-        // TODO homogenize options parsing for all kind of overlay (footprints, catalog, MOC)
-        options = options || {};
-        this.name = options.name || "MOC";
-        this.color = options.color || Color.getNextColor();
-        this.opacity = options.opacity || 1;
-        this.opacity = Math.max(0, Math.min(1, this.opacity)); // 0 <= this.opacity <= 1
-        this.lineWidth = options["lineWidth"] || 1;
-
-
-
-        this.isShowing = true;
-    }
-
+Sesame = (function() {
+    Sesame = {};
     
-    function log2(val) {
-        return Math.log(val) / Math.LN2;
-    }
+    Sesame.cache = {};
 
-    // max norder we can currently handle (limitation of healpix.js)
-    MOC.MAX_NORDER = 13; // NSIDE = 8192
+    Sesame.SESAME_URL = "http://cds.unistra.fr/cgi-bin/nph-sesame.jsonp?";
 
-    MOC.LOWRES_MAXORDER = 5; // 5 or 6 ??
-    MOC.HIGHRES_MAXORDER = 11; // ??
-
-    // TODO: options to modifiy this ?
-    MOC.PIVOT_FOV = 20; // when do we switch from low res cells to high res cells (fov in degrees)
-
-    // add pixel (order, ipix)
-    MOC.prototype._addPix = function(order, ipix) {
-        // fill low and high level cells
-        // 1. if order <= LOWRES_MAXORDER, just store value in low and high res cells
-        if (order<=MOC.LOWRES_MAXORDER) {
-            if (! (order in this._lowResCells)) {
-                this._lowResCells[order] = [];
-                this._highResCells[order] = [];
-            }
-            this._lowResCells[order].push(ipix);
-            this._highResCells[order].push(ipix);
-        }
-        // 2. if LOWRES_MAXORDER < order <= HIGHRES_MAXORDER , degrade ipix for low res cells
-        else if (order<=MOC.HIGHRES_MAXORDER) {
-            if (! (order in this._highResCells)) {
-                this._highResCells[order] = [];
-            }
-            this._highResCells[order].push(ipix);
-            
-            var degradedOrder = MOC.LOWRES_MAXORDER; 
-            var degradedIpix  = Math.floor(ipix / Math.pow(4, (order - degradedOrder)));
-            if (! (degradedOrder in this._lowResCells)) {
-                this._lowResCells= [];
-            }
-            this._lowResCells[degradedOrder].push(degradedIpix);
-        }
-        // 3. if order > HIGHRES_MAXORDER , degrade ipix for low res and high res cells
-        else {
-            // low res cells
-            var degradedOrder = MOC.LOWRES_MAXORDER; 
-            var degradedIpix  = Math.floor(ipix / Math.pow(4, (order - degradedOrder)));
-            if (! (degradedOrder in this._lowResCells)) {
-                this._lowResCells = [];
-            }
-            this._lowResCells[degradedOrder].push(degradedIpix);
-            
-            // high res cells
-            degradedOrder = MOC.HIGHRES_MAXORDER; 
-            degradedIpix  = Math.floor(ipix / Math.pow(4, (order - degradedOrder)));
-            if (! (degradedOrder in this._highResCells)) {
-                this._highResCells = [];
-            }
-            this._highResCells[degradedOrder].push(degradedIpix);
-        }
-    };
-
-    /**
-     * set MOC data by parsing a MOC serialized in JSON
-     * (as defined in IVOA MOC document, section 3.1.1)
+    /** find RA, DEC for any target (object name or position)
+     *  if successful, callback is called with an object {ra: <ra-value>, dec: <dec-value>}
+     *  if not successful, errorCallback is called
      */
-    MOC.prototype.dataFromJSON = function(jsonMOC) {
-        this._highResCells = {};
-        this._lowResCells = {};
-
-        var order, ipix;
-        for (var orderStr in jsonMOC) {
-            if (jsonMOC.hasOwnProperty(orderStr)) {
-                order = parseInt(orderStr);
-                if (this.order===undefined || order > this.order) {
-                    this.order = order;
-                }
-                for (var k=0; k<jsonMOC[orderStr].length; k++) {
-                    ipix = jsonMOC[orderStr][k];
-                    this._addPix(order, ipix);
-                }
-            }
-        }
-    };
-
-    /**
-     * set MOC data by parsing a URL pointing to a FITS MOC file
-     */
-    MOC.prototype.dataFromFITSURL = function(mocURL, successCallback) {
-        this._highResCells = {};
-        this._lowResCells = {};
-
-        var self = this;
-        var callback = function() {
-            // first, let's find MOC norder
-            var hdr0;
-            try {
-                hdr0 = this.getHeader(0);
-            }
-            catch (e) {
-                console.err('Could not get header of extension #0');
-                return;
-            }
-            var hdr1 = this.getHeader(1);
-
-            if (hdr0.contains('HPXMOC')) {
-                self.order = hdr0.get('HPXMOC')
-            }
-            else if (hdr0.contains('MOCORDER')) {
-                self.order = hdr0.get('MOCORDER')
-            }
-            else if (hdr1.contains('HPXMOC')) {
-                self.order = hdr1.get('HPXMOC')
-            }
-            else if (hdr1.contains('MOCORDER')) {
-                self.order = hdr1.get('MOCORDER')
-            }
-            else {
-                console.err('Can not find MOC order in FITS file');
-                return;
-            }
-
-            var data = this.getDataUnit(1);
-            var colName = data.columns[0];
-            data.getRows(0, data.rows, function(rows) {
-                for (var k=0; k<rows.length; k++) {
-                    var uniq = rows[k][colName];
-                    var order = Math.floor(Math.floor(log2(Math.floor(uniq/4))) / 2);
-                    var ipix = uniq - 4 *(Math.pow(4, order));
-
-                    self._addPix(order, ipix);
-                }
-
-            });
-            data = null; // this helps releasing memory
-
-            if (successCallback) {
-                successCallback();
-            }
-        }; // end of callback function
-
-        this.dataURL = mocURL;
-        // TODO: general method to retrieve data (through dedicated class ?)
-        var proxiedURL = Aladin.JSONP_PROXY + '?url=' + encodeURIComponent(this.dataURL);
-        new astro.FITS(proxiedURL, callback);
-    };
-
-    MOC.prototype.setView = function(view) {
-        this.view = view;
-    };
-    
-    MOC.prototype.draw = function(ctx, projection, viewFrame, width, height, largestDim, zoomFactor, fov) {
-        if (! this.isShowing) {
+    Sesame.getTargetRADec = function(target, callback, errorCallback) {
+        if (!callback) {
             return;
         }
+        var isObjectName = /[a-zA-Z]/.test(target);
 
-        var mocCells = fov > MOC.PIVOT_FOV ? this._lowResCells : this._highResCells;
+        // try to parse as a position
+        if ( ! isObjectName) {
+            var coo = new Coo();
 
-        this._drawCells(ctx, mocCells, fov, projection, viewFrame, CooFrameEnum.J2000, width, height, largestDim, zoomFactor);
-
-        
-    };
-
-    MOC.prototype._drawCells = function(ctx, mocCells, fov, projection, viewFrame, surveyFrame, width, height, largestDim, zoomFactor) {
-        ctx.lineWidth = this.lineWidth;
-        // if opacity==1, we draw solid lines, else we fill each HEALPix cell
-        if (this.opacity==1) {
-            ctx.strokeStyle = this.color;
-        }
-        else {
-            ctx.fillStyle = this.color;
-            ctx.globalAlpha = this.opacity;
-        }
-
-        ctx.beginPath();
-
-        var orderedKeys = [];
-        for (key in mocCells) {
-            orderedKeys.push(key);
-        }
-        orderedKeys.sort();
-        var nside, xyCorners, ipix;
-
-        // go through all MOC cells
-        if (fov>80) {
-            var norder;
-            for (var i=0; i<orderedKeys.length; i++) {
-                norder = parseInt(orderedKeys[i]);
-                nside = 1 << norder;
-
-                for (var j=0; j<mocCells[norder].length; j++) {
-                    ipix = mocCells[norder][j];
-                    if (norder>=3) {
-                        xyCorners = getXYCorners(nside, ipix, viewFrame, surveyFrame, width, height, largestDim, zoomFactor, projection);
-                        if (xyCorners) {
-                            drawCorners(ctx, xyCorners);
-                        }
-                    }
-                    else { // compute all norder 3 ipix indexes
-                        var factor = Math.pow(4, (3-norder));
-                        var startIpix = ipix * factor;
-
-                        for (var k=0; k<factor; k++) {
-                            xyCorners = getXYCorners(8, startIpix + k, viewFrame, surveyFrame, width, height, largestDim, zoomFactor, projection);
-                            if (xyCorners) {
-                                drawCorners(ctx, xyCorners);
-                            }
-                        }
-                    }
-                }
+            coo.parse(target);
+            if (callback) {
+                callback({ra: coo.lon, dec: coo.lat});
             }
         }
+        // ask resolution by Sesame
         else {
-            var visibleHpxCellsOrder3 = this.view.getVisiblePixList(3, CooFrameEnum.J2000);
-            var cellsOrder3ToIgnore = {}
-            var norderMax = parseInt(orderedKeys[orderedKeys.length-1]);
-            for (var norder=1; norder<=norderMax; norder++) {
-                nside = 1 << norder;
+            Sesame.resolve(target,
 
-                if (typeof mocCells[norder]==='undefined') {
-                    continue;
+                           function(data) { // success callback
+                               callback({ra:  data.Target.Resolver.jradeg,
+                                         dec: data.Target.Resolver.jdedeg});
+                           },
+
+                           function(data) { // error callback
+                               if (errorCallback) {
+                                   errorCallback();
+                               }
+                           }
+                           );
+        }
+    };
+    
+    Sesame.resolve = function(objectName, callbackFunctionSuccess, callbackFunctionError) {
+        var sesameUrl = Sesame.SESAME_URL;
+
+        $.ajax({
+            url: sesameUrl ,
+            data: {"object": objectName},
+            method: 'GET',
+            dataType: 'jsonp',
+            success: function(data) {
+                if (data.Target && data.Target.Resolver && data.Target.Resolver) {
+                    callbackFunctionSuccess(data);
                 }
-                if (norder<=3) {
-                    for (var j=0; j<mocCells[norder].length; j++) {
-                        ipix = mocCells[norder][j];
-                        var factor = Math.pow(4, (3-norder));
-                        var startIpix = ipix * factor;
-                        for (var k=0; k<factor; k++) {
-                            norder3Ipix = startIpix + k;
-                            xyCorners = getXYCorners(8, norder3Ipix, viewFrame, surveyFrame, width, height, largestDim, zoomFactor, projection);
-                            if (xyCorners) {
-                                drawCorners(ctx, xyCorners);
-                            }
-                            cellsOrder3ToIgnore[norder3Ipix] = 1;
-                        }
-                    }
-                }
-                // TODO: this part could be improved by eliminating ipix already rendered
                 else {
-                    for (var j=0; j<mocCells[norder].length; j++) {
-                        ipix = mocCells[norder][j];
-                        var parentIpixOrder3 = Math.floor(ipix/Math.pow(4, norder-3));
-                        if (parentIpixOrder3 in cellsOrder3ToIgnore) {
-                            continue;
-                        }
-                        xyCorners = getXYCorners(nside, ipix, viewFrame, surveyFrame, width, height, largestDim, zoomFactor, projection);
-                        if (xyCorners) {
-                            drawCorners(ctx, xyCorners);
-                        }
-                    }
+                    callbackFunctionError(data);
                 }
-            }
-        }
-/*
-*/
-        if (this.opacity==1) {
-            ctx.stroke();
-        }
-        else {
-            ctx.fill();
-            ctx.globalAlpha = 1.0;
-        }
+            },
+            error: callbackFunctionError
+            });
     };
-
-    var drawCorners = function(ctx, xyCorners) {
-        ctx.moveTo(xyCorners[0].vx, xyCorners[0].vy);
-        ctx.lineTo(xyCorners[1].vx, xyCorners[1].vy);
-        ctx.lineTo(xyCorners[2].vx, xyCorners[2].vy);
-        ctx.lineTo(xyCorners[3].vx, xyCorners[3].vy);
-        ctx.lineTo(xyCorners[0].vx, xyCorners[0].vy);
-    }
-
-    // TODO: merge with what is done in View.getVisibleCells
-    var getXYCorners = function(nside, ipix, viewFrame, surveyFrame, width, height, largestDim, zoomFactor, projection) {
-        var cornersXYView = [];
-        var cornersXY = [];
-
-        var spVec = new SpatialVector();
-
-        var corners = HealpixCache.corners_nest(ipix, nside);
-        for (var k=0; k<4; k++) {
-            spVec.setXYZ(corners[k].x, corners[k].y, corners[k].z);
-
-            // need for frame transformation ?
-            if (surveyFrame && surveyFrame != viewFrame) {
-                if (surveyFrame==CooFrameEnum.J2000) {
-                    var radec = CooConversion.J2000ToGalactic([spVec.ra(), spVec.dec()]);
-                    lon = radec[0];
-                    lat = radec[1];
-                }
-                else if (surveyFrame==CooFrameEnum.GAL) {
-                    var radec = CooConversion.GalacticToJ2000([spVec.ra(), spVec.dec()]);
-                    lon = radec[0];
-                    lat = radec[1];
-                }
-            }
-            else {
-                lon = spVec.ra();
-                lat = spVec.dec();
-            }
-
-            cornersXY[k] = projection.project(lon, lat);
-        }
-
-
-        if (cornersXY[0] == null ||  cornersXY[1] == null  ||  cornersXY[2] == null ||  cornersXY[3] == null ) {
-            return null;
-        }
-
-        for (var k=0; k<4; k++) {
-            cornersXYView[k] = AladinUtils.xyToView(cornersXY[k].X, cornersXY[k].Y, width, height, largestDim, zoomFactor);
-        }
-
-        var indulge = 10;
-        // detect pixels outside view. Could be improved !
-        // we minimize here the number of cells returned
-        if( cornersXYView[0].vx<0 && cornersXYView[1].vx<0 && cornersXYView[2].vx<0 &&cornersXYView[3].vx<0) {
-            return null;
-        }
-        if( cornersXYView[0].vy<0 && cornersXYView[1].vy<0 && cornersXYView[2].vy<0 &&cornersXYView[3].vy<0) {
-            return null;
-        }
-        if( cornersXYView[0].vx>=width && cornersXYView[1].vx>=width && cornersXYView[2].vx>=width &&cornersXYView[3].vx>=width) {
-            return null;
-        }
-        if( cornersXYView[0].vy>=height && cornersXYView[1].vy>=height && cornersXYView[2].vy>=height &&cornersXYView[3].vy>=height) {
-            return null;
-        }
-
-        cornersXYView = AladinUtils.grow2(cornersXYView, 1);
-        return cornersXYView;
-    };
-
-    MOC.prototype.reportChange = function() {
-        this.view.requestRedraw();
-    };
-
-    MOC.prototype.show = function() {
-        if (this.isShowing) {
-            return;
-        }
-        this.isShowing = true;
-        this.reportChange();
-    };
-
-    MOC.prototype.hide = function() {
-        if (! this.isShowing) {
-            return;
-        }
-        this.isShowing = false;
-        this.reportChange();
-    };
-
-
-
-    return MOC;
+    
+    return Sesame;
 })();
 
+// Copyright 2013 - UDS/CNRS
+// The Aladin Lite program is distributed under the terms
+// of the GNU General Public License version 3.
+//
+// This file is part of Aladin Lite.
+//
+//    Aladin Lite is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, version 3 of the License.
+//
+//    Aladin Lite is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    The GNU General Public License is available in COPYING file
+//    along with Aladin Lite.
+//
+
+
+
+/******************************************************************************
+ * Aladin Lite project
+ * 
+ * File HealpixCache
+ * 
+ * Author: Thomas Boch[CDS]
+ * 
+ *****************************************************************************/
+
+// class holding some HEALPix computations for better performances
+//
+// it is made of :
+// - a static cache for HEALPix corners at nside=8 
+// - a dynamic cache for 
+HealpixCache = (function() {
+
+    var HealpixCache = {};
     
+    HealpixCache.staticCache = {corners: {nside8: []}};
+    // TODO : utilisation du dynamicCache
+    HealpixCache.dynamicCache = {};
+    
+    HealpixCache.lastNside = 8;
+    
+    HealpixCache.hpxIdxCache = null;
+    
+    // TODO : conserver en cache le dernier résultat ?
+    
+    HealpixCache.init = function() {
+    	// pre-compute corners position for nside=8
+    	var hpxIdx = new HealpixIndex(8);
+    	hpxIdx.init();
+    	var npix = HealpixIndex.nside2Npix(8);
+        var corners;
+    	for (var ipix=0; ipix<npix; ipix++) {
+            corners =  hpxIdx.corners_nest(ipix, 1);
+    		HealpixCache.staticCache.corners.nside8.push(corners);
+    	}
+    	
+    	HealpixCache.hpxIdxCache = hpxIdx;
+    };
+
+    HealpixCache.init();
+    
+    HealpixCache.corners_nest = function(ipix, nside) {
+    	if (nside==8) {
+    		return HealpixCache.staticCache.corners.nside8[ipix];
+    	}
+    	
+    	if (nside != HealpixCache.lastNside) {
+    		HealpixCache.hpxIdxCache = new HealpixIndex(nside);
+    		HealpixCache.hpxIdxCache.init();
+    		HealpixCache.lastNside = nside;
+    	}
+    	
+    	return HealpixCache.hpxIdxCache.corners_nest(ipix, 1);
+    	
+    };
+    
+    return HealpixCache;
+})();
+	
+// Copyright 2013 - UDS/CNRS
+// The Aladin Lite program is distributed under the terms
+// of the GNU General Public License version 3.
+//
+// This file is part of Aladin Lite.
+//
+//    Aladin Lite is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, version 3 of the License.
+//
+//    Aladin Lite is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    The GNU General Public License is available in COPYING file
+//    along with Aladin Lite.
+//
+
+
+
+
+/******************************************************************************
+ * Aladin Lite project
+ * 
+ * File Utils
+ * 
+ * Author: Thomas Boch[CDS]
+ * 
+ *****************************************************************************/
+
+Utils = Utils || {};
+
+Utils.cssScale = undefined;
+// adding relMouseCoords to HTMLCanvasElement prototype (see http://stackoverflow.com/questions/55677/how-do-i-get-the-coordinates-of-a-mouse-click-on-a-canvas-element ) 
+function relMouseCoords(event){
+    var totalOffsetX = 0;
+    var totalOffsetY = 0;
+    var canvasX = 0;
+    var canvasY = 0;
+    var currentElement = this;
+   
+
+    if (event.offsetX) {
+        return {x: event.offsetX, y:event.offsetY};
+    } 
+    else {
+        if (!Utils.cssScale) {
+            var st = window.getComputedStyle(document.body, null);
+            var tr = st.getPropertyValue("-webkit-transform") ||
+                    st.getPropertyValue("-moz-transform") ||
+                    st.getPropertyValue("-ms-transform") ||
+                    st.getPropertyValue("-o-transform") ||
+                    st.getPropertyValue("transform");
+            var matrixRegex = /matrix\((-?\d*\.?\d+),\s*0,\s*0,\s*(-?\d*\.?\d+),\s*0,\s*0\)/;
+            var matches = tr.match(matrixRegex);
+            if (matches) {
+                Utils.cssScale = parseFloat(matches[1]);
+            }
+            else {
+                Utils.cssScale = 1;
+            }
+        }
+        var e = event;
+        var canvas = e.target;
+        // http://www.jacklmoore.com/notes/mouse-position/
+        var target = e.target || e.srcElement,
+        style = target.currentStyle || window.getComputedStyle(target, null),
+        borderLeftWidth = parseInt(style['borderLeftWidth'], 10),
+        borderTopWidth = parseInt(style['borderTopWidth'], 10),
+        rect = target.getBoundingClientRect(),
+        offsetX = e.clientX - borderLeftWidth - rect.left,
+        offsetY = e.clientY - borderTopWidth - rect.top;
+        return {x: parseInt(offsetX/Utils.cssScale), y: parseInt(offsetY/Utils.cssScale)};
+    }
+
+    // TODO : should we cache the value of scrollLeft/scrollTop to prevent a reflow ? (cf. http://www.phpied.com/rendering-repaint-reflowrelayout-restyle/ )
+    do {
+        totalOffsetX += currentElement.offsetLeft - currentElement.scrollLeft;
+        totalOffsetY += currentElement.offsetTop - currentElement.scrollTop;
+    }
+    while(currentElement = currentElement.offsetParent)
+        
+
+    // NB: Chrome seems to always use document.body.scrollTop whereas Firefox sometimes use document.documentElement.scrollTop
+    if (event.pageX) {
+        canvasX = event.pageX - totalOffsetX - (document.body.scrollLeft || document.documentElement.scrollLeft);
+        canvasY = event.pageY - totalOffsetY - (document.body.scrollTop || document.documentElement.scrollTop);
+    }
+    // if touch events
+    else {
+        canvasX = event.originalEvent.targetTouches[0].screenX - totalOffsetX - (document.body.scrollLeft || document.documentElement.scrollLeft);
+        canvasY = event.originalEvent.targetTouches[0].screenY - totalOffsetY - (document.body.scrollTop || document.documentElement.scrollTop);
+    }
+
+
+    
+
+    return {x: canvasX, y: canvasY};
+    //return {x: parseInt(canvasX/Utils.cssScale), y: parseInt(canvasY/Utils.cssScale)};
+}
+HTMLCanvasElement.prototype.relMouseCoords = relMouseCoords;
+
+
+
+//Function.prototype.bind polyfill from 
+//https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Function/bind
+if (!Function.prototype.bind) {
+    Function.prototype.bind = function (obj) {
+        // closest thing possible to the ECMAScript 5 internal IsCallable function
+        if (typeof this !== 'function') {
+            throw new TypeError('Function.prototype.bind - what is trying to be bound is not callable');
+        }
+
+        var slice = [].slice,
+        args = slice.call(arguments, 1),
+        self = this,
+        nop = function () { },
+        bound = function () {
+            return self.apply(this instanceof nop ? this : (obj || {}),
+                    args.concat(slice.call(arguments)));
+        };
+
+        bound.prototype = this.prototype;
+
+        return bound;
+    };
+}
+
+
+
+
+
+
+
+
+$ = $ || jQuery;
+
+/* source : http://stackoverflow.com/a/8764051 */
+$.urlParam = function(name, queryString){
+    if (queryString===undefined) {
+        queryString = location.search;
+    }
+	return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(queryString)||[,""])[1].replace(/\+/g, '%20'))||null;
+};
+
+/* source: http://stackoverflow.com/a/1830844 */
+Utils.isNumber = function(n) {
+  return !isNaN(parseFloat(n)) && isFinite(n);
+};
+
+Utils.isInt = function(n) {
+    return Utils.isNumber(n) && Math.floor(n)==n;
+};
+
+/* a debounce function, used to prevent multiple calls to the same function if less than delay milliseconds have passed */
+Utils.debounce = function(fn, delay) {
+    var timer = null;
+    return function () {
+      var context = this, args = arguments;
+      clearTimeout(timer);
+      timer = setTimeout(function () {
+        fn.apply(context, args);
+      }, delay);
+    };
+};
+
+/* return a throttled function, to rate limit the number of calls (by default, one call every 250 milliseconds) */
+Utils.throttle = function(fn, threshhold, scope) {
+  threshhold || (threshhold = 250);
+  var last,
+      deferTimer;
+  return function () {
+    var context = scope || this;
+
+    var now = +new Date,
+        args = arguments;
+    if (last && now < last + threshhold) {
+      // hold on to it
+      clearTimeout(deferTimer);
+      deferTimer = setTimeout(function () {
+        last = now;
+        fn.apply(context, args);
+      }, threshhold);
+    } else {
+      last = now;
+      fn.apply(context, args);
+    }
+  };
+}
+
+
+/* A LRU cache, inspired by https://gist.github.com/devinus/409353#file-gistfile1-js */
+// TODO : utiliser le LRU cache pour les tuiles images
+Utils.LRUCache = function (maxsize) {
+    this._keys = [];
+    this._items = {};
+    this._expires = {};
+    this._size = 0;
+    this._maxsize = maxsize || 1024;
+};
+   
+Utils.LRUCache.prototype = {
+        set: function (key, value) {
+            var keys = this._keys,
+                items = this._items,
+                expires = this._expires,
+                size = this._size,
+                maxsize = this._maxsize;
+
+            if (size >= maxsize) { // remove oldest element when no more room
+                keys.sort(function (a, b) {
+                    if (expires[a] > expires[b]) return -1;
+                    if (expires[a] < expires[b]) return 1;
+                    return 0;
+                });
+
+                size--;
+                delete expires[keys[size]];
+                delete items[keys[size]];
+            }
+
+            keys[size] = key;
+            items[key] = value;
+            expires[key] = Date.now();
+            size++;
+
+            this._keys = keys;
+            this._items = items;
+            this._expires = expires;
+            this._size = size;
+        },
+
+        get: function (key) {
+            var item = this._items[key];
+            if (item) this._expires[key] = Date.now();
+            return item;
+        },
+        
+        keys: function() {
+            return this._keys;
+        }
+};
+
+////////////////////////////////////////////////////////////////////////////:
+
+/**
+  Make an AJAX call, given a list of potential mirrors
+  First successful call will result in options.onSuccess being called back
+  If all calls fail, onFailure is called back at the end
+
+  This method assumes the URL are CORS-compatible, no proxy will be used
+ */
+Utils.loadFromMirrors = function(urls, options) {
+    var data    = options && options.data || null;
+    var method = options && options.method || 'GET';
+    var dataType = options && options.method || null;
+    var timeout = options && options.timeout || 20;
+
+    var onSuccess = options && options.onSuccess || null;
+    var onFailure = options && options.onFailure || null;
+
+    if (urls.length === 0) {
+        (typeof onFailure === 'function') && onFailure();
+    }
+    else {
+        $.ajax({
+            url: urls[0],
+            data: data
+        })
+        .done(function(data) {
+            (typeof onSuccess === 'function') && onSuccess(data);
+        })
+        .fail(function() {
+             Utils.loadFromMirrors(urls.slice(1), options);
+        });
+    }
+} 
+
+// return the jquery ajax object configured with the requested parameters
+// by default, we use the proxy (safer, as we don't know if the remote server supports CORS)
+Utils.getAjaxObject = function(url, method, dataType, useProxy) {
+        if (useProxy!==false) {
+            useProxy = true;
+        }
+
+        if (useProxy===true) {
+            var urlToRequest = Aladin.JSONP_PROXY + '?url=' + encodeURIComponent(url);
+        }
+        else {
+            urlToRequest = url;
+        }
+        method = method || 'GET';
+        dataType = dataType || null;
+
+        return $.ajax({
+            url: urlToRequest,
+            method: method,
+            dataType: dataType
+        }); 
+};
+
+// return true if script is executed in a HTTPS context
+// return false otherwise
+Utils.isHttpsContext = function() {
+    return ( window.location.protocol === 'https:' );
+};
+
+// generate an absolute URL from a relative URL
+// example: getAbsoluteURL('foo/bar/toto') return http://cds.unistra.fr/AL/foo/bar/toto if executed from page http://cds.unistra.fr/AL/
+Utils.getAbsoluteURL = function(url) {
+    var a = document.createElement('a');
+    a.href = url;
+
+    return a.href;
+};
+
+// Copyright 2013 - UDS/CNRS
+// The Aladin Lite program is distributed under the terms
+// of the GNU General Public License version 3.
+//
+// This file is part of Aladin Lite.
+//
+//    Aladin Lite is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, version 3 of the License.
+//
+//    Aladin Lite is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    The GNU General Public License is available in COPYING file
+//    along with Aladin Lite.
+//
+
+
+
+/******************************************************************************
+ * Aladin Lite project
+ * 
+ * File URLBuilder
+ * 
+ * Author: Thomas Boch[CDS]
+ * 
+ *****************************************************************************/
+
+
+URLBuilder = (function() {    
+
+    URLBuilder = {
+        buildSimbadCSURL: function(target, radiusDegrees) {
+            if (target && (typeof target  === "object")) {
+                if ('ra' in target && 'dec' in target) {
+                    var coo = new Coo(target.ra, target.dec, 7);
+                    target = coo.format('s');
+                }
+            }
+            return 'http://alasky.unistra.fr/cgi/simbad-flat/simbad-cs.py?target=' + encodeURIComponent(target) + '&SR=' + radiusDegrees + '&format=votable&SRUNIT=deg&SORTBY=nbref';
+        },
+
+        buildNEDPositionCSURL: function(ra, dec, radiusDegrees) {
+                return 'http://nedwww.ipac.caltech.edu/cgi-bin/nph-objsearch?search_type=Near+Position+Search&of=xml_main&RA=' + ra + '&DEC=' + dec + '&SR=' + radiusDegrees;
+        },
+
+        buildNEDObjectCSURL: function(object, radiusDegrees) {
+                return 'http://ned.ipac.caltech.edu/cgi-bin/nph-objsearch?search_type=Near+Name+Search&radius=' + (60 * radiusDegrees) + '&of=xml_main&objname=' + object;
+        },
+
+        buildVizieRCSURL: function(vizCatId, target, radiusDegrees) {
+            if (target && (typeof target  === "object")) {
+                if ('ra' in target && 'dec' in target) {
+                    var coo = new Coo(target.ra, target.dec, 7);
+                    target = coo.format('s');
+                }
+            }
+            return 'http://vizier.unistra.fr/viz-bin/votable?-source=' + vizCatId + '&-c=' + encodeURIComponent(target) + '&-out.max=999999&-c.rd=' + radiusDegrees;
+        },
+
+        buildSkyBotCSURL: function(ra, dec, radius, epoch, queryOptions) {
+            var url = 'http://vo.imcce.fr/webservices/skybot/skybotconesearch_query.php?-from=AladinLite';
+            url += '&RA=' + encodeURIComponent(ra);
+            url += '&DEC=' + encodeURIComponent(dec);
+            url += '&SR=' + encodeURIComponent(radius);
+            url += '&EPOCH=' + encodeURIComponent(epoch);
+
+            if (queryOptions) {
+                for (var key in queryOptions) {
+                    if (queryOptions.hasOwnProperty(key)) {
+                            url += '&' + key + '=' + encodeURIComponent(queryOptions[key]);
+                    }
+                }
+            }
+
+            return url;
+        }
+    
+
+    };
+
+    return URLBuilder;
+    
+})();
+
+// Copyright 2013 - UDS/CNRS
+// The Aladin Lite program is distributed under the terms
+// of the GNU General Public License version 3.
+//
+// This file is part of Aladin Lite.
+//
+//    Aladin Lite is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, version 3 of the License.
+//
+//    Aladin Lite is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    The GNU General Public License is available in COPYING file
+//    along with Aladin Lite.
+//
+
+
+
+/******************************************************************************
+ * Aladin Lite project
+ * 
+ * File MeasurementTable
+ *
+ * Graphic object showing measurement of a catalog
+ * 
+ * Author: Thomas Boch[CDS]
+ * 
+ *****************************************************************************/
+
+MeasurementTable = (function() {
+
+
+    // constructor
+    MeasurementTable = function(aladinLiteDiv) {
+        this.isShowing = false;
+
+        this.divEl = $('<div class="aladin-measurement-div"></div>');
+        
+        $(aladinLiteDiv).append(this.divEl);
+    }
+
+    // show measurement associated with a given source
+    MeasurementTable.prototype.showMeasurement = function(source) {
+        this.divEl.empty();
+        var header = '<thead><tr>';
+        var content = '<tr>';
+        for (key in source.data) {
+            header += '<th>' + key + '</th>';
+            content += '<td>' + source.data[key] + '</td>';
+        }
+        header += '</tr></thead>';
+        content += '</tr>';
+        this.divEl.append('<table>' + header + content + '</table>');
+        this.show();
+    };
+
+    MeasurementTable.prototype.show = function() {
+        this.divEl.show();
+    };
+    
+    MeasurementTable.prototype.hide = function() {
+        this.divEl.hide();
+    };
+    
+    
+    return MeasurementTable;
+})();
+
+// Copyright 2013 - UDS/CNRS
+// The Aladin Lite program is distributed under the terms
+// of the GNU General Public License version 3.
+//
+// This file is part of Aladin Lite.
+//
+//    Aladin Lite is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, version 3 of the License.
+//
+//    Aladin Lite is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    The GNU General Public License is available in COPYING file
+//    along with Aladin Lite.
+//
+
+
+
+/******************************************************************************
+ * Aladin Lite project
+ * 
+ * File Color
+ * 
+ * Author: Thomas Boch[CDS]
+ * 
+ *****************************************************************************/
+
+Color = (function() {
+
+
+    Color = {};
+    
+    Color.curIdx = 0;
+    Color.colors = ['#ff0000', '#0000ff', '#99cc00', '#ffff00','#000066', '#00ffff', '#9900cc', '#0099cc', '#cc9900', '#cc0099', '#00cc99', '#663333', '#ffcc9a', '#ff9acc', '#ccff33', '#660000', '#ffcc33', '#ff00ff', '#00ff00', '#ffffff'];
+
+    
+    Color.getNextColor = function() {
+        var c = Color.colors[Color.curIdx % (Color.colors.length)];
+        Color.curIdx++;
+        return c;
+    };
+
+    /** return most suited (ie readable) color for a label, given a background color
+     * bkgdColor: color, given as a 'rgb(<r value>, <g value>, <v value>)' . This is returned by $(<element>).css('background-color')
+     * 
+     * example call: Color.getLabelColorForBackground('rgb(3, 123, 42)')
+     * adapted from http://stackoverflow.com/questions/1855884/determine-font-color-based-on-background-color
+     */
+    Color.getLabelColorForBackground = function(rgbBkgdColor) {
+        var lightLabel = '#eee' 
+        var darkLabel = '#111' 
+        rgb = rgbBkgdColor.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+        if (rgb==null) {
+            // we return the dark label color if we can't parse the color
+            return darkLabel
+        }
+        r = parseInt(rgb[1]);
+        g = parseInt(rgb[2]);
+        b = parseInt(rgb[3]);
+        
+        var d = 0;
+        // Counting the perceptive luminance - human eye favors green color... 
+        var a = 1 - ( 0.299 * r + 0.587 * g + 0.114 * b) / 255;
+
+        if (a < 0.5) {
+            return darkLabel; // bright color --> dark font
+        }
+        else {
+            return lightLabel; // dark color --> light font
+        }
+    };
+    
+    return Color;
+})();
+
+// Copyright 2013 - UDS/CNRS
+// The Aladin Lite program is distributed under the terms
+// of the GNU General Public License version 3.
+//
+// This file is part of Aladin Lite.
+//
+//    Aladin Lite is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, version 3 of the License.
+//
+//    Aladin Lite is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    The GNU General Public License is available in COPYING file
+//    along with Aladin Lite.
+//
+
+
+
+/******************************************************************************
+ * Aladin Lite project
+ * 
+ * File AladinUtils
+ * 
+ * Author: Thomas Boch[CDS]
+ * 
+ *****************************************************************************/
+AladinUtils = (function() {
+    return {
+    	/**
+    	 * passage de xy projection à xy dans la vue écran 
+    	 * @param x
+    	 * @param y
+    	 * @param width
+    	 * @param height
+    	 * @param largestDim largest dimension of the view
+    	 * @returns position in the view
+    	 */
+    	xyToView: function(x, y, width, height, largestDim, zoomFactor, round) {
+    	    if (round==undefined) {
+                // we round by default
+    	        round = true;
+    	    }
+
+    	    if (round) {
+    	        // we round the result for presumed performance gains
+    	        return {vx: AladinUtils.myRound(largestDim/2*(1+zoomFactor*x)-(largestDim-width)/2), vy: AladinUtils.myRound(largestDim/2*(1+zoomFactor*y)-(largestDim-height)/2)};
+
+    	    }
+    	    else {
+                return {vx: largestDim/2*(1+zoomFactor*x)-(largestDim-width)/2, vy: largestDim/2*(1+zoomFactor*y)-(largestDim-height)/2};
+    	    }
+    	},
+    	
+    	/**
+    	 * passage de xy dans la vue écran à xy projection
+    	 * @param vx
+    	 * @param vy
+    	 * @param width
+    	 * @param height
+    	 * @param largestDim
+    	 * @param zoomFactor
+    	 * @returns position in xy projection
+    	 */
+    	viewToXy: function(vx, vy, width, height, largestDim, zoomFactor) {
+    		return {x: ((2*vx+(largestDim-width))/largestDim-1)/zoomFactor, y: ((2*vy+(largestDim-height))/largestDim-1)/zoomFactor};
+    	},
+
+    	/**
+    	 * convert a 
+    	 * @returns position x,y in the view. Null if projection is impossible
+    	 */
+        radecToViewXy: function(ra, dec, currentProjection, currentFrame, width, height, largestDim, zoomFactor) {
+            var xy;
+            if (currentFrame!=CooFrameEnum.J2000) {
+                var lonlat = CooConversion.J2000ToGalactic([ra, dec]);
+                xy = currentProjection.project(lonlat[0], lonlat[1]);
+            }
+            else {
+                xy = currentProjection.project(ra, dec);
+            }
+            if (!xy) {
+                return null;
+            }
+            
+            return AladinUtils.xyToView(xy.X, xy.Y, width, height, largestDim, zoomFactor, false);
+        },
+
+    	
+    	myRound: function(a) {
+    		if (a<0) {
+    			return -1*( (-a) | 0);
+    		}
+    		else {
+    			return a | 0;
+    		}
+    	},
+    	
+    	
+    	
+    	/**
+    	 * tests whether a healpix pixel is visible or not
+    	 * @param pixCorners array of position (xy view) of the corners of the pixel
+    	 * @param viewW
+    	 */
+    	isHpxPixVisible: function(pixCorners, viewWidth, viewHeight) {
+    		for (var i = 0; i<pixCorners.length; i++) {
+    			if ( pixCorners[i].vx>=-20 && pixCorners[i].vx<(viewWidth+20) &&
+    				 pixCorners[i].vy>=-20 && pixCorners[i].vy<(viewHeight+20) ) {
+    				return true;
+    			}
+    		}
+    		return false;
+    	},
+    	
+    	ipixToIpix: function(npixIn, norderIn, norderOut) {
+    		var npixOut = [];
+    		if (norderIn>=norderOut) {
+    		}
+    	},
+        
+        getZoomFactorForAngle: function(angleInDegrees, projectionMethod) {
+            var p1 = {ra: 0, dec: 0};
+            var p2 = {ra: angleInDegrees, dec: 0};
+            var projection = new Projection(angleInDegrees/2, 0);
+            projection.setProjection(projectionMethod);
+            var p1Projected = projection.project(p1.ra, p1.dec);
+            var p2Projected = projection.project(p2.ra, p2.dec);
+           
+            var zoomFactor = 1/(p1Projected.X - p2Projected.Y);
+            return zoomFactor;
+        },
+
+        // grow array b of vx,vy view positions by *val* pixels
+        grow2: function(b, val) {
+            var j=0;
+            for ( var i=0; i<4; i++ ) {
+                if ( b[i]==null ) {
+                    j++;
+                }
+            }
+
+            if( j>1 ) {
+                return b;
+            }
+
+            var b1 = [];
+            for ( var i=0; i<4; i++ ) {
+                b1.push( {vx: b[i].vx, vy: b[i].vy} );
+            }
+    
+            for ( var i=0; i<2; i++ ) {
+                var a = i==1 ? 1 : 0;
+                var c = i==1 ? 3 : 2;
+
+                if ( b1[a]==null ) {
+                    var d,g;
+                    if ( a==0 || a==3 ) {
+                        d=1;
+                        g=2;
+                    }
+                    else {
+                        d=0;
+                        g=3;
+                    }
+                    b1[a] = {vx: (b1[d].vx+b1[g].vx)/2, vy: (b1[d].vy+b1[g].vy)/2};
+                }
+                if ( b1[c]==null ) {
+                    var d,g;
+                    if ( c==0 || c==3 ) {
+                        d=1;
+                        g=2;
+                    }
+                    else {
+                        d=0;
+                        g=3;
+                    }
+                    b1[c] = {vx: (b1[d].vx+b1[g].vx)/2, vy: (b1[d].vy+b1[g].vy)/2};
+                }
+                if( b1[a]==null || b1[c]==null ) {
+                    continue;
+                }
+
+                var angle = Math.atan2(b1[c].vy-b1[a].vy, b1[c].vx-b1[a].vx);
+                var chouilla = val*Math.cos(angle);
+                b1[a].vx -= chouilla;
+                b1[c].vx += chouilla;
+                chouilla = val*Math.sin(angle);
+                b1[a].vy-=chouilla;
+                b1[c].vy+=chouilla;
+            }
+            return b1;
+        }
+ 
+    	
+    };
+})();
+
+// Copyright 2013 - UDS/CNRS
+// The Aladin Lite program is distributed under the terms
+// of the GNU General Public License version 3.
+//
+// This file is part of Aladin Lite.
+//
+//    Aladin Lite is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, version 3 of the License.
+//
+//    Aladin Lite is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    The GNU General Public License is available in COPYING file
+//    along with Aladin Lite.
+//
+
+
+
+/******************************************************************************
+ * Aladin Lite project
+ * 
+ * File CooFrameEnum
+ * 
+ * Author: Thomas Boch[CDS]
+ * 
+ *****************************************************************************/
+ 
+ ProjectionEnum = {
+    SIN: Projection.PROJ_SIN,
+    AITOFF:  Projection.PROJ_AITOFF
+ };
+// Copyright 2013 - UDS/CNRS
+// The Aladin Lite program is distributed under the terms
+// of the GNU General Public License version 3.
+//
+// This file is part of Aladin Lite.
+//
+//    Aladin Lite is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, version 3 of the License.
+//
+//    Aladin Lite is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    The GNU General Public License is available in COPYING file
+//    along with Aladin Lite.
+//
+
+
+
+/******************************************************************************
+ * Aladin Lite project
+ * 
+ * File CooFrameEnum
+ * 
+ * Author: Thomas Boch[CDS]
+ * 
+ *****************************************************************************/
+ 
+CooFrameEnum = (function() {
+
+    return {
+        J2000: "J2000",
+        GAL:  "Galactic"
+    };
+ 
+})();
+
+// TODO : utiliser cette fonction partout où on reçoit une string frame en entrée
+CooFrameEnum.fromString = function(str, defaultValue) {
+    if (! str) {
+        return defaultValue ? defaultValue : null;
+    }
+    
+    str = str.toLowerCase().replace(/^\s+|\s+$/g, ''); // convert to lowercase and trim
+    
+    if (str.indexOf('j2000')==0 || str.indexOf('icrs')==0) {
+        return CooFrameEnum.J2000;
+    }
+    else if (str.indexOf('gal')==0) {
+        return CooFrameEnum.GAL;
+    }
+    else {
+        return defaultValue ? defaultValue : null;
+    }
+};
+
+/**
+returns a short name for 
+*/
+CooFrameEnum.shortName = function(frameValue) {
+    if (frameValue==CooFrameEnum.J2000) {
+        return 'J2000';
+    }
+    if (frameValue==CooFrameEnum.GAL) {
+        return 'GAL';
+    }
+
+    return null;
+};
+// Copyright 2013-2017 - UDS/CNRS
+// The Aladin Lite program is distributed under the terms
+// of the GNU General Public License version 3.
+//
+// This file is part of Aladin Lite.
+//
+//    Aladin Lite is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, version 3 of the License.
+//
+//    Aladin Lite is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    The GNU General Public License is available in COPYING file
+//    along with Aladin Lite.
+//
+
+
+
+/******************************************************************************
+ * Aladin Lite project
+ * 
+ * File HiPSDefinition
+ * 
+ * Author: Thomas Boch [CDS]
+ * 
+ *****************************************************************************/
+HiPSDefinition = (function() {
+
+    // constructor
+    var HiPSDefinition = function(properties) {
+        this.properties = properties; // key-value object corresponding to the properties file
+
+        this.id = this.getID();
+        this.obsTitle = properties['obs_title'];
+        this.frame = properties['hips_frame'];
+        this.order = parseInt(properties['hips_order']);
+        this.clientSortKey = properties['client_sort_key'];
+        this.tileFormats = properties.hasOwnProperty('hips_tile_format') && properties['hips_tile_format'].split(' ');
+        this.urls = [];
+        this.urls.push(properties['hips_service_url']);
+        var k = 1;
+        while (properties.hasOwnProperty('hips_service_url_' + k)) {
+            this.urls.push(properties['hips_service_url_' + k]);
+            k++;
+        }
+
+        this.clientApplications = properties['client_application'];
+    };
+
+    HiPSDefinition.prototype = {
+
+        getServiceURLs: function(httpsOnly) {
+            httpsOnly = httpsOnly === true;
+        },
+
+        // return the ID according to the properties
+        getID: function() {
+            // ID is explicitely given
+            if (this.properties.hasOwnProperty('ID')) {
+                return this.properties['ID'];
+            }
+
+            var id = null;
+            // ID might be built from different fields
+            if (this.properties.hasOwnProperty('creator_did')) {
+                id = this.properties['creator_did'];
+            }
+            if (id==null && this.properties.hasOwnProperty('publisher_did')) {
+                id = this.properties['publisher_did'];
+            }
+
+            if (id != null) {
+                // remove ivo:// prefix
+                if (id.slice(0, 6) === 'ivo://') {
+                    id = id.slice(6);
+                }
+
+                // '?' are replaced by '/' (thanks Markus!!)
+                id = id.replace(/\?/g, '/')
+            }
+
+            return id;
+        }
+
+
+
+    };
+
+    // cache (at the source code level) of the list of HiPS
+    // this is the result to a query to http://alasky.u-strasbg.fr/MocServer/query?dataproduct_type=image&client_application=AladinLite&fmt=json&fields=ID,obs_title,client_sort_key,client_application,hips_service_url*,hips_order,hips_tile_format,hips_frame
+    var AL_CACHE_CLASS_LEVEL = [{
+    "ID": "CDS/P/2MASS/color",
+    "obs_title": "2MASS color J (1.23 microns), H (1.66 microns), K (2.16 microns)",
+    "client_sort_key": "04-001-00",
+    "client_application":[ "AladinLite", "AladinDesktop"],
+    "hips_order": "9",
+    "hips_frame": "equatorial",
+    "hips_tile_format": "jpeg",
+    "hips_service_url": "http://alasky.unistra.fr/2MASS/Color",
+    "hips_service_url_1": "http://alaskybis.unistra.fr/2MASS/Color",
+    "hips_service_url_2": "https://alaskybis.unistra.fr/2MASS/Color"
+    }, {
+    "ID": "CDS/P/AKARI/FIS/Color",
+    "obs_title": "AKARI Far-infrared All-Sky Survey - color composition WideL/WideS/N60",
+    "client_sort_key": "04-05-00",
+    "client_application":[ "AladinLite", "AladinDesktop"],
+    "hips_order": "5",
+    "hips_frame": "equatorial",
+    "hips_tile_format": "png jpeg",
+    "hips_service_url": "http://alasky.unistra.fr/AKARI-FIS/ColorLSN60",
+    "hips_service_url_1": "http://alaskybis.unistra.fr/AKARI-FIS/ColorLSN60",
+    "hips_service_url_2": "https://alaskybis.unistra.fr/AKARI-FIS/ColorLSN60"
+    }, {
+    "ID": "CDS/P/DECaLS/DR3/color",
+    "obs_title": "DECaLS DR3 color",
+    "hips_frame": "equatorial",
+    "hips_order": "11",
+    "hips_tile_format": "jpeg",
+    "hips_service_url": "http://alasky.unistra.fr/DECaLS/DR3/color"
+}, {
+    "ID": "CDS/P/DSS2/blue",
+    "obs_title": "DSS2 Blue (XJ+S)",
+    "client_sort_key": "03-01-03",
+    "client_application":[ "AladinLite", "AladinDesktop"],
+    "hips_order": "9",
+    "hips_frame": "equatorial",
+    "hips_tile_format": "jpeg fits",
+    "hips_service_url": "http://alasky.unistra.fr/DSS/DSS2-blue-XJ-S",
+    "hips_service_url_1": "http://alaskybis.unistra.fr/DSS/DSS2-blue-XJ-S",
+    "hips_service_url_2": "https://alaskybis.unistra.fr/DSS/DSS2-blue-XJ-S",
+    "hips_service_url_3": "http://healpix.ias.u-psud.fr/DSS2Blue"
+}, {
+    "ID": "CDS/P/DSS2/color",
+    "obs_title": "DSS colored",
+    "client_sort_key": "03-00",
+    "client_application":[ "AladinLite", "AladinDesktop"],
+    "hips_order": "9",
+    "hips_frame": "equatorial",
+    "hips_tile_format": "jpeg",
+    "hips_service_url": "http://alasky.unistra.fr/DSS/DSSColor",
+    "hips_service_url_1": "http://alaskybis.unistra.fr/DSS/DSSColor",
+    "hips_service_url_2": "https://alaskybis.unistra.fr/DSS/DSSColor",
+    "hips_service_url_3": "http://healpix.ias.u-psud.fr/DSSColorNew",
+    "hips_service_url_4": "http://skies.esac.esa.int/DSSColor/"
+}, {
+    "ID": "CDS/P/DSS2/red",
+    "obs_title": "DSS2 Red (F+R)",
+    "client_sort_key": "03-01-02",
+    "client_application":[ "AladinLite", "AladinDesktop"],
+    "hips_order": "9",
+    "hips_frame": "equatorial",
+    "hips_tile_format": "jpeg fits",
+    "hips_service_url": "http://alasky.unistra.fr/DSS/DSS2Merged",
+    "hips_service_url_1": "http://alaskybis.unistra.fr/DSS/DSS2Merged",
+    "hips_service_url_2": "https://alaskybis.unistra.fr/DSS/DSS2Merged",
+    "hips_service_url_3": "http://healpix.ias.u-psud.fr/DSS2Merged"
+}, {
+    "ID": "CDS/P/Fermi/color",
+    "obs_title": "Fermi Color HEALPix survey",
+    "client_sort_key": "00-01-01",
+    "client_application":[ "AladinLite", "AladinDesktop"],
+    "hips_order": "3",
+    "hips_frame": "equatorial",
+    "hips_tile_format": "jpeg",
+    "hips_service_url": "http://alasky.unistra.fr/Fermi/Color",
+    "hips_service_url_1": "http://alaskybis.unistra.fr/Fermi/Color",
+    "hips_service_url_2": "https://alaskybis.unistra.fr/Fermi/Color"
+}, {
+    "ID": "CDS/P/Finkbeiner",
+    "obs_title": "Finkbeiner Halpha composite survey",
+    "client_sort_key": "06-01",
+    "client_application":[ "AladinLite", "AladinDesktop"],
+    "hips_order": "3",
+    "hips_frame": "galactic",
+    "hips_tile_format": "jpeg fits",
+    "hips_service_url": "http://alasky.unistra.fr/FinkbeinerHalpha",
+    "hips_service_url_1": "http://alaskybis.unistra.fr/FinkbeinerHalpha",
+    "hips_service_url_2": "https://alaskybis.unistra.fr/FinkbeinerHalpha"
+}, {
+    "ID": "CDS/P/GALEXGR6/AIS/color",
+    "obs_title": "GALEX GR6 AIS (until March 2014)- Color composition",
+    "client_sort_key": "02-01-01",
+    "client_application":[ "AladinLite", "AladinDesktop"],
+    "hips_order": "8",
+    "hips_frame": "equatorial",
+    "hips_tile_format": "png jpeg",
+    "hips_service_url": "http://alasky.unistra.fr/GALEX/GR6-03-2014/AIS-Color",
+    "hips_service_url_1": "http://alaskybis.unistra.fr/GALEX/GR6-03-2014/AIS-Color",
+    "hips_service_url_2": "https://alaskybis.unistra.fr/GALEX/GR6-03-2014/AIS-Color"
+}, {
+    "ID": "CDS/P/IRIS/color",
+    "obs_title": "IRAS-IRIS HEALPix survey, color",
+    "client_sort_key": "04-02-01",
+    "client_application":[ "AladinLite", "AladinDesktop"],
+    "hips_order": "3",
+    "hips_frame": "galactic",
+    "hips_tile_format": "jpeg",
+    "hips_service_url": "http://alasky.unistra.fr/IRISColor",
+    "hips_service_url_1": "http://alaskybis.unistra.fr/IRISColor",
+    "hips_service_url_2": "https://alaskybis.unistra.fr/IRISColor",
+    "hips_service_url_3": "http://healpix.ias.u-psud.fr/IRISColor",
+    "hips_service_url_4": "http://skies.esac.esa.int/IRISColor/"
+}, {
+    "ID": "CDS/P/Mellinger/color",
+    "obs_title": "Mellinger optical survey, color",
+    "client_sort_key": "03-03",
+    "client_application":[ "AladinLite", "AladinDesktop"],
+    "hips_order": "4",
+    "hips_frame": "galactic",
+    "hips_tile_format": "jpeg",
+    "hips_service_url": "http://alasky.unistra.fr/MellingerRGB",
+    "hips_service_url_1": "http://alaskybis.unistra.fr/MellingerRGB",
+    "hips_service_url_2": "https://alaskybis.unistra.fr/MellingerRGB"
+}, {
+    "ID": "CDS/P/SDSS9/color",
+    "obs_title": "SDSS 9 color",
+    "client_sort_key": "03-02-01",
+    "client_application":[ "AladinLite", "AladinDesktop"],
+    "hips_order": "10",
+    "hips_frame": "equatorial",
+    "hips_tile_format": "jpeg",
+    "hips_service_url": "http://alasky.unistra.fr/SDSS/DR9/color",
+    "hips_service_url_1": "http://alaskybis.unistra.fr/SDSS/DR9/color",
+    "hips_service_url_2": "https://alaskybis.unistra.fr/SDSS/DR9/color",
+    "hips_service_url_3": "http://healpix.ias.u-psud.fr/SDSS9Color",
+    "hips_service_url_4": "http://skies.esac.esa.int/SDSS9Color/"
+}, {
+    "ID": "CDS/P/SPITZER/color",
+    "obs_title": "IRAC HEALPix survey, color",
+    "client_sort_key": "04-03-00",
+    "client_application":[ "AladinLite", "AladinDesktop"],
+    "hips_order": "9",
+    "hips_frame": "galactic",
+    "hips_tile_format": "jpeg",
+    "hips_service_url": "http://alasky.unistra.fr/SpitzerI1I2I4color",
+    "hips_service_url_1": "http://alaskybis.unistra.fr/SpitzerI1I2I4color",
+    "hips_service_url_2": "https://alaskybis.unistra.fr/SpitzerI1I2I4color",
+    "hips_service_url_3": "http://healpix.ias.u-psud.fr/SPITZERColor"
+}, {
+    "ID": "CDS/P/allWISE/color",
+    "obs_title": "AllWISE color  Red (W4) , Green (W2) , Blue (W1) from raw Atlas Images",
+    "client_sort_key": "04-003-00",
+    "client_application":[ "AladinLite", "AladinDesktop"],
+    "hips_order": "8",
+    "hips_frame": "equatorial",
+    "hips_tile_format": "jpeg",
+    "hips_service_url": "http://alasky.unistra.fr/AllWISE/RGB-W4-W2-W1",
+    "hips_service_url_1": "http://alaskybis.unistra.fr/AllWISE/RGB-W4-W2-W1",
+    "hips_service_url_2": "https://alaskybis.unistra.fr/AllWISE/RGB-W4-W2-W1"
+}, {
+    "ID": "IPAC/P/GLIMPSE360",
+    "obs_title": "GLIMPSE360: Spitzer's Infrared Milky Way",
+    "client_sort_key": "04-03-0",
+    "client_application":[ "AladinLite", "AladinDesktop"],
+    "hips_order": "9",
+    "hips_frame": "equatorial",
+    "hips_tile_format": "jpeg",
+    "hips_service_url": "http://www.spitzer.caltech.edu/glimpse360/aladin/data"
+}, {
+    "ID": "JAXA/P/MAXI_SSC_SUM",
+    "hips_tile_format": "png",
+    "hips_frame": "equatorial",
+    "obs_title": "MAXI SSC all-sky image integrated for 4.5 years",
+    "hips_order": "6",
+    "hips_service_url": "http://darts.isas.jaxa.jp/pub/judo2/HiPS/maxi_ssc_sum",
+    "hips_service_url_1": "http://alasky.unistra.fr//JAXA/JAXA_P_MAXI_SSC_SUM",
+    "hips_service_url_2": "http://alaskybis.unistra.fr//JAXA/JAXA_P_MAXI_SSC_SUM",
+    "hips_service_url_3": "https://alaskybis.unistra.fr//JAXA/JAXA_P_MAXI_SSC_SUM"
+}, {
+    "ID": "JAXA/P/SWIFT_BAT_FLUX",
+    "hips_tile_format": "png",
+    "hips_frame": "equatorial",
+    "obs_title": "Swift-BAT 70-month all-sray hard X-ray survey image",
+    "hips_order": "6",
+    "hips_service_url": "http://darts.isas.jaxa.jp/pub/judo2/HiPS/swift_bat_flux/",
+    "hips_service_url_1": "http://alasky.unistra.fr//JAXA/JAXA_P_SWIFT_BAT_FLUX",
+    "hips_service_url_2": "http://alaskybis.unistra.fr//JAXA/JAXA_P_SWIFT_BAT_FLUX",
+    "hips_service_url_3": "https://alaskybis.unistra.fr//JAXA/JAXA_P_SWIFT_BAT_FLUX"
+}, {
+    "ID": "ov-gso/P/VTSS/Ha",
+    "obs_title": "Virginia Tech Spectral-Line Survey (VTSS) - Halpha image",
+    "client_sort_key": "06-xx",
+    "client_application":[ "AladinLite", "AladinDesktop"],
+    "hips_order": "3",
+    "hips_frame": ["galactic", "galactic"],
+    "hips_tile_format": "png jpeg fits",
+    "hips_service_url": "http://cade.irap.omp.eu/documents/Ancillary/4Aladin/VTSS",
+    "hips_service_url_1": "http://alasky.unistra.fr/IRAP/VTSS",
+    "hips_service_url_2": "http://alaskybis.unistra.fr/IRAP/VTSS",
+    "hips_service_url_3": "https://alaskybis.unistra.fr/IRAP/VTSS"
+}, {
+    "ID": "xcatdb/P/XMM/EPIC",
+    "obs_title": "XMM-Newton stacked EPIC images",
+    "hips_frame": "equatorial",
+    "hips_order": "7",
+    "hips_service_url": "http://saada.u-strasbg.fr/xmmallsky",
+    "hips_tile_format": "png fits",
+    "hips_service_url_1": "http://alasky.unistra.fr/SSC/xmmallsky",
+    "hips_service_url_2": "http://alaskybis.unistra.fr/SSC/xmmallsky",
+    "hips_service_url_3": "https://alaskybis.unistra.fr/SSC/xmmallsky"
+}, {
+    "ID": "xcatdb/P/XMM/PN/color",
+    "obs_title": "False color X-ray images (Red=0.5-1 Green=1-2 Blue=2-4.5)Kev",
+    "hips_order": "7",
+    "hips_frame": "equatorial",
+    "hips_tile_format": "png jpeg",
+    "hips_service_url": "http://saada.unistra.fr/xmmpnsky",
+    "hips_service_url_1": "http://alasky.unistra.fr/SSC/xmmpnsky",
+    "hips_service_url_2": "http://alaskybis.unistra.fr/SSC/xmmpnsky",
+    "hips_service_url_3": "https://alaskybis.unistra.fr/SSC/xmmpnsky"
+}];
+
+    var listHipsProperties = []; // this variable stores our current knowledge
+
+    HiPSDefinition.LOCAL_STORAGE_KEY = 'aladin:hips-list';
+    
+    var RETRIEVAL_TIMESTAMP_KEY = '_timestamp_retrieved';
+    var LAST_URL_KEY = '_last_used_url'; // URL previousy used to retrieve data from this HiPS
+    // retrieve definitions previousy stored in local storage
+    // @return an array with the HiPS definitions, empty array if nothing found or if an error occured
+    HiPSDefinition.getLocalStorageDefinitions = function() {
+        try {
+            var defs = window.localStorage.getItem(HiPSDefinition.LOCAL_STORAGE_KEY);
+            return defs === null ? [] : window.JSON.parse(defs);
+        }
+        catch(e) {
+            console.error(e);
+            return [];
+        }
+    };
+
+    // store in local storage a list of HiPSDefinition objects
+    // @return true if storage was successful
+    HiPSDefinition.storeInLocalStorage = function(properties) {
+        try {
+            window.localStorage.setItem(HiPSDefinition.LOCAL_STORAGE_KEY, window.JSON.stringify(properties));
+        }
+        catch(e) {
+            console.error(e);
+            return false;
+        }
+
+        return true;
+    };
+
+    var MOCSERVER_MIRRORS_HTTP = ['http://alasky.u-strasbg.fr/MocServer/query', 'http://alaskybis.u-strasbg.fr/MocServer/query']; // list of base URL for MocServer mirrors, available in HTTP
+    var MOCSERVER_MIRRORS_HTTPS = ['https://alaskybis.unistra.fr/MocServer/query']; // list of base URL for MocServer mirrors, available in HTTPS
+
+    // get HiPS definitions, by querying the MocServer
+    // return data as dict-like objects
+    HiPSDefinition.getRemoteDefinitions = function(params, successCallbackFn, failureCallbackFn) {
+        var params = params || {client_application: 'AladinLite'}; // by default, retrieve only HiPS tagged "Aladin Lite"
+
+        params['fmt'] = 'json';
+        params['fields'] = 'ID,obs_title,client_sort_key,client_application,hips_service_url*,hips_order,hips_tile_format,hips_frame';
+
+        var urls = Utils.isHttpsContext() ? MOCSERVER_MIRRORS_HTTPS : MOCSERVER_MIRRORS_HTTP;
+
+        var successCallback = function(data) {
+            (typeof successCallbackFn === 'function') && successCallbackFn(data);
+        };
+        var failureCallback = function() {
+            console.error('Could not load HiPS definitions from urls ' + urls);
+            (typeof failureCallbackFn === 'function') && failureCallbackFn();
+        };
+
+        Utils.loadFromMirrors(urls, {data: params, onSuccess: successCallback, onFailure: failureCallback, timeout: 5});
+    };
+
+    // complement the baseList with the items in newList
+    var merge = function(baseList, newList) {
+        var updatedList = [];
+        var newListById = {};
+        for (var k=0; k<newList.length; k++) {
+            var item = newList[k];
+            newListById[item.ID] = item;
+        }
+
+        for (var k=0; k<baseList.length; k++) {
+            var item = baseList[k];
+            var id = item.ID;
+            if (newListById.hasOwnProperty(id)) {
+                var itemToAdd = newListById[id];
+                // we keep the last used URL property
+                if (item.hasOwnProperty(LAST_URL_KEY) && ! itemToAdd.hasOwnProperty(LAST_URL_KEY)) {
+                    itemToAdd[LAST_URL_KEY] = item[LAST_URL_KEY];
+                }
+                updatedList.push(itemToAdd);
+            }
+            else {
+                updatedList.push(item);
+            }
+        }
+
+        return updatedList;
+    };
+
+    HiPSDefinition.CACHE_RETENTION_TIME_SECONDS = 7 * 86400; // definitions can be kept 7 days
+    HiPSDefinition.init = function() {
+        // first, merge local definitions at class level with definitions in local storage
+        listHipsProperties = AL_CACHE_CLASS_LEVEL;
+
+        // second, remove old definitions (client != AladinLite and timestamp older than CACHE_RETENTION_TIME_SECONDS) and merge
+        var localDefs = HiPSDefinition.getLocalStorageDefinitions();
+        // 2.1 remove old defs
+        var now = new Date().getTime();
+        var indicesToRemove = [];
+        for (var k=0; k<localDefs.length; k++) {
+            var def = localDefs[k];
+            if (def.hasOwnProperty(RETRIEVAL_TIMESTAMP_KEY) && (now - def[RETRIEVAL_TIMESTAMP_KEY]) > 1000 * HiPSDefinition.CACHE_RETENTION_TIME_SECONDS) {
+                indicesToRemove.push(k);
+            }
+        }
+        // we have to browse the array in reverse order in order not to mess up indices
+        for (var k = indicesToRemove.length - 1; k >= 0; k--) {
+            localDefs.splice(indicesToRemove[k],1);
+        }
+        // 2.2 merge
+        listHipsProperties = merge(listHipsProperties, localDefs);
+
+        // third, retrieve remote definitions, merge and save
+        HiPSDefinition.getRemoteDefinitions({dataproduct_type: 'image', client_application: 'AladinLite'}, function(remoteDefs) {
+            // adding timestamp of retrieval
+            var now = new Date().getTime();
+            for (var k=0; k<remoteDefs.length; k++) {
+                remoteDefs[k][RETRIEVAL_TIMESTAMP_KEY] = now;
+            }
+            listHipsProperties = merge(listHipsProperties, remoteDefs);
+            HiPSDefinition.storeInLocalStorage(listHipsProperties);
+        });
+
+    };
+
+    // return list of HiPSDefinition objects, filtering out definitions whose client_application is not AladinLite
+    HiPSDefinition.getALDefaultHiPSDefinitions = function() {
+        // filter out definitions with client_application != 'AladinLite'
+        var ret = [];
+        for (var k=0; k<listHipsProperties.length; k++) {
+            var properties = listHipsProperties[k];
+            if ( ! properties.hasOwnProperty('client_application') || properties['client_application'].indexOf('AladinLite')<0) {
+                continue;
+            }
+
+            ret.push(new HiPSDefinition(properties));
+        }
+
+        return ret;
+    };
+
+    // return list of known HiPSDefinition objects
+    HiPSDefinition.getDefinitions = function() {
+        var ret = [];
+        for (var k=0; k<listHipsProperties.length; k++) {
+            var properties = listHipsProperties[k];
+            ret.push(new HiPSDefinition(properties));
+        }
+
+        return ret;
+    };
+
+    // parse a HiPS properties and return a dict-like object with corresponding key-values
+    // return null if parsing failed
+    HiPSDefinition.parseHiPSProperties = function(propertiesStr) {
+        if (propertiesStr==null) {
+            return null;
+        }
+
+        var propertiesDict = {};
+        // remove CR characters
+        propertiesStr = propertiesStr.replace(/[\r]/g, '');
+        // split on LF
+        var lines = propertiesStr.split('\n');
+        for (var k=0; k<lines.length; k++)  {
+            var l = $.trim(lines[k]);
+            // ignore comments lines
+            if (l.slice(0, 1)==='#') {
+                continue;
+            }
+            var idx = l.indexOf('=');
+            if (idx<0) {
+                continue;
+            }
+            var key = $.trim(l.slice(0, idx));
+            var value = $.trim(l.slice(idx+1));
+
+            propertiesDict[key] = value;
+        }
+
+        return propertiesDict;
+    };
+
+
+    // find a HiPSDefinition by id.
+    // look first locally, and remotely only if local search was unsuccessful
+    //
+    // call callback function with a list of HiPSDefinition candidates, empty array if nothing found
+
+    HiPSDefinition.findByID = function(id, callback) {
+        // look first locally
+        var candidates = findByIDLocal(id);
+        if (candidates.length>0) {
+            (typeof callback === 'function') && callback(candidates);
+            return;
+        }
+
+        // then remotely
+        findByIDRemote(id, callback);
+    };
+
+    // find a HiPSDefinition by id.
+    // search is done on the local knowledge of HiPSDefinitions
+    HiPSDefinition.findByIDLocal = function(id2search, callback) {
+        var candidates = [];
+        for (var k=0; k<listHipsProperties.length; k++) {
+            var properties = listHipsProperties[k];
+            var id = properties['ID'];
+            if (id.match(id2search) != null ) {
+                candidates.push(new HiPSDefinition(properties));
+            }
+        }
+
+        return candidates;
+    };
+
+    // find remotely a HiPSDefinition by ID
+    HiPSDefinition.findByIDRemote = function(id, callback) {
+        HiPSDefinition.findHiPSRemote({ID: '*' + id + '*'}, callback);
+    };
+
+    // search a HiPS according to some criteria
+    HiPSDefinition.findHiPSRemote = function(searchOptions, callback) {
+        searchOptions = searchOptions || {};
+        if (! searchOptions.hasOwnProperty('dataproduct_type')) {
+            searchOptions['dataproduct_type'] = 'image';
+        }
+        HiPSDefinition.getRemoteDefinitions(searchOptions, function(candidates) {
+            var defs = [];
+            for (var k=0; k<candidates.length; k++) {
+                defs.push(new HiPSDefinition(candidates[k]));
+            }
+            (typeof callback === 'function') && callback(defs);
+        });
+    };
+
+
+    // Create a HiPSDefinition object from a URL
+    //
+    // If the URL ends with 'properties', it is assumed to be the URL of the properties file
+    // else, it is assumed to be the base URL of the HiPS
+    //
+    // return a HiPSDefinition if successful, null if it failed
+    HiPSDefinition.fromURL = function(url, callback) {
+        var hipsUrl, propertiesUrl;
+        if (url.slice(-10) === 'properties') {
+            propertiesUrl = url;
+            hipsUrl = propertiesUrl.slice(0, -11);
+        }
+        else {
+            if (url.slice(-1) === '/') {
+                url = url.slice(0, -1);
+            }
+            hipsUrl = url;
+            propertiesUrl = hipsUrl + '/properties';
+        }
+
+        var callbackWhenPropertiesLoaded = function(properties) {
+            // this can happen sometimes, for instance Hipsgen does not set the hips_service_url keyword
+            // in that case, we add the URL that was given as input param
+            var hipsPropertiesDict = HiPSDefinition.parseHiPSProperties(properties);
+            if (! hipsPropertiesDict.hasOwnProperty('hips_service_url')) {
+                hipsPropertiesDict['hips_service_url'] = hipsUrl;
+            }
+            (typeof callback === 'function') && callback(new HiPSDefinition(hipsPropertiesDict));
+        };
+
+        // try first without proxy
+        var ajax = Utils.getAjaxObject(propertiesUrl, 'GET', 'text', false);
+        ajax
+            .done(function(data) {
+                callbackWhenPropertiesLoaded(data);
+            })
+            .fail(function() {
+                // if not working, try with the proxy
+                var ajax = Utils.getAjaxObject(propertiesUrl, 'GET', 'text', true);
+                ajax
+                    .done(function(data) {
+                        callbackWhenPropertiesLoaded(data);
+                    })
+                    .fail(function() {
+                        (typeof callback === 'function') && callback(null);
+                    })
+            });
+    };
+
+    // HiPSDefinition generation from a properties dict-like object
+    HiPSDefinition.fromProperties = function(properties) {
+        return new HiPSDefinition(properties);
+    };
+
+
+
+
+    HiPSDefinition.init();
+
+    return HiPSDefinition;
+
+})();
+
+// Copyright 2013 - UDS/CNRS
+// The Aladin Lite program is distributed under the terms
+// of the GNU General Public License version 3.
+//
+// This file is part of Aladin Lite.
+//
+//    Aladin Lite is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, version 3 of the License.
+//
+//    Aladin Lite is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    The GNU General Public License is available in COPYING file
+//    along with Aladin Lite.
+//
+
+
+
+/******************************************************************************
+ * Aladin Lite project
+ * 
+ * File Downloader
+ * Queue downloading for image elements
+ * 
+ * Author: Thomas Boch[CDS]
+ * 
+ *****************************************************************************/
+
+Downloader = (function() {
+	var NB_MAX_SIMULTANEOUS_DL = 4;
+	// TODO : le fading ne marche pas bien actuellement
+	var FADING_ENABLED = false;
+	var FADING_DURATION = 700; // in milliseconds
+	
+	
+	var Downloader = function(view) {
+		this.view = view; // reference to the view to be able to request redraw
+		this.nbDownloads = 0; // number of current downloads
+		this.dlQueue = []; // queue of items being downloaded
+        this.urlsInQueue = {};
+	};
+	
+	Downloader.prototype.requestDownload = function(img, url, cors) {
+        // first check if url already in queue
+        if (url in this.urlsInQueue)  {
+            return;
+        }
+		// put in queue
+		this.dlQueue.push({img: img, url: url, cors: cors});
+		this.urlsInQueue[url] = 1;
+		
+		this.tryDownload();
+	};
+	
+	// try to download next items in queue if possible
+	Downloader.prototype.tryDownload = function() {
+	    //if (this.dlQueue.length>0 && this.nbDownloads<NB_MAX_SIMULTANEOUS_DL) {
+		while (this.dlQueue.length>0 && this.nbDownloads<NB_MAX_SIMULTANEOUS_DL) {
+			this.startDownloadNext();
+		}
+	};
+	
+	Downloader.prototype.startDownloadNext = function() {
+		// get next in queue
+		var next = this.dlQueue.shift();
+		if ( ! next) {
+			return;
+		}
+
+		this.nbDownloads++;
+		var downloaderRef = this;
+		next.img.onload = function() {
+			downloaderRef.completeDownload(this, true); // in this context, 'this' is the Image
+		};
+			
+		next.img.onerror = function(e) {
+			downloaderRef.completeDownload(this, false); // in this context, 'this' is the Image
+		};
+		if (next.cors) {
+		    next.img.crossOrigin = 'anonymous';
+		}
+		
+		else {
+		    if (next.img.crossOrigin !== undefined) {
+		        delete next.img.crossOrigin;
+		    }
+		}
+		
+		
+		next.img.src = next.url;
+	};
+	
+	Downloader.prototype.completeDownload = function(img, success) {
+        delete this.urlsInQueue[img.src];
+		img.onerror = null;
+		img.onload = null;
+		this.nbDownloads--;
+		if (success) {
+			if (FADING_ENABLED) {
+				var now = new Date().getTime();
+				img.fadingStart = now;
+				img.fadingEnd = now + FADING_DURATION;
+			}
+			this.view.requestRedraw();
+		}
+		else {
+		    img.dlError = true;
+		}
+		
+		this.tryDownload();
+	};
+	
+	
+	
+	return Downloader;
+})();
 // Copyright 2015 - UDS/CNRS
 // The Aladin Lite program is distributed under the terms
 // of the GNU General Public License version 3.
@@ -5888,12 +6216,15 @@ Polyline= (function() {
 Overlay = (function() {
    Overlay = function(options) {
         options = options || {};
+
+        this.type = 'overlay';
+
     	this.name = options.name || "overlay";
     	this.color = options.color || Color.getNextColor();
         
     	this.lineWidth = options["lineWidth"] || 2;
     	
-    	//this.indexationNorder = 5; // à quel niveau indexe-t-on les overlays
+    	//this.indexationNorder = 5; // at which level should we index overlays?
     	this.overlays = [];
     	this.overlay_items = []; // currently Circle or Polyline
     	//this.hpxIdx = new HealpixIndex(this.indexationNorder);
@@ -5931,7 +6262,7 @@ Overlay = (function() {
             if(s=='polygon') {
                 curPolygon = [];
                 k++;
-                var frame = parts[k].toLowerCase();
+                frame = parts[k].toLowerCase();
                 if (frame=='icrs' || frame=='j2000') {
                     while(k+2<len) {
                         var ra = parseFloat(parts[k+1]);
@@ -5995,12 +6326,12 @@ Overlay = (function() {
             return;
         }
         
-        // tracé simple
+        // simple drawing
         ctx.strokeStyle= this.color;
 
-        // 1. Tracé polygons
+        // 1. Drawing polygons
         
-        // TODO: les overlay polygons devrait se tracer lui meme (méthode draw)
+        // TODO: les overlay polygons devrait se tracer lui meme (methode draw)
         ctx.lineWidth = this.lineWidth;
     	ctx.beginPath();
     	xyviews = [];
@@ -6009,7 +6340,7 @@ Overlay = (function() {
     	}
         ctx.stroke();
 
-    	// tracé sélection
+    	// selection drawing
         ctx.strokeStyle= Overlay.increase_brightness(this.color, 80);
         //ctx.strokeStyle= 'green';
         ctx.beginPath();
@@ -6022,7 +6353,7 @@ Overlay = (function() {
         }
     	ctx.stroke();
     	
-        // 2. Tracé cercles ou polylines
+        // 2. Circle and polylines drawing
     	for (var k=0; k<this.overlay_items.length; k++) {
     	    this.overlay_items[k].draw(ctx, projection, frame, width, height, largestDim, zoomFactor);
     	}
@@ -6191,7 +6522,6 @@ cds.Source = (function() {
         }
         this.isSelected = true;
         if (this.catalog) {
-console.log(this.isSelected);
             this.catalog.reportChange();
         }
     };
@@ -6269,8 +6599,8 @@ console.log(this.isSelected);
  * 
  *****************************************************************************/
 
-// TODO: indexer sources par numéro HEALPix
-// TODO : harmoniser parsing avec classe Catalog
+// TODO: index sources according to their HEALPix ipix
+// TODO : merge parsing with class Catalog
 ProgressiveCat = (function() {
     
     // TODO : test if CORS support. If no, need to pass through a proxy
@@ -6290,7 +6620,11 @@ ProgressiveCat = (function() {
 
         this.name = options.name || "progressive-cat";
         this.color = options.color || Color.getNextColor();
-        this.sourceSize = options.sourceSize || 10;
+        this.shape = options.shape || "square";
+        this.sourceSize = options.sourceSize || 6;
+        this.selectSize = this.sourceSize + 2;
+        this.selectionColor = '#00ff00'; // TODO: to be merged with Catalog
+
 
         this.onClick = options.onClick || undefined; // TODO: inherit from catalog
 
@@ -6299,28 +6633,35 @@ ProgressiveCat = (function() {
         // we cache the list of sources in each healpix tile. Key of the cache is norder+'-'+npix
         this.sourcesCache = new Utils.LRUCache(100);
 
-        this.cacheCanvas = document.createElement('canvas');
-        this.cacheCanvas.width = this.sourceSize;
-        this.cacheCanvas.height = this.sourceSize;
-        var cacheCtx = this.cacheCanvas.getContext('2d');
-        cacheCtx.beginPath();
-        cacheCtx.strokeStyle = this.color;
-        cacheCtx.lineWidth = 2.0;
-        cacheCtx.moveTo(0, 0);
-        cacheCtx.lineTo(0,  this.sourceSize);
-        cacheCtx.lineTo( this.sourceSize,  this.sourceSize);
-        cacheCtx.lineTo( this.sourceSize, 0);
-        cacheCtx.lineTo(0, 0);
-        cacheCtx.stroke();
+        this.cacheCanvas = cds.Catalog.createShape(this.shape, this.color, this.sourceSize);
+
+        this.cacheSelectCanvas = document.createElement('canvas');
+        this.cacheSelectCanvas.width = this.selectSize;
+        this.cacheSelectCanvas.height = this.selectSize;
+        var cacheSelectCtx = this.cacheSelectCanvas.getContext('2d');
+        cacheSelectCtx.beginPath();
+        cacheSelectCtx.strokeStyle = this.selectionColor;
+        cacheSelectCtx.lineWidth = 2.0;
+        cacheSelectCtx.moveTo(0, 0);
+        cacheSelectCtx.lineTo(0,  this.selectSize);
+        cacheSelectCtx.lineTo( this.selectSize,  this.selectSize);
+        cacheSelectCtx.lineTo( this.selectSize, 0);
+        cacheSelectCtx.lineTo(0, 0);
+        cacheSelectCtx.stroke(); // TODO: to be merged with Catalog
+
+
+
+        this.maxOrderAllsky = 2;
+        this.isReady = false;
     };
 
     // TODO: to be put higher in the class diagram, in a HiPS generic class
-    ProgressiveCat.readProperties = function(successCallback, errorCallback) {
+    ProgressiveCat.readProperties = function(rootUrl, successCallback, errorCallback) {
         if (! successCallback) {
             return;
         }
 
-        var propertiesURL = this.rootUrl + '/properties';
+        var propertiesURL = rootUrl + '/properties';
         $.ajax({
             url: propertiesURL,
             method: 'GET',
@@ -6340,8 +6681,8 @@ ProgressiveCat = (function() {
                 successCallback(props);
                 
             },
-            error: function() { // TODO : which parameters should we put in the error callback
-                errorCallback && errorCallback();
+            error: function(err) { // TODO : which parameters should we put in the error callback
+                errorCallback && errorCallback(err);
             }
         });
 
@@ -6447,25 +6788,29 @@ ProgressiveCat = (function() {
             var self = this;
             this.view = view;
 
-            if (this.maxOrder !== undefined && this.frameStr!==undefined) {
+            if (this.maxOrder && this.frameStr) {
                 this._loadMetadata();
             }
 
             else {
-                ProgressiveCat.readProperties(function (properties) {
-                    self.properties = properties;
-                    this.maxOrder = self.properties['hips_order'];
-                    this.frame = CooFrameEnum.fromString(self.properties['hips_frame']);
+                ProgressiveCat.readProperties(self.rootUrl,
+                    function (properties) {
+                        self.properties = properties;
+                        self.maxOrder = self.properties['hips_order'];
+                        self.frame = CooFrameEnum.fromString(self.properties['hips_frame']);
 
-                    this._loadMetadata();
-                });
+                        self._loadMetadata();
+                    }, function(err) {
+                        console.log('Could not find properties for HiPS ' + self.rootUrl);
+                    }
+                );
             }
         },
 
         _loadMetadata: function() {
             var self = this;
             $.ajax({
-                url: self.rootUrl + '/' + 'metadata.xml',
+                url: self.rootUrl + '/' + 'Metadata.xml',
                 method: 'GET',
                 success: function(xml) {
                     self.fields = getFields(self, xml);
@@ -6478,10 +6823,43 @@ ProgressiveCat = (function() {
         },
 
         _loadAllskyNewMethod: function() {
-            // TODO
+            var self = this;
+            $.ajax({
+                url: self.rootUrl + '/' + 'Norder1/Allsky.tsv',
+                method: 'GET',
+                success: function(tsv) {
+                    self.order1Sources = getSources(self, tsv, self.fields);
+
+                    if (self.order2Sources) {
+                        self.isReady = true;
+                        self.view.requestRedraw();
+                    }
+                },
+                error: function(err) {
+                    console.log('Something went wrong: ' + err);
+                }
+            });
+
+            $.ajax({
+                url: self.rootUrl + '/' + 'Norder2/Allsky.tsv',
+                method: 'GET',
+                success: function(tsv) {
+                    self.order2Sources = getSources(self, tsv, self.fields);
+
+                    if (self.order1Sources) {
+                        self.isReady = true;
+                        self.view.requestRedraw();
+                    }
+                },
+                error: function(err) {
+                    console.log('Something went wrong: ' + err);
+                }
+            });
+
         },
 
         _loadAllskyOldMethod: function() {
+            this.maxOrderAllsky = 3;
             this._loadLevel2Sources();
             this._loadLevel3Sources();
         },
@@ -6493,7 +6871,11 @@ ProgressiveCat = (function() {
                 method: 'GET',
                 success: function(xml) {
                     self.fields = getFields(self, xml);
-                    self.level2Sources = getSources(self, $(xml).find('CSV').text(), self.fields);
+                    self.order2Sources = getSources(self, $(xml).find('CSV').text(), self.fields);
+                    if (self.order3Sources) {
+                        self.isReady = true;
+                        self.view.requestRedraw();
+                    }
                 },
                 error: function(err) {
                     console.log('Something went wrong: ' + err);
@@ -6507,9 +6889,11 @@ ProgressiveCat = (function() {
                 url: self.rootUrl + '/' + 'Norder3/Allsky.xml',
                 method: 'GET',
                 success: function(xml) {
-                    self.level3Sources = getSources(self, $(xml).find('CSV').text(), self.fields);
-                    //console.log(self.level3Sources);
-                    self.view.requestRedraw();
+                    self.order3Sources = getSources(self, $(xml).find('CSV').text(), self.fields);
+                    if (self.order2Sources) {
+                        self.isReady = true;
+                        self.view.requestRedraw();
+                    }
                 },
                 error: function(err) {
                     console.log('Something went wrong: ' + err);
@@ -6518,11 +6902,12 @@ ProgressiveCat = (function() {
         },
 
         draw: function(ctx, projection, frame, width, height, largestDim, zoomFactor) {
-            if (! this.isShowing || ! this.level3Sources) {
+            if (! this.isShowing || ! this.isReady) {
                 return;
             }
-            this.drawSources(this.level2Sources, ctx, projection, frame, width, height, largestDim, zoomFactor);
-            this.drawSources(this.level3Sources, ctx, projection, frame, width, height, largestDim, zoomFactor);
+            this.drawSources(this.order1Sources, ctx, projection, frame, width, height, largestDim, zoomFactor);
+            this.drawSources(this.order2Sources, ctx, projection, frame, width, height, largestDim, zoomFactor);
+            this.drawSources(this.order3Sources, ctx, projection, frame, width, height, largestDim, zoomFactor);
             
             if (!this.tilesInView) {
                 return;
@@ -6541,17 +6926,30 @@ ProgressiveCat = (function() {
             
         },
         drawSources: function(sources, ctx, projection, frame, width, height, largestDim, zoomFactor) {
+            if (! sources) {
+                return;
+            }
             for (var k=0, len = sources.length; k<len; k++) {
-                this.drawSource(sources[k], ctx, projection, frame, width, height, largestDim, zoomFactor);
+                cds.Catalog.drawSource(this, sources[k], ctx, projection, frame, width, height, largestDim, zoomFactor);
+            }
+            for (var k=0, len = sources.length; k<len; k++) {
+                if (! sources[k].isSelected) {
+                    continue;
+                }
+                cds.Catalog.drawSourceSelection(this, sources[k], ctx);
             }
         },
+
         getSources: function() {
             var ret = [];
-            if (this.level2Sources) {
-                ret = ret.concat(this.level2Sources);
+            if (this.order1Sources) {
+                ret = ret.concat(this.order1Sources);
             }
-            if (this.level3Sources) {
-                ret = ret.concat(this.level3Sources);
+            if (this.order2Sources) {
+                ret = ret.concat(this.order2Sources);
+            }
+            if (this.order3Sources) {
+                ret = ret.concat(this.order3Sources);
             }
             if (this.tilesInView) {
                 var sources, key, t;
@@ -6568,44 +6966,25 @@ ProgressiveCat = (function() {
             return ret;
         },
 
-        // TODO : factoriser avec drawSource de Catalog
-        drawSource: function(s, ctx, projection, frame, width, height, largestDim, zoomFactor) {
-            if (! s.isShowing) {
-                return;
-            }
-            var sourceSize = this.sourceSize;
-            var xy;
-            if (frame!=CooFrameEnum.J2000) {
-                var lonlat = CooConversion.J2000ToGalactic([s.ra, s.dec]);
-                xy = projection.project(lonlat[0], lonlat[1]);
-            }
-            else {
-                xy = projection.project(s.ra, s.dec);
-            }
-            if (xy) {
-                var xyview = AladinUtils.xyToView(xy.X, xy.Y, width, height, largestDim, zoomFactor);
-                if (xyview) {
-                    // TODO : index sources
-                    // check if source is visible in view ?
-                    if (xyview.vx>(width+sourceSize)  || xyview.vx<(0-sourceSize) ||
-                        xyview.vy>(height+sourceSize) || xyview.vy<(0-sourceSize)) {
-                        s.x = s.y = undefined;
-                        return;
-                    }
 
-                    s.x = xyview.vx;
-                    s.y = xyview.vy;
-                    ctx.drawImage(this.cacheCanvas, s.x-sourceSize/2, s.y-sourceSize/2);
-                }
-            }
-        },
         
         deselectAll: function() {
-            for (var k=0; k<this.level2Sources.length; k++) {
-                this.level2Sources[k].deselect();
+            if (this.order1Sources) {
+                for (var k=0; k<this.order1Sources.length; k++) {
+                    this.order1Sources[k].deselect();
+                }
             }
-            for (var k=0; k<this.level3Sources.length; k++) {
-                this.level3Sources[k].deselect();
+
+            if (this.order2Sources) {
+                for (var k=0; k<this.order2Sources.length; k++) {
+                    this.order2Sources[k].deselect();
+                }
+            }
+
+            if (this.order3Sources) {
+                for (var k=0; k<this.order3Sources.length; k++) {
+                    this.order3Sources[k].deselect();
+                }
             }
             var keys = this.sourcesCache.keys();
             for (key in keys) {
@@ -6650,7 +7029,7 @@ ProgressiveCat = (function() {
             if (norder>this.maxOrder) {
                 norder = this.maxOrder;
             }
-            if (norder<=3) {
+            if (norder<=this.maxOrderAllsky) {
                 return; // nothing to do, hurrayh !
             }
             var cells = this.view.getVisibleCells(norder, this.frame);
@@ -6683,7 +7062,7 @@ ProgressiveCat = (function() {
                             url: Aladin.JSONP_PROXY,
                             data: {"url": self.getTileURL(norder, ipix)},
                             */
-                            // ATTENTIOn : je passe en JSON direct, car je n'arrive pas à choper les 404 en JSONP
+                            // ATTENTIOn : je passe en JSON direct, car je n'arrive pas a choper les 404 en JSONP
                             url: self.getTileURL(norder, ipix),
                             method: 'GET',
                             //dataType: 'jsonp',
@@ -6755,11 +7134,11 @@ cds.Catalog = (function() {
     	this.sourceSize = options.sourceSize || 6;
     	this.markerSize = options.sourceSize || 12;
     	this.shape = options.shape || "square";
-        this.maxNbSources = options.limit || undefined;
+        this.maxNbSources = options.limit || undefined;
         this.onClick = options.onClick || undefined;
 
-        this.raField = options.raField || undefined; // ID or name of the field holding RA
-        this.decField = options.decField || undefined; // ID or name of the field holding dec
+        this.raField = options.raField || undefined; // ID or name of the field holding RA
+        this.decField = options.decField || undefined; // ID or name of the field holding dec
 
         this.displayLabel = options.displayLabel || false;
         this.labelColor = options.labelColor || this.color;
@@ -6771,8 +7150,12 @@ cds.Catalog = (function() {
             }
         }
     	
-        if (this.shape instanceof Image) {
+        if (this.shape instanceof Image || this.shape instanceof HTMLCanvasElement) {
             this.sourceSize = this.shape.width;
+        }
+        this._shapeIsFunction = false; // if true, the shape is a function drawing on the canvas
+        if ($.isFunction(this.shape)) {
+            this._shapeIsFunction = true;
         }
         this.selectSize = this.sourceSize + 2;
         
@@ -6819,7 +7202,7 @@ cds.Catalog = (function() {
     };
     
     cds.Catalog.createShape = function(shapeName, color, sourceSize) {
-        if (shapeName instanceof Image) { // 
+        if (shapeName instanceof Image || shapeName instanceof HTMLCanvasElement) { // in this case, the shape is already created
             return shapeName;
         }
         var c = document.createElement('canvas');
@@ -6875,64 +7258,13 @@ cds.Catalog = (function() {
     };
     
 
-    
-    
-    // return an array of Source(s) from a VOTable url
-    // callback function is called each time a TABLE element has been parsed
-    cds.Catalog.parseVOTable = function(url, callback, maxNbSources, useProxy, raField, decField) {
-
-        // adapted from votable.js
-        function getPrefix($xml) {
-            var prefix;
-            // If Webkit chrome/safari/... (no need prefix)
-            if($xml.find('RESOURCE').length>0) {
-                prefix = '';
-            }
-            else {
-                // Select all data in the document
-                prefix = $xml.find("*").first();
-
-                if (prefix.length==0) {
-                    return '';
-                }
-
-                // get name of the firt tag
-                prefix = prefix.prop("tagName");
-
-                var idx = prefix.indexOf(':');
-
-                prefix = prefix.substring(0, idx) + "\\:";
-
-
-            }
-
-            return prefix;
-        }
-        
-        function doParseVOTable(xml, callback) {
-            xml = xml.replace(/^\s+/g, ''); // we need to trim whitespaces at start of document
-            var attributes = ["name", "ID", "ucd", "utype", "unit", "datatype", "arraysize", "width", "precision"];
-            
-            var fields = [];
-            var k = 0;
-            var $xml = $(xml);
-            var prefix = getPrefix($xml);
-            $xml.find(prefix + "FIELD").each(function() {
-                var f = {};
-                for (var i=0; i<attributes.length; i++) {
-                    var attribute = attributes[i];
-                    if ($(this).attr(attribute)) {
-                        f[attribute] = $(this).attr(attribute);
-                    }
-                }
-                if ( ! f.ID) {
-                    f.ID = "col_" + k;
-                }
-                fields.push(f);
-                k++;
-            });
-                
-            //// find RA/DEC fields ////
+        // find RA, Dec fields among the given fields
+        //
+        // @param fields: list of objects with ucd, unit, ID, name attributes
+        // @param raField:  index or name of right ascension column (might be undefined)
+        // @param decField: index or name of declination column (might be undefined)
+        //
+        function findRADecFields(fields, raField, decField) {
             var raFieldIdx,  decFieldIdx;
             raFieldIdx = decFieldIdx = null;
 
@@ -6972,8 +7304,8 @@ cds.Catalog = (function() {
                 var field = fields[l];
                 if ( ! raFieldIdx) {
                     if (field.ucd) {
-                        var ucd = field.ucd.toLowerCase();
-                        if (ucd.indexOf('pos.eq.ra')>=0 || ucd.indexOf('pos_eq_ra')>=0) {
+                        var ucd = $.trim(field.ucd.toLowerCase());
+                        if (ucd.indexOf('pos.eq.ra')==0 || ucd.indexOf('pos_eq_ra')==0) {
                             raFieldIdx = l;
                             continue;
                         }
@@ -6982,15 +7314,110 @@ cds.Catalog = (function() {
                     
                 if ( ! decFieldIdx) {
                     if (field.ucd) {
-                        var ucd = field.ucd.toLowerCase();
-                        if (ucd.indexOf('pos.eq.dec')>=0 || ucd.indexOf('pos_eq_dec')>=0) {
+                        var ucd = $.trim(field.ucd.toLowerCase());
+                        if (ucd.indexOf('pos.eq.dec')==0 || ucd.indexOf('pos_eq_dec')==0) {
                             decFieldIdx = l;
                             continue;
                         }
                     }
                 }
+            }
+
+            // still not found ? try some common names for RA and Dec columns
+            if (raFieldIdx==null && decFieldIdx==null) {
+                for (var l=0, len=fields.length; l<len; l++) {
+                    var field = fields[l];
+                    var name = field.name || field.ID || '';
+                    name = name.toLowerCase();
+                    
+                    if ( ! raFieldIdx) {
+                        if (name.indexOf('ra')==0 || name.indexOf('_ra')==0 || name.indexOf('ra(icrs)')==0 || name.indexOf('_ra')==0 || name.indexOf('alpha')==0) {
+                            raFieldIdx = l;
+                            continue;
+                        }
+                    }
+
+                    if ( ! decFieldIdx) {
+                        if (name.indexOf('dej2000')==0 || name.indexOf('_dej2000')==0 || name.indexOf('de')==0 || name.indexOf('de(icrs)')==0 || name.indexOf('_de')==0 || name.indexOf('delta')==0) {
+                            decFieldIdx = l;
+                            continue;
+                        }
+                    }
+                    
+                }
+            }
+
+            // last resort: take two first fieds
+            if (raFieldIdx==null || decFieldIdx==null) {
+                raFieldIdx  = 0;
+                decFieldIdx = 1
+            }
+
+            return [raFieldIdx, decFieldIdx];
+        };
+        
+    
+    
+    // return an array of Source(s) from a VOTable url
+    // callback function is called each time a TABLE element has been parsed
+    cds.Catalog.parseVOTable = function(url, callback, maxNbSources, useProxy, raField, decField) {
+
+        // adapted from votable.js
+        function getPrefix($xml) {
+            var prefix;
+            // If Webkit chrome/safari/... (no need prefix)
+            if($xml.find('RESOURCE').length>0) {
+                prefix = '';
+            }
+            else {
+                // Select all data in the document
+                prefix = $xml.find("*").first();
+
+                if (prefix.length==0) {
+                    return '';
+                }
+
+                // get name of the first tag
+                prefix = prefix.prop("tagName");
+
+                var idx = prefix.indexOf(':');
+
+                prefix = prefix.substring(0, idx) + "\\:";
+
 
             }
+
+            return prefix;
+        }
+
+        function doParseVOTable(xml, callback) {
+            xml = xml.replace(/^\s+/g, ''); // we need to trim whitespaces at start of document
+            var attributes = ["name", "ID", "ucd", "utype", "unit", "datatype", "arraysize", "width", "precision"];
+            
+            var fields = [];
+            var k = 0;
+            var $xml = $(xml);
+            var prefix = getPrefix($xml);
+            $xml.find(prefix + "FIELD").each(function() {
+                var f = {};
+                for (var i=0; i<attributes.length; i++) {
+                    var attribute = attributes[i];
+                    if ($(this).attr(attribute)) {
+                        f[attribute] = $(this).attr(attribute);
+                    }
+                }
+                if ( ! f.ID) {
+                    f.ID = "col_" + k;
+                }
+                fields.push(f);
+                k++;
+            });
+                
+            var raDecFieldIdxes = findRADecFields(fields, raField, decField);
+            var raFieldIdx,  decFieldIdx;
+            raFieldIdx = raDecFieldIdxes[0];
+            decFieldIdx = raDecFieldIdxes[1];
+
             var sources = [];
             
             var coo = new Coo();
@@ -7032,12 +7459,57 @@ cds.Catalog = (function() {
         });
     };
     
+    // API
     cds.Catalog.prototype.addSources = function(sourcesToAdd) {
+        sourcesToAdd = [].concat(sourcesToAdd); // make sure we have an array and not an individual source
     	this.sources = this.sources.concat(sourcesToAdd);
     	for (var k=0, len=sourcesToAdd.length; k<len; k++) {
     	    sourcesToAdd[k].setCatalog(this);
     	}
         this.reportChange();
+    };
+
+    // API
+    //
+    // create sources from a 2d array and add them to the catalog
+    //
+    // @param columnNames: array with names of the columns
+    // @array: 2D-array, each item being a 1d-array with the same number of items as columnNames
+    cds.Catalog.prototype.addSourcesAsArray = function(columnNames, array) {
+        var fields = [];
+        for (var colIdx=0 ; colIdx<columnNames.length; colIdx++) {
+            fields.push({name: columnNames[colIdx]});
+        }
+        var raDecFieldIdxes = findRADecFields(fields, this.raField, this.decField);
+        var raFieldIdx,  decFieldIdx;
+        raFieldIdx = raDecFieldIdxes[0];
+        decFieldIdx = raDecFieldIdxes[1];
+
+
+        var newSources = [];
+        var coo = new Coo();
+        var ra, dec, row, dataDict;
+        for (var rowIdx=0 ; rowIdx<array.length ; rowIdx++) {
+            row = array[rowIdx];
+            if (Utils.isNumber(row[raFieldIdx]) && Utils.isNumber(row[decFieldIdx])) {
+                   ra = parseFloat(row[raFieldIdx]);
+                   dec = parseFloat(row[decFieldIdx]);
+            }
+               else {
+                   coo.parse(row[raFieldIdx] + " " + row[decFieldIdx]);
+                   ra = coo.lon;
+                   dec = coo.lat;
+               }
+
+            dataDict = {};
+            for (var colIdx=0 ; colIdx<columnNames.length; colIdx++) {
+                dataDict[columnNames[colIdx]] = row[colIdx];
+            }
+
+            newSources.push(A.source(ra, dec, dataDict));
+        }
+
+        this.addSources(newSources);
     };
     
     // return the currnet list of Source objects
@@ -7095,9 +7567,15 @@ cds.Catalog = (function() {
 
         //ctx.lineWidth = 1;
     	//ctx.beginPath();
-    	for (var k=0, len = this.sources.length; k<len; k++) {
-    		this.drawSource(this.sources[k], ctx, projection, frame, width, height, largestDim, zoomFactor);
-    	}
+        if (this._shapeIsFunction) {
+            ctx.save();
+        }
+ 	    for (var k=0, len = this.sources.length; k<len; k++) {
+		    cds.Catalog.drawSource(this, this.sources[k], ctx, projection, frame, width, height, largestDim, zoomFactor);
+        }
+        if (this._shapeIsFunction) {
+            ctx.restore();
+        }
         //ctx.stroke();
 
     	// tracé sélection
@@ -7107,7 +7585,7 @@ cds.Catalog = (function() {
             if (! this.sources[k].isSelected) {
                 continue;
             }
-            this.drawSourceSelection(this.sources[k], ctx);
+            cds.Catalog.drawSourceSelection(this, this.sources[k], ctx);
             
         }
         // NEEDED ?
@@ -7118,18 +7596,18 @@ cds.Catalog = (function() {
             ctx.fillStyle = this.labelColor;
             ctx.font = this.labelFont;
             for (var k=0, len = this.sources.length; k<len; k++) {
-                this.drawSourceLabel(this.sources[k], ctx);
+                cds.Catalog.drawSourceLabel(this, this.sources[k], ctx);
             }
         }
     };
     
     
     
-    cds.Catalog.prototype.drawSource = function(s, ctx, projection, frame, width, height, largestDim, zoomFactor) {
+    cds.Catalog.drawSource = function(catalogInstance, s, ctx, projection, frame, width, height, largestDim, zoomFactor) {
         if (! s.isShowing) {
             return;
         }
-        var sourceSize = this.sourceSize;
+        var sourceSize = catalogInstance.sourceSize;
         // TODO : we could factorize this code with Aladin.world2pix
         var xy;
         if (frame!=CooFrameEnum.J2000) {
@@ -7139,6 +7617,7 @@ cds.Catalog = (function() {
         else {
             xy = projection.project(s.ra, s.dec);
         }
+
         if (xy) {
             var xyview = AladinUtils.xyToView(xy.X, xy.Y, width, height, largestDim, zoomFactor, true);
             var max = s.popup ? 100 : s.sourceSize;
@@ -7154,12 +7633,14 @@ cds.Catalog = (function() {
                 
                 s.x = xyview.vx;
                 s.y = xyview.vy;
-
-                if (s.marker) {
-                    ctx.drawImage(this.cacheMarkerCanvas, s.x-sourceSize/2, s.y-sourceSize/2);
+                if (catalogInstance._shapeIsFunction) {
+                    catalogInstance.shape(s, ctx, catalogInstance.view.getViewParams());
+                }
+                else if (s.marker) {
+                    ctx.drawImage(catalogInstance.cacheMarkerCanvas, s.x-sourceSize/2, s.y-sourceSize/2);
                 }
                 else {
-                    ctx.drawImage(this.cacheCanvas, s.x-this.cacheCanvas.width/2, s.y-this.cacheCanvas.height/2);
+                    ctx.drawImage(catalogInstance.cacheCanvas, s.x-catalogInstance.cacheCanvas.width/2, s.y-catalogInstance.cacheCanvas.height/2);
                 }
 
 
@@ -7173,21 +7654,21 @@ cds.Catalog = (function() {
         }
     };
     
-    cds.Catalog.prototype.drawSourceSelection = function(s, ctx) {
+    cds.Catalog.drawSourceSelection = function(catalogInstance, s, ctx) {
         if (!s || !s.isShowing || !s.x || !s.y) {
             return;
         }
-        var sourceSize = this.selectSize;
+        var sourceSize = catalogInstance.selectSize;
         
-        ctx.drawImage(this.cacheSelectCanvas, s.x-sourceSize/2, s.y-sourceSize/2);
+        ctx.drawImage(catalogInstance.cacheSelectCanvas, s.x-sourceSize/2, s.y-sourceSize/2);
     };
 
-    cds.Catalog.prototype.drawSourceLabel = function(s, ctx) {
+    cds.Catalog.drawSourceLabel = function(catalogInstance, s, ctx) {
         if (!s || !s.isShowing || !s.x || !s.y) {
             return;
         }
 
-        var label = s.data[this.labelColumn];
+        var label = s.data[catalogInstance.labelColumn];
         if (!label) {
             return;
         }
@@ -7690,7 +8171,7 @@ HpxKey = (function() {
         this.dx = dx || 0; // shift in x (for all-sky tiles)
         this.dy = dy || 0; // shift in y (for all-sky tiles)
 
-        this.allskyTexture = allskyTexture || undefined;
+        this.allskyTexture = allskyTexture || undefined;
         this.allskyTextureSize = allskyTextureSize;
 
         this.parente = 0; // if this key comes from an ancestor, length of the filiation
@@ -7704,7 +8185,7 @@ HpxKey = (function() {
         var hpxKey = new HpxKey(father.norder+1, father.npix*4 + childNb, father.hips, father.width/2, father.height/2,
                                 childNb==2 || childNb==3 ? father.dx+father.width/2 : father.dx, childNb==1 || childNb==3 ? father.dy+father.height/2 : father.dy, father.allskyTexture, father.allskyTextureSize);
         hpxKey.parente = father.parente + 1;
-        hpxKey.ancestor = father.ancestor || father;
+        hpxKey.ancestor = father.ancestor || father;
 
 
         return hpxKey;
@@ -7754,8 +8235,8 @@ HpxKey = (function() {
                 if (!this.allskyTexture && !this.hips.tileSize) {
                     this.hips.tileSize = tile.img.width;
                 }
-                var img = this.allskyTexture || tile.img;
-                var w = this.allskyTextureSize || img.width;
+                var img = this.allskyTexture || tile.img;
+                var w = this.allskyTextureSize || img.width;
                 if (this.parente) {
                     w = w / Math.pow(2, this.parente);
                 } 
@@ -7941,7 +8422,7 @@ HpxKey = (function() {
  * 
  * File HpxImageSurvey
  * 
- * Author: Thomas Boch[CDS]
+ * Author: Thomas Boch [CDS]
  * 
  *****************************************************************************/
 
@@ -7953,42 +8434,50 @@ HpxImageSurvey = (function() {
      * They will be determined by reading the properties file
      *  
      */
-    var HpxImageSurvey = function(id, name, rootUrl, cooFrame, maxOrder, options) {
-        this.id = id;
-    	this.name = name;
-    	if (rootUrl.slice(-1 )=== '/') {
-    	    this.rootUrl = rootUrl.substr(0, rootUrl.length-1);
-    	}
-    	else {
-    	    this.rootUrl = rootUrl;
-    	}
-    	
-    	options = options || {};
-    	// TODO : support PNG
-    	this.imgFormat = options.imgFormat || 'jpg';
+    var HpxImageSurvey = function(idOrHiPSDefinition, name, rootUrl, cooFrame, maxOrder, options) {
+        // new way
+        if (idOrHiPSDefinition instanceof HiPSDefinition) {
+            this.hipsDefinition = idOrHiPSDefinition;
 
-        // permet de forcer l'affichage d'un certain niveau
-        this.minOrder = options.minOrder || null;
-
-        this.tileSize = undefined;
-
-        // TODO : lire depuis fichier properties
-        this.cooFrame = CooFrameEnum.fromString(cooFrame, CooFrameEnum.J2000);
-        
-        // force coo frame for Glimpse 360
-        if (this.rootUrl.indexOf('/glimpse360/aladin/data')>=0) {
-            this.cooFrame = CooFrameEnum.J2000;
         }
+
+        else {
+// REPRENDRE LA,  EN CREANT l'OBJET HiPSDefinition
+            // old way, we retrofit parameters into a HiPSDefinition object
+            this.id = idOrHiPSDefinition;
+    	    this.name = name;
+    	    if (rootUrl.slice(-1) === '/') {
+    	        this.rootUrl = rootUrl.substr(0, rootUrl.length-1);
+    	    }
+    	    else {
+    	        this.rootUrl = rootUrl;
+    	    }
+            // make URL absolute
+            this.rootUrl = Utils.getAbsoluteURL(this.rootUrl);
+    	
+    	    options = options || {};
+    	    // TODO : support PNG
+    	    this.imgFormat = options.imgFormat || 'jpg';
+
+            // permet de forcer l'affichage d'un certain niveau
+            this.minOrder = options.minOrder || null;
+
+
+            // TODO : lire depuis fichier properties
+            this.cooFrame = CooFrameEnum.fromString(cooFrame, CooFrameEnum.J2000);
         
-        // TODO : lire depuis fichier properties
-        this.maxOrder = maxOrder;
+            // force coo frame for Glimpse 360
+            if (this.rootUrl.indexOf('/glimpse360/aladin/data')>=0) {
+                this.cooFrame = CooFrameEnum.J2000;
+            }
+            // TODO : lire depuis fichier properties
+            this.maxOrder = maxOrder;
+        }
     	
+        this.tileSize = undefined;
     	this.allskyTexture = null;
-    	
     	this.alpha = 0.0; // opacity value between 0 and 1 (if this layer is an opacity layer)
-    
     	this.allskyTextureSize = 0;
-    
         this.lastUpdateDateNeededTiles = 0;
 
         var found = false;
@@ -8008,7 +8497,9 @@ HpxImageSurvey = (function() {
         }
         HpxImageSurvey.SURVEYS_OBJECTS[this.id] = this;
     };
-    
+
+
+
     HpxImageSurvey.UPDATE_NEEDED_TILES_DELAY = 1000; // in milliseconds
     
     HpxImageSurvey.prototype.init = function(view, callback) {
@@ -8018,8 +8509,8 @@ HpxImageSurvey = (function() {
             this.cm = new ColorMap(this.view);
         }
     	
-    	//this.tileBuffer = new TileBuffer();
     	// tileBuffer is now shared across different image surveys
+    	//this.tileBuffer = new TileBuffer();
     	this.tileBuffer = this.view.tileBuffer;
     	
     	this.useCors = false;
@@ -8217,16 +8708,6 @@ HpxImageSurvey = (function() {
         return null;
     }
    
-/* 
-    HpxImageSurvey.getSurveyFromId = function(id) {
-    	var info = HpxImageSurvey.getSurveyInfoFromId(id);
-    	if (info) {
-    		return new HpxImageSurvey(info.id, info.name, info.url, info.frame, info.maxOrder);
-    	}
-    	
-    	return null;
-    };
-*/
     
     HpxImageSurvey.prototype.getTileURL = function(norder, npix) {
     	var dirIdx = Math.floor(npix/10000)*10000;
@@ -8273,28 +8754,27 @@ HpxImageSurvey = (function() {
      * @param subdivide: should
      *
      */
-    HpxImageSurvey.prototype.draw = function(ctx, view, subdivide) {
+    HpxImageSurvey.prototype.draw = function(ctx, view, subdivide, curOverlayNorder) {
         subdivide = (subdivide===undefined) ? false: subdivide;
 
-        var cornersXYViewMapAllsky = view.getVisibleCells(3);
+        var cornersXYViewMapAllsky = view.getVisibleCells(3, this.cooFrame);
         var cornersXYViewMapHighres = null;
 
 
 
-        var norder4Display = Math.min(view.curNorder, this.maxOrder);
-        if (view.curNorder>=3) {
-            if (view.curNorder==3) {
+        var norder4Display = Math.min(curOverlayNorder, this.maxOrder);
+        if (curOverlayNorder>=3) {
+            if (curOverlayNorder==3) {
                 cornersXYViewMapHighres = cornersXYViewMapAllsky;
             }
             else {
-                cornersXYViewMapHighres = view.getVisibleCells(norder4Display);
+                cornersXYViewMapHighres = view.getVisibleCells(norder4Display, this.cooFrame);
             }
         }
 
         // new way of drawing
         if (subdivide) {
-            if (view.curNorder>=3) {
-
+            if (curOverlayNorder>=3) {
                 this.drawHighres(ctx, cornersXYViewMapHighres, norder4Display, view);
             }
             else {
@@ -9025,14 +9505,16 @@ View = (function() {
                 this.setZoom(zoom);
             }
     		
-    		// current image survey displayed
+    		// current reference image survey displayed
     		this.imageSurvey = null;
-    		// current catalog displayed
+    		// current catalogs displayed
     		this.catalogs = [];
             // overlays (footprints for instance)
     		this.overlays = [];
             // MOCs
     		this.mocs = [];
+            // reference to all overlay layers (= catalogs + overlays + mocs)
+            this.allOverlayLayers = []
     		
     
     		
@@ -9069,9 +9551,23 @@ View = (function() {
     		    clearTimeout(self.resizeTimer);
     		    self.resizeTimer = setTimeout(function() {self.fixLayoutDimensions(self)}, 100);
     		});
+
+
+            // in some contexts (Jupyter notebook for instance), the parent div changes little time after Aladin Lite creation
+            // this results in canvas dimension to be incorrect.
+            // The following line tries to fix this issue
+            setTimeout(function() {
+                var computedWidth = $(self.aladinDiv).width();
+                var computedHeight = $(self.aladinDiv).height();
+
+                if (self.width!==computedWidth || self.height===computedHeight) {
+                    self.fixLayoutDimensions();
+                    self.setZoomLevel(self.zoomLevel); // needed to force recomputation of displayed FoV
+                }
+           }, 1000);
     	};
 	
-    // différents modes
+    // different available modes
     View.PAN = 0;
     View.SELECT = 1;
     	
@@ -9101,11 +9597,11 @@ View = (function() {
 	View.prototype.fixLayoutDimensions = function() {
         Utils.cssScale = undefined;
 		
-        this.width = $(this.aladinDiv).width();
-		this.height = $(this.aladinDiv).height();
-		
-		this.width = Math.max(this.width, 1);
-		this.height = Math.max(this.height, 1); // this prevents many problems when div size is 0s
+        var computedWidth = $(this.aladinDiv).width();
+		var computedHeight = $(this.aladinDiv).height();
+
+		this.width = Math.max(computedWidth, 1);
+		this.height = Math.max(computedHeight, 1); // this prevents many problems when div size is equal to 0
         
 		
 		this.cx = this.width/2;
@@ -9242,7 +9738,7 @@ View = (function() {
 	        view.fovDiv.html("FoV:");
 	        return;
 	    }
-        // màj valeur FoV
+        // update FoV value
         var fovStr;
         if (view.fov>1) {
             fovStr = Math.round(view.fov*100)/100 + "°";
@@ -9354,9 +9850,9 @@ View = (function() {
                 }
                 // show measurements
                 else {
-                    if (view.aladin.objClickedFunction) {
-                        var ret = view.aladin.objClickedFunction(o);
-                    }
+                    var objClickedFunction = view.aladin.callbacksByEventName['objectClicked'];
+                    (typeof objClickedFunction === 'function') && objClickedFunction(o);
+
                     //else {
                     if (lastClickedObject) {
                         lastClickedObject.actionOtherObjectClicked();
@@ -9372,15 +9868,14 @@ View = (function() {
                     lastClickedObject.actionOtherObjectClicked();
 
                     lastClickedObject = null;
-                    if (view.aladin.objClickedFunction) {
-                        var ret = view.aladin.objClickedFunction(null);
-                    }
+                    var objClickedFunction = view.aladin.callbacksByEventName['objectClicked'];
+                    (typeof objClickedFunction === 'function') && objClickedFunction(null);
                 }
                 
             }
 
 
-            // TODO : remplacer par mécanisme de listeners
+            // TODO : remplacer par mecanisme de listeners
             // on avertit les catalogues progressifs
             view.refreshProgressiveCats();
 
@@ -9409,21 +9904,29 @@ View = (function() {
                     var closest = view.closestObjects(xymouse.x, xymouse.y, 5);
                     if (closest) {
                         view.setCursor('pointer');
-                        if (view.aladin.objHoveredFunction && closest[0]!=lastHoveredObject) {
-                            var ret = view.aladin.objHoveredFunction(closest[0]);
+                        var objHoveredFunction = view.aladin.callbacksByEventName['objectHovered'];
+                        if (typeof objHoveredFunction === 'function' && closest[0]!=lastHoveredObject) {
+                            var ret = objHoveredFunction(closest[0]);
                         }
                         lastHoveredObject = closest[0];
                     }
                     else {
                         view.setCursor('default');
-                        if (view.aladin.objHoveredFunction && lastHoveredObject) {
+                        var objHoveredFunction = view.aladin.callbacksByEventName['objectHovered'];
+                        if (typeof objHoveredFunction === 'function' && lastHoveredObject) {
                             lastHoveredObject = null;
                             // call callback function to notify we left the hovered object
-                            var ret = view.aladin.objHoveredFunction(null);
+                            var ret = objHoveredFunction(null);
                         }
                     }
                 }
-                if (!hasTouchEvents) return;
+                if (!hasTouchEvents) {
+                    return;
+                }
+            }
+
+            if (! view.dragging) {
+                return;
             }
 
             var xoffset, yoffset;
@@ -9514,7 +10017,13 @@ View = (function() {
             event.preventDefault();
             event.stopPropagation();
             var level = view.zoomLevel;
-            var delta = event.deltaY;
+
+             var delta = event.deltaY;
+            // this seems to happen in context of Jupyter notebook --> we have to invert the direction of scroll
+            // hope this won't trigger some side effects ...
+            if (event.hasOwnProperty('originalEvent')) {
+                delta = -event.originalEvent.deltaY;
+            } 
             if (delta>0) {
                 level += 1;
             }
@@ -9538,6 +10047,39 @@ View = (function() {
         view.stats = stats;
 
         createListeners(view);
+
+        view.executeCallbacksThrottled = Utils.throttle(
+            function() {
+                var pos = view.aladin.pix2world(view.width/2, view.height/2);
+                var fov = view.fov;
+                if (pos===undefined || fov===undefined) {
+                    return;
+                }
+
+                var ra = pos[0];
+                var dec = pos[1];
+                // trigger callback only if position has changed !
+                if (ra!==this.ra || dec!==this.dec) {
+                    var posChangedFn = view.aladin.callbacksByEventName['positionChanged'];
+                    (typeof posChangedFn === 'function') && posChangedFn({ra: ra, dec: dec});
+    
+                    // finally, save ra and dec value
+                    this.ra = ra;
+                    this.dec = dec;
+                }
+
+                // trigger callback only if FoV (zoom) has changed !
+                if (fov!==this.old_fov) {
+                    var fovChangedFn = view.aladin.callbacksByEventName['zoomChanged'];
+                    (typeof fovChangedFn === 'function') && fovChangedFn(fov);
+    
+                    // finally, save fov value
+                    this.old_fov = fov;
+                }
+
+            },
+            100);
+
 
         view.displayHpxGrid = false;
         view.displaySurvey = true;
@@ -9598,6 +10140,15 @@ View = (function() {
 
         return 'rgb(' + r + ',' + g + ',' + b + ')';
     };
+
+    View.prototype.getViewParams = function() {
+        var resolution = this.width > this.height ? this.fov / this.width : this.fov / this.height;
+        return {
+            fov: [this.width * resolution, this.height * resolution],   
+            width: this.width,   
+            height: this.height   
+        };
+    };
 	
 	
 
@@ -9624,6 +10175,9 @@ View = (function() {
 		this.stats.update();
         //console.log("redraw at " + now);
 
+        // execute 'positionChanged' and 'zoomChanged' callbacks
+        this.executeCallbacksThrottled();
+
 		var imageCtx = this.imageCtx;
 		//////// 1. Draw images ////////
 		
@@ -9635,27 +10189,22 @@ View = (function() {
         var bkgdColor = this.getBackgroundColor();	
 		// fill with background of the same color than the first color map value (lowest intensity)
         if (this.projectionMethod==ProjectionEnum.SIN) {
-            if (this.fov>80) {
+            if (this.fov>=60) {
                 imageCtx.fillStyle = bkgdColor;
                 imageCtx.beginPath();
-                imageCtx.arc(this.cx, this.cy, this.cx*this.zoomFactor, 0, 2*Math.PI, true);
+                var maxCxCy = this.cx>this.cy ? this.cx : this.cy;
+                imageCtx.arc(this.cx, this.cy, maxCxCy * this.zoomFactor, 0, 2*Math.PI, true);
                 imageCtx.fill();
             }
-            // pour éviter les losanges blancs qui apparaissent quand les tuiles sont en attente de chargement
-            else if (this.fov<60) {
+            // pour eviter les losanges blancs qui apparaissent quand les tuiles sont en attente de chargement
+            else {
                 imageCtx.fillStyle = bkgdColor;
                 imageCtx.fillRect(0, 0, this.imageCanvas.width, this.imageCanvas.height);
-            }
-            else { // 60 <= fov <= 80
-                imageCtx.fillStyle = bkgdColor;
-                imageCtx.beginPath();
-                imageCtx.arc(this.cx, this.cy, this.cx*this.zoomFactor, 0, 2*Math.PI, true);
-                imageCtx.fill();
             }
         }
 
         
-        // TODO : voir si on doit vraiment faire ces vérifs à chaque coup
+        // TODO : check if we really need to make that test every time
 		if (!this.projection) {
 			this.projection = new Projection(this.viewCenter.lon, this.viewCenter.lat);
 		}
@@ -9665,17 +10214,17 @@ View = (function() {
 		this.projection.setProjection(this.projectionMethod);
 	
 
-		// ************* Tracé au niveau allsky (faible résolution) *****************
+		// ************* Draw allsky tiles (low resolution) *****************
 
         var cornersXYViewMapHighres = null;
-        // Pour traitement des DEFORMATIONS --> TEMPORAIRE, draw deviendra la méthode utilisée systématiquement
+        // Pour traitement des DEFORMATIONS --> TEMPORAIRE, draw deviendra la methode utilisee systematiquement
 	    if (this.imageSurvey && this.imageSurvey.isReady && this.displaySurvey) {
                 if (this.aladin.reduceDeformations==null) {
-                    this.imageSurvey.draw(imageCtx, this, !this.dragging);
+                    this.imageSurvey.draw(imageCtx, this, !this.dragging, this.curNorder);
                 }
 
                 else {
-                    this.imageSurvey.draw(imageCtx, this, this.aladin.reduceDeformations);
+                    this.imageSurvey.draw(imageCtx, this, this.aladin.reduceDeformations, this.curNorder);
                 }
         }
         /*
@@ -9694,7 +10243,7 @@ View = (function() {
 		    // redraw image survey
 		    if (this.imageSurvey && this.imageSurvey.isReady && this.displaySurvey) {
 		        // TODO : a t on besoin de dessiner le allsky si norder>=3 ?
-		        // TODO refactoring : devrait être une méthode de HpxImageSurvey
+		        // TODO refactoring : should be a method of HpxImageSurvey
 			    this.imageSurvey.redrawAllsky(imageCtx, cornersXYViewMapAllsky, this.fov, this.curNorder);
                 if (this.curNorder>=3) {
                     this.imageSurvey.redrawHighres(imageCtx, cornersXYViewMapHighres, this.curNorder);
@@ -9711,11 +10260,11 @@ View = (function() {
 		    imageCtx.globalAlpha = this.overlayImageSurvey.getAlpha();
 
             if (this.aladin.reduceDeformations==null) {
-                this.overlayImageSurvey.draw(imageCtx, this, !this.dragging);
+                this.overlayImageSurvey.draw(imageCtx, this, !this.dragging, this.curOverlayNorder);
             }
 
             else {
-                this.overlayImageSurvey.draw(imageCtx, this, this.aladin.reduceDeformations);
+                this.overlayImageSurvey.draw(imageCtx, this, this.aladin.reduceDeformations, this.curOverlayNorder);
             }
             /*
 	        if (this.fov>50) {
@@ -9777,7 +10326,7 @@ View = (function() {
             this.mustClearCatalog = false;
         }
 		if (this.catalogs && this.catalogs.length>0 && this.displayCatalog && (! this.dragging  || View.DRAW_SOURCES_WHILE_DRAGGING)) {
-		      // TODO : ne pas effacer systématiquement
+		      // TODO : do not clear every time
 	        //// clear canvas ////
 		    if (! catalogCanvasCleared) {
 		        catalogCtx.clearRect(0, 0, this.width, this.height);
@@ -9867,7 +10416,7 @@ View = (function() {
 		}
         
         
- 		// TODO : est ce la bonne façon de faire ?
+ 		// TODO : is this the right way?
  		if (saveNeedRedraw==this.needRedraw) {
  			this.needRedraw = false;
  		}
@@ -9876,7 +10425,8 @@ View = (function() {
         // objects lookup
         if (!this.dragging) {
             this.updateObjectsLookup();
-        }
+        } 
+
 	};
 
     View.prototype.forceRedraw = function() {
@@ -9909,7 +10459,7 @@ View = (function() {
             var hpxIdx = new HealpixIndex(nside);
             hpxIdx.init();
             var spatialVector = new SpatialVector();
-            // si frame != frame survey image, il faut faire la conversion dans le système du survey
+            // if frame != frame image survey, we need to convert to survey frame system
             var xy = AladinUtils.viewToXy(this.cx, this.cy, this.width, this.height, this.largestDim, this.zoomFactor);
             var radec = this.projection.unproject(xy.x, xy.y);
             var lonlat = [];
@@ -9955,10 +10505,10 @@ View = (function() {
 	    if (! frameSurvey && this.imageSurvey) {
 	        frameSurvey = this.imageSurvey.cooFrame;
 	    }
-		var cells = []; // will be returned
+		var cells = []; // array to be returned
 		var cornersXY = [];
 		var spVec = new SpatialVector();
-		var nside = Math.pow(2, norder); // TODO : à changer
+		var nside = Math.pow(2, norder); // TODO : to be modified
 		var npix = HealpixIndex.nside2Npix(nside);
 		var ipixCenter = null;
 		
@@ -9975,7 +10525,7 @@ View = (function() {
 			var hpxIdx = new HealpixIndex(nside);
 			hpxIdx.init();
 			var spatialVector = new SpatialVector();
-			// si frame != frame survey image, il faut faire la conversion dans le système du survey
+            // if frame != frame image survey, we need to convert to survey frame system
 			var xy = AladinUtils.viewToXy(this.cx, this.cy, this.width, this.height, this.largestDim, this.zoomFactor);
 			var radec = this.projection.unproject(xy.x, xy.y);
 			var lonlat = [];
@@ -10111,7 +10661,7 @@ View = (function() {
 		var cornersXY = [];
 		var lon, lat;
 		var spVec = new SpatialVector();
-		var nside = Math.pow(2, norder); // TODO : à changer
+		var nside = Math.pow(2, norder); // TODO : to be modified
 		
 		
 		var cornersXYView = [];  // will be returned
@@ -10232,19 +10782,19 @@ View = (function() {
     View.prototype.computeNorder = function() {
         var resolution = this.fov / this.largestDim; // in degree/pixel
         var tileSize = 512; // TODO : read info from HpxImageSurvey.tileSize
-        var nside = HealpixIndex.calculateNSide(3600*tileSize*resolution); // 512 = taille d'une image "tuile"
+        var nside = HealpixIndex.calculateNSide(3600*tileSize*resolution); // 512 = size of a "tile" image
         var norder = Math.log(nside)/Math.log(2);
         norder = Math.max(norder, 1);
         this.realNorder = norder;
 
             
-        // forcer le passage à norder 3 (sinon, on reste flou trop longtemps)
+        // here, we force norder to 3 (otherwise, the display is "blurry" for too long when zooming in)
         if (this.fov<=50 && norder<=2) {
             norder = 3;
         }
            
 
-        // si l'on ne souhaite pas afficher le allsky
+        // that happens if we do not wish to display tiles coming from Allsky.[jpg|png]
         if (this.imageSurvey && norder<=2 && this.imageSurvey.minOrder>2) {
             norder = this.imageSurvey.minOrder;
         }
@@ -10266,8 +10816,6 @@ View = (function() {
             
         this.curNorder = norder;
         this.curOverlayNorder = overlayNorder;
-
-        
     };
 	
     View.prototype.untaintCanvases = function() {
@@ -10348,7 +10896,7 @@ View = (function() {
 		    newImageSurvey = imageSurvey;
 		}
 		
-		// ràz buffer
+		// buffer reset
 		this.tileBuffer = new TileBuffer();
         
 		newImageSurvey.isReady = false;
@@ -10456,7 +11004,7 @@ View = (function() {
         }
     };
     View.prototype.layerNameExists = function(name) {
-        var c = this.catalogs;
+        var c = this.allOverlayLayers;
         for (var k=0; k<c.length; k++) {
             if (name==c[k].name) {
                 return true;
@@ -10468,11 +11016,14 @@ View = (function() {
     View.prototype.removeLayers = function() {
         this.catalogs = [];
         this.overlays = [];
+        this.mocs = [];
+        this.allOverlayLayers = [];
         this.requestRedraw();
     };
 
     View.prototype.addCatalog = function(catalog) {
         catalog.name = this.makeUniqLayerName(catalog.name);
+        this.allOverlayLayers.push(catalog);
         this.catalogs.push(catalog);
         if (catalog.type=='catalog') {
             catalog.setView(this);
@@ -10482,12 +11033,16 @@ View = (function() {
         }
     };
     View.prototype.addOverlay = function(overlay) {
+        overlay.name = this.makeUniqLayerName(overlay.name);
         this.overlays.push(overlay);
+        this.allOverlayLayers.push(overlay);
         overlay.setView(this);
     };
     
     View.prototype.addMOC = function(moc) {
+        moc.name = this.makeUniqLayerName(moc.name);
         this.mocs.push(moc);
+        this.allOverlayLayers.push(moc);
         moc.setView(this);
     };
     
@@ -10632,8 +11187,6 @@ Aladin = (function() {
         }
 
 
-	    HealpixCache.init();
-        
 	    var self = this;
 	    
 	    // if not options was set, try to retrieve them from the query string
@@ -10713,7 +11266,7 @@ Aladin = (function() {
 
 
 		// Aladin logo
-		$("<div class='aladin-logo-container'><a href='http://aladin.u-strasbg.fr/' title='Powered by Aladin Lite' target='_blank'><div class='aladin-logo'></div></a></div>").appendTo(aladinDiv);
+		$("<div class='aladin-logo-container'><a href='http://aladin.unistra.fr/' title='Powered by Aladin Lite' target='_blank'><div class='aladin-logo'></div></a></div>").appendTo(aladinDiv);
 		
 		
 		// we store the boxes
@@ -10732,7 +11285,7 @@ Aladin = (function() {
 
 	    // retrieve available surveys
 	    $.ajax({
-	        url: "http://aladin.u-strasbg.fr/java/nph-aladin.pl",
+	        url: "http://aladin.unistra.fr/java/nph-aladin.pl",
 	        data: {"frame": "aladinLiteDic"},
 	        method: 'GET',
 	        dataType: 'jsonp', // could this be repaced by json ??
@@ -10890,12 +11443,17 @@ Aladin = (function() {
         if (options.fullScreen) {
             window.setTimeout(function() {self.toggleFullscreen();}, 1000);
         }
+
+
+        this.callbacksByEventName = {}; // we store the callback functions (on 'zoomChanged', 'positionChanged', ...) here
 	};
 	
     /**** CONSTANTS ****/
-    Aladin.VERSION = "2016-07-06"; // will be filled by the build.sh script
+    Aladin.VERSION = "2017-08-25"; // will be filled by the build.sh script
     
-    Aladin.JSONP_PROXY = "http://alasky.u-strasbg.fr/cgi/JSONProxy";
+    Aladin.JSONP_PROXY = "http://alasky.unistra.fr/cgi/JSONProxy";
+
+
     
     Aladin.DEFAULT_OPTIONS = {
         target:                 "0 +0",
@@ -10990,6 +11548,43 @@ Aladin = (function() {
 	Aladin.prototype.setFoV = Aladin.prototype.setFov = function(fovDegrees) {
 		this.view.setZoom(fovDegrees);
 	};
+
+    // @API
+    // (experimental) try to adjust the FoV to the given object name. Does nothing if object is not known from Simbad
+	Aladin.prototype.adjustFovForObject = function(objectName) {
+        var self = this;
+		this.getFovForObject(objectName, function(fovDegrees) {
+            self.setFoV(fovDegrees);
+        });
+	};
+
+    
+	Aladin.prototype.getFovForObject = function(objectName, callback) {
+        var query = "SELECT galdim_majaxis, V FROM basic JOIN ident ON oid=ident.oidref JOIN allfluxes ON oid=allfluxes.oidref WHERE id='" + objectName + "'";
+        var url = 'http://simbad.u-strasbg.fr/simbad/sim-tap/sync?query=' + encodeURIComponent(query) + '&request=doQuery&lang=adql&format=json&phase=run';
+
+        var ajax = Utils.getAjaxObject(url, 'GET', 'json', false)
+        ajax.done(function(result) {
+            var defaultFov = 4 / 60; // 4 arcmin
+            var fov = defaultFov;
+
+            if ( 'data' in result && result.data.length>0) {
+                var galdimMajAxis = Utils.isNumber(result.data[0][0]) ? result.data[0][0] / 60.0 : null; // result gives galdim in arcmin
+                var magV = Utils.isNumber(result.data[0][1]) ? result.data[0][1] : null;
+
+                if (galdimMajAxis !== null) {
+                    fov = 2 * galdimMajAxis;
+                }
+                else if (magV !== null) {
+                    if (magV<10) {
+                        fov = 2 * Math.pow(2.0, (6-magV/2.0)) / 60;
+                    }
+                }
+            }
+
+            (typeof callback === 'function') && callback(fov);
+        });
+    };
 	
     Aladin.prototype.setFrame = function(frameName) {
         if (! frameName) {
@@ -11187,7 +11782,7 @@ Aladin = (function() {
         this.view.removeLayers();
     };
 
-    // should be merged into a unique "add" method
+    // these 3 methods should be merged into a unique "add" method
     Aladin.prototype.addCatalog = function(catalog) {
         this.view.addCatalog(catalog);
     };
@@ -11364,6 +11959,7 @@ Aladin = (function() {
         return A.catalogFromURL(url, options, successCallback);
     };
 
+    // API
     A.catalogFromVizieR = function(vizCatId, target, radius, options, successCallback) {
         options = options || {};
         if (! ('name' in options)) {
@@ -11373,18 +11969,27 @@ Aladin = (function() {
         return A.catalogFromURL(url, options, successCallback, false);
     };
 
-     
+    // API
+    A.catalogFromSkyBot = function(ra, dec, radius, epoch, queryOptions, options, successCallback) {
+        queryOptions = queryOptions || {};
+        options = options || {};
+        if (! ('name' in options)) {
+            options['name'] = 'SkyBot';
+        }
+        var url = URLBuilder.buildSkyBotCSURL(ra, dec, radius, epoch, queryOptions);
+        return A.catalogFromURL(url, options, successCallback, false);
+    };
+
+     Aladin.AVAILABLE_CALLBACKS = ['select', 'objectClicked', 'objectHovered', 'positionChanged', 'zoomChanged']; 
      // API
+     //
+     // setting callbacks
      Aladin.prototype.on = function(what, myFunction) {
-         if (what==='select') {
-             this.selectFunction = myFunction;
+         if (Aladin.AVAILABLE_CALLBACKS.indexOf(what)<0) {
+            return; 
          }
-         else if (what=='objectClicked') {
-            this.objClickedFunction = myFunction;
-         }
-         else if (what=='objectHovered') {
-            this.objHoveredFunction = myFunction;
-         }
+
+         this.callbacksByEventName[what] = myFunction;
      };
      
      Aladin.prototype.select = function() {
@@ -11397,9 +12002,8 @@ Aladin = (function() {
          }
          else if (what==='selectend') {
              this.view.setMode(View.PAN);
-             if (this.selectFunction) {
-                 this.selectFunction(params);
-             }
+             var callbackFn = this.callbacksByEventName['select'];
+             (typeof callbackFn === 'function') && callbackFn(params);
          }
      };
      
@@ -11442,21 +12046,30 @@ Aladin = (function() {
          cmSelect.val(self.getBaseImageLayer().getColorMap().mapName);
 
          
-         // loop over catalogs
-         var cats = this.view.catalogs;
+         // loop over all overlay layers
+         var layers = this.view.allOverlayLayers;
          var str = '<ul>';
-         for (var k=cats.length-1; k>=0; k--) {
-             var name = cats[k].name;
+         for (var k=layers.length-1; k>=0; k--) {
+             var layer = layers[k];
+             var name = layer.name;
              var checked = '';
-             if (cats[k].isShowing) {
+             if (layer.isShowing) {
                  checked = 'checked="checked"';
              }
-             var nbSources = cats[k].getSources().length;
-             var title = nbSources + ' source' + ( nbSources>1 ? 's' : '');
-             var color = cats[k].color;
-             var rgbColor = $('<div></div>').css('color', color).css('color'); // trick to retrieve the color as 'rgb(,,)'
+
+             var tooltipText = '';
+             if (layer.type=='catalog' || layer.type=='progressivecat') {
+                var nbSources = layer.getSources().length;
+                tooltipText = nbSources + ' source' + ( nbSources>1 ? 's' : '');
+            }
+            else if (layer.type=='moc') {
+                tooltipText = 'Coverage: ' + (100*layer.skyFraction()).toFixed(3) + ' % of sky';
+            }
+
+
+             var rgbColor = $('<div></div>').css('color', layer.color).css('color'); // trick to retrieve the color as 'rgb(,,)'
              var labelColor = Color.getLabelColorForBackground(rgbColor);
-             str += '<li><div class="aladin-layerIcon" style="background: ' + color + ';"></div><input type="checkbox" ' + checked + ' id="aladin_lite_' + name + '"></input><label for="aladin_lite_' + name + '" class="aladin-layer-label" style="background: ' + color + '; color:' + labelColor + ';" title="' + title + '">' + name + '</label></li>';
+             str += '<li><div class="aladin-layerIcon" style="background: ' + layer.color + ';"></div><input type="checkbox" ' + checked + ' id="aladin_lite_' + name + '"></input><label for="aladin_lite_' + name + '" class="aladin-layer-label" style="background: ' + layer.color + '; color:' + labelColor + ';" title="' + tooltipText + '">' + name + '</label></li>';
          }
          str += '</ul>';
          layerBox.append(str);
@@ -11553,13 +12166,13 @@ Aladin = (function() {
          
          // handler to hide/show overlays
          $(this.aladinDiv).find('.aladin-layerBox ul input').change(function() {
-             var catName = ($(this).attr('id').substr(12));
-             var cat = self.layerByName(catName);
+             var layerName = ($(this).attr('id').substr(12));
+             var layer = self.layerByName(layerName);
              if ($(this).is(':checked')) {
-                 cat.show();
+                 layer.show();
              }
              else {
-                 cat.hide();
+                 layer.hide();
              }
          });
          
@@ -11569,8 +12182,8 @@ Aladin = (function() {
      };
      
      Aladin.prototype.layerByName = function(name) {
-         var c = this.view.catalogs;
-         for (var k=0; k<this.view.catalogs.length; k++) {
+         var c = this.view.allOverlayLayers;
+         for (var k=0; k<c.length; k++) {
              if (name==c[k].name) {
                  return c[k];
              }
@@ -11625,6 +12238,11 @@ Aladin = (function() {
       * 
       */
      Aladin.prototype.pix2world = function(x, y) {
+         // this might happen at early stage of initialization
+         if (!this.view) {
+            return;
+         }
+
          var xy = AladinUtils.viewToXy(x, y, this.view.width, this.view.height, this.view.largestDim, this.view.zoomFactor);
          
          var radec = this.view.projection.unproject(xy.x, xy.y);
@@ -11652,6 +12270,11 @@ Aladin = (function() {
       *   
       */
      Aladin.prototype.world2pix = function(ra, dec) {
+         // this might happen at early stage of initialization
+         if (!this.view) {
+            return;
+         }
+
          var xy;
          if (this.view.cooFrame==CooFrameEnum.GAL) {
              var lonlat = CooConversion.J2000ToGalactic([ra, dec]);
@@ -11815,7 +12438,7 @@ Aladin.prototype.getShareURL = function() {
     coo.prec = 7;
     coo.lon = radec[0];
     coo.lat = radec[1];
-    return 'http://aladin.u-strasbg.fr/AladinLite/?target=' + encodeURIComponent(coo.format('s')) +
+    return 'http://aladin.unistra.fr/AladinLite/?target=' + encodeURIComponent(coo.format('s')) +
            '&fov=' + this.getFov()[0].toFixed(2) + '&survey=' + encodeURIComponent(this.getBaseImageLayer().id);
 };
 
@@ -11833,10 +12456,10 @@ Aladin.prototype.getEmbedCode = function() {
     var survey = this.getBaseImageLayer().id;
     var fov = this.getFov()[0];
     var s = '';
-    s += '<link rel="stylesheet" href="http://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.css" />\n';
-    s += '<script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.min.js" charset="utf-8"></script>\n';
+    s += '<link rel="stylesheet" href="http://aladin.unistra.fr/AladinLite/api/v2/latest/aladin.min.css" />\n';
+    s += '<script type="text/javascript" src="//code.jquery.com/jquery-1.9.1.min.js" charset="utf-8"></script>\n';
     s += '<div id="aladin-lite-div" style="width:400px;height:400px;"></div>\n';
-    s += '<script type="text/javascript" src="http://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.js" charset="utf-8"></script>\n';
+    s += '<script type="text/javascript" src="http://aladin.unistra.fr/AladinLite/api/v2/latest/aladin.min.js" charset="utf-8"></script>\n';
     s += '<script type="text/javascript">\n';
     s += 'var aladin = A.aladin("#aladin-lite-div", {survey: "' + survey + 'P/DSS2/color", fov: ' + fov.toFixed(2) + ', target: "' + coo.format('s') + '"});\n';
     s += '</script>';
@@ -11864,7 +12487,7 @@ Aladin.prototype.displayFITS = function(url, options, successCallback, errorCall
     }
     var self = this;
     $.ajax({
-        url: 'http://alasky.u-strasbg.fr/cgi/fits2HiPS',
+        url: 'http://alasky.unistra.fr/cgi/fits2HiPS',
         data: data,
         method: 'GET',
         dataType: 'json',

@@ -259,6 +259,7 @@
       var datatype = rowData.datatype;
       var arraySize = rowData.arraysize;
       var description = rowData.description;
+      var xtype = rowData.xtype;
       var order;
 
       if (uType in this.getColumnOptions())
@@ -266,32 +267,32 @@
         var allColumnIDs = this.config.getAllColumnIDs();
         order = allColumnIDs.indexOf(uType);
 
-        this._addFieldsForUType(uType, ucd, unit, datatype, arraySize, description, order);
+        this._addFieldsForUType(uType, ucd, unit, datatype, arraySize, description, xtype, order);
 
         // Hack to include non-standard UTypes into the mix.
         if (uType === this.getFootprintColumnID())
         {
           var raColumnID = this.getRAColumnID();
           order = allColumnIDs.indexOf(raColumnID);
-          this._addFieldsForUType(raColumnID, ucd, unit, datatype, arraySize, description, order);
+          this._addFieldsForUType(raColumnID, ucd, unit, datatype, arraySize, description, xtype, order);
 
           var decColumnID = this.getDecColumnID();
           order = allColumnIDs.indexOf(decColumnID);
-          this._addFieldsForUType(decColumnID, ucd, unit, datatype, arraySize, description, order);
+          this._addFieldsForUType(decColumnID, ucd, unit, datatype, arraySize, description, xtype, order);
 
           var areaFOVColumnID = this.getFOVColumnID();
           order = allColumnIDs.indexOf(areaFOVColumnID);
-          this._addFieldsForUType(areaFOVColumnID, ucd, unit, datatype, arraySize, description, order);
+          this._addFieldsForUType(areaFOVColumnID, ucd, unit, datatype, arraySize, description, xtype, order);
         }
         else if (uType === "caom2:Plane.uri")
         {
           order = allColumnIDs.indexOf("caom2:Plane.uri.downloadable");
-          this._addFieldsForUType("caom2:Plane.uri.downloadable", ucd, unit, datatype, arraySize, description, order);
+          this._addFieldsForUType("caom2:Plane.uri.downloadable", ucd, unit, datatype, arraySize, description, xtype, order);
         }
         else if (uType === "obscore:Curation.PublisherDID")
         {
             order = allColumnIDs.indexOf("obscore:Curation.PublisherDID.downloadable");
-            this._addFieldsForUType("obscore:Curation.PublisherDID.downloadable", ucd, unit, datatype, arraySize, description, order);
+            this._addFieldsForUType("obscore:Curation.PublisherDID.downloadable", ucd, unit, datatype, arraySize, description, xtype, order);
         }
       }
 
@@ -311,7 +312,7 @@
      * @param {Number} _order
      * @private
      */
-    this._addFieldsForUType = function (_uType, _ucd, _unit, _datatype, _arraySize, _description, _order)
+    this._addFieldsForUType = function (_uType, _ucd, _unit, _datatype, _arraySize, _description, _xtype, _order)
     {
       var utypeFields = this.columnOptions[_uType];
       var tableMD = this.tableMetadata;
@@ -324,11 +325,9 @@
                                 _uType,
                                 _ucd,
                                 _uType,
-                                utypeFields.unit ? utypeFields.unit :
-                                _unit,
-                                stringUtil.contains(_datatype, "INTERVAL", false) ? "INTERVAL" : null,
-                                // xtype not normally available
-                                new cadc.vot.Datatype(utypeFields.datatype ? utypeFields.datatype : _datatype),
+                                utypeFields.unit ? utypeFields.unit : _unit,
+				_xtype,
+                                utypeFields.datatype ? utypeFields.datatype : _datatype,
                                 _arraySize,
                                 _description,
                                 utypeFields.label));
