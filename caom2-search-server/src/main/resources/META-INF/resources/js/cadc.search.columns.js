@@ -189,11 +189,6 @@
 
                     var runID = $("#downloadForm").find("input[name='fragment']").val().substring(6);
 
-                    var useMaqDatalink = true;
-                    if ( ($("#resultsMaqEnabled") == "undefined") || $("#resultsMaqEnabled").hasClass("cadc-display-none") ) {
-                      useMaqDatalink = false;
-                    }
-
                     // Get the thumbnails and previews from datalink
                     $.ajax({
                              url: " " + ca.nrc.cadc.search.services.applicationEndpoint + ca.nrc.cadc.search.DATALINK_URL_SUFFIX,
@@ -201,8 +196,7 @@
                              data: {
                                id: planeURIValue,
                                request: "downloads-only",
-                               runid: runID,
-                               useMaq: useMaqDatalink
+                               runid: runID
                              },
                              statusCode: {
                                200: function (data) {

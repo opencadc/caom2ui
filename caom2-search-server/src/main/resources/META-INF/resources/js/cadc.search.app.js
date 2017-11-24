@@ -297,8 +297,8 @@
       // this.options.useMaq is passed in from index.jsp, and denotes whether
       // the toggle is being used at all
       // - it'll have to be se
-      // todo: might be this is removed
-//      var useMaq = this.useMaqQuery();
+      // Accessing useMaq value from toggle doesn't work here because the active tab hasn't
+      // been defined all that can be referenced here is the useMaq in the initial options.
 
       $.get(this.options.tapSyncEndpoint,
             {
@@ -1168,8 +1168,9 @@
         {
             // check switch value on current form
             var activeSearchForm = this._getActiveForm();
-            return activeSearchForm.find(".useMaq").val();
+            return activeSearchForm.$form.find(".useMaq").val() === "on" ? true : false;
         }
+        return false;
     };
 
     /**
