@@ -717,7 +717,7 @@
                                    "QUERY": stringUtil.format(defaultData.QUERY, [field.tap_column,
                                                                                   req.term.toLowerCase()])
                                  });
-                    //TODO: what needs to be done here for MAQ?
+                    //TODO: does anything need to be done differently here for MAQ?
                     $.get(config.options.tapSyncEndpoint, payload)
                         .done(function (csvData)
                               {
@@ -781,23 +781,19 @@
                                                   this._clearTargetList();
                                                 }.bind(this));
 
-
-      // TODO: what happens if this element isn't shown on the page?
-      // Will this fail silently?
       $currForm.find(".useMaq").change(function(event) {
                                                 // This sets up or removes the MAQ mode display items
                                                 // in the form and results panel
                                                   if (this.maqToggleEnabled === true) {
                                                     // toggle results table header element
-                                                    if (event.currentTarget.checked === "true" )
+                                                    if ((event.currentTarget.checked === "true" )
+                                                      || (event.currentTarget.checked === true ))
                                                     {
-                                                        $("#resultsMaqEnabled").removeClass("cadc-display-none");
-                                                        this.$form.find(".useMaqValue").val(true);
+                                                      this.setResultsMaqMode(true);
                                                     }
                                                     else
                                                     {
-                                                        $("#resultsMaqEnabled").addClass("cadc-display-none");
-                                                        this.$form.find(".useMaqValue").val(false);
+                                                      this.setResultsMaqMode(false);
                                                     }
 
                                                     this.disableMaqToggle();
@@ -905,8 +901,10 @@
       else
       {
         // todo: this variable name might need to change to 'maqEnabledForApp' or 'maqEnabledForParent'
+        // for it to be more maintainable
         this.maqToggleEnabled = true;
         this.setMaqToggle(useMaqDataTrain);
+        this.setResultsMaqMode(useMaqDataTrain);
       }
 
       try
@@ -946,6 +944,20 @@
       this.maqToggleEnabled = true;
       var $useMaqEl = this.$form.find(".useMaq");
       $useMaqEl.bootstrapToggle("enable");
+    }
+
+    this.setResultsMaqMode = function(setOn)
+    {
+      if ((setOn === true) || (setOn === "true"))
+      {
+        $("#resultsMaqEnabled").removeClass("cadc-display-none");
+        this.$form.find(".useMaqValue").val(true);
+      }
+      else
+      {
+        $("#resultsMaqEnabled").addClass("cadc-display-none");
+        this.$form.find(".useMaqValue").val(false);
+      }
     }
 
     /**

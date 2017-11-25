@@ -1162,17 +1162,6 @@
         return maqValue;
     };
 
-    this.useMaqQuery = function()
-    {
-        if (this.options.useMaq === "true")
-        {
-            // check switch value on current form
-            var activeSearchForm = this._getActiveForm();
-            return activeSearchForm.$form.find(".useMaq").val() === "on" ? true : false;
-        }
-        return false;
-    };
-
     /**
      * Start this application.  This will check for a quick submission.
      */
