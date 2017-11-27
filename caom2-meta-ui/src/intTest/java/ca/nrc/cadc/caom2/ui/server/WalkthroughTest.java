@@ -53,11 +53,10 @@ public class WalkthroughTest extends AbstractAdvancedSearchIntegrationTest {
     @Test
     public void observationViewTest() throws Exception {
         // TODO: need an observation that exists in dev, production and (beta?)
-        final String publisherID = NetUtil.encode(PublisherID.SCHEME + "://com" +
-            ".myauth/JCMT?scuba2_00049_20160410T133916/raw-450um");
-        final ObservationViewPage observationViewPage = goTo(endpoint + "view/" + publisherID, null, ObservationViewPage
-            .class);
+        final String publisherID = NetUtil.encode(PublisherID.SCHEME +
+            "://cadc.nrc.ca/JCMT?scuba2_00049_20160410T133916/raw-450um");
+        final ObservationViewPage observationViewPage = goTo(endpoint + "view?ID=" + publisherID,
+            null, ObservationViewPage.class);
         verifyTrue(observationViewPage.isObsLoaded());
     }
-
 }
