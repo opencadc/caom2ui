@@ -73,6 +73,7 @@ import ca.nrc.cadc.auth.AuthMethod;
 import ca.nrc.cadc.auth.AuthenticationUtil;
 import ca.nrc.cadc.caom2.Observation;
 import ca.nrc.cadc.caom2.ObservationURI;
+import ca.nrc.cadc.caom2.PublisherID;
 import ca.nrc.cadc.caom2.xml.ObservationParsingException;
 import ca.nrc.cadc.caom2.xml.ObservationReader;
 import ca.nrc.cadc.config.ApplicationConfiguration;
@@ -137,9 +138,8 @@ public abstract class BaseClient
         try
         {
             // Discover client service URL
-            Subject subject = getCurrentSubject();
-            RegistryClient rc = new RegistryClient();
-            ApplicationConfiguration ac = new ApplicationConfiguration(PROPERTIES_FILE_PATH);
+            final Subject subject = getCurrentSubject();
+            final ApplicationConfiguration ac = new ApplicationConfiguration(PROPERTIES_FILE_PATH);
 
             AuthMethod authMethod = AuthenticationUtil.getAuthMethodFromCredentials(subject);
             if (authMethod == null)
@@ -147,7 +147,7 @@ public abstract class BaseClient
                 authMethod = AuthMethod.ANON;
             }
 
-            final URL repoURL = rc
+            final URL repoURL = getRegistryClient()
                     .getServiceURL(ac.lookupServiceURI(propertyKey, resourceId), standardsURI, authMethod);
 
             return new URL(repoURL.toExternalForm() + path);
@@ -160,6 +160,27 @@ public abstract class BaseClient
             throw new RuntimeException(errMsg, urie);
         }
 
+    }
+
+    protected RegistryClient getRegistryClient() {
+        return new RegistryClient();
+    }
+
+    URL getServiceURL(final PublisherID publisherID) throws IOException {
+        final URL serviceURL = getRegistryClient().getServiceURL(publisherID.getResourceID(), standardsURI,
+            getAuthMethod());
+
+        LOGGER.debug(String.format("Service URL '%s'", serviceURL.toExternalForm()));
+
+        return serviceURL;
+    }
+
+    private AuthMethod getAuthMethod() {
+        // Discover client service URL
+        final Subject subject = getCurrentSubject();
+
+        final AuthMethod authMethod = AuthenticationUtil.getAuthMethodFromCredentials(subject);
+        return (authMethod == null) ? AuthMethod.ANON : authMethod;
     }
 
 

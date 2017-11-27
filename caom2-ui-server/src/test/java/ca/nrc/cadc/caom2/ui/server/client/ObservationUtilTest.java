@@ -68,112 +68,24 @@
 
 package ca.nrc.cadc.caom2.ui.server.client;
 
-
-import ca.nrc.cadc.auth.AuthMethod;
-import ca.nrc.cadc.caom2.Algorithm;
-import ca.nrc.cadc.caom2.Observation;
+import ca.nrc.cadc.caom2.ObservationURI;
 import ca.nrc.cadc.caom2.PublisherID;
-import ca.nrc.cadc.net.HttpDownload;
-import ca.nrc.cadc.reg.Standards;
-import ca.nrc.cadc.reg.client.RegistryClient;
 
-import javax.security.auth.Subject;
 import java.net.URI;
-import java.net.URL;
 
 import org.junit.Test;
-
-import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 
-public class Caom2MetaClientTest {
+public class ObservationUtilTest {
     @Test
-    public void getObservation() throws Exception {
-        final HttpDownload mockDownload = createMock(HttpDownload.class);
-        final RegistryClient mockRegistryClient = createMock(RegistryClient.class);
-        final Caom2MetaClient.ReadAction mockObservationReader = createMock(Caom2MetaClient.ReadAction.class);
-        final Observation result = new Observation("COLLECTION", "OBSID",
-            new Algorithm("exposure")) {
-            @Override
-            public String toString() {
-                return super.toString();
-            }
-        };
+    public void getObservationURI() throws Exception {
+        final ObservationUtil testSubject = new ObservationUtil();
+        final PublisherID publisherID = new PublisherID(URI.create("ivo://myhost.com/COLL?OBSID/PRODID"));
+        final ObservationURI expected = new ObservationURI("COLL", "OBSID");
 
-        final Caom2MetaClient testSubject = new Caom2MetaClient() {
-            /**
-             * Place for testers to override.
-             *
-             * @return URL instance.
-             */
-            @Override
-            public URL getServiceURL() {
-                try {
-                    return new URL("http://mysite.com");
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
+        final ObservationURI result = testSubject.getObservationURI(publisherID);
 
-            @Override
-            protected RegistryClient getRegistryClient() {
-                return mockRegistryClient;
-            }
-
-            /**
-             * Place for testers to override.
-             *
-             * @return ReadAction instance.
-             */
-            @Override
-            public Caom2MetaClient.ReadAction getObservationReader() {
-                return mockObservationReader;
-            }
-
-            /**
-             * Place for testers to override.
-             *
-             * @return Subject instance.
-             */
-            @Override
-            public Subject getCurrentSubject() {
-                return new Subject();
-            }
-
-            /**
-             * Obtain a new instance of a downloader.  Tests can override as needed.
-             *
-             * @param url        The URL to download from.
-             * @param readAction The read action to write to.
-             * @return HttpDownload instance.
-             */
-            @Override
-            public HttpDownload getDownloader(URL url, ReadAction readAction) {
-                return mockDownload;
-            }
-        };
-
-        final PublisherID publisherID =
-            new PublisherID(URI.create(PublisherID.SCHEME + "://com.myauthhost/COLLECTION?OBSID/G024.143.732+17.167"));
-
-        expect(mockObservationReader.getObs()).andReturn(result).once();
-
-        expect(mockRegistryClient.getServiceURL(URI.create(PublisherID.SCHEME + "://com.myauthhost/COLLECTION"),
-            Standards.CAOM2_OBS_20, AuthMethod.ANON)).andReturn(new URL("http://myhost.com/myservice")).once();
-
-        mockDownload.run();
-        expectLastCall().once();
-
-        expect(mockDownload.getThrowable()).andReturn(null).once();
-
-        replay(mockDownload, mockRegistryClient, mockObservationReader);
-
-        // Doesn't return anything.
-        final Observation observation = testSubject.getObservation(publisherID);
-
-        assertEquals("Wrong observation returned.", result, observation);
-
-        verify(mockDownload, mockRegistryClient, mockObservationReader);
+        assertEquals("Wrong Observation URI.", expected, result);
     }
 }

@@ -9,14 +9,14 @@ plugins {
 }
 
 repositories {
-    jcenter()
     mavenLocal()
+    jcenter()
 }
 
 dependencies {
     compile 'log4j:log4j:1.2.+'
 
-    compile 'org.opencadc:caom2-search-server:[2.3.7, )'
+    compile 'org.opencadc:caom2-search-server:[2.3.8, )'
 
     providedCompile 'javax.servlet:javax.servlet-api:3.1.+'
     providedCompile 'javax.servlet:javax.servlet-api:3.0.+'
@@ -45,7 +45,7 @@ ext {
 
 sourceCompatibility = 1.7
 group = 'org.opencadc'
-version = '2016'
+version = '2017'
 
 apply from: '../../../_shared.gradle'
 

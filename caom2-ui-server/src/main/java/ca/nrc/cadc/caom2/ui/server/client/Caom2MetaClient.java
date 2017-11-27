@@ -70,52 +70,62 @@
 package ca.nrc.cadc.caom2.ui.server.client;
 
 import ca.nrc.cadc.caom2.Observation;
-import ca.nrc.cadc.caom2.ObservationURI;
+import ca.nrc.cadc.caom2.PublisherID;
 import ca.nrc.cadc.net.HttpDownload;
-import ca.nrc.cadc.net.NetUtil;
 import ca.nrc.cadc.reg.Standards;
 import org.apache.log4j.Logger;
 
 import javax.security.auth.Subject;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 
 /**
  * Get observation information from caom2meta
- * 
+ *
  * @author hjeeves
  */
-public class Caom2MetaClient extends BaseClient
-{
-    static final Logger LOGGER = Logger.getLogger(Caom2MetaClient.class);
+public class Caom2MetaClient extends BaseClient {
+    private static final Logger LOGGER = Logger.getLogger(Caom2MetaClient.class);
+    private static final String CAOM2META_SERVICE_URI_PROPERTY_KEY = "org.opencadc.caom2ui.caom2ops-service-id";
+    private static final URI CAOM2META_RESOURCE_ID = URI.create("ivo://cadc.nrc.ca/caom2ops");
 
-    static final String CAOM2META_SERVICE_URI_PROPERTY_KEY = "org.opencadc.caom2ui.caom2ops-service-id";
-    static final URI CAOM2META_RESOURCE_ID = URI.create("ivo://cadc.nrc.ca/caom2ops");
+    private final ObservationUtil observationUtil;
 
-    public Caom2MetaClient() {
+
+    /**
+     * Complete constructor.  Useful for testing.
+     *
+     * @param observationUtil The ObservationUtil instance.
+     */
+    protected Caom2MetaClient(ObservationUtil observationUtil) {
         resourceId = CAOM2META_RESOURCE_ID;
         propertyKey = CAOM2META_SERVICE_URI_PROPERTY_KEY;
         standardsURI = Standards.CAOM2_OBS_20;
         // Set path at a point where observation information is available
+
+        this.observationUtil = observationUtil;
+    }
+
+    public Caom2MetaClient() {
+        this(new ObservationUtil());
     }
 
     /**
      * Download the Observation for the given URI.
-     * @param subject The Subject to download as.
-     * @param uri     The Observation URI.
+     *
+     * @param publisherID The Publisher ID passed into the request..
      * @return Observation instance.
      */
-    public Observation getObservation(final Subject subject, final ObservationURI uri)
-    {
-        path = "?ID=" + NetUtil.encode(uri.getURI().toString());
-        URL serviceURL = getServiceURL();
+    public Observation getObservation(final PublisherID publisherID) throws IOException {
+        final URL serviceURL = getServiceURL(publisherID);
 
         LOGGER.debug(String.format("Using service URL '%s'", serviceURL.toExternalForm()));
 
         final ReadAction ra = getObservationReader();
         final HttpDownload get = getDownloader(serviceURL, ra);
 
-        Subject.doAs(subject, new GetAction(get, uri));
+        Subject.doAs(getCurrentSubject(), new GetAction(get, observationUtil.getObservationURI(publisherID)));
 
         return ra.getObs();
     }

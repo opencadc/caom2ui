@@ -31,29 +31,32 @@
  ****  C A N A D I A N   A S T R O N O M Y   D A T A   C E N T R E  *****
  ************************************************************************
  */
+
 package ca.nrc.cadc.caom2.ui.server;
 
 
+import ca.nrc.cadc.caom2.PublisherID;
+import ca.nrc.cadc.net.NetUtil;
 import ca.nrc.cadc.util.StringUtil;
 import ca.nrc.cadc.web.selenium.AbstractWebApplicationIntegrationTest;
 import org.junit.Test;
 import org.openqa.selenium.By;
 
 
-public class WalkthroughTest extends AbstractAdvancedSearchIntegrationTest
-{
+public class WalkthroughTest extends AbstractAdvancedSearchIntegrationTest {
 
-    public WalkthroughTest() throws Exception
-    {
+    public WalkthroughTest() throws Exception {
         super();
     }
 
 
     @Test
-    public void observationViewTest() throws Exception
-    {
+    public void observationViewTest() throws Exception {
         // TODO: need an observation that exists in dev, production and (beta?)
-        ObservationViewPage observationViewPage = goTo(endpoint + "view/JCMT/scuba2_00049_20160410T133916", null, ObservationViewPage.class);
+        final String publisherID = NetUtil.encode(PublisherID.SCHEME + "://com" +
+            ".myauth/JCMT?scuba2_00049_20160410T133916/raw-450um");
+        final ObservationViewPage observationViewPage = goTo(endpoint + "view/" + publisherID, null, ObservationViewPage
+            .class);
         verifyTrue(observationViewPage.isObsLoaded());
     }
 

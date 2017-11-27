@@ -86,13 +86,11 @@ import java.io.IOException;
 import java.util.List;
 
 
-public class Caom2RepoObservationServlet extends HttpServlet
-{
-    private final long serialVersionUID = 201708242300L;
+public class Caom2RepoObservationServlet extends HttpServlet {
     private static Logger log = Logger.getLogger(Caom2RepoObservationServlet.class);
 
     private static final String ERROR_MESSAGE_NOT_FOUND_FORBIDDEN =
-            "Observation with URI '%s' not found, or you are "
+        "Observation with URI '%s' not found, or you are "
             + "forbidden from seeing it.  Please login and "
             + "try again. | l'Observation '%s' pas "
             + "trouvé, ou vous n'avez pas permission.  S'il "
@@ -104,16 +102,16 @@ public class Caom2RepoObservationServlet extends HttpServlet
     private static final int OBSERVATION_VIEW = 3;
     private static final int NOT_SUPPORTED = 0;
 
+    private final ObservationUtil observationUtil;
     private final Caom2RepoClient repoClient;
 
-    public Caom2RepoObservationServlet()
-    {
-        this(new Caom2RepoClient());
+    public Caom2RepoObservationServlet() {
+        this(new Caom2RepoClient(), new ObservationUtil());
     }
 
-    public Caom2RepoObservationServlet(Caom2RepoClient repoClient)
-    {
+    public Caom2RepoObservationServlet(Caom2RepoClient repoClient, final ObservationUtil observationUtil) {
         this.repoClient = repoClient;
+        this.observationUtil = observationUtil;
     }
 
     /**
@@ -128,48 +126,39 @@ public class Caom2RepoObservationServlet extends HttpServlet
      */
     protected void doGet(final HttpServletRequest request,
                          final HttpServletResponse response)
-            throws ServletException, IOException
-    {
+        throws ServletException, IOException {
         final long start = System.currentTimeMillis();
 
-        try
-        {
+        try {
             int requestType = getRequestType(request);
 
-            switch (requestType)
-            {
-                case COLLECTION_LIST:
-                {
+            switch (requestType) {
+                case COLLECTION_LIST: {
                     List<String> collections = repoClient.getCollections();
                     request.setAttribute("collections", collections);
                     forward(request, response, "/collectionslist.jsp");
                     break;
                 }
-                case OBSERVATION_LIST:
-                {
+                case OBSERVATION_LIST: {
                     List<ObsLink> uris = repoClient.getObservations(getCollectionFromRequest(request));
                     request.setAttribute("uris", uris);
                     forward(request, response, "/obslist.jsp");
                     break;
                 }
-                case OBSERVATION_VIEW:
-                {
-                    final ObservationURI uri = ObservationUtil.getURI(request);
+                case OBSERVATION_VIEW: {
+                    final ObservationURI uri = observationUtil.getObservationURI(request);
                     final Observation obs =
-                            repoClient.getObservation(repoClient.getCurrentSubject(), uri);
+                        repoClient.getObservation(repoClient.getCurrentSubject(), uri);
 
-                    if (obs == null)
-                    {
+                    if (obs == null) {
                         String errMsg = String.format(ERROR_MESSAGE_NOT_FOUND_FORBIDDEN, uri, uri);
                         log.error(errMsg);
                         request.setAttribute("errorMsg", errMsg);
                         forward(request, response, "/error.jsp");
-                    }
-                    else
-                    {
+                    } else {
                         request.setAttribute("collection", (uri == null) ? "Unknown" : uri.getCollection());
                         request.setAttribute("observationID", (uri == null) ? "Unknown"
-                                                                            : uri.getObservationID());
+                            : uri.getObservationID());
                         request.setAttribute("obs", obs);
                         forward(request, response, "/display.jsp");
                     }
@@ -177,58 +166,43 @@ public class Caom2RepoObservationServlet extends HttpServlet
                     break;
                 }
                 case NOT_SUPPORTED:
-                default:
-                {
+                default: {
                     request.setAttribute("errorMsg", "Request type not supported");
                     RequestDispatcher dispatcher = request.getRequestDispatcher("/error.jsp");
                     dispatcher.forward(request, response);
                     break;
                 }
             }
-        }
-        catch (RuntimeException oops)
-        {
+        } catch (RuntimeException oops) {
             log.error("unexpected runtime exception", oops);
             request.setAttribute("runtimeException", oops);
             request.setAttribute("errorMsg", oops.getMessage());
             RequestDispatcher dispatcher = request.getRequestDispatcher("/error.jsp");
             dispatcher.forward(request, response);
-        }
-        finally
-        {
+        } finally {
             log.info("doGet[" + (System.currentTimeMillis() - start) + "ms]");
         }
 
     }
 
-    private int getRequestType(HttpServletRequest request)
-    {
+    private int getRequestType(HttpServletRequest request) {
         String sid = request.getPathInfo();
         int requestType = NOT_SUPPORTED;
 
-        if (sid != null)
-        {
+        if (sid != null) {
             sid = sid.substring(1, sid.length()); // strip leading /
             String[] parts = sid.split("/");
 
-            if (parts.length == 1)
-            {
-                if (parts[0].isEmpty())
-                {
+            if (parts.length == 1) {
+                if (parts[0].isEmpty()) {
                     requestType = COLLECTION_LIST;
-                }
-                else
-                {
+                } else {
                     requestType = OBSERVATION_LIST;
                 }
-            }
-            else if (parts.length == 2)
-            {
+            } else if (parts.length == 2) {
                 requestType = OBSERVATION_VIEW;
             }
-        }
-        else
-        {
+        } else {
             requestType = COLLECTION_LIST;
         }
 
@@ -236,17 +210,14 @@ public class Caom2RepoObservationServlet extends HttpServlet
         return requestType;
     }
 
-    private String getCollectionFromRequest(HttpServletRequest request)
-    {
+    private String getCollectionFromRequest(HttpServletRequest request) {
         String sid = request.getPathInfo();
 
-        if (sid != null)
-        {
+        if (sid != null) {
             sid = sid.substring(1, sid.length()); // strip leading /
             final String[] parts = sid.split("/");
 
-            if (parts.length == 1)
-            {
+            if (parts.length == 1) {
                 return parts[0];
             }
         }
@@ -259,8 +230,7 @@ public class Caom2RepoObservationServlet extends HttpServlet
 
     private void forward(final HttpServletRequest request,
                          final HttpServletResponse response, final String path)
-            throws ServletException, IOException
-    {
+        throws ServletException, IOException {
         final RequestDispatcher dispatcher = request.getRequestDispatcher(path);
         dispatcher.forward(request, response);
     }
