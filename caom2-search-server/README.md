@@ -1,4 +1,4 @@
-### CAOM-2 Search interface v2.1.7 <a href="https://travis-ci.org/opencadc/caom2ui"><img src="https://travis-ci.org/opencadc/caom2ui.svg?branch=bootstrap" /></a>
+### CAOM-2 Search interface v2.3.9 <a href="https://travis-ci.org/opencadc/caom2ui"><img src="https://travis-ci.org/opencadc/caom2ui.svg?branch=bootstrap" /></a>
 
 This is the User Interface to perform complicated searches to a running [TAP](http://www.ivoa.net/documents/TAP/) web service.
 
@@ -9,8 +9,55 @@ Simply run
 
 To have a constructed JAR file in the `build/libs` directory that can be used to create a WAR to then be run in a Java Servlet Container.
 
-See the [index.jsp](src/main/resources/META-INF/resources/index.jsp) for properties to set, although it is very recommended to leave
+See the Properties File section below for properties to set, although it is very recommended to leave
 them as their defaults.
+
+### Deployment options
+#### Properties File
+##### Location: config/org.opencadc.search.properties
+
+##### Example content:
+```
+# The TAP Service ID to resolve.
+org.opencadc.search.tap-service-id = ivo://cadc.nrc.ca/tap
+
+# Alternate TAP Service ID to resolve.
+# Overrides default for org.opencadc.search.tap-service-id
+# org.opencadc.search.maq-tap-service-id = ivo://cadc.nrc.ca/sc2tap
+
+# Alternate Datalink Service ID to resolve.
+org.opencadc.search.maq-datalink-service-id = ivo://cadc.nrc.ca/sc2links
+
+# The endpoint for this application. 
+org.opencadc.search.app-service-endpoint = /AdvancedSearch
+
+# The CAOM2-Ops (Package) Service ID to resolve.
+# org.opencadc.search.caom2ops-service-id = ivo://cadc.nrc.ca/caom2ops
+
+# The CAOM2-Ops (Package) Service ID to resolve.
+#org.opencadc.search.caom2link-service-id = ivo://cadc.nrc.ca/caom2ops
+
+# The CAOM2-Ops (Package) Service ID to resolve.
+#org.opencadc.search.caom2pkg-service-id = ivo://cadc.nrc.ca/caom2ops
+
+# Whether to show the ObsCore tab
+org.opencadc.search.obs-core = true
+
+# Max row count for results
+# org.opencadc.search.max-row-count = 10000
+```
+
+#### Secondary TAP data source
+On the query form, there is the option of enabling a toggle to allow Archive Search to switch between two TAP data services.
+
+The primary service is defined in the Properties file using:
+org.opencadc.search.tap-service-id
+
+The secondary as
+org.opencadc.search.maq-tap-service-id
+
+To enable the toggle, include a key/value pair using the secondary key in the Properties File
+
 
 ### Running
 
