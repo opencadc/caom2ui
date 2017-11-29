@@ -9,12 +9,43 @@ Simply run
 
 To have a constructed JAR file in the `build/libs` directory that can be used to create a WAR to then be run in a Java Servlet Container.
 
-See the [index.jsp](src/main/resources/META-INF/resources/index.jsp) for properties to set, although it is very recommended to leave
+See the Properties File section below for properties to set, although it is very recommended to leave
 them as their defaults.
 
 ### Deployment options
 #### Properties File
-config/org.opencadc.search.properties
+##### Location: config/org.opencadc.search.properties
+
+##### Example content:
+```
+# The TAP Service ID to resolve.
+org.opencadc.search.tap-service-id = ivo://cadc.nrc.ca/tap
+
+# Alternate TAP Service ID to resolve.
+# Overrides default for org.opencadc.search.tap-service-id
+# org.opencadc.search.maq-tap-service-id = ivo://cadc.nrc.ca/sc2tap
+
+# Alternate Datalink Service ID to resolve.
+org.opencadc.search.maq-datalink-service-id = ivo://cadc.nrc.ca/sc2links
+
+# The endpoint for this application. 
+org.opencadc.search.app-service-endpoint = /AdvancedSearch
+
+# The CAOM2-Ops (Package) Service ID to resolve.
+# org.opencadc.search.caom2ops-service-id = ivo://cadc.nrc.ca/caom2ops
+
+# The CAOM2-Ops (Package) Service ID to resolve.
+#org.opencadc.search.caom2link-service-id = ivo://cadc.nrc.ca/caom2ops
+
+# The CAOM2-Ops (Package) Service ID to resolve.
+#org.opencadc.search.caom2pkg-service-id = ivo://cadc.nrc.ca/caom2ops
+
+# Whether to show the ObsCore tab
+org.opencadc.search.obs-core = true
+
+# Max row count for results
+# org.opencadc.search.max-row-count = 10000
+```
 
 #### Secondary TAP data source
 On the query form, there is the option of enabling a toggle to allow Archive Search to switch between two TAP data services.
