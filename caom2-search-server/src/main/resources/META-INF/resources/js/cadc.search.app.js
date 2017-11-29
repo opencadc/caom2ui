@@ -1150,17 +1150,24 @@
 
     this.getMaqParameterFromURI = function()
     {
-        var maqValue = ""
-        if (this.options.useMaq === "true")
+      // If the toggle is not displayed, return ''
+      // If the toggle is to be displayed, the default value is 'on' (return "true")
+      // If it is on and there is a URL query, return the value from URL
+
+      var maqValue = ""
+      if (this.options.useMaq === "true")
+      {
+        var currentQuery = this.getQueryFromURI();
+        if (currentQuery.useMaq != undefined)
         {
-          var currentQuery = this.getQueryFromURI();
-          if (currentQuery.useMaq != undefined)
-          {
-              maqValue = currentQuery.useMaq[0];
-          }
+            maqValue = currentQuery.useMaq[0];
+        } else {
+            // Set the default
+            maqValue = "true";
         }
-        return maqValue;
-    };
+      }
+      return maqValue;
+  };
 
     /**
      * Start this application.  This will check for a quick submission.
@@ -1168,9 +1175,6 @@
     this.start = function ()
     {
       // After the series of columns (Data Train) has loaded, then proceed.
-      // TODO: with useMaq in a URL, if it's not handled explicitly prior to
-      // loading the data train, it could lead to an infinite loop of loading
-      // the data train. :(
       var postDataTrainLoad = function (_continue)
       {
         var activeSearchForm = this._getActiveForm()
@@ -1187,7 +1191,6 @@
           var queryObject =  currentURI.getQuery();
 
           //// Work directly with the form object.
-          //var activeSearchForm = this._getActiveForm();
           var $submitForm = activeSearchForm.getForm();
           var doSubmit;
 
@@ -1216,9 +1219,6 @@
               }
             });
 
-            // TODO: what is this doing, as it toggles the MAQ switch
-            // Consider using a class on inputs to be toggled to exclude MAQ
-            // as well which has bad effects.
             //$submitForm.find("input").change();
 
             // Update DataTrain
@@ -1301,6 +1301,8 @@
             this._selectTab(destinationTabID);
           }
         }
+
+
       }.bind(this);
 
       var caomSearchForm = this.getCAOMSearchForm();
@@ -1364,15 +1366,28 @@
                                                 postDataTrainLoad(false);
                                               });
 
+
       obsCoreSearchForm.subscribe(ca.nrc.cadc.search.events.onInit,
                                   function ()
                                   {
                                     obsCoreSearchForm.enable();
                                     obsCoreSearchForm.resetFields();
-                                  });
 
-      // pass in the useMaq flag here so it can be used
-      // to set the form toggle & load data train appropriately
+                                  })
+
+      obsCoreSearchForm.getDataTrain().subscribe(ca.nrc.cadc.search.datatrain.events.onDataTrainLoaded,
+          function ()
+          {
+            obsCoreSearchForm.enableMaqToggle();
+          }.bind(this));
+
+      obsCoreSearchForm.getDataTrain().subscribe(ca.nrc.cadc.search.datatrain.events.onDataTrainLoadFail,
+          function ()
+          {
+            obsCoreSearchForm.enableMaqToggle();
+          }.bind(this));
+
+      // if parameter function returns '' the toggle is not displayed
       caomSearchForm.init(this.getMaqParameterFromURI());
       obsCoreSearchForm.init(this.getMaqParameterFromURI());
     };

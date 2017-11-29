@@ -1231,7 +1231,9 @@
 
 
       $.each(_searchItems, function (name, value) {
-        currentURI.setQueryValue(name, encodeURIComponent(value));
+        if (name != "useMaq") {
+          currentURI.setQueryValue(name, encodeURIComponent(value));
+        }
       });
 
       // Then issue the href (target) of the link.

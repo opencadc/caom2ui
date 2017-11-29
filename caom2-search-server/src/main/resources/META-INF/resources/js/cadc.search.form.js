@@ -717,7 +717,7 @@
                                    "QUERY": stringUtil.format(defaultData.QUERY, [field.tap_column,
                                                                                   req.term.toLowerCase()])
                                  });
-                    //TODO: does anything need to be done differently here for MAQ?
+                    // Does anything need to be done differently here for MAQ support?
                     $.get(config.options.tapSyncEndpoint, payload)
                         .done(function (csvData)
                               {
@@ -891,6 +891,7 @@
                        $targetNameResolutionStatus.removeClass("busy");
                      });
 
+
       // Toggling the MAQ switch will trigger datatrain load
       // "" can mean it's not in the URL, or it's not enabled for this app
       if (useMaqDataTrain === "")
@@ -900,8 +901,6 @@
       }
       else
       {
-        // todo: this variable name might need to change to 'maqEnabledForApp' or 'maqEnabledForParent'
-        // for it to be more maintainable
         this.maqToggleEnabled = true;
         this.setMaqToggle(useMaqDataTrain);
         this.setResultsMaqMode(useMaqDataTrain);
@@ -933,7 +932,6 @@
 
     this.disableMaqToggle = function()
     {
-    // todo: is maqToggleEnabled used correctly?
       this.maqToggleEnabled = false
       var $useMaqEl = this.$form.find(".useMaq");
       $useMaqEl.bootstrapToggle("disable");

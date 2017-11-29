@@ -587,4 +587,14 @@ canvas.aladin-imageCanvas {
     display: none;
 }
 
+.maq-div {
+  display: inline;
+  margin-left: 10px;
+}
+
+.maq-label {
+  font-weight: normal;
+  font-size: 9pt;
+}
+
 
