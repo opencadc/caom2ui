@@ -1224,15 +1224,17 @@
         ? $(format(value, columnUType, value, toUnit))
         : $(formatOutputHTML(value, columnUType, value)));
 
+    var maqKey = "useMaq";
+
     if ($output.text())
     {
-      var currentURI = cadc.web.util.currentURI();
-      // Need to strip off tab # anchor tag...
-
+      var currentURIStr = cadc.web.util.currentURI().toString();
+      // Trim off existing query and tab reference
+      var baseURI = new cadc.web.util.URI(currentURIStr.substr(0,currentURIStr.indexOf("?")));
 
       $.each(_searchItems, function (name, value) {
-        if (name != "useMaq") {
-          currentURI.setQueryValue(name, encodeURIComponent(value));
+        if (name != maqKey) {
+          baseURI.setQueryValue(name, encodeURIComponent(value));
         }
       });
 
@@ -1242,16 +1244,9 @@
       // Force open in a new window.  This MUST be set to _blank.
       $link.attr("target", "_blank");
 
-      var useMaqStr = "&useMaq=";
-      if (($("#resultsMaqEnabled") == "undefined") || $("#resultsMaqEnabled").hasClass("cadc-display-none"))
-      {
-        useMaqStr += "false";
-      } else {
-        useMaqStr += "true";
-      }
+      var useMaqStr = "&" + maqKey + "=" + !(($("#resultsMaqEnabled") == "undefined") || $("#resultsMaqEnabled").hasClass("cadc-display-none"));
 
-      var currentURIStr = currentURI.toString();
-      $link.attr("href", currentURIStr.substr(0,currentURIStr.indexOf('#')) + useMaqStr);
+      $link.attr("href", baseURI.toString() + useMaqStr);
       $link.addClass("quicksearch_link");
       $link.text($output.text());
 

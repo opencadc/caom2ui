@@ -321,13 +321,16 @@ public class SearchJobServlet extends SyncServlet {
         // Create the TAP job to prepare to be executed.
         // Check to see if this should return MAQ data
 
-        URI tapServiceURI = DEFAULT_TAP_SERVICE_URI;
-        String tapServiceKey = TAP_SERVICE_URI_PROPERTY_KEY;
-        log.info("useMaq value: " + request.getParameter("useMaq"));
+        final URI tapServiceURI;
+        final String tapServiceKey;
+
         if ((request.getParameter("useMaq") != null)
             && (request.getParameter("useMaq").equals("true"))) {
             tapServiceURI = ALTERNATE_TAP_SERVICE_URI;
             tapServiceKey = ALT_TAP_SERVICE_URI_PROPERTY_KEY;
+        } else {
+            tapServiceURI = DEFAULT_TAP_SERVICE_URI;
+            tapServiceKey = TAP_SERVICE_URI_PROPERTY_KEY;
         }
 
         final JobRunner runner =

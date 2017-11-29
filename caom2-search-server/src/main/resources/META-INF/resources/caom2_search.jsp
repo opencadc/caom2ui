@@ -32,7 +32,7 @@
     <div class="col-sm-12 button-holder">
       <button type="submit"
               class="btn btn-primary submit-query"
-              valcue="<fmt:message key="SEARCH_BUTTON_LABEL" bundle="${langBundle}" />">
+              value="<fmt:message key="SEARCH_BUTTON_LABEL" bundle="${langBundle}" />">
         <fmt:message key="SEARCH_BUTTON_LABEL" bundle="${langBundle}"/>
       </button>
       <button type="reset"

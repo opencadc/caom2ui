@@ -85,6 +85,7 @@
 
     // For controlling MAQ Switch triggering data train load
     var isFirstLoad = true;
+    var maqKey = "useMaq";
 
     // Text area containing the ADQL query.
     var $queryCode = $("#query");
@@ -689,7 +690,7 @@
       {
         if (field.value && (ca.nrc.cadc.search.field_ignore.indexOf(field.name) < 0))
         {
-          if (field.name === "useMaq")
+          if (field.name === maqKey)
           {
             parameters.push(field.name + '=' + field.value);
           } else {
@@ -1209,7 +1210,7 @@
                   activeSearchForm.setSelectValue(ca.nrc.cadc.search.CAOM2_TARGET_NAME_FIELD_ID, qKey,
                                                   decodeURIComponent(qValue.join()));
                 }
-                else if (qKey !== "useMaq")
+                else if (qKey !== maqKey)
                 {
                   // useMaq has been handled prior to the data train being loaded
                   activeSearchForm.setInputValue(qKey, decodeURIComponent(qValue.join()));
@@ -1219,7 +1220,12 @@
               }
             });
 
-            //$submitForm.find("input").change();
+            $submitForm.find("input").each(function(item, index) {
+              // Explicitly skip the useMaq input toggle
+              if (this.className !== maqKey) {
+                $(this).change();
+              }
+            });
 
             // Update DataTrain
             var dtUType = $submitForm.find(".hierarchy_utype").text();
