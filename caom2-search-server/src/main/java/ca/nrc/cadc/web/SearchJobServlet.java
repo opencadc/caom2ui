@@ -70,42 +70,65 @@ package ca.nrc.cadc.web;
 
 import ca.nrc.cadc.auth.HTTPIdentityManager;
 import ca.nrc.cadc.auth.IdentityManager;
-import ca.nrc.cadc.config.ApplicationConfiguration;
 import ca.nrc.cadc.caom2.CAOMQueryGenerator;
 import ca.nrc.cadc.caom2.ObsCoreQueryGenerator;
+import ca.nrc.cadc.config.ApplicationConfiguration;
 import ca.nrc.cadc.date.DateUtil;
 import ca.nrc.cadc.net.TransientException;
 import ca.nrc.cadc.reg.client.RegistryClient;
+import ca.nrc.cadc.search.DefaultNameResolverClient;
 import ca.nrc.cadc.search.ObsModel;
 import ca.nrc.cadc.search.QueryGenerator;
-import ca.nrc.cadc.search.DefaultNameResolverClient;
 import ca.nrc.cadc.search.parser.exception.PositionParserException;
 import ca.nrc.cadc.search.upload.StreamingVOTableWriter;
 import ca.nrc.cadc.search.upload.UploadResults;
-import ca.nrc.cadc.tap.SyncTAPClient;
 import ca.nrc.cadc.tap.DefaultSyncTAPClient;
+import ca.nrc.cadc.tap.SyncTAPClient;
 import ca.nrc.cadc.tap.TAPSearcher;
-import ca.nrc.cadc.uws.*;
-import ca.nrc.cadc.uws.server.*;
+import ca.nrc.cadc.uws.AdvancedRunner;
+import ca.nrc.cadc.uws.ExecutionPhase;
+import ca.nrc.cadc.uws.HTTPResponseSyncOutput;
+import ca.nrc.cadc.uws.Job;
+import ca.nrc.cadc.uws.Parameter;
+import ca.nrc.cadc.uws.SyncResponseWriterImpl;
+import ca.nrc.cadc.uws.server.DatabaseJobPersistence;
+import ca.nrc.cadc.uws.server.JobManager;
+import ca.nrc.cadc.uws.server.JobNotFoundException;
+import ca.nrc.cadc.uws.server.JobPersistenceException;
+import ca.nrc.cadc.uws.server.JobRunner;
+import ca.nrc.cadc.uws.server.JobUpdater;
+import ca.nrc.cadc.uws.server.SyncOutput;
+import ca.nrc.cadc.uws.server.SyncServlet;
 import ca.nrc.cadc.uws.server.impl.PostgresJobPersistence;
 import ca.nrc.cadc.uws.web.JobCreator;
-import org.apache.commons.fileupload.FileUploadException;
-
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
-import java.net.URI;
-import java.util.*;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.log4j.Logger;
 
 
-public class SearchJobServlet extends SyncServlet
-{
+public class SearchJobServlet extends SyncServlet {
+    private static final Logger log = Logger.getLogger(SearchJobServlet.class);
     private static final String TAP_SERVICE_URI_PROPERTY_KEY = "org.opencadc.search.tap-service-id";
+    private static final String ALT_TAP_SERVICE_URI_PROPERTY_KEY = "org.opencadc.search.maq-tap-service-id";
     private static final URI DEFAULT_TAP_SERVICE_URI = URI.create("ivo://cadc.nrc.ca/tap");
+    private static final URI ALTERNATE_TAP_SERVICE_URI = URI.create("ivo://cadc.nrc.ca/sc2tap");
 
     private JobManager jobManager;
     private JobUpdater jobUpdater;
@@ -113,8 +136,7 @@ public class SearchJobServlet extends SyncServlet
 
 
     @Override
-    public void init(final ServletConfig config) throws ServletException
-    {
+    public void init(final ServletConfig config) throws ServletException {
         super.init(config);
 
         final DatabaseJobPersistence jobPersistence = createJobPersistence(new HTTPIdentityManager());
@@ -130,11 +152,10 @@ public class SearchJobServlet extends SyncServlet
     /**
      * Override as needed.
      *
-     * @param identityManager       The Identity Manager to pass to the persistence.
-     * @return      DatabasePersistence instance.
+     * @param identityManager The Identity Manager to pass to the persistence.
+     * @return DatabasePersistence instance.
      */
-    DatabaseJobPersistence createJobPersistence(final IdentityManager identityManager)
-    {
+    DatabaseJobPersistence createJobPersistence(final IdentityManager identityManager) {
         return new PostgresJobPersistence(identityManager);
     }
 
@@ -192,14 +213,10 @@ public class SearchJobServlet extends SyncServlet
      */
     @Override
     protected void doPost(final HttpServletRequest request, final HttpServletResponse response)
-            throws ServletException, IOException
-    {
-        try
-        {
+        throws ServletException, IOException {
+        try {
             processRequest(request, response);
-        }
-        catch (TransientException ex)
-        {
+        } catch (TransientException ex) {
             // OutputStream not open, write an error response
             response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
             response.addHeader("Retry-After", Integer.toString(ex.getRetryDelay()));
@@ -209,9 +226,7 @@ public class SearchJobServlet extends SyncServlet
             w.println("failed to get or persist job state.");
             w.println("   reason: " + ex.getMessage());
             w.close();
-        }
-        catch (JobPersistenceException ex)
-        {
+        } catch (JobPersistenceException ex) {
             // OutputStream not open, write an error response
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.setContentType("text/plain");
@@ -221,9 +236,7 @@ public class SearchJobServlet extends SyncServlet
             w.close();
 
             throw new RuntimeException(ex);
-        }
-        catch (Throwable t)
-        {
+        } catch (Throwable t) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.setContentType("text/plain");
             PrintWriter w = response.getWriter();
@@ -240,27 +253,22 @@ public class SearchJobServlet extends SyncServlet
      *
      * @return The current Date in UTC.
      */
-    private Date currentDateUTC()
-    {
+    private Date currentDateUTC() {
         final Calendar calendar = Calendar.getInstance(DateUtil.UTC);
         return calendar.getTime();
     }
 
     private void processRequest(final HttpServletRequest request, final HttpServletResponse response)
-            throws JobPersistenceException, TransientException, FileUploadException, IOException,
-                   PositionParserException, JobNotFoundException
-    {
+        throws JobPersistenceException, TransientException, FileUploadException, IOException,
+        PositionParserException, JobNotFoundException {
         final Map<String, Object> uploadPayload = new HashMap<>();
         final List<Parameter> extraJobParameters = new ArrayList<>();
 
-        final JobCreator jobCreator = new JobCreator(getInlineContentHandler())
-        {
+        final JobCreator jobCreator = new JobCreator(getInlineContentHandler()) {
             @Override
             protected void processStream(final String name, final String contentType, final InputStream inputStream)
-                    throws IOException
-            {
-                try
-                {
+                throws IOException {
+                try {
                     final String[] nameParts = name.split("\\.");
                     final String paramName = nameParts[0];
                     final File uploadFile = new File(paramName);
@@ -268,7 +276,7 @@ public class SearchJobServlet extends SyncServlet
                     final String resolver = (nameParts.length == 2) ? nameParts[1] : "ALL";
                     final UploadResults uploadResults = new UploadResults(resolver, 0, 0);
                     final StreamingVOTableWriter tableWriter =
-                            new StreamingVOTableWriter(uploadResults, new DefaultNameResolverClient());
+                        new StreamingVOTableWriter(uploadResults, new DefaultNameResolverClient());
 
                     tableWriter.write(inputStream, fos);
                     extraJobParameters.add(new Parameter(UploadResults.UPLOAD_RESOLVER, resolver));
@@ -276,17 +284,15 @@ public class SearchJobServlet extends SyncServlet
                     fos.flush();
                     fos.close();
 
-                    if (uploadFile.length() > 0)
-                    {
+                    if (uploadFile.length() > 0) {
                         uploadPayload.put(paramName, uploadFile);
                     }
-                }
-                catch (IOException e)
-                {
+                } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             }
         };
+
 
         // Create the audit job.
         final Job auditJob = jobManager.create(jobCreator.create(request));
@@ -294,33 +300,44 @@ public class SearchJobServlet extends SyncServlet
 
         final SyncOutput syncOutput = new HTTPResponseSyncOutput(response);
         final SyncTAPClient tapClient =
-                new DefaultSyncTAPClient(false, new RegistryClient())
-                {
-                    /**
-                     * Build the payload to POST.
-                     *
-                     * @param job       The Job to get the payload for.
-                     * @return Map of Parameter name -> value.
-                     */
-                    @Override
-                    protected Map<String, Object> getQueryPayload(Job job)
-                    {
-                        final Map<String, Object> queryPayload = super.getQueryPayload(job);
-                        queryPayload.putAll(uploadPayload);
+            new DefaultSyncTAPClient(false, new RegistryClient()) {
+                /**
+                 * Build the payload to POST.
+                 *
+                 * @param job       The Job to get the payload for.
+                 * @return Map of Parameter name -> value.
+                 */
+                @Override
+                protected Map<String, Object> getQueryPayload(Job job) {
+                    final Map<String, Object> queryPayload = super.getQueryPayload(job);
+                    queryPayload.putAll(uploadPayload);
 
-                        return queryPayload;
-                    }
-                };
+                    return queryPayload;
+                }
+            };
 
         jobUpdater.setPhase(auditJob.getID(), ExecutionPhase.PENDING, ExecutionPhase.QUEUED, currentDateUTC());
 
         // Create the TAP job to prepare to be executed.
+        // Check to see if this should return MAQ data
+
+        final URI tapServiceURI;
+        final String tapServiceKey;
+
+        if ((request.getParameter("useMaq") != null)
+            && (request.getParameter("useMaq").equals("true"))) {
+            tapServiceURI = ALTERNATE_TAP_SERVICE_URI;
+            tapServiceKey = ALT_TAP_SERVICE_URI_PROPERTY_KEY;
+        } else {
+            tapServiceURI = DEFAULT_TAP_SERVICE_URI;
+            tapServiceKey = TAP_SERVICE_URI_PROPERTY_KEY;
+        }
+
         final JobRunner runner =
-                new AdvancedRunner(auditJob, jobUpdater, syncOutput,
-                                   new TAPSearcher(new SyncResponseWriterImpl(syncOutput), jobUpdater, tapClient,
-                                                   getQueryGenerator(auditJob)),
-                                   applicationConfiguration.lookupServiceURI(TAP_SERVICE_URI_PROPERTY_KEY,
-                                                                             DEFAULT_TAP_SERVICE_URI));
+            new AdvancedRunner(auditJob, jobUpdater, syncOutput,
+                new TAPSearcher(new SyncResponseWriterImpl(syncOutput), jobUpdater, tapClient,
+                    getQueryGenerator(auditJob)),
+                applicationConfiguration.lookupServiceURI(tapServiceKey, tapServiceURI));
 
         runner.run();
         response.setStatus(HttpServletResponse.SC_OK);
@@ -331,14 +348,11 @@ public class SearchJobServlet extends SyncServlet
      *
      * @return QueryGenerator instance.
      */
-    private QueryGenerator getQueryGenerator(final Job job)
-    {
+    private QueryGenerator getQueryGenerator(final Job job) {
         // Look for parameters starting with obscore to determine if
         // querying CAOM2 or ObsCore.
-        for (final Parameter parameter : job.getParameterList())
-        {
-            if (ObsModel.isObsCore(parameter.getName()))
-            {
+        for (final Parameter parameter : job.getParameterList()) {
+            if (ObsModel.isObsCore(parameter.getName())) {
                 return new ObsCoreQueryGenerator(job);
             }
         }

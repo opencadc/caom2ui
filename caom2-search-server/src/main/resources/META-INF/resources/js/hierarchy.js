@@ -172,13 +172,16 @@
     this.modelDataSource = _modelDataSource;
     this.pageLanguage = $("html").attr("lang");
     this.$dataTrainDOM = $("div[id='" + this.modelDataSource + "@Hierarchy']");
+    this.$dtTableDOM = $("." + this.modelDataSource + "_dtTableDiv");
     this.uType = this.$dataTrainDOM.find(".hierarchy_utype").text();
+    this.useMaq = this.$dataTrainDOM.find(".load_maq_data_train").text();
     this.groups = [];
     this.freshInstruments = [];
 
     this.defaults = {
       autoInit: false,
-      tapSyncEndpoint: "/search/tap/sync"
+      tapSyncEndpoint: "/search/tap/sync",
+      useMaq: this.useMaq
     };
 
     this.options = $.extend({}, true, this.defaults, _options);
@@ -200,21 +203,34 @@
      */
     this.init = function ()
     {
+      this._toggleLoading(true);
+      this._loadDataTrain();
+    };
+
+    /**
+     * Make call to server to get TAP data to load into DataTrain
+     * @private
+     */
+    this._loadDataTrain = function() {
       var tapQuery = this._createTAPQuery();
 
       $.get(this.options.tapSyncEndpoint, {
-        "LANG": "ADQL",
-        "FORMAT": "CSV",
-        "QUERY": tapQuery
-      }).done(function (data)
-              {
-                this._trigger(ca.nrc.cadc.search.datatrain.events.onDataTrainLoaded, {data: data});
-              }.bind(this))
-          .fail(function (jqXHR)
-                {
-                  trigger(ca.nrc.cadc.search.datatrain.events.onDataTrainLoadFail, {responseText: jqXHR.responseText});
-                }.bind(this));
-    };
+          "LANG": "ADQL",
+          "FORMAT": "CSV",
+          "USEMAQ": this.useMaq,
+          "QUERY": tapQuery
+        }).done(function (data)
+        {
+
+          this.groups = [];
+          this._trigger(ca.nrc.cadc.search.datatrain.events.onDataTrainLoaded, {data: data});
+        }.bind(this))
+        .fail(function (jqXHR)
+        {
+          this._trigger(ca.nrc.cadc.search.datatrain.events.onDataTrainLoadFail, {responseText: jqXHR.responseText});
+        }.bind(this)
+      );
+    }
 
     /**
      * Create the TAP query to obtain the Data Train values.
@@ -229,6 +245,10 @@
       for (var i = 0, ul = uTypes.length; i < ul; i++)
       {
         var nextUType = uTypes[i];
+        if (nextUType === "useMaq")
+        {
+          continue;
+        }
         var colOpts = this._getColumnConfig(nextUType);
 
         if (colOpts.hasOwnProperty("tap_column_name"))
@@ -254,7 +274,7 @@
 
     /**
      * Do an initial load of all of the groupings.  This will parse the given
-     * CSV data and append the resulting selects tot he given container.
+     * CSV data and append the resulting selects to the given container.
      *
      * @param {String} data                The CSV data from the response.
      */
@@ -314,6 +334,29 @@
     };
 
     /**
+     * Load MAQ data into DataTrain if useMaq = true
+     * @param useMaq
+     */
+    this.setMaqMode = function(useMaq)
+    {
+      this._clearTable();
+      this._toggleLoading(true);
+      this.useMaq = useMaq;
+      this._loadDataTrain();
+    }
+
+    /**
+     * Clear the existing set of data train tables
+     * @private
+     */
+    this._clearTable = function()
+    {
+      if (this.$dtTableDOM.children().length > 0) {
+        this.$dtTableDOM.empty();
+      }
+    }
+
+    /**
      * Construct a DOM of a select and append it.
      * @param _group
      * @returns {*}
@@ -353,8 +396,8 @@
           firstSelect = select.childNodes[1];
         }
 
-        // Add <select> to the table cell.
-        this.$dataTrainDOM.append(select);
+        // Add <select> to the data train table div
+        this.$dtTableDOM.append(select);
       }
 
       // Return first select.
@@ -365,11 +408,10 @@
      * Toggle the loading icon.
      * @private
      */
-    this._toggleLoading = function ()
+    this._toggleLoading = function (turnOn)
     {
-      // Remove temporary div.
       var building = document.getElementById(this.uType + ".building");
-      building.className = (building.className.indexOf("hidden") >= 0) ? "" : "hidden";
+      building.className = (turnOn == true) ? "" : "hidden";
     };
 
     /**
@@ -1111,7 +1153,7 @@
                    {
                      var dt = args.dataTrain;
                      dt.load(args.data);
-                     dt._toggleLoading();
+                     dt._toggleLoading(false);
                    });
 
     this.subscribe(ca.nrc.cadc.search.datatrain.events.onDataTrainLoadFail,
@@ -1119,7 +1161,7 @@
                    {
                      alert("Error while querying TAP to initialize the page: " + args.responseText);
                      var dt = args.dataTrain;
-                     dt._toggleLoading();
+                     dt._toggleLoading(false);
                    });
 
     if (this.options.autoInit === true)

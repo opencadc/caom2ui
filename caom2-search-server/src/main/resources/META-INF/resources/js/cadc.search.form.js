@@ -121,6 +121,7 @@
 
     this.config = _config;
     this.options = _options;
+    this.maqToggleEnabled = false;
 
     /**
      * @type {Metadata|cadc.vot.Metadata}
@@ -650,7 +651,7 @@
     /**
      * Initialize this form.
      */
-    this.init = function ()
+    this.init = function (useMaqDataTrain)
     {
       var $currForm = this.$form;
       this.targetNameFieldID = $currForm.find("input[name$='@Shape1.value']").prop("id");
@@ -716,7 +717,7 @@
                                    "QUERY": stringUtil.format(defaultData.QUERY, [field.tap_column,
                                                                                   req.term.toLowerCase()])
                                  });
-
+                    // Does anything need to be done differently here for MAQ support?
                     $.get(config.options.tapSyncEndpoint, payload)
                         .done(function (csvData)
                               {
@@ -778,6 +779,26 @@
       $currForm.find(".targetList_clear").click(function ()
                                                 {
                                                   this._clearTargetList();
+                                                }.bind(this));
+
+      $currForm.find(".useMaq").change(function(event) {
+                                                // This sets up or removes the MAQ mode display items
+                                                // in the form and results panel
+                                                  if (this.maqToggleEnabled === true) {
+                                                    // toggle results table header element
+                                                    if ((event.currentTarget.checked === "true" )
+                                                      || (event.currentTarget.checked === true ))
+                                                    {
+                                                      this.setResultsMaqMode(true);
+                                                    }
+                                                    else
+                                                    {
+                                                      this.setResultsMaqMode(false);
+                                                    }
+
+                                                    this.disableMaqToggle();
+                                                    this.dataTrain.setMaqMode(event.currentTarget.checked);
+                                                  }
                                                 }.bind(this));
 
       // Prevent closing details when a value is present.
@@ -870,7 +891,20 @@
                        $targetNameResolutionStatus.removeClass("busy");
                      });
 
-      this.dataTrain.init();
+
+      // Toggling the MAQ switch will trigger datatrain load
+      // "" can mean it's not in the URL, or it's not enabled for this app
+      if (useMaqDataTrain === "")
+      {
+        this.disableMaqToggle();
+        this.dataTrain.init();
+      }
+      else
+      {
+        this.maqToggleEnabled = true;
+        this.setMaqToggle(useMaqDataTrain);
+        this.setResultsMaqMode(useMaqDataTrain);
+      }
 
       try
       {
@@ -881,6 +915,48 @@
         console.error("Error found.\n" + err);
       }
     };
+
+
+    this.setMaqToggle = function(setOn)
+    {
+        if (setOn === "true")
+        {
+          this.$form.find(".useMaq").bootstrapToggle('on');
+        }
+        else
+        {
+          this.$form.find(".useMaq").bootstrapToggle('off');
+        }
+        this.disableMaqToggle();
+    }
+
+    this.disableMaqToggle = function()
+    {
+      this.maqToggleEnabled = false
+      var $useMaqEl = this.$form.find(".useMaq");
+      $useMaqEl.bootstrapToggle("disable");
+    }
+
+    this.enableMaqToggle = function()
+    {
+      this.maqToggleEnabled = true;
+      var $useMaqEl = this.$form.find(".useMaq");
+      $useMaqEl.bootstrapToggle("enable");
+    }
+
+    this.setResultsMaqMode = function(setOn)
+    {
+      if ((setOn === true) || (setOn === "true"))
+      {
+        $("#resultsMaqEnabled").removeClass("cadc-display-none");
+        this.$form.find(".useMaqValue").val(true);
+      }
+      else
+      {
+        $("#resultsMaqEnabled").addClass("cadc-display-none");
+        this.$form.find(".useMaqValue").val(false);
+      }
+    }
 
     /**
      * User entered target is acceptable; meaning it passes name resolution and/or coordinate parsing.
@@ -1840,6 +1916,15 @@
       var $inputItem = this.$form.find("input[id='" + _inputID + "']");
       var $formItem = this.$form.find("[id='" + _inputID + "']");
 
+      // Classname used instead of id for this element because it exists on both caom2 and obscore
+      // search forms
+      if (_inputID === "useMaq")
+      {
+        // Note that changing this box will kick off a data train update as well,
+        // which may affect timing on Additional Constraints (hierarchy.js) fields that need to be updated
+        $inputItem = this.$form.find("input[class='" + _inputID + "']");
+      }
+
       if ($inputItem.length > 0)
       {
         if ($inputItem.is(":checkbox"))
@@ -1878,6 +1963,12 @@
         this.$form.append($newHiddenFormName);
       }
     };
+
+    this.toggleMaqMode = function()
+    {
+      // check if toggle is enabled for application first
+      this.$form.find(".useMaq").click();
+    }
 
     /**
      * Update the select element with the select value. Return true if the select is updated, false otherwise.
