@@ -23,6 +23,7 @@
     <input type="hidden" name="SelectList" class="CAOM2_selectlist"/>
     <input type="hidden" name="MaxRecords" value="${param.maxRowLimit}"/>
     <input type="hidden" name="format" value="csv"/>
+    <input type="hidden" class="useMaqValue" name="useMaq" value="${param.useMaq}"/>
 
     <!-- Used by AdvancedSearch to pass to VOTV. -->
     <input type="hidden" id="max_row_limit_warning"
@@ -39,6 +40,16 @@
               value="<fmt:message key="RESET_BUTTON_LABEL" bundle="${langBundle}" />">
         <fmt:message key="RESET_BUTTON_LABEL" bundle="${langBundle}"/>
       </button>
+      <!-- useMaq = true means display this checkbox -->
+      <c:if test="${param.useMaq eq 'true'}" >
+        <div class="maq-div">
+          <label class="maq-label"><input class="useMaq"
+                 type="checkbox"
+                 checked data-toggle="toggle"
+                 data-size="mini"
+                 data-onstyle="info"> Use MAQ Data Source </label>
+        </div>
+      </c:if>
     </div>
 
     <div class="col-sm-12">
@@ -131,9 +142,9 @@
         <strong><fmt:message key="RES_TIME" bundle="${langBundle}"/></strong><br>
         <p class="resolver-result-time"></p>
       </div>
-
+      
       <c:import
-          url="hierarchy.jsp?colcount=seven-col&utype=Plane.energy.emBand/Observation.collection/Observation.instrument.name/Plane.energy.bandpassName/Plane.calibrationLevel/Plane.dataProductType/Observation.type&modelDataSource=caom2"/>
+          url="hierarchy.jsp?colcount=seven-col&utype=Plane.energy.emBand/Observation.collection/Observation.instrument.name/Plane.energy.bandpassName/Plane.calibrationLevel/Plane.dataProductType/Observation.type&modelDataSource=caom2&useMaq=${param.useMaq}" />
 
     </div>
 

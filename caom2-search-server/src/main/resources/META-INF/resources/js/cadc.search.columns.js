@@ -1209,6 +1209,7 @@
     return htmlFormat.format();
   }
 
+
   /**
    * Format the given utype value as a link for a quick search.
    *
@@ -1223,12 +1224,18 @@
         ? $(format(value, columnUType, value, toUnit))
         : $(formatOutputHTML(value, columnUType, value)));
 
+    var maqKey = "useMaq";
+
     if ($output.text())
     {
-      var currentURI = cadc.web.util.currentURI();
+      var currentURIStr = cadc.web.util.currentURI().toString();
+      // Trim off existing query and tab reference
+      var baseURI = new cadc.web.util.URI(currentURIStr.substr(0,currentURIStr.indexOf("?")));
 
       $.each(_searchItems, function (name, value) {
-        currentURI.setQueryValue(name, encodeURIComponent(value));
+        if (name != maqKey) {
+          baseURI.setQueryValue(name, encodeURIComponent(value));
+        }
       });
 
       // Then issue the href (target) of the link.
@@ -1236,7 +1243,10 @@
 
       // Force open in a new window.  This MUST be set to _blank.
       $link.attr("target", "_blank");
-      $link.attr("href", currentURI.toString());
+
+      var useMaqStr = "&" + maqKey + "=" + !(($("#resultsMaqEnabled") == "undefined") || $("#resultsMaqEnabled").hasClass("cadc-display-none"));
+
+      $link.attr("href", baseURI.toString() + useMaqStr);
       $link.addClass("quicksearch_link");
       $link.text($output.text());
 

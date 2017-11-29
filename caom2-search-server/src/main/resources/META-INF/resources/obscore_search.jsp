@@ -23,6 +23,7 @@
     <input type="hidden" name="SelectList" class="ObsCore_selectlist"/>
     <input type="hidden" name="MaxRecords" value="${param.maxRowLimit}"/>
     <input type="hidden" name="format" value="csv"/>
+    <input type="hidden" class="useMaqValue" name="useMaq" value="${param.useMaq}"/>
 
 
     <div class="col-sm-12 button-holder">
@@ -36,6 +37,17 @@
               value="<fmt:message key="RESET_BUTTON_LABEL" bundle="${langBundle}" />">
         <fmt:message key="RESET_BUTTON_LABEL" bundle="${langBundle}"/>
       </button>
+
+      <!-- useMaq = true means display this checkbox -->
+      <c:if test="${param.useMaq eq 'true'}" >
+        <div class="maq-div">
+        <label class="maq-label"><input class="useMaq"
+                 type="checkbox"
+                 checked data-toggle="toggle"
+                 data-size="mini"
+                 data-onstyle="info"> Use MAQ Data Source </label>
+        </div>
+      </c:if>
     </div>
 
 
