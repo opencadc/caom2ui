@@ -173,7 +173,7 @@
      */
     this.getConverter = function ()
     {
-      return this.previewCollectionConfiguration.converter;
+      return this.previewCollectionConfiguration ? this.previewCollectionConfiguration.converter : null;
     };
 
     /**
@@ -190,7 +190,8 @@
      */
     this.getPreview = function (_successCallback, _failCallback)
     {
-      var previewConverterFunction = this.getConverter().bind(this);
+      var converter = this.getConverter();
+      var previewConverterFunction = converter ? converter.bind(this) : null;
 
       if (previewConverterFunction)
       {
