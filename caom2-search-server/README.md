@@ -1,4 +1,5 @@
-### CAOM-2 Search interface v2.3.9 <a href="https://travis-ci.org/opencadc/caom2ui"><img src="https://travis-ci.org/opencadc/caom2ui.svg?branch=master" /></a>
+### CAOM-2 Search interface v2.3.10 <a href="https://travis-ci.org/opencadc/caom2ui"><img src="https://travis-ci
+.org/opencadc/caom2ui.svg?branch=master" /></a>
 
 This is the User Interface to perform complicated searches to a running [TAP](http://www.ivoa.net/documents/TAP/) web service.
 
