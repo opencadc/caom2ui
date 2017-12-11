@@ -3,3 +3,4 @@
 * Create link from Provenance reference URL on page.
 * Code clean up.
 * Browser test updates.
+* Add identifying CSS classes to HTML Table rows.
