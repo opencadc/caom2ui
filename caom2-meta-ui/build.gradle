@@ -7,8 +7,8 @@ plugins {
 }
 
 repositories {
-    jcenter()
     mavenLocal()
+    jcenter()
 }
 
 sourceCompatibility = '1.7'

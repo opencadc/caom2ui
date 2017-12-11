@@ -71,7 +71,6 @@ package ca.nrc.cadc.caom2.ui.server;
 
 import ca.nrc.cadc.caom2.Observation;
 import ca.nrc.cadc.caom2.ObservationURI;
-import ca.nrc.cadc.caom2.PublisherID;
 import ca.nrc.cadc.caom2.ui.server.client.Caom2MetaClient;
 import ca.nrc.cadc.caom2.ui.server.client.ObservationUtil;
 import org.apache.log4j.Logger;
@@ -82,45 +81,36 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.net.URISyntaxException;
 
 
 /**
  * @author jeevesh
  */
-public class Caom2MetaObservationServlet extends HttpServlet {
+public class Caom2MetaObservationServlet extends HttpServlet
+{
+    private final long serialVersionUID = -917406909288899339L;
     private static Logger log = Logger.getLogger(Caom2MetaObservationServlet.class);
 
     private static final String ERROR_MESSAGE_NOT_FOUND_FORBIDDEN =
-        "Observation with URI '%s' not found, or you are "
+            "Observation with URI '%s' not found, or you are "
             + "forbidden from seeing it.  Please login and "
             + "try again. | l'Observation '%s' pas "
             + "trouvé, ou vous n'avez pas permission.  S'il "
             + "vous plaît connecter et essayez à nouveau.";
 
-    protected static final String MISSING_PUBLISHER_ID =
-        "Must specify publisherID (ivo://<authority>/<collection>?<obsid>/<productid> in the path. | " + "Le chemain " +
-            "est incomplet.";
 
-
-    private final ObservationUtil observationUtil;
     private final Caom2MetaClient metaClient;
 
 
-    public Caom2MetaObservationServlet() {
-        this(new Caom2MetaClient(), new ObservationUtil());
+    public Caom2MetaObservationServlet()
+    {
+        this(new Caom2MetaClient());
     }
 
 
-    /**
-     * Complete constructor for testing.
-     *
-     * @param metaClient      The Meta Client instance to use.
-     * @param observationUtil The ObservationUtil to use.
-     */
-    Caom2MetaObservationServlet(Caom2MetaClient metaClient, final ObservationUtil observationUtil) {
+    public Caom2MetaObservationServlet(Caom2MetaClient metaClient)
+    {
         this.metaClient = metaClient;
-        this.observationUtil = observationUtil;
     }
 
     /**
@@ -134,45 +124,62 @@ public class Caom2MetaObservationServlet extends HttpServlet {
      * @throws IOException      If IO exception.
      */
     protected void doGet(final HttpServletRequest request, final HttpServletResponse response)
-        throws ServletException, IOException {
+            throws ServletException, IOException
+    {
         final long start = System.currentTimeMillis();
         final String errMsg;
 
-        try {
+        try
+        {
             // Parse the parameters given in the url.
-            final PublisherID publisherID = observationUtil.getPublisherID(request);
-            if (publisherID == null) {
-                errMsg = Caom2MetaObservationServlet.MISSING_PUBLISHER_ID;
+            final ObservationURI uri = ObservationUtil.getURI(request);
+            if (uri == null)
+            {
+                errMsg = "Must specify collection/observationID in the path. | "
+                        + "Le chemain est incomplet.";
                 log.error(errMsg);
                 request.setAttribute("errorMsg", errMsg);
                 forward(request, response, "/error.jsp");
-            } else {
-                final Observation obs = metaClient.getObservation(publisherID);
+            }
+            else
+            {
+                request.setAttribute("collection", uri.getCollection());
+                request.setAttribute("observationID", uri.getObservationID());
 
-                if (obs == null) {
-                    final ObservationURI observationURI = observationUtil.getObservationURI(publisherID);
-                    errMsg = String.format(Caom2MetaObservationServlet.ERROR_MESSAGE_NOT_FOUND_FORBIDDEN,
-                        observationURI.getURI(), observationURI.getURI());
+                final Observation obs =
+                        metaClient.getObservation(metaClient.getCurrentSubject(), uri);
+
+                if (obs == null)
+                {
+                    errMsg = String.format(ERROR_MESSAGE_NOT_FOUND_FORBIDDEN, uri, uri);
                     log.error(errMsg);
                     request.setAttribute("errorMsg", errMsg);
                     forward(request, response, "/error.jsp");
-                } else {
+                }
+                else
+                {
                     request.setAttribute("obs", obs);
                     forward(request, response, "/display.jsp");
                 }
             }
-        } catch (RuntimeException oops) {
+        }
+        catch (RuntimeException oops)
+        {
             log.error("unexpected exception", oops);
             request.setAttribute("errorMsg", oops.getMessage());
             forward(request, response, "/error.jsp");
-        } finally {
+        }
+        finally
+        {
             log.info("doGet[" + (System.currentTimeMillis() - start) + "ms]");
         }
     }
 
-    private void forward(final HttpServletRequest request, final HttpServletResponse response, final String path)
-        throws ServletException, IOException {
-        final RequestDispatcher dispatcher = request.getRequestDispatcher(path);
-        dispatcher.forward(request, response);
+    private void forward(final HttpServletRequest request,
+                         final HttpServletResponse response, final String path)
+            throws ServletException, IOException
+    {
+            final RequestDispatcher dispatcher = request.getRequestDispatcher(path);
+            dispatcher.forward(request, response);
     }
 }

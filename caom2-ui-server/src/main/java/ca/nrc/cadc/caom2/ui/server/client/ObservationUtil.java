@@ -69,61 +69,23 @@
 package ca.nrc.cadc.caom2.ui.server.client;
 
 import ca.nrc.cadc.caom2.ObservationURI;
-import ca.nrc.cadc.caom2.PublisherID;
-import ca.nrc.cadc.util.StringUtil;
 
 import javax.servlet.http.HttpServletRequest;
-import java.net.URI;
-import java.net.URISyntaxException;
 
 
-public final class ObservationUtil
-{
-    public ObservationURI getObservationURI(final HttpServletRequest request)
-    {
+public final class ObservationUtil {
+    public static ObservationURI getURI(final HttpServletRequest request) {
         final String sid = request.getPathInfo();
 
-        if (sid != null)
-        {
+        if (sid != null) {
             final String modifiedSID = sid.substring(1, sid.length()); // strip leading /
             final String[] parts = modifiedSID.split("/");
 
-            if (parts.length == 2)
-            {
+            if (parts.length == 2) {
                 return new ObservationURI(parts[0], parts[1]);
             }
         }
 
         return null;
-    }
-
-    public ObservationURI getObservationURI(final PublisherID publisherID) {
-        final URI publisherIDURI = publisherID.getURI();
-        final String path = publisherIDURI.getPath();
-        final String collection = path.startsWith("/") ? path.substring(1) : path;
-        final String[] query = publisherIDURI.getQuery().split("/");
-
-        return new ObservationURI(collection, query[0]);
-    }
-
-    public PublisherID getPublisherID(final HttpServletRequest request) {
-        try {
-            final URI uri = getURI(request);
-            return (uri == null) ? null : new PublisherID(uri);
-        } catch (URISyntaxException | IllegalArgumentException e) {
-            // Catch a bad URI, or a missing scheme.
-            return null;
-        }
-    }
-
-    public URI getURI(final HttpServletRequest request) throws URISyntaxException {
-        final String param = request.getParameter("ID");
-        final String sanitizedPath = sanitizePath(param);
-        return StringUtil.hasText(sanitizedPath) ? new URI(sanitizedPath) : null;
-    }
-
-    public String sanitizePath(final String path) {
-        // strip leading /
-        return StringUtil.hasText(path) ? (path.startsWith("/") ? path.substring(1, path.length()) : path) : null;
     }
 }
