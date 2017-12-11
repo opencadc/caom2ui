@@ -77,6 +77,7 @@ import java.util.Calendar;
 import java.util.TimeZone;
 
 import org.junit.Test;
+
 import static org.junit.Assert.*;
 
 
@@ -101,7 +102,8 @@ public class SSTest {
 
         final String out = SS.toString(provenance);
         final String expected = "name: TESTPROV<br>version: null<br>producer: TESTPRODUCER<br>project: TESTPROJ<br>" +
-            "reference: <a href=\"http://mysite.com/reference\">http://mysite.com/reference</a><br>runID: null" +
+            "reference: <a class=\"provenance-reference\" href=\"http://mysite.com/reference\">http://mysite" +
+            ".com/reference</a><br>runID: null" +
             "<br>lastExecuted: 1977-11-25 01:15:00.000<br>inputs: caom:COLL1/PLANE1/123 caom:COLL1/PLANE2/123 " +
             "caom:COLL1/PLANE2/456 <br>keywords: ";
 

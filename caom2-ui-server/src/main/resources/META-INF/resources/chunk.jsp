@@ -14,7 +14,7 @@ request.setAttribute("chunk", c);
 <jsp:useBean id="chunk" scope="request" type="ca.nrc.cadc.caom2.Chunk"/>
 <jsp:useBean id="indent" scope="request" type="java.lang.Integer"/>
 
-<div style="margin-left: <%= indent.intValue() %>em">
+<div class="chunk" style="margin-left: <%= indent.intValue() %>em">
 
   <h3>Chunk</h3>
 

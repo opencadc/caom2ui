@@ -60,6 +60,10 @@ table
   margin: 0;
 }
 
+table.content > tr:nth-child(even) {
+    background: #ddd;
+}
+
 span.error
 {
     background: red;
@@ -463,10 +467,12 @@ table.content tr.odd
   background: white;
 }
 
+/*
 table.content tr.even
 {
   background: #ddd;
 }
+*/
 
 table.content tr.subhead
 {

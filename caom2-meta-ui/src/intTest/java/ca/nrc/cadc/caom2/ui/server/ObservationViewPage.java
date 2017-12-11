@@ -69,73 +69,65 @@
 package ca.nrc.cadc.caom2.ui.server;
 
 import ca.nrc.cadc.web.selenium.AbstractTestWebPage;
-import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
-import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.events.WebDriverEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class ObservationViewPage extends AbstractTestWebPage
-{
-    private static final int DEFAULT_TIMEOUT_IN_SECONDS = 20;
-    private static Logger log = Logger.getLogger(ObservationViewPage.class);
+public class ObservationViewPage extends AbstractTestWebPage {
+    private static final int PAGE_TIMEOUT_SECONDS = 5;
+
+    @FindBy(tagName = "h1")
+    private WebElement title;
+
+    @FindBy(css = "body > div.main > div.observation > div.plane")
+    private WebElement firstPlane;
 
     /**
      * Constructors need to be public for reflection to find them.
      *
-     * @param driver        WebDriver instance.
-     * @throws Exception        Any errors.
+     * @param driver WebDriver instance.
      */
-    public ObservationViewPage(final WebDriver driver) throws Exception
-    {
-        super(driver, DEFAULT_TIMEOUT_IN_SECONDS);
+    public ObservationViewPage(final WebDriver driver) {
+        super(driver, PAGE_TIMEOUT_SECONDS);
 
         PageFactory.initElements(driver, this);
+
+        verifyTrue(title.getText().equals("Common Archive Observation Model (CAOM2)"));
     }
 
 
-    public boolean isObsLoaded() throws Exception
-    {
-        List<String> h3headers = new ArrayList<>();
+    public void ensureLoaded() throws Exception {
+        final List<String> h3headers = new ArrayList<>();
         h3headers.add("Chunk");
 
-        List<String> h2headers = new ArrayList<>();
+        final List<String> h2headers = new ArrayList<>();
         h2headers.add("SimpleObservation");
         h2headers.add("Plane");
         h2headers.add("Artifact");
         h2headers.add("Part");
 
-
-        for (String header: h3headers)
-        {
-            String xpath = "//h3[contains(text(),'" + header + "')]";
-            WebElement headerEl = find(By.xpath(xpath));
-            if (headerEl == null)
-            {
-                String errMsg = "Can't find header: " + header;
-                log.info(errMsg);
-                throw new RuntimeException(errMsg);
-            }
+        for (final String header : h3headers) {
+            final String xpath = "//h3[contains(text(),'" + header + "')]";
+            find(By.xpath(xpath));
         }
 
-        for (String h2header: h2headers)
-        {
-            String xpath = "//h2[contains(text(),'" + h2header + "')]";
-            WebElement headerEl = find(By.xpath(xpath));
-            if (headerEl == null)
-            {
-                String errMsg = "Can't find header: " + h2header;
-                log.info(errMsg);
-                throw new RuntimeException(errMsg);
-            }
+        for (final String h2header : h2headers) {
+            final String xpath = "//h2[contains(text(),'" + h2header + "')]";
+            find(By.xpath(xpath));
         }
+    }
 
-        return true;
+    public void ensureProvenanceReferenceLink() throws Exception {
+        final WebElement table = firstPlane.findElement(By.cssSelector("table.content"));
+        final WebElement provenanceTableRow = table.findElement(By.cssSelector("tr.provenance"));
+        waitForElementClickable(provenanceTableRow.findElement(
+            By.cssSelector("td:nth-child(2) > a.provenance-reference")));
     }
 }

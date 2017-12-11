@@ -16,7 +16,7 @@ request.setAttribute("artifact", a);
 <jsp:useBean id="indent" scope="request" type="java.lang.Integer"/>
 
 
-<div style="margin-left: <%= indent.intValue() %>em">
+<div class="artifact" style="margin-left: <%= indent.intValue() %>em">
 
   <h2>Artifact</h2>
 

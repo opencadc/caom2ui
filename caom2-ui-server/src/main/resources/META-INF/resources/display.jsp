@@ -156,13 +156,7 @@
         padding-right: 0.5em;
       }
 
-      table.content tr.odd
-      {
-        background: white;
-      }
-
-      table.content tr.even
-      {
+      table.content tr:nth-child(even) {
         background: #ddd;
       }
 

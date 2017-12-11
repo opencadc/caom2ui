@@ -253,7 +253,8 @@ public class SS {
     }
 
     public static String toString(URL url) {
-        return "<a href=\"" + url.toExternalForm() + "\">" + url.toExternalForm() + "</a>";
+        return "<a class=\"provenance-reference\" href=\"" + url.toExternalForm() + "\">" + url.toExternalForm() +
+            "</a>";
     }
 
     public static String toString(Provenance p) {

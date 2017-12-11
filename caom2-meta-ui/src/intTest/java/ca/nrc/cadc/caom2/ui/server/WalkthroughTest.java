@@ -35,28 +35,24 @@
 package ca.nrc.cadc.caom2.ui.server;
 
 
-import ca.nrc.cadc.caom2.PublisherID;
-import ca.nrc.cadc.net.NetUtil;
-import ca.nrc.cadc.util.StringUtil;
 import ca.nrc.cadc.web.selenium.AbstractWebApplicationIntegrationTest;
 import org.junit.Test;
-import org.openqa.selenium.By;
 
 
-public class WalkthroughTest extends AbstractAdvancedSearchIntegrationTest {
+public class WalkthroughTest extends AbstractWebApplicationIntegrationTest {
+    private static final String ENDPOINT = "/caom2ui/";
 
     public WalkthroughTest() throws Exception {
         super();
     }
 
-
     @Test
     public void observationViewTest() throws Exception {
         // TODO: need an observation that exists in dev, production and (beta?)
-        final String publisherID = NetUtil.encode(PublisherID.SCHEME +
-            "://cadc.nrc.ca/JCMT?scuba2_00049_20160410T133916/raw-450um");
-        final ObservationViewPage observationViewPage = goTo(endpoint + "view?ID=" + publisherID,
+        final ObservationViewPage observationViewPage = goTo(ENDPOINT + "view/IRIS/f008h000",
             null, ObservationViewPage.class);
-        verifyTrue(observationViewPage.isObsLoaded());
+        observationViewPage.ensureLoaded();
+        observationViewPage.ensureProvenanceReferenceLink();
     }
+
 }
