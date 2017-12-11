@@ -61,7 +61,7 @@ idea {
         }
         dependencies {
             intTestCompile 'junit:junit:4.+'
-            intTestCompile 'org.opencadc:cadc-web-test:[1.0.4, )'
+            intTestCompile 'org.opencadc:cadc-web-test:[1.0.6, )'
             intTestCompile 'org.seleniumhq.selenium:selenium-java:2.53.+'
         }
 
