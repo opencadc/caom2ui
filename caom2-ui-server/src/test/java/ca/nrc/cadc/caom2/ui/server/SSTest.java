@@ -1,3 +1,4 @@
+
 /*
  ************************************************************************
  *******************  CANADIAN ASTRONOMY DATA CENTRE  *******************
@@ -66,26 +67,56 @@
  ************************************************************************
  */
 
-package ca.nrc.cadc.caom2.ui.server.client;
+package ca.nrc.cadc.caom2.ui.server;
 
-import ca.nrc.cadc.caom2.ObservationURI;
+import ca.nrc.cadc.caom2.PlaneURI;
+import ca.nrc.cadc.caom2.Provenance;
 
-import javax.servlet.http.HttpServletRequest;
+import java.net.URI;
+import java.util.Calendar;
+import java.util.TimeZone;
+
+import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 
-public final class ObservationUtil {
-    public static ObservationURI getURI(final HttpServletRequest request) {
-        final String sid = request.getPathInfo();
+public class SSTest {
 
-        if (sid != null) {
-            final String modifiedSID = sid.substring(1, sid.length()); // strip leading /
-            final String[] parts = modifiedSID.split("/");
+    @Test
+    public void toStringProvenance() throws Exception {
+        final Provenance provenance = new Provenance("TESTPROV");
 
-            if (parts.length == 2) {
-                return new ObservationURI(parts[0], parts[1]);
-            }
-        }
+        // November 25th, 1977.
+        final Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+        cal.set(1977, Calendar.NOVEMBER, 25, 1, 15, 0);
+        cal.set(Calendar.MILLISECOND, 0);
 
-        return null;
+        provenance.reference = URI.create("http://mysite.com/reference");
+        provenance.project = "TESTPROJ";
+        provenance.producer = "TESTPRODUCER";
+        provenance.lastExecuted = cal.getTime();
+        provenance.getInputs().add(new PlaneURI(URI.create("caom:COLL1/PLANE1/123")));
+        provenance.getInputs().add(new PlaneURI(URI.create("caom:COLL1/PLANE2/123")));
+        provenance.getInputs().add(new PlaneURI(URI.create("caom:COLL1/PLANE2/456")));
+
+        final String out = SS.toString(provenance);
+        final String expected = "name: TESTPROV<br>version: null<br>producer: TESTPRODUCER<br>project: TESTPROJ<br>" +
+            "reference: <a class=\"provenance-reference\" href=\"http://mysite.com/reference\">http://mysite" +
+            ".com/reference</a><br>runID: null" +
+            "<br>lastExecuted: 1977-11-25 01:15:00.000<br>inputs: caom:COLL1/PLANE1/123 caom:COLL1/PLANE2/123 " +
+            "caom:COLL1/PLANE2/456 <br>keywords: ";
+
+        assertEquals("Wrong output.", expected, out);
+
+        provenance.reference = null;
+
+        final String out2 = SS.toString(provenance);
+        final String expected2 = "name: TESTPROV<br>version: null<br>producer: TESTPRODUCER<br>project: TESTPROJ<br>" +
+            "reference: null<br>runID: null" +
+            "<br>lastExecuted: 1977-11-25 01:15:00.000<br>inputs: caom:COLL1/PLANE1/123 caom:COLL1/PLANE2/123 " +
+            "caom:COLL1/PLANE2/456 <br>keywords: ";
+
+        assertEquals("Wrong output.", expected2, out2);
     }
 }

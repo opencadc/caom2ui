@@ -31,30 +31,27 @@
  ****  C A N A D I A N   A S T R O N O M Y   D A T A   C E N T R E  *****
  ************************************************************************
  */
+
 package ca.nrc.cadc.caom2.ui.server;
 
 
-import ca.nrc.cadc.util.StringUtil;
 import ca.nrc.cadc.web.selenium.AbstractWebApplicationIntegrationTest;
 import org.junit.Test;
-import org.openqa.selenium.By;
 
 
-public class WalkthroughTest extends AbstractAdvancedSearchIntegrationTest
-{
+public class WalkthroughTest extends AbstractWebApplicationIntegrationTest {
+    private static final String DEFAULT_ENDPOINT = "/caom2ui/";
 
-    public WalkthroughTest() throws Exception
-    {
+    public WalkthroughTest() throws Exception {
         super();
     }
 
-
     @Test
-    public void observationViewTest() throws Exception
-    {
+    public void observationViewTest() throws Exception {
         // TODO: need an observation that exists in dev, production and (beta?)
-        ObservationViewPage observationViewPage = goTo(endpoint + "view/JCMT/scuba2_00049_20160410T133916", null, ObservationViewPage.class);
-        verifyTrue(observationViewPage.isObsLoaded());
+        final ObservationViewPage observationViewPage = goTo(getEndpoint(DEFAULT_ENDPOINT) + "view/IRIS/f008h000",
+            null, ObservationViewPage.class);
+        observationViewPage.ensureLoaded();
+        observationViewPage.ensureProvenanceReferenceLink();
     }
-
 }
