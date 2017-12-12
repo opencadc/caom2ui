@@ -4,6 +4,7 @@ package ca.nrc.cadc.caom2.ui.server;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.DateFormat;
+import java.text.MessageFormat;
 import java.util.*;
 
 import ca.nrc.cadc.caom2.*;
@@ -253,8 +254,8 @@ public class SS {
     }
 
     public static String toString(URL url) {
-        return "<a class=\"provenance-reference\" href=\"" + url.toExternalForm() + "\">" + url.toExternalForm() +
-            "</a>";
+        final MessageFormat format = new MessageFormat("<a class=\"provenance-reference\" href=\"{0}\">{0}</a>");
+        return format.format(new Object[] {url.toExternalForm()});
     }
 
     public static String toString(Provenance p) {
