@@ -15,12 +15,12 @@ request.setAttribute("plane", p);
 <jsp:useBean id="plane" scope="request" type="ca.nrc.cadc.caom2.Plane"/>
 <jsp:useBean id="indent" scope="request" type="java.lang.Integer"/>
 
-<div style="margin-left: <%= indent.intValue() %>em">
+<div class="plane" style="margin-left: <%= indent.intValue() %>em">
 
   <h2>Plane</h2>
 
   <table class="content">
-    <tr>
+    <tr class="even">
       <td>planeID</td>
       <td><%= plane.getID() %> aka <%= plane.getID()
           .getLeastSignificantBits() %>
@@ -41,12 +41,12 @@ request.setAttribute("plane", p);
       <td><%= SS.toString(plane.metaRelease) %>
       </td>
     </tr>
-    <tr>
+    <tr class="even">
       <td>dataRelease</td>
       <td><%= SS.toString(plane.dataRelease) %>
       </td>
     </tr>
-    <tr class="even">
+    <tr>
       <td>dataProductType</td>
       <td><%= SS.toString(plane.dataProductType) %>
       </td>
@@ -56,7 +56,7 @@ request.setAttribute("plane", p);
       <td><%= SS.toString(plane.calibrationLevel) %>
       </td>
     </tr>
-    <tr>
+    <tr class="provenance">
       <td>provenance</td>
       <td><%= SS.toString(plane.provenance) %>
       </td>
