@@ -12,7 +12,8 @@ classes should alter those!
 
 .slick-header.ui-state-default, .slick-headerrow.ui-state-default {
   width: 100%;
-  overflow: hidden;
+  overflow-x: auto;
+  /*overflow-y: auto;*/
   border-left: 0;
 }
 
@@ -29,8 +30,8 @@ classes should alter those!
   overflow: hidden;
   -o-text-overflow: ellipsis;
   text-overflow: ellipsis;
-  height: 16px;
-  line-height: 16px;
+  height: 30px;
+  line-height: 20px;
   margin: 0;
   padding: 4px;
   border-width: 0;
