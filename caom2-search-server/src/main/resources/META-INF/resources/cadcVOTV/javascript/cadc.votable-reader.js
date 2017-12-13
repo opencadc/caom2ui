@@ -72,7 +72,7 @@
 
           if (!stringValue || ($.trim(stringValue) == ""))
           {
-            num = null;
+            num = Number.NaN;
           }
           else if (cellDatatype.isFloatingPointNumeric())
           {
@@ -876,13 +876,11 @@
 
     function start()
     {
-      var ajaxInput = {
-        url: getURLString(),
-        type: "GET",
-        xhr: createRequest
-      };
-
-      $.ajax(ajaxInput).fail(getErrorCallbackFunction());
+      $.ajax({
+               url: getURLString(),
+               type: "GET",
+               xhr: createRequest
+             }).fail(getErrorCallbackFunction());
     }
 
     function handleInputError()
@@ -1000,9 +998,8 @@
       }
 
       request.addEventListener("error", loadEnd, false);
-      request.addEventListener("readystatechange", readyStateChangeHandler, false);
-
-      request.withCredentials = true;
+      request.addEventListener("readystatechange", readyStateChangeHandler,
+                               false);
 
       // Load end was not supported by Safari, so use the individual events that
       // it represents instead.

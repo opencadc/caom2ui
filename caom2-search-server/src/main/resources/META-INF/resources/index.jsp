@@ -36,8 +36,6 @@
 <div class="container-fluid">
 
 <%-- MainContentStart --%>
-  <h1><fmt:message key="TITLE" bundle="${langBundle}"/></h1>
-
   <ul id="tabList" class="nav nav-tabs" role="tablist">
     <li role="presentation" class="active">
       <a href="#queryFormTab"
@@ -183,7 +181,7 @@
                     .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"cadcVOTV/css/jquery-ui-1.11.4.min.css?version=@version@\" />")
                     .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"css/tooltipster.css?version=@version@\" />")
                     .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"css/caom2_search.css?version=@version@\" />")
-                    .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"cadcVOTV/css/slick.grid-frozen.css?version=@version@\" />")
+                    .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"cadcVOTV/css/slick.grid.css?version=@version@\" />")
                     .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"cadcVOTV/css/slick.pager.css?version=@version@\" />")
                     .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"cadcVOTV/css/cadc.columnpicker.dialog.css?version=@version@\"/>")
                     .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"cadcVOTV/css/cadc.votv.css?version=@version@\" />")
@@ -222,7 +220,7 @@
           <script type="text/javascript"
                   src="cadcVOTV/javascript/cadc.checkboxselectcolumn.js?version=@version@"></script>
           <script type="text/javascript"
-                  src="cadcVOTV/javascript/slick.grid-frozen.js?version=@version@"></script>
+                  src="cadcVOTV/javascript/slick.grid.js?version=@version@"></script>
           <script type="text/javascript"
                   src="cadcVOTV/javascript/slick.dataview.js?version=@version@"></script>
           <script type="text/javascript"

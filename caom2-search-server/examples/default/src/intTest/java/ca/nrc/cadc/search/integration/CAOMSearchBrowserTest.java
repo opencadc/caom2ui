@@ -69,6 +69,7 @@ public class CAOMSearchBrowserTest extends AbstractAdvancedSearchIntegrationTest
         SearchResultsPage searchResultsPage = searchFormPage.submitSuccess();
 
         searchResultsPage.waitForElementPresent(ONE_CLICK_DOWNLOAD_LINK_ROW_3_ID_BY);
+        searchResultsPage.confirmFootprintViewer();
 
         final String currentWindow = getCurrentWindowHandle();
 

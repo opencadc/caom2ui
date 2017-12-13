@@ -1,22 +1,24 @@
-(function ($) {
+;(function($, window, undefined) {
+  'use strict'
+
   // register namespace
   $.extend(true, window, {
-    "cadc": {
-      "vot": {
-        "VOTable": VOTable,
-        "Metadata": Metadata,
-        "Datatype": Datatype,
-        "Field": Field,
-        "Parameter": Parameter,
-        "Resource": Resource,
-        "Info": Info,
-        "Table": Table,
-        "Row": Row,
-        "Cell": Cell,
-        "TableData": TableData
+    cadc: {
+      vot: {
+        VOTable: VOTable,
+        Metadata: Metadata,
+        Datatype: Datatype,
+        Field: Field,
+        Parameter: Parameter,
+        Resource: Resource,
+        Info: Info,
+        Table: Table,
+        Row: Row,
+        Cell: Cell,
+        TableData: TableData
       }
     }
-  });
+  })
 
   /**
    *
@@ -87,28 +89,24 @@
    * @param __resources   The resources from the source.
    * @constructor
    */
-  function VOTable(__metadata, __resources)
-  {
-    var _self = this;
+  function VOTable(__metadata, __resources) {
+    var _self = this
 
-    _self.resources = __resources;
-    _self.metadata = __metadata;
+    _self.resources = __resources
+    _self.metadata = __metadata
 
-    function getResources()
-    {
-      return _self.resources;
+    function getResources() {
+      return _self.resources
     }
 
-    function getMetadata()
-    {
-      return _self.metadata;
+    function getMetadata() {
+      return _self.metadata
     }
 
-    $.extend(this,
-             {
-               "getResources": getResources,
-               "getMetadata": getMetadata
-             });
+    $.extend(this, {
+      getResources: getResources,
+      getMetadata: getMetadata
+    })
   }
 
   /**
@@ -122,36 +120,37 @@
    * @param __groups
    * @constructor
    */
-  function Metadata(__parameters, __infos, _description, __links, __fields,
-                    __groups)
-  {
-    var _selfMetadata = this;
+  function Metadata(
+    __parameters,
+    __infos,
+    _description,
+    __links,
+    __fields,
+    __groups
+  ) {
+    var _selfMetadata = this
 
-    _selfMetadata.parameters = __parameters || [];
-    _selfMetadata.infos = __infos || [];
-    _selfMetadata.description = _description;
-    _selfMetadata.links = __links || [];
-    _selfMetadata.fields = __fields || [];
-    _selfMetadata.groups = __groups || [];
+    _selfMetadata.parameters = __parameters || []
+    _selfMetadata.infos = __infos || []
+    _selfMetadata.description = _description
+    _selfMetadata.links = __links || []
+    _selfMetadata.fields = __fields || []
+    _selfMetadata.groups = __groups || []
 
-    function getInfos()
-    {
-      return _selfMetadata.infos;
+    function getInfos() {
+      return _selfMetadata.infos
     }
 
-    function getDescription()
-    {
-      return _selfMetadata.description;
+    function getDescription() {
+      return _selfMetadata.description
     }
 
-    function getParameters()
-    {
-      return _selfMetadata.parameters;
+    function getParameters() {
+      return _selfMetadata.parameters
     }
 
-    function getFields()
-    {
-      return _selfMetadata.fields;
+    function getFields() {
+      return _selfMetadata.fields
     }
 
     /**
@@ -159,34 +158,28 @@
      *
      * @param _fields  {Array} of values.
      */
-    function setFields(_fields)
-    {
-      _selfMetadata.fields = _fields;
+    function setFields(_fields) {
+      _selfMetadata.fields = _fields
     }
 
-    function getLinks()
-    {
-      return _selfMetadata.links;
+    function getLinks() {
+      return _selfMetadata.links
     }
 
-    function getGroups()
-    {
-      return _selfMetadata.groups;
+    function getGroups() {
+      return _selfMetadata.groups
     }
 
-    function addField(_field)
-    {
-      getFields().push(_field);
+    function addField(_field) {
+      getFields().push(_field)
     }
 
-    function insertField(_fieldIndex, _field)
-    {
-      getFields()[_fieldIndex] = _field;
+    function insertField(_fieldIndex, _field) {
+      getFields()[_fieldIndex] = _field
     }
 
-    function hasFieldWithID(_fieldID)
-    {
-      return (getField(_fieldID) != null);
+    function hasFieldWithID(_fieldID) {
+      return getField(_fieldID) != null
     }
 
     /**
@@ -195,124 +188,116 @@
      *
      * @return {cadc.vot.Field}   Field instance, or null if not found.
      */
-    function getField(_fieldID)
-    {
-      if (_fieldID)
-      {
-        var currFields = getFields();
+    function getField(_fieldID) {
+      if (_fieldID) {
+        var currFields = getFields()
 
-        for (var f = 0; f < currFields.length; f++)
-        {
-          var nextField = currFields[f];
+        for (var f = 0; f < currFields.length; f++) {
+          var nextField = currFields[f]
 
-          if (nextField && (currFields[f].getID() == _fieldID))
-          {
-            return nextField;
+          if (nextField && currFields[f].getID() == _fieldID) {
+            return nextField
           }
         }
       }
 
-      return null;
+      return null
     }
 
-
-    $.extend(this,
-             {
-               "getInfos": getInfos,
-               "getDescription": getDescription,
-               "getParameters": getParameters,
-               "getFields": getFields,
-               "getField": getField,
-               "setFields": setFields,
-               "getLinks": getLinks,
-               "getGroups": getGroups,
-               "addField": addField,
-               "insertField": insertField,
-               "hasFieldWithID": hasFieldWithID
-             });
+    $.extend(this, {
+      getInfos: getInfos,
+      getDescription: getDescription,
+      getParameters: getParameters,
+      getFields: getFields,
+      getField: getField,
+      setFields: setFields,
+      getLinks: getLinks,
+      getGroups: getGroups,
+      addField: addField,
+      insertField: insertField,
+      hasFieldWithID: hasFieldWithID
+    })
   }
 
-  function Datatype(_datatypeValue)
-  {
-    var _selfDatatype = this;
+  function Datatype(_datatypeValue) {
+    var _selfDatatype = this
 
-    _selfDatatype.datatypeValue = _datatypeValue || "";
+    _selfDatatype.datatypeValue = _datatypeValue || ''
 
-    var stringTypes = ["varchar", "char", "adql:VARCHAR", "adql:CLOB",
-                       "adql:REGION", "polygon", "point", "circle", "interval", "uri"];
-    var integerTypes = ["int", "long", "short"];
-    var floatingPointTypes = ["float", "double", "adql:DOUBLE", "adql:FLOAT"];
-    var timestampTypes = ["timestamp", "adql:TIMESTAMP"];
+    var stringTypes = [
+      'varchar',
+      'char',
+      'adql:VARCHAR',
+      'adql:CLOB',
+      'adql:REGION',
+      'polygon',
+      'point',
+      'circle',
+      'interval',
+      'uri'
+    ]
+    var integerTypes = ['int', 'long', 'short']
+    var floatingPointTypes = ['float', 'double', 'adql:DOUBLE', 'adql:FLOAT']
+    var timestampTypes = ['timestamp', 'adql:TIMESTAMP']
 
-    function getDatatypeValue()
-    {
-      return _selfDatatype.datatypeValue;
+    function getDatatypeValue() {
+      return _selfDatatype.datatypeValue
     }
 
-    function isNumeric()
-    {
+    function isNumeric() {
       // will accept float, double, long, int, short, real, adql:DOUBLE,
       // adql:INTEGER, adql:POINT, adql:REAL
       //
-      return !isCharDatatype() && !isTimestamp() && !isBoolean();
+      return !isCharDatatype() && !isTimestamp() && !isBoolean()
     }
 
     /**
      * Return whether this datatype is a Timestamp.
      * @returns {boolean}   True if timestamp, False otherwise.
      */
-    function isTimestamp()
-    {
-      return datatypeMatches(timestampTypes);
+    function isTimestamp() {
+      return datatypeMatches(timestampTypes)
     }
 
-    function isBoolean()
-    {
-      return getDatatypeValue() == "boolean";
+    function isBoolean() {
+      return getDatatypeValue() == 'boolean'
     }
 
-    function isFloatingPointNumeric()
-    {
-      return datatypeMatches(floatingPointTypes);
+    function isFloatingPointNumeric() {
+      return datatypeMatches(floatingPointTypes)
     }
 
-    function isIntegerNumeric()
-    {
-      return datatypeMatches(integerTypes);
+    function isIntegerNumeric() {
+      return datatypeMatches(integerTypes)
     }
 
-    function isCharDatatype()
-    {
-      return datatypeMatches(stringTypes);
+    function isCharDatatype() {
+      return datatypeMatches(stringTypes)
     }
 
-    function datatypeMatches(_datatypes)
-    {
-      var dataTypeValue = getDatatypeValue();
-      var stringUtil = new cadc.web.util.StringUtil(dataTypeValue);
-      for (var stIndex = 0; stIndex < _datatypes.length; stIndex++)
-      {
-        if (stringUtil.contains(_datatypes[stIndex]))
-        {
-          return true;
+    function datatypeMatches(_datatypes) {
+      var dataTypeValue = getDatatypeValue()
+      var stringUtil = new org.opencadc.StringUtil()
+      for (var stIndex = 0; stIndex < _datatypes.length; stIndex++) {
+        if (stringUtil.contains(dataTypeValue, _datatypes[stIndex])) {
+          return true
         }
       }
-      return false;
+      return false
     }
-  
-    $.extend(this,
-             {
-               "getDatatypeValue": getDatatypeValue,
-               "isNumeric": isNumeric,
-               "isTimestamp": isTimestamp,
-               "isIntegerNumeric": isIntegerNumeric,
-               "isFloatingPointNumeric": isFloatingPointNumeric,
-               "isBoolean": isBoolean
-             });
+
+    $.extend(this, {
+      getDatatypeValue: getDatatypeValue,
+      isNumeric: isNumeric,
+      isTimestamp: isTimestamp,
+      isIntegerNumeric: isIntegerNumeric,
+      isFloatingPointNumeric: isFloatingPointNumeric,
+      isBoolean: isBoolean
+    })
   }
 
   /**
-   * 
+   *
    * @param _name
    * @param _id
    * @param _ucd
@@ -325,129 +310,116 @@
    * @param label
    * @constructor
    */
-  function Field(_name, _id, _ucd, _utype, _unit, _xtype, __datatype,
-                 _arraysize, _description, label)
-  {
-    var _selfField = this;
-    var INTERVAL_XTYPE_KEYWORD = "INTERVAL";
-    var types = set(__datatype, _xtype);
+  function Field(
+    _name,
+    _id,
+    _ucd,
+    _utype,
+    _unit,
+    _xtype,
+    __datatype,
+    _arraysize,
+    _description,
+    label
+  ) {
+    var _selfField = this
+    var INTERVAL_XTYPE_KEYWORD = 'INTERVAL'
+    var types = set(__datatype, _xtype)
 
-    _selfField.name = _name;
-    _selfField.id = _id;
-    _selfField.ucd = _ucd;
-    _selfField.utype = _utype;
-    _selfField.unit = _unit;
-    _selfField.xtype = types._xt;
-    _selfField.datatype = types._dt;
-    _selfField.arraysize = _arraysize;
-    _selfField.description = _description;
-    _selfField.label = label;
+    _selfField.name = _name
+    _selfField.id = _id
+    _selfField.ucd = _ucd
+    _selfField.utype = _utype
+    _selfField.unit = _unit
+    _selfField.xtype = types._xt
+    _selfField.datatype = types._dt
+    _selfField.arraysize = _arraysize
+    _selfField.description = _description
+    _selfField.label = label
 
-    function getName()
-    {
-      return _selfField.name;
+    function getName() {
+      return _selfField.name
     }
 
-    function getID()
-    {
-      return _selfField.id;
+    function getID() {
+      return _selfField.id
     }
 
-    function getLabel()
-    {
-      return _selfField.label;
+    function getLabel() {
+      return _selfField.label
     }
 
-    function getUType()
-    {
-      return _selfField.utype;
-    }
-    
-    function getUCD()
-    {
-      return _selfField.ucd;
+    function getUType() {
+      return _selfField.utype
     }
 
-    function getUnit()
-    {
-     return _selfField.unit;
+    function getUCD() {
+      return _selfField.ucd
     }
 
-    function getXType()
-    {
-      return _selfField.xtype;
+    function getUnit() {
+      return _selfField.unit
     }
 
-    function containsInterval()
-    {
-      return new cadc.web.util.StringUtil(getXType()).contains(
-        INTERVAL_XTYPE_KEYWORD);
+    function getXType() {
+      return _selfField.xtype
     }
 
-    function getDatatype()
-    {
-      return _selfField.datatype;
+    function containsInterval() {
+      var stringUtil = new org.opencadc.StringUtil()
+      return stringUtil.contains(getXType(), INTERVAL_XTYPE_KEYWORD)
     }
 
-    function getDescription()
-    {
-      return _selfField.description;
+    function getDatatype() {
+      return _selfField.datatype
     }
 
-    function getArraySize()
-    {
-      return _selfField.arraysize;
+    function getDescription() {
+      return _selfField.description
     }
 
-    function set(_dtype, _xtype)
-    {
-      var dt, xt;
-      if (_xtype)
-      {
+    function getArraySize() {
+      return _selfField.arraysize
+    }
+
+    function set(_dtype, _xtype) {
+      var dt, xt
+      if (_xtype) {
         // xtype = 'polygon' | 'circle' | 'point' | 'interval' | 'uri'
         // over-rides the datatype of 'double'
-        dt = new Datatype(_xtype);
-      }
-      else if (_dtype)
-      {
-        if (typeof _dtype === 'object' )
-        {
-	  dt = _dtype;
-	}
-        else
-        {
-          var stringUtil = new cadc.web.util.StringUtil(_dtype);
-	  if (stringUtil.contains(INTERVAL_XTYPE_KEYWORD))
-          {
-	    xt = INTERVAL_XTYPE_KEYWORD;
+        dt = new Datatype(_xtype)
+      } else if (_dtype) {
+        if (typeof _dtype === 'object') {
+          dt = _dtype
+        } else {
+          var stringUtil = new org.opencadc.StringUtil()
+          if (stringUtil.contains(_dtype, INTERVAL_XTYPE_KEYWORD)) {
+            xt = INTERVAL_XTYPE_KEYWORD
           }
-          dt = new Datatype(_dtype);
+          dt = new Datatype(_dtype)
         }
+      } else {
+        dt = new Datatype('varchar')
       }
-      else
-      {
-        dt = new Datatype("varchar");
-      }
-      return {_dt:dt, _xt:xt};
+      return { _dt: dt, _xt: xt }
     }
 
-    $.extend(this,
-             {
-               "getDatatype": getDatatype,
-               "getID": getID,
-               "getName": getName,
-               "getUnit": getUnit,
-               "getUType": getUType,
-               "getXType": getXType,
-               "containsInterval": containsInterval,
-               "getDescription": getDescription,
-               "getUCD": getUCD,
-               "getArraySize": getArraySize
-             });
+    $.extend(this, {
+      getDatatype: getDatatype,
+      getID: getID,
+      getName: getName,
+      getUnit: getUnit,
+      getUType: getUType,
+      getXType: getXType,
+      containsInterval: containsInterval,
+      getDescription: getDescription,
+      getUCD: getUCD,
+      getArraySize: getArraySize
+    })
   }
 
   /**
-   * 
+   *
    * @param _name
    * @param _id
    * @param _ucd
@@ -460,153 +432,137 @@
    * @param _value
    * @constructor
    */
-  function Parameter(_name, _id, _ucd, _utype, _unit, _xtype, __datatype,
-                     _arraysize, _description, _value)
-  {
-    var _selfParameter = this;
+  function Parameter(
+    _name,
+    _id,
+    _ucd,
+    _utype,
+    _unit,
+    _xtype,
+    __datatype,
+    _arraysize,
+    _description,
+    _value
+  ) {
+    var _selfParameter = this
 
-    _selfParameter.name = _name;
-    _selfParameter.id = _id;
-    _selfParameter.ucd = _ucd;
-    _selfParameter.utype = _utype;
-    _selfParameter.unit = _unit;
-    _selfParameter.xtype = _xtype;
-    _selfParameter.datatype = __datatype || {};
-    _selfParameter.arraysize = _arraysize;
-    _selfParameter.description = _description;
-    _selfParameter.value = _value;
+    _selfParameter.name = _name
+    _selfParameter.id = _id
+    _selfParameter.ucd = _ucd
+    _selfParameter.utype = _utype
+    _selfParameter.unit = _unit
+    _selfParameter.xtype = _xtype
+    _selfParameter.datatype = __datatype || {}
+    _selfParameter.arraysize = _arraysize
+    _selfParameter.description = _description
+    _selfParameter.value = _value
 
-    function getName()
-    {
-      return _selfParameter.name;
+    function getName() {
+      return _selfParameter.name
     }
 
-    function getValue()
-    {
-      return _selfParameter.value;
+    function getValue() {
+      return _selfParameter.value
     }
 
-    function getUType()
-    {
-      return _selfParameter.utype;
+    function getUType() {
+      return _selfParameter.utype
     }
 
-    function getID()
-    {
-      return _selfParameter.id;
+    function getID() {
+      return _selfParameter.id
     }
 
-    function getUCD()
-    {
-      return _selfParameter.ucd;
+    function getUCD() {
+      return _selfParameter.ucd
     }
 
-    function getDescription()
-    {
-      return _selfParameter.description;
+    function getDescription() {
+      return _selfParameter.description
     }
 
-
-    $.extend(this,
-             {
-               "getName": getName,
-               "getValue": getValue,
-               "getUType": getUType,
-               "getID": getID,
-               "getUCD": getUCD,
-               "getDescription": getDescription
-             });
+    $.extend(this, {
+      getName: getName,
+      getValue: getValue,
+      getUType: getUType,
+      getID: getID,
+      getUCD: getUCD,
+      getDescription: getDescription
+    })
   }
 
-  function Info(_name, _value)
-  {
-    var _selfInfo = this;
+  function Info(_name, _value) {
+    var _selfInfo = this
 
-    _selfInfo.name = _name;
-    _selfInfo.value = _value;
-    
-    function getName()
-    {
-      return _selfInfo.name;
-    }
-    
-    function getValue()
-    {
-      return _selfInfo.value;
-    }
-    
-    function isError()
-    {
-      return getName() == "ERROR";
+    _selfInfo.name = _name
+    _selfInfo.value = _value
+
+    function getName() {
+      return _selfInfo.name
     }
 
+    function getValue() {
+      return _selfInfo.value
+    }
 
-    $.extend(this,
-             {
-               "getName": getName,
-               "getValue": getValue,
-               "isError": isError
-             });
+    function isError() {
+      return getName() == 'ERROR'
+    }
+
+    $.extend(this, {
+      getName: getName,
+      getValue: getValue,
+      isError: isError
+    })
   }
 
-  function Resource(_ID, _name, _metaFlag, __metadata, __tables)
-  {
-    var _selfResource = this;
+  function Resource(_ID, _name, _metaFlag, __metadata, __tables) {
+    var _selfResource = this
 
-    _selfResource.ID = _ID;
-    _selfResource.name = _name;
-    _selfResource.metaFlag = _metaFlag;
-    _selfResource.metadata = __metadata;
-    _selfResource.tables = __tables;
+    _selfResource.ID = _ID
+    _selfResource.name = _name
+    _selfResource.metaFlag = _metaFlag
+    _selfResource.metadata = __metadata
+    _selfResource.tables = __tables
 
-    function getTables()
-    {
-      return _selfResource.tables;
+    function getTables() {
+      return _selfResource.tables
     }
 
-    function getID()
-    {
-      return _selfResource.ID;
+    function getID() {
+      return _selfResource.ID
     }
 
-    function isMeta()
-    {
-      return _selfResource.metaFlag;
+    function isMeta() {
+      return _selfResource.metaFlag
     }
 
-    function getName()
-    {
-      return _selfResource.name;
+    function getName() {
+      return _selfResource.name
     }
 
-    function getMetadata()
-    {
-      return _selfResource.metadata;
+    function getMetadata() {
+      return _selfResource.metadata
     }
 
-    function getDescription()
-    {
-      return getMetadata().getDescription();
+    function getDescription() {
+      return getMetadata().getDescription()
     }
 
-    function getInfos()
-    {
-      return getMetadata().getInfos();
+    function getInfos() {
+      return getMetadata().getInfos()
     }
 
-
-    $.extend(this,
-             {
-               "getTables": getTables,
-               "getMetadata": getMetadata,
-               "getID": getID,
-               "getName": getName,
-               "isMeta": isMeta,
-               "getInfos": getInfos,
-               "getDescription": getDescription
-             });
+    $.extend(this, {
+      getTables: getTables,
+      getMetadata: getMetadata,
+      getID: getID,
+      getName: getName,
+      isMeta: isMeta,
+      getInfos: getInfos,
+      getDescription: getDescription
+    })
   }
-
 
   /**
    *
@@ -614,34 +570,29 @@
    * @param __tabledata
    * @constructor
    */
-  function Table(__metadata, __tabledata)
-  {
-    var _selfTable = this;
+  function Table(__metadata, __tabledata) {
+    var _selfTable = this
 
-    _selfTable.metadata = __metadata;
-    _selfTable.tabledata = __tabledata;
+    _selfTable.metadata = __metadata
+    _selfTable.tabledata = __tabledata
 
-    function getTableData()
-    {
-      return _selfTable.tabledata;
+    function getTableData() {
+      return _selfTable.tabledata
     }
 
-    function getMetadata()
-    {
-      return _selfTable.metadata;
+    function getMetadata() {
+      return _selfTable.metadata
     }
 
-    function getFields()
-    {
-      return getMetadata().getFields();
+    function getFields() {
+      return getMetadata().getFields()
     }
 
-    $.extend(this,
-             {
-               "getTableData": getTableData,
-               "getFields": getFields,
-               "getMetadata": getMetadata
-             });
+    $.extend(this, {
+      getTableData: getTableData,
+      getFields: getFields,
+      getMetadata: getMetadata
+    })
   }
 
   /**
@@ -650,26 +601,22 @@
    * @param __cells
    * @constructor
    */
-  function Row(_id, __cells)
-  {
-    var _selfRow = this;
+  function Row(_id, __cells) {
+    var _selfRow = this
 
-    _selfRow.id = _id;
-    _selfRow.cells = __cells || [];
+    _selfRow.id = _id
+    _selfRow.cells = __cells || []
 
-    function getID()
-    {
-      return _selfRow.id;
+    function getID() {
+      return _selfRow.id
     }
 
-    function getCells()
-    {
-      return _selfRow.cells;
+    function getCells() {
+      return _selfRow.cells
     }
 
-    function getSize()
-    {
-      return getCells().length;
+    function getSize() {
+      return getCells().length
     }
 
     /**
@@ -678,30 +625,26 @@
      * @param _fieldID    The ID of the cell's field.
      * @returns {*}     Value of the cell.
      */
-    function getCellValue(_fieldID)
-    {
-      var value = null;
+    function getCellValue(_fieldID) {
+      var value = null
 
-      $.each(getCells(), function (cellIndex, cell)
-      {
-        var cellFieldID = cell.getField().getID();
+      $.each(getCells(), function(cellIndex, cell) {
+        var cellFieldID = cell.getField().getID()
 
-        if (cellFieldID === _fieldID)
-        {
-          value = cell.getValue();
+        if (cellFieldID === _fieldID) {
+          value = cell.getValue()
         }
-      });
+      })
 
-      return value;
+      return value
     }
 
-    $.extend(this,
-             {
-               "getID": getID,
-               "getCells": getCells,
-               "getSize": getSize,
-               "getCellValue": getCellValue
-             })
+    $.extend(this, {
+      getID: getID,
+      getCells: getCells,
+      getSize: getSize,
+      getCellValue: getCellValue
+    })
   }
 
   /**
@@ -711,28 +654,24 @@
    * @param __field
    * @constructor
    */
-  function Cell(_value, __field)
-  {
-    var _selfCell = this;
+  function Cell(_value, __field) {
+    var _selfCell = this
 
-    _selfCell.value = _value;
-    _selfCell.field = __field;
+    _selfCell.value = _value
+    _selfCell.field = __field
 
-    function getValue()
-    {
-      return _selfCell.value;
+    function getValue() {
+      return _selfCell.value
     }
 
-    function getField()
-    {
-      return _selfCell.field;
+    function getField() {
+      return _selfCell.field
     }
 
-    $.extend(this,
-             {
-               "getValue": getValue,
-               "getField": getField
-             })
+    $.extend(this, {
+      getValue: getValue,
+      getField: getField
+    })
   }
 
   /**
@@ -741,28 +680,23 @@
    * @param _longestValues
    * @constructor
    */
-  function TableData(__rows, _longestValues)
-  {
-    var _selfTableData = this;
+  function TableData(__rows, _longestValues) {
+    var _selfTableData = this
 
-    _selfTableData.rows = __rows;
-    _selfTableData.longestValues = _longestValues || {};
+    _selfTableData.rows = __rows
+    _selfTableData.longestValues = _longestValues || {}
 
-    function getRows()
-    {
-      return _selfTableData.rows;
+    function getRows() {
+      return _selfTableData.rows
     }
 
-    function getLongestValues()
-    {
-      return _selfTableData.longestValues;
+    function getLongestValues() {
+      return _selfTableData.longestValues
     }
 
-    $.extend(this,
-             {
-               "getRows": getRows,
-               "getLongestValues": getLongestValues
-             })
+    $.extend(this, {
+      getRows: getRows,
+      getLongestValues: getLongestValues
+    })
   }
-
-})(jQuery);
+})(jQuery, window)

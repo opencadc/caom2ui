@@ -34,17 +34,10 @@
       _handler.unsubscribeAll();
     }
 
-    function getCheckboxLabel() {
-      return _options.checkboxLabel ? options.checkboxLabel : "";
-    }
-
-    function handleSelectedRowsChanged(e, args)
-    {
+    function handleSelectedRowsChanged(e, args) {
       var selectedRows = _grid.getSelectedRows();
-
       var lookup = {}, row, i;
-      for (i = 0; i < selectedRows.length; i++)
-      {
+      for (i = 0; i < selectedRows.length; i++) {
         row = selectedRows[i];
         lookup[row] = true;
         if (lookup[row] !== _selectedRowsLookup[row]) {
@@ -55,24 +48,13 @@
       for (i in _selectedRowsLookup) {
         _grid.invalidateRow(i);
       }
-
       _selectedRowsLookup = lookup;
-
       _grid.render();
 
-      if (selectedRows.length && selectedRows.length == _grid.getDataLength())
-      {
-        _grid.updateColumnHeader(_options.columnId,
-                                 getCheckboxLabel() +
-                                 "<input type='checkbox' class='slick-header-column-checkboxsel' checked='checked'>",
-                                 _options.toolTip);
-      }
-      else
-      {
-        _grid.updateColumnHeader(_options.columnId,
-                                 getCheckboxLabel() +
-                                 "<input class='slick-header-column-checkboxsel' type='checkbox'>",
-                                 _options.toolTip);
+      if (selectedRows.length && selectedRows.length == _grid.getDataLength()) {
+        _grid.updateColumnHeader(_options.columnId, "<input type='checkbox' checked='checked'>", _options.toolTip);
+      } else {
+        _grid.updateColumnHeader(_options.columnId, "<input type='checkbox'>", _options.toolTip);
       }
     }
 
@@ -89,8 +71,7 @@
       }
     }
 
-    function handleClick(e, args)
-    {
+    function handleClick(e, args) {
       // clicking on a row select checkbox
       if (_grid.getColumns()[args.cell].id === _options.columnId && $(e.target).is(":checkbox")) {
         // if editing, try to commit
@@ -106,17 +87,38 @@
       }
     }
 
-    function toggleRowSelection(row)
-    {
-      if (_selectedRowsLookup[row])
-      {
-        _grid.setSelectedRows($.grep(_grid.getSelectedRows(), function (n)
-        {
-          return n != row;
+    function toggleRowSelection(row) {
+      if (_selectedRowsLookup[row]) {
+        _grid.setSelectedRows($.grep(_grid.getSelectedRows(), function (n) {
+          return n != row
         }));
       } else {
         _grid.setSelectedRows(_grid.getSelectedRows().concat(row));
       }
+      _grid.setActiveCell(row, getCheckboxColumnCellIndex());
+      _grid.focus();
+    }
+
+    function selectRows(rowArray) {
+      var i, l=rowArray.length, addRows = [];
+      for(i=0; i<l; i++) { 
+        if (!_selectedRowsLookup[rowArray[i]]) {
+          addRows[addRows.length] = rowArray[i];
+        }
+      }
+      _grid.setSelectedRows(_grid.getSelectedRows().concat(addRows));
+    }
+
+    function deSelectRows(rowArray) {
+      var i, l=rowArray.length, removeRows = [];
+      for(i=0; i<l; i++) { 
+        if (_selectedRowsLookup[rowArray[i]]) {
+          removeRows[removeRows.length] = rowArray[i];
+        }
+      }
+      _grid.setSelectedRows($.grep(_grid.getSelectedRows(), function (n) {
+        return removeRows.indexOf(n)<0
+      }));
     }
 
     function handleHeaderClick(e, args) {
@@ -142,39 +144,49 @@
       }
     }
 
+    var _checkboxColumnCellIndex = null;
+    
+    function getCheckboxColumnCellIndex() {
+      if (_checkboxColumnCellIndex === null) {
+        _checkboxColumnCellIndex = 0;
+        var colArr = _grid.getColumns();
+        for (var i=0; i < colArr.length; i++) {
+          if (colArr[i].id == _options.columnId) { 
+            _checkboxColumnCellIndex = i;
+          }
+        }
+      }
+      return _checkboxColumnCellIndex;
+    }
+
     function getColumnDefinition() {
       return {
         id: _options.columnId,
-        name: getCheckboxLabel() + "<input type='checkbox'>",
+        name: "<input type='checkbox'>",
         toolTip: _options.toolTip,
         field: "sel",
         width: _options.width,
         resizable: false,
         sortable: false,
-        headerCssClass: _options.headerCssClass,
         cssClass: _options.cssClass,
         formatter: checkboxSelectionFormatter
       };
     }
 
-    function checkboxSelectionFormatter(row, cell, value, columnDef,
-                                        dataContext)
-    {
-      if (dataContext)
-      {
+    function checkboxSelectionFormatter(row, cell, value, columnDef, dataContext) {
+      if (dataContext) {
         return _selectedRowsLookup[row]
-            ? "<input class='_select_" + dataContext["id"] + "' type='checkbox' checked='checked'>"
-            : "<input class='_select_" + dataContext["id"] + "' type='checkbox'>";
+            ? "<input type='checkbox' checked='checked'>"
+            : "<input type='checkbox'>";
       }
-      else
-      {
-        return null;
-      }
+      return null;
     }
 
     $.extend(this, {
       "init": init,
       "destroy": destroy,
+      "deSelectRows": deSelectRows,
+      "selectRows": selectRows,
       "getColumnDefinition": getColumnDefinition
     });
   }
