@@ -1318,28 +1318,6 @@
         })
       }
 
-      // _self.grid.onRenderComplete.subscribe(function(e, args) {
-      //   var g = args.grid
-      //   if (getRowManager().onRowRendered) {
-      //     var renderedRange = g.getRenderedRange()
-      //     for (
-      //       var i = renderedRange.top, ii = renderedRange.bottom;
-      //       i <= ii;
-      //       i++
-      //     ) {
-      //       var $nextRow = g.getData().getItem(i)
-      //       getRowManager().onRowRendered($nextRow, i)
-      //     }
-      //   }
-
-      //   _self.setViewportOffset(
-      //     $('div.slick-header-columns').height() +
-      //       _self.getOptions().heightOffset
-      //   )
-      //   _self.setViewportHeight()
-      //   g.resizeCanvas()
-      // })
-
       dataView.onPagingInfoChanged.subscribe(function(e, pagingInfo) {
         _self.grid.updatePagingStatusFromView(pagingInfo)
       })
