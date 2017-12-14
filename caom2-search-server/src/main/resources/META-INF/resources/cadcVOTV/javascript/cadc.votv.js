@@ -1,4 +1,4 @@
-;(function($) {
+;(function($, window, undefined) {
   // register namespace
   $.extend(true, window, {
     cadc: {
@@ -488,10 +488,10 @@
       }
 
       // Add items directly to prevent unnecessary refreshes.
-      if (rowIndex) {
-        getDataView().insertItem(rowIndex, dataRow)
-      } else {
+      if (rowIndex === null || isNaN(rowIndex)) {
         getDataView().sortedAddItem(dataRow)
+      } else {
+        getDataView().insertItem(rowIndex, dataRow)
       }
 
       trigger(cadc.vot.events.onRowAdded, { rowData: dataRow })
@@ -1767,4 +1767,4 @@
       unsubscribe: unsubscribe
     })
   }
-})(jQuery)
+})(jQuery, window)

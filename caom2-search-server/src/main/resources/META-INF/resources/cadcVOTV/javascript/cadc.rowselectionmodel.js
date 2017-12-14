@@ -242,4 +242,4 @@
       onSelectedRangesChanged: new Slick.Event()
     })
   }
-})(jQuery)
+})(jQuery, window)
