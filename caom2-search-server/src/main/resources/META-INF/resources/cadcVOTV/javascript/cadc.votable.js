@@ -367,7 +367,14 @@
 
     function containsInterval() {
       var stringUtil = new org.opencadc.StringUtil()
-      return stringUtil.contains(getXType(), INTERVAL_XTYPE_KEYWORD)
+      return (
+        stringUtil.contains(getXType(), INTERVAL_XTYPE_KEYWORD, false) ||
+        stringUtil.contains(
+          getDatatype().getDatatypeValue(),
+          INTERVAL_XTYPE_KEYWORD,
+          false
+        )
+      )
     }
 
     function getDatatype() {

@@ -158,16 +158,13 @@
 
                         w.document.title = collection + ' - ' + productID
                         w.focus()
+                        return false
                       })
                     } else {
                       $link.click(function() {
                         return false
                       })
                     }
-                    // else
-                    // {
-                    //   $cell.empty();
-                    // }
                   }
 
                   if (planeURIValue) {
@@ -1311,7 +1308,9 @@
 
     $link.text(value)
     $link.prop('id', column.id + '_' + rowNum + '_observation_details')
-    $link.addClass(ca.nrc.cadc.search.DETAILS_CSS)
+    $link
+      .addClass(ca.nrc.cadc.search.DETAILS_CSS)
+      .addClass('no-propagate-event')
     $link.prop('target', '_observation_details')
     $link.prop('href', detailsURI.toString())
     $link.data('observation-uri', observationURI)
@@ -1386,7 +1385,7 @@
         )
 
       $link.attr('href', baseURI.toString() + useMaqStr)
-      $link.addClass('quicksearch_link')
+      $link.addClass('quicksearch_link').addClass('no-propagate-event')
       $link.text($output.text())
 
       var tipOutput

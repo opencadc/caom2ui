@@ -1,4 +1,4 @@
-;(function($, A) {
+;(function($, A, window, undefined) {
   'use strict'
 
   if (typeof A === 'undefined') {
@@ -209,8 +209,8 @@
             reset()
 
             var v = args.application
-            var data = v.getGrid().getData()
-            var currentRows = data.getRows()
+            // var data = v.getGrid().getData()
+            var currentRows = v.getRows()
             var cdl = currentRows.length
 
             if (inputs.maxRowCount && cdl <= inputs.maxRowCount) {
@@ -549,4 +549,4 @@
       destroy: destroy
     })
   }
-})(jQuery, A)
+})(jQuery, A, window)
