@@ -146,7 +146,12 @@
                           )
                         }
 
-                        var w = window.open('', '_PREVIEW')
+                        // name parameter (second one) passed in to open()
+                        // leads to Safari not being able to focus on the document
+                        // (w.focus() returns undefined, implying the system can't do it)
+                        // Calling with no parameters works for Chrome, Safari & Firefox
+                        // as of Dec 2017 - s2224
+                        var w = window.open()
                         w.document.body.innerHTML = ''
 
                         // Open and close are here to stop browsers expecting more data.
