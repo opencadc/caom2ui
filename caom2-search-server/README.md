@@ -1,5 +1,5 @@
 
-### CAOM-2 Search interface v2.4.20
+### CAOM-2 Search interface v2.4.2
 
 <a href="https://travis-ci.org/opencadc/caom2ui"><img src="https://travis-ci.org/opencadc/caom2ui.svg?branch=master" /></a>
 
