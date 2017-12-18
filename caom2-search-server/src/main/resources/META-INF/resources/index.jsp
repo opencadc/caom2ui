@@ -1,4 +1,5 @@
 <%@ page import="ca.nrc.cadc.config.ApplicationConfiguration" %>
+<%@ page import="ca.nrc.cadc.util.StringUtil" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" session="false"
          pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -17,11 +18,7 @@
   final String applicationEndpoint = configuration.lookup("org.opencadc.search.app-service-endpoint", "/search");
   final String maqServiceId = configuration.lookup("org.opencadc.search.maq-tap-service-id","");
 
-  boolean useMaq = false;
-  if (maqServiceId != "")
-  {
-      useMaq = true;
-  }
+  boolean useMaq = StringUtil.hasText(maqServiceId);
   final String tapSyncEndpoint = applicationEndpoint + "/tap/sync";
 %>
 
