@@ -1379,15 +1379,12 @@
 
       // Force open in a new window.  This MUST be set to _blank.
       $link.attr('target', '_blank')
+      var $enabledMAQ = $('#downloadForm').find('#resultsMaqEnabled')
 
       var useMaqStr =
         '&' +
         maqKey +
-        '=' +
-        !(
-          $('#resultsMaqEnabled') == 'undefined' ||
-          $('#resultsMaqEnabled').hasClass('cadc-display-none')
-        )
+        '=' + (($enabledMAQ.length > 0) && !$enabledMAQ.hasClass('cadc-display-none'))
 
       $link.attr('href', baseURI.toString() + useMaqStr)
       $link.addClass('quicksearch_link').addClass('no-propagate-event')
