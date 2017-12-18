@@ -203,10 +203,20 @@
           }
         }
 
-        if ($target.is(':checkbox')) {
+        var shouldNotPropagate =
+          _options.propagateEvents === false ||
+          $target.is(':checkbox') ||
+          $target.hasClass('no-propagate-event')
+
+        if (
+          $target.is(':checkbox') ||
+          (_options.selectClickedRow && isTargetAllowRowSelection($target))
+        ) {
           _ranges = rowsToRanges(selection)
           setSelectedRanges(_ranges)
-        } else {
+        }
+
+        if (shouldNotPropagate) {
           e.stopImmediatePropagation()
         }
       } else {
