@@ -1,9 +1,10 @@
+
 /*
  ************************************************************************
  *******************  CANADIAN ASTRONOMY DATA CENTRE  *******************
  **************  CENTRE CANADIEN DE DONNÉES ASTRONOMIQUES  **************
  *
- *  (c) 2016.                            (c) 2016.
+ *  (c) 2018.                            (c) 2018.
  *  Government of Canada                 Gouvernement du Canada
  *  National Research Council            Conseil national de recherches
  *  Ottawa, Canada, K1A 0R6              Ottawa, Canada, K1A 0R6
@@ -66,38 +67,53 @@
  ************************************************************************
  */
 
-package ca.nrc.cadc.web;
+package ca.nrc.cadc.search;
 
-import ca.nrc.cadc.config.ApplicationConfiguration;
+import ca.nrc.cadc.net.HttpDownload;
+import ca.nrc.cadc.search.util.JobURLCreator;
 
-import javax.servlet.http.HttpServlet;
-import java.net.URI;
-
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.URL;
 
 /**
- * Base servlet to allow configuration.
+ * Common request handler for Preview requests.
  */
-public abstract class ConfigurableServlet extends HttpServlet implements Configuration {
-    private final ApplicationConfiguration configuration;
+public class PreviewRequestHandler {
 
-    public ConfigurableServlet() {
-        this(new ApplicationConfiguration(DEFAULT_CONFIG_FILE_PATH));
+    private final URL dataServiceURL;
+    private final JobURLCreator jobURLCreator;
+
+
+    public PreviewRequestHandler(final URL dataServiceURL, final JobURLCreator jobURLCreator) {
+        this.dataServiceURL = dataServiceURL;
+        this.jobURLCreator = jobURLCreator;
     }
 
-    protected ConfigurableServlet(final ApplicationConfiguration configuration) {
-        this.configuration = configuration;
+    public void get(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+        final OutputStream outputStream = new BufferedOutputStream(resp.getOutputStream());
+
+        try {
+            final HttpDownload download = createDownloader(jobURLCreator.create(dataServiceURL, req),
+                outputStream);
+
+            download.setFollowRedirects(true);
+            download.run();
+
+            final int responseCode = download.getResponseCode();
+
+            if (responseCode > 400) {
+                resp.setStatus(responseCode);
+            }
+        } finally {
+            outputStream.flush();
+        }
     }
 
-
-    protected URI getServiceID(final String lookupKey, final URI defaultValue) {
-        return configuration.lookupServiceURI(lookupKey, defaultValue);
-    }
-
-    protected String lookup(final String lookupKey) {
-        return configuration.lookup(lookupKey);
-    }
-
-    public String lookup(final String key, final String defaultValue) {
-        return configuration.lookup(key, defaultValue);
+    HttpDownload createDownloader(final URL url, final OutputStream outputStream) {
+        return new HttpDownload(url, outputStream);
     }
 }

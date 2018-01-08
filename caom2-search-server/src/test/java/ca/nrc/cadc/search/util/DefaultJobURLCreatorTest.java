@@ -1,9 +1,10 @@
+
 /*
  ************************************************************************
  *******************  CANADIAN ASTRONOMY DATA CENTRE  *******************
  **************  CENTRE CANADIEN DE DONNÉES ASTRONOMIQUES  **************
  *
- *  (c) 2016.                            (c) 2016.
+ *  (c) 2018.                            (c) 2018.
  *  Government of Canada                 Gouvernement du Canada
  *  National Research Council            Conseil national de recherches
  *  Ottawa, Canada, K1A 0R6              Ottawa, Canada, K1A 0R6
@@ -66,38 +67,54 @@
  ************************************************************************
  */
 
-package ca.nrc.cadc.web;
+package ca.nrc.cadc.search.util;
 
-import ca.nrc.cadc.config.ApplicationConfiguration;
+import org.junit.Test;
+import ca.nrc.cadc.AbstractUnitTest;
 
-import javax.servlet.http.HttpServlet;
-import java.net.URI;
+import javax.servlet.http.HttpServletRequest;
+import java.net.URL;
+
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.reset;
+import static org.easymock.EasyMock.verify;
+import static org.junit.Assert.assertEquals;
+
+public class DefaultJobURLCreatorTest extends AbstractUnitTest<DefaultJobURLCreator> {
+    @Test
+    public void createJobURL() throws Exception {
+        final HttpServletRequest mockRequest = createMock(HttpServletRequest.class);
+        final URL dataServiceURL = new URL("http://localhost/data/pub");
+
+        setTestSubject(new DefaultJobURLCreator());
+
+        expect(mockRequest.getPathInfo()).andReturn("/COLLECTION/OBSID_PREV_256.JPG").once();
+
+        replay(mockRequest);
+
+        final URL expectedURL = new URL("http", "localhost",
+            "/data/pub/COLLECTION/OBSID_PREV_256.JPG");
+        final URL url = getTestSubject().create(dataServiceURL, mockRequest);
+        assertEquals("Expected URL is not what was generated.", expectedURL, url);
+
+        verify(mockRequest);
 
 
-/**
- * Base servlet to allow configuration.
- */
-public abstract class ConfigurableServlet extends HttpServlet implements Configuration {
-    private final ApplicationConfiguration configuration;
+        // TEST 2
+        reset(mockRequest);
 
-    public ConfigurableServlet() {
-        this(new ApplicationConfiguration(DEFAULT_CONFIG_FILE_PATH));
-    }
+        expect(mockRequest.getPathInfo()).andReturn("/COLLECTION/OBSID_PREV 256.JPG").once();
 
-    protected ConfigurableServlet(final ApplicationConfiguration configuration) {
-        this.configuration = configuration;
-    }
+        replay(mockRequest);
 
+        final URL expectedURL2 =
+            new URL("http", "localhost",
+                "/data/pub/COLLECTION/OBSID_PREV+256.JPG");
+        final URL url2 = getTestSubject().create(dataServiceURL, mockRequest);
+        assertEquals("Expected URL is not what was generated.", expectedURL2, url2);
 
-    protected URI getServiceID(final String lookupKey, final URI defaultValue) {
-        return configuration.lookupServiceURI(lookupKey, defaultValue);
-    }
-
-    protected String lookup(final String lookupKey) {
-        return configuration.lookup(lookupKey);
-    }
-
-    public String lookup(final String key, final String defaultValue) {
-        return configuration.lookup(key, defaultValue);
+        verify(mockRequest);
     }
 }

@@ -1,9 +1,10 @@
+
 /*
  ************************************************************************
  *******************  CANADIAN ASTRONOMY DATA CENTRE  *******************
  **************  CENTRE CANADIEN DE DONNÉES ASTRONOMIQUES  **************
  *
- *  (c) 2016.                            (c) 2016.
+ *  (c) 2018.                            (c) 2018.
  *  Government of Canada                 Gouvernement du Canada
  *  National Research Council            Conseil national de recherches
  *  Ottawa, Canada, K1A 0R6              Ottawa, Canada, K1A 0R6
@@ -66,38 +67,75 @@
  ************************************************************************
  */
 
-package ca.nrc.cadc.web;
+package ca.nrc.cadc.search;
 
-import ca.nrc.cadc.config.ApplicationConfiguration;
+import ca.nrc.cadc.AbstractUnitTest;
+import ca.nrc.cadc.net.HttpDownload;
+import ca.nrc.cadc.search.util.JobURLCreator;
+import org.junit.Test;
 
-import javax.servlet.http.HttpServlet;
-import java.net.URI;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.WriteListener;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.URL;
 
-/**
- * Base servlet to allow configuration.
- */
-public abstract class ConfigurableServlet extends HttpServlet implements Configuration {
-    private final ApplicationConfiguration configuration;
+import static org.junit.Assert.*;
+import static org.easymock.EasyMock.*;
 
-    public ConfigurableServlet() {
-        this(new ApplicationConfiguration(DEFAULT_CONFIG_FILE_PATH));
-    }
+public class PreviewRequestHandlerTest extends AbstractUnitTest<PreviewRequestHandler> {
 
-    protected ConfigurableServlet(final ApplicationConfiguration configuration) {
-        this.configuration = configuration;
-    }
+    @Test
+    public void get() throws Exception {
+        final OutputStream outputStream = new ByteArrayOutputStream();
+        final ServletOutputStream responseOutputStream = new ServletOutputStream() {
+            @Override
+            public boolean isReady() {
+                return true;
+            }
 
+            @Override
+            public void setWriteListener(WriteListener writeListener) {
+            }
 
-    protected URI getServiceID(final String lookupKey, final URI defaultValue) {
-        return configuration.lookupServiceURI(lookupKey, defaultValue);
-    }
+            @Override
+            public void write(int b) throws IOException {
+                outputStream.write(b);
+            }
+        };
+        final URL dataServiceURL = new URL("http://mysite.com/data/here");
+        final URL jobURL = new URL("http://mysite.com/jobs/88");
+        final HttpServletRequest mockRequest = createMock(HttpServletRequest.class);
+        final HttpDownload mockHTTPDownload = createMock(HttpDownload.class);
+        final HttpServletResponse mockResponse = createMock(HttpServletResponse.class);
+        final JobURLCreator mockJobURLCreator = createMock(JobURLCreator.class);
+        final PreviewRequestHandler testSubject = new PreviewRequestHandler(dataServiceURL, mockJobURLCreator) {
+            @Override
+            HttpDownload createDownloader(URL url, OutputStream outputStream) {
+                return mockHTTPDownload;
+            }
+        };
 
-    protected String lookup(final String lookupKey) {
-        return configuration.lookup(lookupKey);
-    }
+        expect(mockJobURLCreator.create(dataServiceURL, mockRequest)).andReturn(jobURL).once();
 
-    public String lookup(final String key, final String defaultValue) {
-        return configuration.lookup(key, defaultValue);
+        expect(mockResponse.getOutputStream()).andReturn(responseOutputStream).once();
+
+        mockHTTPDownload.setFollowRedirects(true);
+        expectLastCall().once();
+
+        mockHTTPDownload.run();
+        expectLastCall().once();
+
+        expect(mockHTTPDownload.getResponseCode()).andReturn(200).once();
+
+        replay(mockRequest, mockResponse, mockJobURLCreator, mockHTTPDownload);
+
+        testSubject.get(mockRequest, mockResponse);
+
+        verify(mockRequest, mockResponse, mockJobURLCreator, mockHTTPDownload);
     }
 }
