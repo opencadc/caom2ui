@@ -63,7 +63,8 @@
                   "caom2:Plane.provenance.inputs",
                   "caom2:Plane.id",
                   "caom2:Plane.uri.downloadable",
-                  "caom2:Plane.uri"
+                  "caom2:Plane.uri",
+                  "caom2:Plane.publisherID"
 	              ],
                 "unitTypes": {
                   "caom2:Plane.energy.restwav": "GHz"
@@ -125,7 +126,8 @@
                   "caom2:Observation.requirements.flag",
                   "caom2:Plane.id",
                   "caom2:Plane.uri.downloadable",
-                  "caom2:Plane.uri"
+                  "caom2:Plane.uri",
+                  "caom2:Plane.publisherID"
 	              ],
                 "unitTypes": {
                   "caom2:Plane.energy.restwav": "m"
@@ -187,7 +189,8 @@
                   "caom2:Observation.requirements.flag",
                   "caom2:Plane.id",
                   "caom2:Plane.uri.downloadable",
-                  "caom2:Plane.uri"
+                  "caom2:Plane.uri",
+                  "caom2:Plane.publisherID"
 	              ],
                 "unitTypes": {
                   "caom2:Plane.energy.restwav": "m"
@@ -238,7 +241,8 @@
                   "caom2:Plane.energy.restwav",
                   "caom2:Plane.id",
                   "caom2:Plane.uri.downloadable",
-                  "caom2:Plane.uri"
+                  "caom2:Plane.uri",
+                  "caom2:Plane.publisherID"
                 ],
                 "unitTypes": {
                   "caom2:Plane.time.exposure": "DAYS"
@@ -300,7 +304,8 @@
                   "caom2:Observation.requirements.flag",
                   "caom2:Plane.id",
                   "caom2:Plane.uri.downloadable",
-                  "caom2:Plane.uri"
+                  "caom2:Plane.uri",
+                  "caom2:Plane.publisherID"
                 ],
                 "size": 13
               },
@@ -359,7 +364,8 @@
                   "caom2:Observation.requirements.flag",
                   "caom2:Plane.id",
                   "caom2:Plane.uri.downloadable",
-                  "caom2:Plane.uri"
+                  "caom2:Plane.uri",
+                  "caom2:Plane.publisherID"
                 ],
                 "size": 10
               },
@@ -419,7 +425,8 @@
                   "caom2:Observation.requirements.flag",
                   "caom2:Plane.id",
                   "caom2:Plane.uri.downloadable",
-                  "caom2:Plane.uri"
+                  "caom2:Plane.uri",
+                  "caom2:Plane.publisherID"
 	              ],
                 "unitTypes": {
                   "caom2:Plane.energy.restwav": "m"

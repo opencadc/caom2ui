@@ -195,6 +195,7 @@ public abstract class ObsModel
         "Plane.energy.bandpassName",
         "Plane.energy.emBand",
         "Plane.dataProductType",
+        "Plane.publisherID",
 
         // ObsCore
         "Access.Format",
