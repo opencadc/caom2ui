@@ -31,7 +31,7 @@
    * @param {String} [_endpoint]  The endpoint for previews service.  This is not configurable yet!
    * @constructor
    */
-  function Preview(_collection, _observationID, _productID, _size, _runID, _endpoint)
+  function Preview(_collection, _observationID, _productID, _size, _runID, _endpoint, publisherID)
   {
     this.collection = _collection;
     this.observationID = _observationID;
@@ -39,6 +39,7 @@
     this.size = _size;
     this.runID = _runID;
     this.endpoint = _endpoint || ca.nrc.cadc.search.services.previewsEndpoint;
+    this.publisherID = publisherID;
 
 
     /**
