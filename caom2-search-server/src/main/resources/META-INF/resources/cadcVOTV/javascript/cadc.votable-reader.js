@@ -831,6 +831,9 @@
       $.ajax({
         url: getURLString(),
         type: 'GET',
+        xhrFields: {
+          withCredentials: true
+        },
         xhr: createRequest
       }).fail(getErrorCallbackFunction())
     }

@@ -75,6 +75,7 @@ import ca.nrc.cadc.caom2.ObsCoreQueryGenerator;
 import ca.nrc.cadc.config.ApplicationConfiguration;
 import ca.nrc.cadc.date.DateUtil;
 import ca.nrc.cadc.net.TransientException;
+import ca.nrc.cadc.profiler.Profiler;
 import ca.nrc.cadc.reg.client.RegistryClient;
 import ca.nrc.cadc.search.DefaultNameResolverClient;
 import ca.nrc.cadc.search.ObsModel;
@@ -113,6 +114,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -133,6 +135,7 @@ public class SearchJobServlet extends SyncServlet {
     private JobManager jobManager;
     private JobUpdater jobUpdater;
     private ApplicationConfiguration applicationConfiguration;
+    private final Profiler profiler = new Profiler(SearchJobServlet.class);
 
 
     @Override
@@ -261,6 +264,8 @@ public class SearchJobServlet extends SyncServlet {
     private void processRequest(final HttpServletRequest request, final HttpServletResponse response)
         throws JobPersistenceException, TransientException, FileUploadException, IOException,
         PositionParserException, JobNotFoundException {
+        final UUID checkpointID = UUID.randomUUID();
+        profiler.checkpoint(String.format("%s processRequest() Start", checkpointID));
         final Map<String, Object> uploadPayload = new HashMap<>();
         final List<Parameter> extraJobParameters = new ArrayList<>();
 
@@ -297,6 +302,8 @@ public class SearchJobServlet extends SyncServlet {
         // Create the audit job.
         final Job auditJob = jobManager.create(jobCreator.create(request));
         auditJob.getParameterList().addAll(extraJobParameters);
+
+        profiler.checkpoint(String.format("%s processRequest() Create Audit Job", checkpointID));
 
         final SyncOutput syncOutput = new HTTPResponseSyncOutput(response);
         final SyncTAPClient tapClient =
@@ -341,6 +348,7 @@ public class SearchJobServlet extends SyncServlet {
 
         runner.run();
         response.setStatus(HttpServletResponse.SC_OK);
+        profiler.checkpoint(String.format("%s processRequest() End", checkpointID));
     }
 
     /**
