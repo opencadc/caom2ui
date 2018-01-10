@@ -35,7 +35,7 @@
               "FormConfiguration": CAOM2FormConfiguration,
               "config": {
                 "id": "CAOM2",
-                "download_access_key": "caom2:Plane.uri.downloadable",
+                "download_access_key": "caom2:Plane.publisherID.downloadable",
                 "default_sort_column": "caom2:Plane.time.bounds.lower",
                 "collection_select_id": "Observation.collection",
                 "footprint_column_id": "caom2:Plane.position.bounds",
@@ -61,7 +61,7 @@
             "types": {
               "CAOM2": {
                 "id": "CAOM2",
-                "download_access_key": "caom2:Plane.uri.downloadable",
+                "download_access_key": "caom2:Plane.publisherID.downloadable",
                 "default_sort_column": "caom2:Plane.time.bounds.lower",
                 "collection_select_id": "Observation.collection",
                 "footprint_column_id": "caom2:Plane.position.bounds",
@@ -284,10 +284,10 @@
           order = allColumnIDs.indexOf(areaFOVColumnID);
           this._addFieldsForUType(areaFOVColumnID, ucd, unit, datatype, arraySize, description, xtype, order);
         }
-        else if (uType === "caom2:Plane.uri")
+        else if (uType === "caom2:Plane.publisherID")
         {
-          order = allColumnIDs.indexOf("caom2:Plane.uri.downloadable");
-          this._addFieldsForUType("caom2:Plane.uri.downloadable", ucd, unit, datatype, arraySize, description, xtype, order);
+          order = allColumnIDs.indexOf("caom2:Plane.publisherID.downloadable");
+          this._addFieldsForUType("caom2:Plane.publisherID.downloadable", ucd, unit, datatype, arraySize, description, xtype, order);
         }
         else if (uType === "obscore:Curation.PublisherDID")
         {

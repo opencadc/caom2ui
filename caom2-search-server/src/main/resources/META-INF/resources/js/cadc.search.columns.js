@@ -543,9 +543,9 @@
                 label: 'CAOM Plane URI',
                 tap_column_name: 'Plane.planeURI'
               },
-              'caom2:Plane.uri.downloadable': {
+              'caom2:Plane.publisherID.downloadable': {
                 label: 'DOWNLOADABLE',
-                tap_column_name: 'isDownloadable(Plane.planeURI)'
+                tap_column_name: 'isDownloadable(Plane.publisherID)'
               },
               'caom2:Plane.productID': {
                 label: 'Product ID',

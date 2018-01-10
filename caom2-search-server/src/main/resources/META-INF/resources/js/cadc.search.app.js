@@ -1016,7 +1016,7 @@
               arrIndex++
             ) {
               var $nextRow = resultsVOTV.getRow(selectedRows[arrIndex])
-              var $nextPlaneURI = $nextRow['caom2:Plane.uri.downloadable']
+              var $nextPlaneURI = $nextRow['caom2:Plane.downloadable.downloadable']
 
               var $input = $('<input>')
               $input.prop('type', 'hidden')
