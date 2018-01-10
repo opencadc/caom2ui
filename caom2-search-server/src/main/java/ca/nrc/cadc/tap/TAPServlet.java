@@ -75,20 +75,18 @@ import ca.nrc.cadc.reg.Standards;
 import ca.nrc.cadc.reg.client.RegistryClient;
 import ca.nrc.cadc.util.StringUtil;
 import ca.nrc.cadc.web.ConfigurableServlet;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import javax.security.auth.Subject;
-import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.apache.log4j.Logger;
 
 
 public class TAPServlet extends ConfigurableServlet {
-    private static final Logger log = Logger.getLogger(TAPServlet.class);
     private static final String TAP_SERVICE_URI_PROPERTY_KEY = "org.opencadc.search.tap-service-id";
     private static final String ALT_TAP_SERVICE_URI_PROPERTY_KEY = "org.opencadc.search.maq-tap-service-id";
     private static final URI DEFAULT_TAP_SERVICE_URI = URI.create("ivo://cadc.nrc.ca/tap");
@@ -147,15 +145,13 @@ public class TAPServlet extends ConfigurableServlet {
      * @param resp an {@link HttpServletResponse} object that
      *             contains the response the servlet sends
      *             to the client
-     * @throws IOException      if an input or output error is
-     *                          detected when the servlet handles
-     *                          the GET request
-     * @throws ServletException if the request for the GET
-     *                          could not be handled
+     * @throws IOException if an input or output error is
+     *                     detected when the servlet handles
+     *                     the GET request
      * @see ServletResponse#setContentType
      */
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         handleRequest(req, resp);
     }
 
@@ -196,25 +192,24 @@ public class TAPServlet extends ConfigurableServlet {
      * @param resp an {@link HttpServletResponse} object that
      *             contains the response the servlet sends
      *             to the client
-     * @throws IOException      if an input or output error is
-     *                          detected when the servlet handles
-     *                          the request
-     * @throws ServletException if the request for the POST
-     *                          could not be handled
+     * @throws IOException if an input or output error is
+     *                     detected when the servlet handles
+     *                     the request
      * @see ServletOutputStream
      * @see ServletResponse#setContentType
      */
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         handleRequest(req, resp);
     }
 
-    private void handleRequest(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
+    private void handleRequest(final HttpServletRequest request, final HttpServletResponse response)
+        throws IOException {
         final RegistryClient registryClient = getRegistryClient();
         final Subject currentSubject = AuthenticationUtil.getCurrentSubject();
         final AuthMethod currentAuthMethod = AuthenticationUtil.getAuthMethod(currentSubject);
-        final URL serviceURL = registryClient.getServiceURL(lookupServiceURI(request), Standards.TAP_SYNC_11, (currentAuthMethod == null) ? AuthMethod.ANON :
-            currentAuthMethod);
+        final URL serviceURL = registryClient.getServiceURL(lookupServiceURI(request), Standards.TAP_SYNC_11,
+            (currentAuthMethod == null) ? AuthMethod.ANON : currentAuthMethod);
 
         response.sendRedirect(serviceURL.toExternalForm() + "?" + request.getQueryString());
     }

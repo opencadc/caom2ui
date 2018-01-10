@@ -1,9 +1,10 @@
+
 /*
  ************************************************************************
  *******************  CANADIAN ASTRONOMY DATA CENTRE  *******************
  **************  CENTRE CANADIEN DE DONNÉES ASTRONOMIQUES  **************
  *
- *  (c) 2015.                            (c) 2015.
+ *  (c) 2018.                            (c) 2018.
  *  Government of Canada                 Gouvernement du Canada
  *  National Research Council            Conseil national de recherches
  *  Ottawa, Canada, K1A 0R6              Ottawa, Canada, K1A 0R6
@@ -66,69 +67,52 @@
  ************************************************************************
  */
 
-package ca.nrc.cadc.search;
+package ca.nrc.cadc.search.util;
 
-import ca.nrc.cadc.auth.AuthMethod;
-import ca.nrc.cadc.reg.Standards;
-import ca.nrc.cadc.reg.client.RegistryClient;
-import ca.nrc.cadc.web.ConfigurableServlet;
-import org.apache.http.client.utils.URIBuilder;
+import ca.nrc.cadc.net.NetUtil;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 
 
-/**
- * Servlet to redirect a caller to the appropriate place for a single request
- * download of a single CAOM-2 URI.
- */
-public class PackageServlet extends ConfigurableServlet {
-    private static final String CAOM2PKG_SERVICE_URI_PROPERTY_KEY = "org.opencadc.search.caom2pkg-service-id";
-    private static final URI DEFAULT_CAOM2PKG_SERVICE_URI = URI.create("ivo://cadc.nrc.ca/caom2ops");
+public class DefaultJobURLCreator implements JobURLCreator {
 
     /**
-     * Only supported method.  This will accept an ID parameter in the request
-     * to query on.
+     * Create a Job URL.
      *
-     * @param request  The HTTP Request.
-     * @param response The HTTP Response.
-     * @throws IOException      Any other errors.
+     * @param dataServiceURL The URL for the Data service.
+     * @param request        The HTTP Servlet Request.
+     * @return URL instance.  Never null.
+     * @throws IOException For any IO errors.
      */
     @Override
-    protected void doGet(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
-        try {
-            get(request, response, new RegistryClient());
-        } catch (URISyntaxException e) {
-            throw new IOException(e);
-        }
+    public URL create(final URL dataServiceURL, final HttpServletRequest request) throws IOException {
+        final String path = request.getPathInfo();
+        final URL jobURL = new URL(dataServiceURL + path);
+
+        return encodeURL(jobURL);
     }
 
-
     /**
-     * Handle a GET request with the given Registry client to perform the lookup.
+     * Encode the URL to be hit for the Preview.
      *
-     * @param request        The HTTP Request.
-     * @param response       The HTTP Response.
-     * @param registryClient The RegistryClient to do lookups.
-     * @throws IOException        Any request access problems.
-     * @throws URISyntaxException For uri issues.
+     * @param url The URL to encode the individual items for.
+     * @return URL encoded.
+     * @throws IOException If the URL cannot be read or encoded.
      */
-    void get(final HttpServletRequest request, final HttpServletResponse response, final RegistryClient registryClient)
-        throws IOException, URISyntaxException {
-        final URL serviceURL = registryClient.getServiceURL(getServiceID(CAOM2PKG_SERVICE_URI_PROPERTY_KEY,
-                                                                         DEFAULT_CAOM2PKG_SERVICE_URI),
-                                                            Standards.PKG_10, AuthMethod.COOKIE);
+    private URL encodeURL(final URL url) throws IOException {
+        final StringBuilder urlPathAndQueryString = new StringBuilder(url.toExternalForm().length());
+        final String[] pathItems = url.getPath().split("/");
 
-        final URIBuilder builder = new URIBuilder(serviceURL.toURI());
-
-        for (final String IDValue : request.getParameterValues("ID")) {
-            builder.addParameter("ID", IDValue);
+        for (final String s : pathItems) {
+            urlPathAndQueryString.append(NetUtil.encode(s));
+            urlPathAndQueryString.append("/");
         }
 
-        response.sendRedirect(builder.build().toURL().toExternalForm());
+        urlPathAndQueryString.replace(urlPathAndQueryString.lastIndexOf("/"), urlPathAndQueryString.length(),
+                                      "");
+
+        return new URL(url, urlPathAndQueryString.toString());
     }
 }

@@ -458,7 +458,7 @@
         _self.defaultDec = decValue
       }
 
-      if (polygonValue !== null) {
+      if (polygonValue) {
         var footprintValues = polygonValue.split(POLYGON_SPLIT)
         var footprintValuesLength = footprintValues.length
 

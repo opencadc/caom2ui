@@ -1,9 +1,10 @@
+
 /*
  ************************************************************************
  *******************  CANADIAN ASTRONOMY DATA CENTRE  *******************
  **************  CENTRE CANADIEN DE DONNÉES ASTRONOMIQUES  **************
  *
- *  (c) 2015.                            (c) 2015.
+ *  (c) 2018.                            (c) 2018.
  *  Government of Canada                 Gouvernement du Canada
  *  National Research Council            Conseil national de recherches
  *  Ottawa, Canada, K1A 0R6              Ottawa, Canada, K1A 0R6
@@ -68,67 +69,73 @@
 
 package ca.nrc.cadc.search;
 
-import ca.nrc.cadc.auth.AuthMethod;
-import ca.nrc.cadc.reg.Standards;
-import ca.nrc.cadc.reg.client.RegistryClient;
-import ca.nrc.cadc.web.ConfigurableServlet;
-import org.apache.http.client.utils.URIBuilder;
+import ca.nrc.cadc.AbstractUnitTest;
+import ca.nrc.cadc.net.HttpDownload;
+import ca.nrc.cadc.search.util.JobURLCreator;
+import org.junit.Test;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.WriteListener;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.io.OutputStream;
 import java.net.URL;
 
+import static org.junit.Assert.*;
+import static org.easymock.EasyMock.*;
 
-/**
- * Servlet to redirect a caller to the appropriate place for a single request
- * download of a single CAOM-2 URI.
- */
-public class PackageServlet extends ConfigurableServlet {
-    private static final String CAOM2PKG_SERVICE_URI_PROPERTY_KEY = "org.opencadc.search.caom2pkg-service-id";
-    private static final URI DEFAULT_CAOM2PKG_SERVICE_URI = URI.create("ivo://cadc.nrc.ca/caom2ops");
+public class PreviewRequestHandlerTest extends AbstractUnitTest<PreviewRequestHandler> {
 
-    /**
-     * Only supported method.  This will accept an ID parameter in the request
-     * to query on.
-     *
-     * @param request  The HTTP Request.
-     * @param response The HTTP Response.
-     * @throws IOException      Any other errors.
-     */
-    @Override
-    protected void doGet(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
-        try {
-            get(request, response, new RegistryClient());
-        } catch (URISyntaxException e) {
-            throw new IOException(e);
-        }
-    }
+    @Test
+    public void get() throws Exception {
+        final OutputStream outputStream = new ByteArrayOutputStream();
+        final ServletOutputStream responseOutputStream = new ServletOutputStream() {
+            @Override
+            public boolean isReady() {
+                return true;
+            }
 
+            @Override
+            public void setWriteListener(WriteListener writeListener) {
+            }
 
-    /**
-     * Handle a GET request with the given Registry client to perform the lookup.
-     *
-     * @param request        The HTTP Request.
-     * @param response       The HTTP Response.
-     * @param registryClient The RegistryClient to do lookups.
-     * @throws IOException        Any request access problems.
-     * @throws URISyntaxException For uri issues.
-     */
-    void get(final HttpServletRequest request, final HttpServletResponse response, final RegistryClient registryClient)
-        throws IOException, URISyntaxException {
-        final URL serviceURL = registryClient.getServiceURL(getServiceID(CAOM2PKG_SERVICE_URI_PROPERTY_KEY,
-                                                                         DEFAULT_CAOM2PKG_SERVICE_URI),
-                                                            Standards.PKG_10, AuthMethod.COOKIE);
+            @Override
+            public void write(int b) throws IOException {
+                outputStream.write(b);
+            }
+        };
+        final URL dataServiceURL = new URL("http://mysite.com/data/here");
+        final URL jobURL = new URL("http://mysite.com/jobs/88");
+        final HttpServletRequest mockRequest = createMock(HttpServletRequest.class);
+        final HttpDownload mockHTTPDownload = createMock(HttpDownload.class);
+        final HttpServletResponse mockResponse = createMock(HttpServletResponse.class);
+        final JobURLCreator mockJobURLCreator = createMock(JobURLCreator.class);
+        final PreviewRequestHandler testSubject = new PreviewRequestHandler(dataServiceURL, mockJobURLCreator) {
+            @Override
+            HttpDownload createDownloader(URL url, OutputStream outputStream) {
+                return mockHTTPDownload;
+            }
+        };
 
-        final URIBuilder builder = new URIBuilder(serviceURL.toURI());
+        expect(mockJobURLCreator.create(dataServiceURL, mockRequest)).andReturn(jobURL).once();
 
-        for (final String IDValue : request.getParameterValues("ID")) {
-            builder.addParameter("ID", IDValue);
-        }
+        expect(mockResponse.getOutputStream()).andReturn(responseOutputStream).once();
 
-        response.sendRedirect(builder.build().toURL().toExternalForm());
+        mockHTTPDownload.setFollowRedirects(true);
+        expectLastCall().once();
+
+        mockHTTPDownload.run();
+        expectLastCall().once();
+
+        expect(mockHTTPDownload.getResponseCode()).andReturn(200).once();
+
+        replay(mockRequest, mockResponse, mockJobURLCreator, mockHTTPDownload);
+
+        testSubject.get(mockRequest, mockResponse);
+
+        verify(mockRequest, mockResponse, mockJobURLCreator, mockHTTPDownload);
     }
 }

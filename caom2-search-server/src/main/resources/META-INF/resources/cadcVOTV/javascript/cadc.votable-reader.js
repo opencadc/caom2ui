@@ -633,6 +633,7 @@
     function getVOTable() {
       return _selfJSONBuilder.voTable
     }
+    4
 
     function getData() {
       return _selfJSONBuilder.jsonData
@@ -652,7 +653,7 @@
    * @constructor
    */
   function CSVBuilder(maxRowLimit, input, buildRowData) {
-    var _selfCSVBuilder = this
+    var $_selfCSVBuilder = $(this)
     var longestValues = {}
     var chunk = { lastMatch: 0, rowCount: 0 }
     var pageSize = input.pageSize || null
@@ -696,11 +697,11 @@
     }
 
     function subscribe(event, eHandler) {
-      $(_selfCSVBuilder).on(event.type, eHandler)
+      $_selfCSVBuilder.on(event.type, eHandler)
     }
 
     function fireEvent(event, eventData) {
-      $(_selfCSVBuilder).trigger(event, eventData)
+      $_selfCSVBuilder.trigger(event, eventData)
     }
 
     function advanceToNextRow(asChunk, lastFound) {
@@ -831,6 +832,9 @@
       $.ajax({
         url: getURLString(),
         type: 'GET',
+        xhrFields: {
+          withCredentials: true
+        },
         xhr: createRequest
       }).fail(getErrorCallbackFunction())
     }

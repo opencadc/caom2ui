@@ -1,9 +1,10 @@
+
 /*
  ************************************************************************
  *******************  CANADIAN ASTRONOMY DATA CENTRE  *******************
  **************  CENTRE CANADIEN DE DONNÉES ASTRONOMIQUES  **************
  *
- *  (c) 2015.                            (c) 2015.
+ *  (c) 2018.                            (c) 2018.
  *  Government of Canada                 Gouvernement du Canada
  *  National Research Council            Conseil national de recherches
  *  Ottawa, Canada, K1A 0R6              Ottawa, Canada, K1A 0R6
@@ -68,67 +69,50 @@
 
 package ca.nrc.cadc.search;
 
-import ca.nrc.cadc.auth.AuthMethod;
-import ca.nrc.cadc.reg.Standards;
-import ca.nrc.cadc.reg.client.RegistryClient;
-import ca.nrc.cadc.web.ConfigurableServlet;
-import org.apache.http.client.utils.URIBuilder;
+import ca.nrc.cadc.net.HttpDownload;
+import ca.nrc.cadc.search.util.JobURLCreator;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedOutputStream;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.io.OutputStream;
 import java.net.URL;
 
-
 /**
- * Servlet to redirect a caller to the appropriate place for a single request
- * download of a single CAOM-2 URI.
+ * Common request handler for Preview requests.
  */
-public class PackageServlet extends ConfigurableServlet {
-    private static final String CAOM2PKG_SERVICE_URI_PROPERTY_KEY = "org.opencadc.search.caom2pkg-service-id";
-    private static final URI DEFAULT_CAOM2PKG_SERVICE_URI = URI.create("ivo://cadc.nrc.ca/caom2ops");
+public class PreviewRequestHandler {
 
-    /**
-     * Only supported method.  This will accept an ID parameter in the request
-     * to query on.
-     *
-     * @param request  The HTTP Request.
-     * @param response The HTTP Response.
-     * @throws IOException      Any other errors.
-     */
-    @Override
-    protected void doGet(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
+    private final URL dataServiceURL;
+    private final JobURLCreator jobURLCreator;
+
+
+    PreviewRequestHandler(final URL dataServiceURL, final JobURLCreator jobURLCreator) {
+        this.dataServiceURL = dataServiceURL;
+        this.jobURLCreator = jobURLCreator;
+    }
+
+    public void get(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+        final OutputStream outputStream = new BufferedOutputStream(resp.getOutputStream());
+
         try {
-            get(request, response, new RegistryClient());
-        } catch (URISyntaxException e) {
-            throw new IOException(e);
+            final HttpDownload download = createDownloader(jobURLCreator.create(dataServiceURL, req), outputStream);
+
+            download.setFollowRedirects(true);
+            download.run();
+
+            final int responseCode = download.getResponseCode();
+
+            if (responseCode > 400) {
+                resp.setStatus(responseCode);
+            }
+        } finally {
+            outputStream.flush();
         }
     }
 
-
-    /**
-     * Handle a GET request with the given Registry client to perform the lookup.
-     *
-     * @param request        The HTTP Request.
-     * @param response       The HTTP Response.
-     * @param registryClient The RegistryClient to do lookups.
-     * @throws IOException        Any request access problems.
-     * @throws URISyntaxException For uri issues.
-     */
-    void get(final HttpServletRequest request, final HttpServletResponse response, final RegistryClient registryClient)
-        throws IOException, URISyntaxException {
-        final URL serviceURL = registryClient.getServiceURL(getServiceID(CAOM2PKG_SERVICE_URI_PROPERTY_KEY,
-                                                                         DEFAULT_CAOM2PKG_SERVICE_URI),
-                                                            Standards.PKG_10, AuthMethod.COOKIE);
-
-        final URIBuilder builder = new URIBuilder(serviceURL.toURI());
-
-        for (final String IDValue : request.getParameterValues("ID")) {
-            builder.addParameter("ID", IDValue);
-        }
-
-        response.sendRedirect(builder.build().toURL().toExternalForm());
+    HttpDownload createDownloader(final URL url, final OutputStream outputStream) {
+        return new HttpDownload(url, outputStream);
     }
 }
