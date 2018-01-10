@@ -88,7 +88,7 @@ public class PreviewRequestHandler {
     private final JobURLCreator jobURLCreator;
 
 
-    public PreviewRequestHandler(final URL dataServiceURL, final JobURLCreator jobURLCreator) {
+    PreviewRequestHandler(final URL dataServiceURL, final JobURLCreator jobURLCreator) {
         this.dataServiceURL = dataServiceURL;
         this.jobURLCreator = jobURLCreator;
     }
@@ -97,8 +97,7 @@ public class PreviewRequestHandler {
         final OutputStream outputStream = new BufferedOutputStream(resp.getOutputStream());
 
         try {
-            final HttpDownload download = createDownloader(jobURLCreator.create(dataServiceURL, req),
-                outputStream);
+            final HttpDownload download = createDownloader(jobURLCreator.create(dataServiceURL, req), outputStream);
 
             download.setFollowRedirects(true);
             download.run();

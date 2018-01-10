@@ -176,19 +176,19 @@
      */
     this._getActiveForm = function() {
       // could be a tab other than a form tab...
-      if (
-        this._getActiveTabID()
-          .toLowerCase()
-          .indexOf('obscore') > 0
-      ) {
-        activeFormID = this.getObsCoreSearchForm().getID()
-      } else if (
-        this._getActiveTabID()
-          .toLowerCase()
-          .indexOf('queryform') > 0
-      ) {
-        activeFormID = this.getCAOMSearchForm().getID()
-      }
+      // if (
+      //   this._getActiveTabID()
+      //     .toLowerCase()
+      //     .indexOf('obscore') > 0
+      // ) {
+      //   activeFormID = this.getObsCoreSearchForm().getID()
+      // } else if (
+      //   this._getActiveTabID()
+      //     .toLowerCase()
+      //     .indexOf('queryform') > 0
+      // ) {
+      //   activeFormID = this.getCAOMSearchForm().getID()
+      // }
 
       return this.getCAOMSearchForm().isActive(activeFormID)
         ? this.getCAOMSearchForm()
@@ -1118,38 +1118,37 @@
 
     // End initForms function.
 
-
     this._setBookmarkURL = function(hrefURI) {
-        hrefURI.clearQuery()
-        var href = hrefURI.toString()
+      hrefURI.clearQuery()
+      var href = hrefURI.toString()
 
-        // Strip off the fragment part of the
-        // href url if necessary.
-        var index = href.indexOf('#')
-        if (index !== -1) {
-          href = href.substring(0, index)
-        }
-
-        var serializer = new cadc.vot.ResultStateSerializer(
-          href + this._getFormQueryString(),
-          resultsVOTV.sortcol,
-          resultsVOTV.sortDir ? 'asc' : 'dsc',
-          resultsVOTV.getDisplayedColumns(),
-          resultsVOTV.getResizedColumns(),
-          resultsVOTV.getColumnFilters(),
-          resultsVOTV.getUpdatedColumnSelects()
-        )
-
-        var serializedUrl = serializer.getResultStateUrl();
-
-        $('#bookmark_link')
-          .find('#bookmark_url_display')
-          .text(serializedUrl)
-
-        this._trigger(ca.nrc.cadc.search.events.onSetBookmarkUrl, {
-          url: serializedUrl
-        })
+      // Strip off the fragment part of the
+      // href url if necessary.
+      var index = href.indexOf('#')
+      if (index !== -1) {
+        href = href.substring(0, index)
       }
+
+      var serializer = new cadc.vot.ResultStateSerializer(
+        href + this._getFormQueryString(),
+        resultsVOTV.sortcol,
+        resultsVOTV.sortDir ? 'asc' : 'dsc',
+        resultsVOTV.getDisplayedColumns(),
+        resultsVOTV.getResizedColumns(),
+        resultsVOTV.getColumnFilters(),
+        resultsVOTV.getUpdatedColumnSelects()
+      )
+
+      var serializedUrl = serializer.getResultStateUrl()
+
+      $('#bookmark_link')
+        .find('#bookmark_url_display')
+        .text(serializedUrl)
+
+      this._trigger(ca.nrc.cadc.search.events.onSetBookmarkUrl, {
+        url: serializedUrl
+      })
+    }
 
     /**
      * Obtain the currently active tab's ID.

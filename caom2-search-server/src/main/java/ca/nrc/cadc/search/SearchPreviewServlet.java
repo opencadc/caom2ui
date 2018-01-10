@@ -44,7 +44,6 @@ import ca.nrc.cadc.web.ConfigurableServlet;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
-import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -98,9 +97,9 @@ public class SearchPreviewServlet extends ConfigurableServlet {
 
     @Override
     protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-        final UUID checkpointID = UUID.randomUUID();
-        profiler.checkpoint(String.format("%s doGet() start", checkpointID));
+        final String uri = req.getParameter("id");
+        profiler.checkpoint(String.format("%s doGet() start", uri));
         this.previewRequestHandler.get(req, resp);
-        profiler.checkpoint(String.format("%s doGet() end", checkpointID));
+        profiler.checkpoint(String.format("%s doGet() end", uri));
     }
 }

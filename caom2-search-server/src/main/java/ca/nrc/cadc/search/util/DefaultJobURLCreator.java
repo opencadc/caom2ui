@@ -102,9 +102,7 @@ public class DefaultJobURLCreator implements JobURLCreator {
      * @throws IOException If the URL cannot be read or encoded.
      */
     private URL encodeURL(final URL url) throws IOException {
-        final StringBuilder urlPathAndQueryString =
-            new StringBuilder(url.toExternalForm().length());
-
+        final StringBuilder urlPathAndQueryString = new StringBuilder(url.toExternalForm().length());
         final String[] pathItems = url.getPath().split("/");
 
         for (final String s : pathItems) {
@@ -112,8 +110,8 @@ public class DefaultJobURLCreator implements JobURLCreator {
             urlPathAndQueryString.append("/");
         }
 
-        urlPathAndQueryString.replace(urlPathAndQueryString.lastIndexOf("/"),
-            urlPathAndQueryString.length(), "");
+        urlPathAndQueryString.replace(urlPathAndQueryString.lastIndexOf("/"), urlPathAndQueryString.length(),
+                                      "");
 
         return new URL(url, urlPathAndQueryString.toString());
     }

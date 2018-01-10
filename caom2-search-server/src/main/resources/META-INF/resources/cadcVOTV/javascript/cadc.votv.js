@@ -1,4 +1,5 @@
 ;(function($, window, undefined) {
+  'use strict'
   // register namespace
   $.extend(true, window, {
     cadc: {
@@ -237,15 +238,6 @@
 
             voTableBuilder.subscribe(cadc.vot.onPageAddEnd, function() {
               getDataView().endUpdate()
-
-              // Sorting as data
-              // loads.  Not sure
-              // if this is a good
-              // idea or not.
-              // jenkinsd
-              // 2014.05.09 WebRT
-              // 53730
-              //sort();
             })
 
             voTableBuilder.subscribe(cadc.vot.onRowAdd, function(event, row) {
@@ -489,7 +481,7 @@
 
       // Add items directly to prevent unnecessary refreshes.
       if (rowIndex === null || isNaN(rowIndex)) {
-        getDataView().sortedAddItem(dataRow)
+        getDataView().addItem(dataRow)
       } else {
         getDataView().insertItem(rowIndex, dataRow)
       }
@@ -1306,6 +1298,7 @@
       if (getRowManager().onRowRendered) {
         _self.grid.onRenderComplete.subscribe(function(e, args) {
           var g = args.grid
+
           var renderedRange = g.getRenderedRange()
           for (
             var i = renderedRange.top, ii = renderedRange.bottom;
@@ -1395,7 +1388,9 @@
       _self.setViewportHeight()
       _self.grid.resizeCanvas()
 
-      sort()
+      _self.subscribe(cadc.vot.events.onDataLoaded, function() {
+        sort()
+      })
     }
 
     /**
@@ -1723,6 +1718,7 @@
       build: build,
       render: render,
       load: load,
+      sort: sort,
       doFilter: doFilter,
       areNumbers: areNumbers,
       areStrings: areStrings,

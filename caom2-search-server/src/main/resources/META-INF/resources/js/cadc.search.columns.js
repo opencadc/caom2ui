@@ -212,6 +212,9 @@
                         request: 'downloads-only',
                         runid: runID
                       },
+                      xhrFields: {
+                        withCredentials: true
+                      },
                       statusCode: {
                         200: function(data) {
                           var evaluator = new cadc.vot.xml.VOTableXPathEvaluator(
@@ -292,8 +295,6 @@
                                   readableIndex >= 0 &&
                                   tableDatas[readableIndex].textContent ===
                                     'true'
-                                // if (readable === true)
-                                // {
                                 var contentType =
                                   tableDatas[contentTypeIndex].textContent
                                 var semantics =
@@ -315,7 +316,6 @@
                                     tableDatas[accessUrlIndex].textContent
                                   )
                                 }
-                                // }
                               }
                             }
 
@@ -1384,7 +1384,8 @@
       var useMaqStr =
         '&' +
         maqKey +
-        '=' + (($enabledMAQ.length > 0) && !$enabledMAQ.hasClass('cadc-display-none'))
+        '=' +
+        ($enabledMAQ.length > 0 && !$enabledMAQ.hasClass('cadc-display-none'))
 
       $link.attr('href', baseURI.toString() + useMaqStr)
       $link.addClass('quicksearch_link').addClass('no-propagate-event')

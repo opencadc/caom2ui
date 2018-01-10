@@ -82,8 +82,9 @@ public class PreviewServlet extends ConfigurableServlet {
 
     @Override
     protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-        profiler.checkpoint("doGet() start");
+        final String requestPath = req.getPathInfo();
+        profiler.checkpoint(String.format("%s doGet() start", requestPath));
         this.previewRequestHandler.get(req, resp);
-        profiler.checkpoint("doGet() end");
+        profiler.checkpoint(String.format("%s doGet() end", requestPath));
     }
 }
