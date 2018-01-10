@@ -122,8 +122,8 @@
      */
     this.obsCoreSearchForm = null
 
-    // The active Form's ID being used to submit the last query.
-    var activeFormID
+    // The active Form's ID being used to submit the last query.  Default is CAOM-2.
+    this.activeFormID = 'queryForm'
 
     /**
      * @return {String}
@@ -169,6 +169,38 @@
     }
 
     /**
+     * Obtain the currently active tab's ID.
+     *
+     * Check the sessionStorage for the activePanel component, then the
+     * currently listed active tab (i.e. with class 'active').
+     *
+     * @return  {String}    The ID of the active tab.
+     * @private
+     */
+    this._getActiveTabID = function() {
+      var $tabList = $('ul#tabList')
+      var activeTab = $tabList.find('li.active')
+      var defaultTab = $tabList.find('li.default')
+      var langURLPath = $(
+        "span[lang='" + this.getPageLanguage() + "'].lang-link-target"
+      ).text()
+      var cachedTabID = sessionStorage.getItem(
+        'activePanel-' + langURLPath + '0'
+      )
+      var targetTabID
+
+      if (cachedTabID) {
+        targetTabID = cachedTabID
+      } else if (activeTab && activeTab.find('a:first').length) {
+        targetTabID = activeTab.find('a:first').attr('href')
+      } else {
+        targetTabID = defaultTab.find('a:first').attr('href')
+      }
+
+      return targetTabID
+    }
+
+    /**
      * Obtain the currently active form object.
      *
      * return {ca.nrc.cadc.search.SearchForm|SearchForm}    Form instance.
@@ -190,7 +222,7 @@
       //   activeFormID = this.getCAOMSearchForm().getID()
       // }
 
-      return this.getCAOMSearchForm().isActive(activeFormID)
+      return this.getCAOMSearchForm().isActive(this.activeFormID)
         ? this.getCAOMSearchForm()
         : this.getObsCoreSearchForm()
     }
@@ -424,12 +456,18 @@
        * jenkinsd 05.03.2017
        *
        */
-      $('li.tab').click(function() {
-        window.location.hash = $(this)
-          .find('a')
-          .first()
-          .attr('href')
-      })
+      $('#tabList > li').click(
+        function(e) {
+          var tabID = e.target.hash
+          window.location.hash = tabID
+
+          if (tabID.toLowerCase().indexOf('obscore') > 0) {
+            this.activeFormID = this.getObsCoreSearchForm().getID()
+          } else if (tabID.toLowerCase().indexOf('queryform') > 0) {
+            this.activeFormID = this.getCAOMSearchForm().getID()
+          }
+        }.bind(this)
+      )
 
       this._initBackButtonHandling()
     }
@@ -786,9 +824,9 @@
         var cadcForm = args.cadcForm
 
         // Searching on different data.  Switch the columns.
-        if (!activeFormID || !cadcForm.isActive(activeFormID)) {
+        if (!this.activeFormID || !cadcForm.isActive(this.activeFormID)) {
           // This is now the active form.
-          activeFormID = cadcForm.getID()
+          this.activeFormID = cadcForm.getID()
         }
 
         var formatCheckbox = function($rowItem) {
@@ -1148,38 +1186,6 @@
       this._trigger(ca.nrc.cadc.search.events.onSetBookmarkUrl, {
         url: serializedUrl
       })
-    }
-
-    /**
-     * Obtain the currently active tab's ID.
-     *
-     * Check the sessionStorage for the activePanel component, then the
-     * currently listed active tab (i.e. with class 'active').
-     *
-     * @return  {String}    The ID of the active tab.
-     * @private
-     */
-    this._getActiveTabID = function() {
-      var $tabList = $('ul#tabList')
-      var activeTab = $tabList.find('li.active')
-      var defaultTab = $tabList.find('li.default')
-      var langURLPath = $(
-        "span[lang='" + this.getPageLanguage() + "'].lang-link-target"
-      ).text()
-      var cachedTabID = sessionStorage.getItem(
-        'activePanel-' + langURLPath + '0'
-      )
-      var targetTabID
-
-      if (cachedTabID) {
-        targetTabID = cachedTabID
-      } else if (activeTab && activeTab.find('a:first').length) {
-        targetTabID = activeTab.find('a:first').attr('href')
-      } else {
-        targetTabID = defaultTab.find('a:first').attr('href')
-      }
-
-      return targetTabID
     }
 
     this.getQueryFromURI = function() {
