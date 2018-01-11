@@ -53,18 +53,15 @@ public class SearchPreviewServlet extends ConfigurableServlet {
     private static final URI DEFAULT_CAOM2LINK_SERVICE_URI = URI.create("ivo://cadc.nrc.ca/caom2ops");
 
     private final PreviewRequestHandler previewRequestHandler;
-    private final Profiler profiler;
 
 
     /**
      * Complete constructor.
      *
      * @param previewRequestHandler Request handler for Preview requests.
-     * @param profiler              The checkpoint profiler.
      */
-    public SearchPreviewServlet(final PreviewRequestHandler previewRequestHandler, final Profiler profiler) {
+    public SearchPreviewServlet(final PreviewRequestHandler previewRequestHandler) {
         this.previewRequestHandler = previewRequestHandler;
-        this.profiler = profiler;
     }
 
     /**
@@ -92,12 +89,12 @@ public class SearchPreviewServlet extends ConfigurableServlet {
                 return new URL(dataServiceURL + "?" + request.getQueryString());
             }
         });
-        this.profiler = new Profiler(SearchPreviewServlet.class);
     }
 
     @Override
     protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
         final String uri = req.getParameter("id");
+        final Profiler profiler = new Profiler(SearchPreviewServlet.class);
         profiler.checkpoint(String.format("%s doGet() start", uri));
         this.previewRequestHandler.get(req, resp);
         profiler.checkpoint(String.format("%s doGet() end", uri));

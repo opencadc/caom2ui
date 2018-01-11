@@ -137,7 +137,6 @@ public class SearchJobServlet extends SyncServlet {
     private JobManager jobManager;
     private JobUpdater jobUpdater;
     private ApplicationConfiguration applicationConfiguration;
-    private final Profiler profiler = new Profiler(SearchJobServlet.class);
 
 
     @Override
@@ -263,7 +262,9 @@ public class SearchJobServlet extends SyncServlet {
     private void processRequest(final HttpServletRequest request, final HttpServletResponse response)
         throws JobPersistenceException, TransientException, FileUploadException, IOException,
         PositionParserException, JobNotFoundException {
+
         final String requestURI = request.getRequestURI();
+        final Profiler profiler = new Profiler(SearchJobServlet.class);
         profiler.checkpoint(String.format("%s processRequest() Start", requestURI));
         final Map<String, Object> uploadPayload = new HashMap<>();
         final List<Parameter> extraJobParameters = new ArrayList<>();
@@ -340,9 +341,9 @@ public class SearchJobServlet extends SyncServlet {
 
         final JobRunner runner =
             new AdvancedRunner(auditJob, jobUpdater, syncOutput,
-                new TAPSearcher(new SyncResponseWriterImpl(syncOutput), jobUpdater, tapClient,
-                    getQueryGenerator(auditJob)),
-                applicationConfiguration.lookupServiceURI(tapServiceKey, tapServiceURI));
+                               new TAPSearcher(new SyncResponseWriterImpl(syncOutput), jobUpdater, tapClient,
+                                               getQueryGenerator(auditJob)),
+                               applicationConfiguration.lookupServiceURI(tapServiceKey, tapServiceURI));
 
         runner.run();
         response.setStatus(HttpServletResponse.SC_OK);

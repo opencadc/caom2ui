@@ -53,18 +53,15 @@ public class PreviewServlet extends ConfigurableServlet {
     private static final String DATA_URI = "ivo://cadc.nrc.ca/data";
 
     private final PreviewRequestHandler previewRequestHandler;
-    private final Profiler profiler;
 
 
     /**
      * Complete constructor.
      *
      * @param previewRequestHandler     Request handler for Preview requests.
-     * @param profiler                  The checkpoint profiler.
      */
-    public PreviewServlet(final PreviewRequestHandler previewRequestHandler, final Profiler profiler) {
+    public PreviewServlet(final PreviewRequestHandler previewRequestHandler) {
         this.previewRequestHandler = previewRequestHandler;
-        this.profiler = profiler;
     }
 
     /**
@@ -76,13 +73,13 @@ public class PreviewServlet extends ConfigurableServlet {
         final URL dataServiceURL = registryClient.getServiceURL(URI.create(DATA_URI), Standards.DATA_10,
             AuthMethod.COOKIE);
         this.previewRequestHandler = new PreviewRequestHandler(dataServiceURL, new DefaultJobURLCreator());
-        this.profiler = new Profiler(PreviewServlet.class);
     }
 
 
     @Override
     protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
         final String requestPath = req.getPathInfo();
+        final Profiler profiler = new Profiler(PreviewServlet.class);
         profiler.checkpoint(String.format("%s doGet() start", requestPath));
         this.previewRequestHandler.get(req, resp);
         profiler.checkpoint(String.format("%s doGet() end", requestPath));
