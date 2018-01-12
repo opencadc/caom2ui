@@ -35,6 +35,7 @@
 package ca.nrc.cadc.search;
 
 import ca.nrc.cadc.auth.AuthMethod;
+import ca.nrc.cadc.auth.AuthenticationUtil;
 import ca.nrc.cadc.profiler.Profiler;
 import ca.nrc.cadc.reg.Standards;
 import ca.nrc.cadc.reg.client.RegistryClient;
@@ -47,6 +48,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
+import java.util.Set;
 
 
 public class PreviewServlet extends ConfigurableServlet {
@@ -78,10 +80,11 @@ public class PreviewServlet extends ConfigurableServlet {
 
     @Override
     protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-        final String requestPath = req.getPathInfo();
+        final Set<String> userIDs = AuthenticationUtil.getUseridsFromSubject();
+        final String userIDCheckpoint = userIDs.isEmpty() ? "Anonymous" : userIDs.toString();
+        final String checkpointID = userIDCheckpoint + "/" + req.getPathInfo();
         final Profiler profiler = new Profiler(PreviewServlet.class);
-        profiler.checkpoint(String.format("%s doGet() start", requestPath));
         this.previewRequestHandler.get(req, resp);
-        profiler.checkpoint(String.format("%s doGet() end", requestPath));
+        profiler.checkpoint(String.format("%s doGet()", checkpointID));
     }
 }
