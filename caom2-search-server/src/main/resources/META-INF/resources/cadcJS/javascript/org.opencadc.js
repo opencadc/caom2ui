@@ -66,43 +66,39 @@
  *
  ************************************************************************
  */
-(function ($)
-{
+;(function($) {
   // register namespace
   $.extend(true, window, {
-    "org": {
-      "opencadc": {
-        "StringUtil": StringUtil
+    org: {
+      opencadc: {
+        StringUtil: StringUtil
       }
     }
-  });
-
+  })
 
   /**
    * Basic String utility class.
    *
    * @constructor
    */
-  function StringUtil()
-  {
+  function StringUtil() {
     /**
      * Obtain whether the given string has any length (i.e. > 0).
      * @param _str          The string to check.
      * @returns {boolean}
      */
-    function hasLength(_str)
-    {
-      return ((_str !== null) && (_str.length > 0));
+    function hasLength(_str) {
+      return _str != null && _str.length > 0
     }
 
     /**
      * Obtain whether the given string has any text (i.e. !== '').
-     * @param {String|Number|Boolean} _str          The string to check.
+     * @param _str          The string to check.
      * @returns {boolean}
      */
-    function hasText(_str)
-    {
-      return hasLength(_str) && ($.trim(String(_str)) !== "");
+    function hasText(_str) {
+      var wrapper = String(_str)
+      return hasLength(wrapper) && $.trim(wrapper) !== ''
     }
 
     /**
@@ -125,14 +121,12 @@
      * @param _values {Array}     The values to replace.
      * @returns {string}
      */
-    function format(_str, _values)
-    {
+    function format(_str, _values) {
       // Create new string to not modify the original.
-      return _str.replace(/{(\d+)}/g, function (match, number)
-      {
-        var index = (number - 1);
-        return _values[index] ? _values[index] : match;
-      });
+      return _str.replace(/{(\d+)}/g, function(match, number) {
+        var index = number - 1
+        return _values[index] ? _values[index] : match
+      })
     }
 
     /**
@@ -141,9 +135,14 @@
      * @param _str        String to sanitize.
      * @returns {string}
      */
-    function markupForHTML(_str)
-    {
-      return hasLength(_str) ? _str.toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") : "";
+    function markupForHTML(_str) {
+      return _str
+        ? _str
+            .toString()
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+        : ''
     }
 
     /**
@@ -153,36 +152,35 @@
      * @param _str          The string to execute against.
      * @returns {boolean}
      */
-    function matches(_regex, _str)
-    {
-      return new RegExp(_regex).test(_str);
+    function matches(_regex, _str) {
+      return new RegExp(_regex).test(_str)
     }
 
     /**
      * Obtain whether the _string contains the given _str.
      *
-     * @param _string         The String to check.
-     * @param _match          The string to see if is contained.
-     * @param _matchCase      Optionally match case.
+     * @param {String} _string         The String to check.
+     * @param {String} _match          The string to see if is contained.
+     * @param {boolean} [_matchCase=false]      Optionally match case.
      * @returns {boolean}
      */
-    function contains(_string, _match, _matchCase)
-    {
-      var expression = ".*" + _match + ".*";
-      var regExp = (_matchCase === true) ? new RegExp(expression) : new RegExp(expression, "gi");
-
-      return regExp.test(_string);
+    function contains(_string, _match, _matchCase) {
+      return (
+        _string &&
+        _match &&
+        (_matchCase === true
+          ? _string.indexOf(_match)
+          : _string.toLowerCase().indexOf(_match.toLowerCase())) >= 0
+      )
     }
 
-    $.extend(this,
-        {
-          "sanitize": markupForHTML,
-          "hasLength": hasLength,
-          "hasText": hasText,
-          "format": format,
-          "matches": matches,
-          "contains": contains
-        });
+    $.extend(this, {
+      sanitize: markupForHTML,
+      hasLength: hasLength,
+      hasText: hasText,
+      format: format,
+      matches: matches,
+      contains: contains
+    })
   }
-
-})(jQuery);
+})(jQuery)

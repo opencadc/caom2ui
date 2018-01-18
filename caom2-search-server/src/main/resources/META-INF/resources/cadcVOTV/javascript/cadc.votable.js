@@ -239,6 +239,7 @@
     var integerTypes = ['int', 'long', 'short']
     var floatingPointTypes = ['float', 'double', 'adql:DOUBLE', 'adql:FLOAT']
     var timestampTypes = ['timestamp', 'adql:TIMESTAMP']
+    var stringUtil = new org.opencadc.StringUtil()
 
     function getDatatypeValue() {
       return _selfDatatype.datatypeValue
@@ -260,7 +261,7 @@
     }
 
     function isBoolean() {
-      return getDatatypeValue() == 'boolean'
+      return getDatatypeValue() === 'boolean'
     }
 
     function isFloatingPointNumeric() {
@@ -277,7 +278,6 @@
 
     function datatypeMatches(_datatypes) {
       var dataTypeValue = getDatatypeValue()
-      var stringUtil = new org.opencadc.StringUtil()
       for (var stIndex = 0; stIndex < _datatypes.length; stIndex++) {
         if (stringUtil.contains(dataTypeValue, _datatypes[stIndex])) {
           return true

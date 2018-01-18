@@ -35,41 +35,71 @@
 package ca.nrc.cadc.search;
 
 import ca.nrc.cadc.auth.AuthMethod;
+import ca.nrc.cadc.profiler.Profiler;
 import ca.nrc.cadc.reg.Standards;
 import ca.nrc.cadc.reg.client.RegistryClient;
+import ca.nrc.cadc.search.util.JobURLCreator;
+import ca.nrc.cadc.web.ConfigurableServlet;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 
-public class SearchPreviewServlet extends PreviewServlet {
+public class SearchPreviewServlet extends ConfigurableServlet {
     private static final String CAOM2LINK_SERVICE_URI_PROPERTY_KEY = "org.opencadc.search.caom2link-service-id";
     private static final URI DEFAULT_CAOM2LINK_SERVICE_URI = URI.create("ivo://cadc.nrc.ca/caom2ops");
+
+    private final PreviewRequestHandler previewRequestHandler;
+    private final Profiler profiler;
+
+
+    /**
+     * Complete constructor.
+     *
+     * @param previewRequestHandler Request handler for Preview requests.
+     * @param profiler              The checkpoint profiler.
+     */
+    public SearchPreviewServlet(final PreviewRequestHandler previewRequestHandler, final Profiler profiler) {
+        this.previewRequestHandler = previewRequestHandler;
+        this.profiler = profiler;
+    }
 
     /**
      * Constructor to use the Registry Client to obtain the Data Web Service
      * location.
      */
     public SearchPreviewServlet() {
-        super();
         final RegistryClient registryClient = new RegistryClient();
-        this.dataServiceURL = registryClient.getServiceURL(
-                getServiceID(
-                    CAOM2LINK_SERVICE_URI_PROPERTY_KEY,
-                    DEFAULT_CAOM2LINK_SERVICE_URI),
-                Standards.DATALINK_LINKS_10, AuthMethod.COOKIE);
+        final URL dataServiceURL = registryClient.getServiceURL(
+            getServiceID(
+                CAOM2LINK_SERVICE_URI_PROPERTY_KEY,
+                DEFAULT_CAOM2LINK_SERVICE_URI),
+            Standards.DATALINK_LINKS_10, AuthMethod.COOKIE);
+        this.previewRequestHandler = new PreviewRequestHandler(dataServiceURL, new JobURLCreator() {
+            /**
+             * Create a Job URL.
+             *
+             * @param dataServiceURL The URL for the Data service.
+             * @param request        The HTTP Servlet Request.
+             * @return URL instance.  Never null.
+             * @throws IOException For any IO errors.
+             */
+            @Override
+            public URL create(final URL dataServiceURL, final HttpServletRequest request) throws IOException {
+                return new URL(dataServiceURL + "?" + request.getQueryString());
+            }
+        });
+        this.profiler = new Profiler(SearchPreviewServlet.class);
     }
 
-    /**
-     * Form the URL for the job as based on the given parameter.
-     *
-     * @param request The HTTP Request.
-     * @return A URL instance.
-     * @throws IOException If the URL cannot be created.
-     */
-    protected URL createJobURL(final HttpServletRequest request)
-        throws IOException {
-        return new URL(getDataServiceURL() + "?" + request.getQueryString());
+    @Override
+    protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+        final String uri = req.getParameter("id");
+        profiler.checkpoint(String.format("%s doGet() start", uri));
+        this.previewRequestHandler.get(req, resp);
+        profiler.checkpoint(String.format("%s doGet() end", uri));
     }
 }

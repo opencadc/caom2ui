@@ -77,34 +77,27 @@ import java.net.URI;
 /**
  * Base servlet to allow configuration.
  */
-public abstract class ConfigurableServlet extends HttpServlet implements Configuration
-{
+public abstract class ConfigurableServlet extends HttpServlet implements Configuration {
     private final ApplicationConfiguration configuration;
 
-    public ConfigurableServlet()
-    {
+    public ConfigurableServlet() {
         this(new ApplicationConfiguration(DEFAULT_CONFIG_FILE_PATH));
     }
 
-    protected ConfigurableServlet(final ApplicationConfiguration configuration)
-    {
+    protected ConfigurableServlet(final ApplicationConfiguration configuration) {
         this.configuration = configuration;
     }
 
 
-    protected URI getServiceID(final String lookupKey,
-                               final URI defaultValue)
-    {
+    protected URI getServiceID(final String lookupKey, final URI defaultValue) {
         return configuration.lookupServiceURI(lookupKey, defaultValue);
     }
 
-    protected String lookup(final String lookupKey)
-    {
+    protected String lookup(final String lookupKey) {
         return configuration.lookup(lookupKey);
     }
 
-    public String lookup(final String key, final String defaultValue)
-    {
+    public String lookup(final String key, final String defaultValue) {
         return configuration.lookup(key, defaultValue);
     }
 }
