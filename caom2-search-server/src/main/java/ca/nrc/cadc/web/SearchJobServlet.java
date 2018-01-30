@@ -68,6 +68,7 @@
 
 package ca.nrc.cadc.web;
 
+import ca.nrc.cadc.auth.AuthenticationUtil;
 import ca.nrc.cadc.auth.HTTPIdentityManager;
 import ca.nrc.cadc.auth.IdentityManager;
 import ca.nrc.cadc.caom2.CAOMQueryGenerator;
@@ -115,6 +116,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -137,7 +139,6 @@ public class SearchJobServlet extends SyncServlet {
     private JobManager jobManager;
     private JobUpdater jobUpdater;
     private ApplicationConfiguration applicationConfiguration;
-    private final Profiler profiler = new Profiler(SearchJobServlet.class);
 
 
     @Override
@@ -263,8 +264,11 @@ public class SearchJobServlet extends SyncServlet {
     private void processRequest(final HttpServletRequest request, final HttpServletResponse response)
         throws JobPersistenceException, TransientException, FileUploadException, IOException,
         PositionParserException, JobNotFoundException {
-        final String requestURI = request.getRequestURI();
-        profiler.checkpoint(String.format("%s processRequest() Start", requestURI));
+
+        final Set<String> userIDs = AuthenticationUtil.getUseridsFromSubject();
+        final String userIDCheckpoint = userIDs.isEmpty() ? "Anonymous" : userIDs.toString();
+        final String checkpointID = userIDCheckpoint + "/" + request.getRequestURI();
+        final Profiler profiler = new Profiler(SearchJobServlet.class);
         final Map<String, Object> uploadPayload = new HashMap<>();
         final List<Parameter> extraJobParameters = new ArrayList<>();
 
@@ -301,7 +305,7 @@ public class SearchJobServlet extends SyncServlet {
         final Job auditJob = jobManager.create(jobCreator.create(request));
         auditJob.getParameterList().addAll(extraJobParameters);
 
-        profiler.checkpoint(String.format("%s processRequest() Create Audit Job", requestURI));
+        profiler.checkpoint(String.format("%s processRequest() Create Audit Job", checkpointID));
 
         final SyncOutput syncOutput = new HTTPResponseSyncOutput(response);
         final SyncTAPClient tapClient =
@@ -340,13 +344,13 @@ public class SearchJobServlet extends SyncServlet {
 
         final JobRunner runner =
             new AdvancedRunner(auditJob, jobUpdater, syncOutput,
-                new TAPSearcher(new SyncResponseWriterImpl(syncOutput), jobUpdater, tapClient,
-                    getQueryGenerator(auditJob)),
-                applicationConfiguration.lookupServiceURI(tapServiceKey, tapServiceURI));
+                               new TAPSearcher(new SyncResponseWriterImpl(syncOutput), jobUpdater, tapClient,
+                                               getQueryGenerator(auditJob)),
+                               applicationConfiguration.lookupServiceURI(tapServiceKey, tapServiceURI));
 
         runner.run();
         response.setStatus(HttpServletResponse.SC_OK);
-        profiler.checkpoint(String.format("%s processRequest() End", requestURI));
+        profiler.checkpoint(String.format("%s processRequest()", checkpointID));
     }
 
     /**

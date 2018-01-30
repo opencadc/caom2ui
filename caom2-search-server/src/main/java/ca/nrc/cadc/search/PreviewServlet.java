@@ -35,6 +35,7 @@
 package ca.nrc.cadc.search;
 
 import ca.nrc.cadc.auth.AuthMethod;
+import ca.nrc.cadc.auth.AuthenticationUtil;
 import ca.nrc.cadc.profiler.Profiler;
 import ca.nrc.cadc.reg.Standards;
 import ca.nrc.cadc.reg.client.RegistryClient;
@@ -47,24 +48,22 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
+import java.util.Set;
 
 
 public class PreviewServlet extends ConfigurableServlet {
     private static final String DATA_URI = "ivo://cadc.nrc.ca/data";
 
     private final PreviewRequestHandler previewRequestHandler;
-    private final Profiler profiler;
 
 
     /**
      * Complete constructor.
      *
      * @param previewRequestHandler     Request handler for Preview requests.
-     * @param profiler                  The checkpoint profiler.
      */
-    public PreviewServlet(final PreviewRequestHandler previewRequestHandler, final Profiler profiler) {
+    public PreviewServlet(final PreviewRequestHandler previewRequestHandler) {
         this.previewRequestHandler = previewRequestHandler;
-        this.profiler = profiler;
     }
 
     /**
@@ -76,15 +75,16 @@ public class PreviewServlet extends ConfigurableServlet {
         final URL dataServiceURL = registryClient.getServiceURL(URI.create(DATA_URI), Standards.DATA_10,
             AuthMethod.COOKIE);
         this.previewRequestHandler = new PreviewRequestHandler(dataServiceURL, new DefaultJobURLCreator());
-        this.profiler = new Profiler(PreviewServlet.class);
     }
 
 
     @Override
     protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-        final String requestPath = req.getPathInfo();
-        profiler.checkpoint(String.format("%s doGet() start", requestPath));
+        final Set<String> userIDs = AuthenticationUtil.getUseridsFromSubject();
+        final String userIDCheckpoint = userIDs.isEmpty() ? "Anonymous" : userIDs.toString();
+        final String checkpointID = userIDCheckpoint + "/" + req.getPathInfo();
+        final Profiler profiler = new Profiler(PreviewServlet.class);
         this.previewRequestHandler.get(req, resp);
-        profiler.checkpoint(String.format("%s doGet() end", requestPath));
+        profiler.checkpoint(String.format("%s doGet()", checkpointID));
     }
 }
