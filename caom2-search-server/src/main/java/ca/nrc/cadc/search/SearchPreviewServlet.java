@@ -35,6 +35,7 @@
 package ca.nrc.cadc.search;
 
 import ca.nrc.cadc.auth.AuthMethod;
+import ca.nrc.cadc.auth.AuthenticationUtil;
 import ca.nrc.cadc.profiler.Profiler;
 import ca.nrc.cadc.reg.Standards;
 import ca.nrc.cadc.reg.client.RegistryClient;
@@ -44,6 +45,7 @@ import ca.nrc.cadc.web.ConfigurableServlet;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
+import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -53,18 +55,15 @@ public class SearchPreviewServlet extends ConfigurableServlet {
     private static final URI DEFAULT_CAOM2LINK_SERVICE_URI = URI.create("ivo://cadc.nrc.ca/caom2ops");
 
     private final PreviewRequestHandler previewRequestHandler;
-    private final Profiler profiler;
 
 
     /**
      * Complete constructor.
      *
      * @param previewRequestHandler Request handler for Preview requests.
-     * @param profiler              The checkpoint profiler.
      */
-    public SearchPreviewServlet(final PreviewRequestHandler previewRequestHandler, final Profiler profiler) {
+    public SearchPreviewServlet(final PreviewRequestHandler previewRequestHandler) {
         this.previewRequestHandler = previewRequestHandler;
-        this.profiler = profiler;
     }
 
     /**
@@ -89,17 +88,18 @@ public class SearchPreviewServlet extends ConfigurableServlet {
              */
             @Override
             public URL create(final URL dataServiceURL, final HttpServletRequest request) throws IOException {
-                return new URL(dataServiceURL + "?" + request.getQueryString());
+                return new URL(dataServiceURL + "?id=" + request.getParameter("id"));
             }
         });
-        this.profiler = new Profiler(SearchPreviewServlet.class);
     }
 
     @Override
     protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-        final String uri = req.getParameter("id");
-        profiler.checkpoint(String.format("%s doGet() start", uri));
+        final Set<String> userIDs = AuthenticationUtil.getUseridsFromSubject();
+        final String userIDCheckpoint = userIDs.isEmpty() ? "Anonymous" : userIDs.toString();
+        final String checkpointID = userIDCheckpoint + "/" + req.getParameter("id");
+        final Profiler profiler = new Profiler(SearchPreviewServlet.class);
         this.previewRequestHandler.get(req, resp);
-        profiler.checkpoint(String.format("%s doGet() end", uri));
+        profiler.checkpoint(String.format("%s doGet()", checkpointID));
     }
 }

@@ -113,8 +113,9 @@ public class DefaultSyncTAPClientTest extends AbstractUnitTest<DefaultSyncTAPCli
 
         expect(mockRegistryClient.getServiceURL(
             testServiceURI,
-            Standards.TAP_SYNC_11,
-            AuthMethod.ANON))
+            Standards.TAP_10,
+            AuthMethod.ANON,
+            Standards.INTERFACE_UWS_SYNC))
             .andReturn(new URL("http://www.site.com/example/tap"));
 
         replay(mockRegistryClient, mockPost);
