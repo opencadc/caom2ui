@@ -15,7 +15,7 @@ request.setAttribute("part", p);
 <jsp:useBean id="part" scope="request" type="ca.nrc.cadc.caom2.Part"/>
 <jsp:useBean id="indent" scope="request" type="java.lang.Integer"/>
 
-<div style="margin-left: <%= indent.intValue() %>em">
+<div class="part" style="margin-left: <%= indent.intValue() %>em">
 
   <h2>Part</h2>
 

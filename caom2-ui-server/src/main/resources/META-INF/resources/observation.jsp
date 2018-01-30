@@ -14,13 +14,13 @@ This JSP page renders an HTML table with the Observation metadata.
   request.setAttribute("indent", indent);
 %>
 
-<div style="margin-left: <%= indent.intValue() %>em">
+<div class="observation" style="margin-left: <%= indent.intValue() %>em">
 
   <h2><%= obs.getClass().getSimpleName() %>
   </h2>
 
   <table class="content">
-    <tr>
+    <tr class="even">
       <td>obsID</td>
       <td><%= obs.getID() %> aka <%= obs.getID().getLeastSignificantBits() %>
       </td>
@@ -30,7 +30,7 @@ This JSP page renders an HTML table with the Observation metadata.
       <td><%= SS.toString(obs.getLastModified()) %>
       </td>
     </tr>
-    <tr>
+    <tr class="even">
       <td>collection</td>
       <td><%= obs.getCollection() %>
       </td>
@@ -40,7 +40,7 @@ This JSP page renders an HTML table with the Observation metadata.
       <td><%= obs.getObservationID() %>
       </td>
     </tr>
-    <tr>
+    <tr class="even">
       <td>metaRelease</td>
       <td><%= SS.toString(obs.metaRelease) %>
       </td>
@@ -50,8 +50,7 @@ This JSP page renders an HTML table with the Observation metadata.
       <td><%= SS.toString(obs.sequenceNumber) %>
       </td>
     </tr>
-
-    <tr>
+    <tr class="even">
       <td>algorithm</td>
       <td><%= SS.toString(obs.getAlgorithm()) %>
       </td>
@@ -61,7 +60,7 @@ This JSP page renders an HTML table with the Observation metadata.
       <td><%= SS.toMemberString(request.getContextPath(), obs) %>
       </td>
     </tr>
-    <tr>
+    <tr class="even">
       <td>type</td>
       <td><%= SS.toString(obs.type) %>
       </td>

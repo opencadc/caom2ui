@@ -3,7 +3,7 @@
  *******************  CANADIAN ASTRONOMY DATA CENTRE  *******************
  **************  CENTRE CANADIEN DE DONNÉES ASTRONOMIQUES  **************
  *
- *  (c) 2017.                            (c) 2017.
+ *  (c) 2018.                            (c) 2018.
  *  Government of Canada                 Gouvernement du Canada
  *  National Research Council            Conseil national de recherches
  *  Ottawa, Canada, K1A 0R6              Ottawa, Canada, K1A 0R6
@@ -65,27 +65,20 @@
  *
  ************************************************************************
  */
-
-package ca.nrc.cadc.caom2.ui.server.client;
-
-import ca.nrc.cadc.caom2.ObservationURI;
+package ca.nrc.cadc.search.util;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.net.URL;
 
 
-public final class ObservationUtil {
-    public static ObservationURI getURI(final HttpServletRequest request) {
-        final String sid = request.getPathInfo();
-
-        if (sid != null) {
-            final String modifiedSID = sid.substring(1, sid.length()); // strip leading /
-            final String[] parts = modifiedSID.split("/");
-
-            if (parts.length == 2) {
-                return new ObservationURI(parts[0], parts[1]);
-            }
-        }
-
-        return null;
-    }
+public interface JobURLCreator {
+    /**
+     * Create a Job URL.
+     * @param dataServiceURL    The URL for the Data service.
+     * @param request           The HTTP Servlet Request.
+     * @return  URL instance.  Never null.
+     * @throws IOException  For any IO errors.
+     */
+    URL create(final URL dataServiceURL, final HttpServletRequest request) throws IOException;
 }

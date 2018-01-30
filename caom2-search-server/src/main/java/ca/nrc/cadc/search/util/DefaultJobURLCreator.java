@@ -1,9 +1,10 @@
+
 /*
  ************************************************************************
  *******************  CANADIAN ASTRONOMY DATA CENTRE  *******************
  **************  CENTRE CANADIEN DE DONNÉES ASTRONOMIQUES  **************
  *
- *  (c) 2017.                            (c) 2017.
+ *  (c) 2018.                            (c) 2018.
  *  Government of Canada                 Gouvernement du Canada
  *  National Research Council            Conseil national de recherches
  *  Ottawa, Canada, K1A 0R6              Ottawa, Canada, K1A 0R6
@@ -66,26 +67,52 @@
  ************************************************************************
  */
 
-package ca.nrc.cadc.caom2.ui.server.client;
+package ca.nrc.cadc.search.util;
 
-import ca.nrc.cadc.caom2.ObservationURI;
+import ca.nrc.cadc.net.NetUtil;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.net.URL;
 
 
-public final class ObservationUtil {
-    public static ObservationURI getURI(final HttpServletRequest request) {
-        final String sid = request.getPathInfo();
+public class DefaultJobURLCreator implements JobURLCreator {
 
-        if (sid != null) {
-            final String modifiedSID = sid.substring(1, sid.length()); // strip leading /
-            final String[] parts = modifiedSID.split("/");
+    /**
+     * Create a Job URL.
+     *
+     * @param dataServiceURL The URL for the Data service.
+     * @param request        The HTTP Servlet Request.
+     * @return URL instance.  Never null.
+     * @throws IOException For any IO errors.
+     */
+    @Override
+    public URL create(final URL dataServiceURL, final HttpServletRequest request) throws IOException {
+        final String path = request.getPathInfo();
+        final URL jobURL = new URL(dataServiceURL + path);
 
-            if (parts.length == 2) {
-                return new ObservationURI(parts[0], parts[1]);
-            }
+        return encodeURL(jobURL);
+    }
+
+    /**
+     * Encode the URL to be hit for the Preview.
+     *
+     * @param url The URL to encode the individual items for.
+     * @return URL encoded.
+     * @throws IOException If the URL cannot be read or encoded.
+     */
+    private URL encodeURL(final URL url) throws IOException {
+        final StringBuilder urlPathAndQueryString = new StringBuilder(url.toExternalForm().length());
+        final String[] pathItems = url.getPath().split("/");
+
+        for (final String s : pathItems) {
+            urlPathAndQueryString.append(NetUtil.encode(s));
+            urlPathAndQueryString.append("/");
         }
 
-        return null;
+        urlPathAndQueryString.replace(urlPathAndQueryString.lastIndexOf("/"), urlPathAndQueryString.length(),
+                                      "");
+
+        return new URL(url, urlPathAndQueryString.toString());
     }
 }

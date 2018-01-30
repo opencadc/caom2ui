@@ -1,9 +1,10 @@
+
 /*
  ************************************************************************
  *******************  CANADIAN ASTRONOMY DATA CENTRE  *******************
  **************  CENTRE CANADIEN DE DONNÉES ASTRONOMIQUES  **************
  *
- *  (c) 2017.                            (c) 2017.
+ *  (c) 2018.                            (c) 2018.
  *  Government of Canada                 Gouvernement du Canada
  *  National Research Council            Conseil national de recherches
  *  Ottawa, Canada, K1A 0R6              Ottawa, Canada, K1A 0R6
@@ -66,26 +67,52 @@
  ************************************************************************
  */
 
-package ca.nrc.cadc.caom2.ui.server.client;
+package ca.nrc.cadc.search;
 
-import ca.nrc.cadc.caom2.ObservationURI;
-import ca.nrc.cadc.caom2.PublisherID;
+import ca.nrc.cadc.net.HttpDownload;
+import ca.nrc.cadc.search.util.JobURLCreator;
 
-import java.net.URI;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.URL;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
+/**
+ * Common request handler for Preview requests.
+ */
+public class PreviewRequestHandler {
+
+    private final URL dataServiceURL;
+    private final JobURLCreator jobURLCreator;
 
 
-public class ObservationUtilTest {
-    @Test
-    public void getObservationURI() throws Exception {
-        final ObservationUtil testSubject = new ObservationUtil();
-        final PublisherID publisherID = new PublisherID(URI.create("ivo://myhost.com/COLL?OBSID/PRODID"));
-        final ObservationURI expected = new ObservationURI("COLL", "OBSID");
+    PreviewRequestHandler(final URL dataServiceURL, final JobURLCreator jobURLCreator) {
+        this.dataServiceURL = dataServiceURL;
+        this.jobURLCreator = jobURLCreator;
+    }
 
-        final ObservationURI result = testSubject.getObservationURI(publisherID);
+    public void get(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+        final OutputStream outputStream = new BufferedOutputStream(resp.getOutputStream());
 
-        assertEquals("Wrong Observation URI.", expected, result);
+        try {
+            final HttpDownload download = createDownloader(jobURLCreator.create(dataServiceURL, req), outputStream);
+
+            download.setFollowRedirects(true);
+            download.run();
+
+            final int responseCode = download.getResponseCode();
+
+            if (responseCode > 400) {
+                resp.setStatus(responseCode);
+            }
+        } finally {
+            outputStream.flush();
+        }
+    }
+
+    HttpDownload createDownloader(final URL url, final OutputStream outputStream) {
+        return new HttpDownload(url, outputStream);
     }
 }

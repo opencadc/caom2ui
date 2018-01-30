@@ -106,11 +106,11 @@ abstract class AbstractSearchFormPage extends AbstractTestWebPage
 
     void enterInputValue(final WebElement inputElement, final String value) throws Exception
     {
-        waitForElementVisible(inputElement);
         final String inputID = inputElement.getAttribute("id");
 
         summonTooltip(inputID);
         showInputField(inputID);
+        waitForElementVisible(inputElement);
 
         for (int i = 0; i < value.length(); i++)
         {
@@ -202,9 +202,9 @@ abstract class AbstractSearchFormPage extends AbstractTestWebPage
         final By tooltipCloseLink = By.xpath("//*[contains(@class, 'glyphicon-remove-circle')]");
         waitForElementPresent(tooltipCloseLink);
         final WebElement tooltipClose = find(tooltipCloseLink);
-        waitForElementVisible(tooltipClose);
+//        waitForElementVisible(tooltipClose);
         click(tooltipClose);
-        waitForElementNotPresent(tooltipCloseLink);
+//        waitForElementNotPresent(tooltipCloseLink);
     }
 
 

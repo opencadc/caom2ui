@@ -1,9 +1,10 @@
+
 /*
  ************************************************************************
  *******************  CANADIAN ASTRONOMY DATA CENTRE  *******************
  **************  CENTRE CANADIEN DE DONNÉES ASTRONOMIQUES  **************
  *
- *  (c) 2017.                            (c) 2017.
+ *  (c) 2018.                            (c) 2018.
  *  Government of Canada                 Gouvernement du Canada
  *  National Research Council            Conseil national de recherches
  *  Ottawa, Canada, K1A 0R6              Ottawa, Canada, K1A 0R6
@@ -66,26 +67,75 @@
  ************************************************************************
  */
 
-package ca.nrc.cadc.caom2.ui.server.client;
+package ca.nrc.cadc.search;
 
-import ca.nrc.cadc.caom2.ObservationURI;
+import ca.nrc.cadc.AbstractUnitTest;
+import ca.nrc.cadc.net.HttpDownload;
+import ca.nrc.cadc.search.util.JobURLCreator;
+import org.junit.Test;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.WriteListener;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.URL;
 
-public final class ObservationUtil {
-    public static ObservationURI getURI(final HttpServletRequest request) {
-        final String sid = request.getPathInfo();
+import static org.junit.Assert.*;
+import static org.easymock.EasyMock.*;
 
-        if (sid != null) {
-            final String modifiedSID = sid.substring(1, sid.length()); // strip leading /
-            final String[] parts = modifiedSID.split("/");
+public class PreviewRequestHandlerTest extends AbstractUnitTest<PreviewRequestHandler> {
 
-            if (parts.length == 2) {
-                return new ObservationURI(parts[0], parts[1]);
+    @Test
+    public void get() throws Exception {
+        final OutputStream outputStream = new ByteArrayOutputStream();
+        final ServletOutputStream responseOutputStream = new ServletOutputStream() {
+            @Override
+            public boolean isReady() {
+                return true;
             }
-        }
 
-        return null;
+            @Override
+            public void setWriteListener(WriteListener writeListener) {
+            }
+
+            @Override
+            public void write(int b) throws IOException {
+                outputStream.write(b);
+            }
+        };
+        final URL dataServiceURL = new URL("http://mysite.com/data/here");
+        final URL jobURL = new URL("http://mysite.com/jobs/88");
+        final HttpServletRequest mockRequest = createMock(HttpServletRequest.class);
+        final HttpDownload mockHTTPDownload = createMock(HttpDownload.class);
+        final HttpServletResponse mockResponse = createMock(HttpServletResponse.class);
+        final JobURLCreator mockJobURLCreator = createMock(JobURLCreator.class);
+        final PreviewRequestHandler testSubject = new PreviewRequestHandler(dataServiceURL, mockJobURLCreator) {
+            @Override
+            HttpDownload createDownloader(URL url, OutputStream outputStream) {
+                return mockHTTPDownload;
+            }
+        };
+
+        expect(mockJobURLCreator.create(dataServiceURL, mockRequest)).andReturn(jobURL).once();
+
+        expect(mockResponse.getOutputStream()).andReturn(responseOutputStream).once();
+
+        mockHTTPDownload.setFollowRedirects(true);
+        expectLastCall().once();
+
+        mockHTTPDownload.run();
+        expectLastCall().once();
+
+        expect(mockHTTPDownload.getResponseCode()).andReturn(200).once();
+
+        replay(mockRequest, mockResponse, mockJobURLCreator, mockHTTPDownload);
+
+        testSubject.get(mockRequest, mockResponse);
+
+        verify(mockRequest, mockResponse, mockJobURLCreator, mockHTTPDownload);
     }
 }

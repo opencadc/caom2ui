@@ -103,6 +103,8 @@ public class SearchResultsPage extends AbstractTestWebPage
     private static final By CHANGE_COLUMNS_AVAILABLE_COLUMNS_LIST_BY = By.id(CHANGE_COLUMNS_AVAILABLE_COLUMNS_LIST_ID);
     private static final String CHANGE_COLUMNS_SELECTED_COLUMNS_LIST_ID = "cadc_columnpicker_selected_items";
     private static final By CHANGE_COLUMNS_SELECTED_COLUMNS_LIST_BY = By.id(CHANGE_COLUMNS_SELECTED_COLUMNS_LIST_ID);
+    private static final By FOOTPRINT_VIEWER_TOGGLE_LINK = By.id("slick-visualize");
+    private static final By FOOTPRINT_VIEWER = By.id("aladin-lite");
 
     static final String ICON_BUSY_SRC = "cadcVOTV/images/PleaseWait-small.gif";
     static final String ICON_IDLE_SRC = "images/transparent-20.png";
@@ -261,6 +263,14 @@ public class SearchResultsPage extends AbstractTestWebPage
     WebElement getRestFrameEnergyColumnHeader() throws Exception
     {
         return getGrid().findElement(REST_FRAME_COLUMN_HEADER);
+    }
+
+    void confirmFootprintViewer() throws Exception
+    {
+        click(FOOTPRINT_VIEWER_TOGGLE_LINK);
+        waitForElementVisible(FOOTPRINT_VIEWER);
+        click(FOOTPRINT_VIEWER_TOGGLE_LINK);
+        waitForElementInvisible(FOOTPRINT_VIEWER);
     }
 
     void confirmProposalProjectColumnHeader() throws Exception

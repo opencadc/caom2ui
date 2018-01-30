@@ -5,19 +5,22 @@ No built-in (selected, editable, highlight, flashing, invalid, loading, :focus) 
 classes should alter those!
 */
 
-.slick-column-name
-{
-  float: left;
-}
-
-.slick-header.ui-state-default, .slick-headerrow.ui-state-default {
+.slick-header.ui-state-default, .slick-headerrow.ui-state-default, .slick-footerrow.ui-state-default, .slick-top-panel-scroller.ui-state-default {
   width: 100%;
-  overflow-x: auto;
-  /*overflow-y: auto;*/
-  border-left: 0;
+  overflow: auto;
+  position: relative;
+  border-left: 0px !important;
 }
 
-.slick-header-columns, .slick-headerrow-columns {
+.slick-header.ui-state-default {
+  overflow: inherit;
+}
+
+.slick-header::-webkit-scrollbar,  .slick-headerrow::-webkit-scrollbar, .slick-footerrow::-webkit-scrollbar {
+  display: none
+}
+
+.slick-header-columns, .slick-headerrow-columns, .slick-footerrow-columns {
   position: relative;
   white-space: nowrap;
   cursor: default;
@@ -27,6 +30,7 @@ classes should alter those!
 .slick-header-column.ui-state-default {
   position: relative;
   display: inline-block;
+ /*box-sizing: content-box !important; use this for Firefox! */ 
   overflow: hidden;
   -o-text-overflow: ellipsis;
   text-overflow: ellipsis;
@@ -34,12 +38,14 @@ classes should alter those!
   line-height: 16px;
   margin: 0;
   padding: 4px;
-  border-width: 0;
   border-right: 1px solid silver;
+  border-left: 0px !important;
+  border-top: 0px !important;
+  border-bottom: 0px !important;
   float: left;
 }
 
-.slick-headerrow-column.ui-state-default {
+.slick-headerrow-column.ui-state-default, .slick-footerrow-column.ui-state-default {
   padding: 4px;
 }
 
@@ -56,12 +62,27 @@ classes should alter those!
   float: left;
 }
 
+.slick-sort-indicator-numbered {
+  display: inline-block;
+  width: 8px;
+  height: 5px;
+  margin-left: 4px;
+  margin-top: 0;
+  padding-left: 1px;
+  line-height: 20px;
+  float: left;
+  font-family: Arial;
+  font-style: normal;
+  font-weight: bold;
+  color: #6190CD;
+}
+
 .slick-sort-indicator-desc {
-  background: url(../images/sort-desc.gif);
+  background: url(images/sort-desc.gif);
 }
 
 .slick-sort-indicator-asc {
-  background: url(../images/sort-asc.gif);
+  background: url(images/sort-asc.gif);
 }
 
 .slick-resizable-handle {
@@ -70,7 +91,7 @@ classes should alter those!
   display: block;
   cursor: col-resize;
   width: 4px;
-  right: 0;
+  right: 0px;
   top: 0;
   height: 100%;
 }
@@ -86,11 +107,11 @@ classes should alter those!
 
 .slick-row.ui-widget-content, .slick-row.ui-state-active {
   position: absolute;
-  border: 0;
+  border: 0px;
   width: 100%;
 }
 
-.slick-cell, .slick-headerrow-column {
+.slick-cell, .slick-headerrow-column , .slick-footerrow-column{
   position: absolute;
   border: 1px solid transparent;
   border-right: 1px dotted silver;
@@ -99,13 +120,19 @@ classes should alter those!
   -o-text-overflow: ellipsis;
   text-overflow: ellipsis;
   vertical-align: middle;
-  /*z-index: 1;*/
+  z-index: 1;
   padding: 1px 2px 2px 1px;
   margin: 0;
   white-space: nowrap;
   cursor: default;
 }
-
+.slick-cell, .slick-headerrow-column{
+  border-bottom-color: silver;
+}
+.slick-footerrow-column {
+  border-top-color: silver;
+}
+ 
 .slick-group {
 }
 

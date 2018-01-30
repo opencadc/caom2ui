@@ -84,7 +84,6 @@
 #resultTable
 {
   width: 100%;
-  height: 1000px;
   outline: 0;
   background: #fff;
   border: 1px solid gray;
@@ -450,10 +449,26 @@ span.slick-column-picker-button:hover
   background: rgb(255, 255, 187);
 }
 
+.slick-header-column.ui-state-hover {
+  border: 1px solid #fbcb09;
+  background: #fdf5ce url(images/ui-bg_glass_100_fdf5ce_1x400.png) 50% 50% repeat !important;
+  font-weight: bold;
+  color: #c77405;
+}
+
+.slick-headerrow.ui-state-default {
+  overflow: hidden !important;  
+}
+
 .slick-header-column.ui-state-default
 {
   color: #000;
+  box-sizing: content-box !important;
   font-weight: normal;
+  height: 22px !important;
+  line-height: inherit !important;
+  padding-left: 5px;
+  padding-top: 4px;  
 }
 
 /**

@@ -1,9 +1,10 @@
+
 /*
  ************************************************************************
  *******************  CANADIAN ASTRONOMY DATA CENTRE  *******************
  **************  CENTRE CANADIEN DE DONNÉES ASTRONOMIQUES  **************
  *
- *  (c) 2017.                            (c) 2017.
+ *  (c) 2018.                            (c) 2018.
  *  Government of Canada                 Gouvernement du Canada
  *  National Research Council            Conseil national de recherches
  *  Ottawa, Canada, K1A 0R6              Ottawa, Canada, K1A 0R6
@@ -66,26 +67,54 @@
  ************************************************************************
  */
 
-package ca.nrc.cadc.caom2.ui.server.client;
+package ca.nrc.cadc.search.util;
 
-import ca.nrc.cadc.caom2.ObservationURI;
+import org.junit.Test;
+import ca.nrc.cadc.AbstractUnitTest;
 
 import javax.servlet.http.HttpServletRequest;
+import java.net.URL;
+
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.reset;
+import static org.easymock.EasyMock.verify;
+import static org.junit.Assert.assertEquals;
+
+public class DefaultJobURLCreatorTest extends AbstractUnitTest<DefaultJobURLCreator> {
+    @Test
+    public void createJobURL() throws Exception {
+        final HttpServletRequest mockRequest = createMock(HttpServletRequest.class);
+        final URL dataServiceURL = new URL("http://localhost/data/pub");
+
+        setTestSubject(new DefaultJobURLCreator());
+
+        expect(mockRequest.getPathInfo()).andReturn("/COLLECTION/OBSID_PREV_256.JPG").once();
+
+        replay(mockRequest);
+
+        final URL expectedURL = new URL("http", "localhost",
+            "/data/pub/COLLECTION/OBSID_PREV_256.JPG");
+        final URL url = getTestSubject().create(dataServiceURL, mockRequest);
+        assertEquals("Expected URL is not what was generated.", expectedURL, url);
+
+        verify(mockRequest);
 
 
-public final class ObservationUtil {
-    public static ObservationURI getURI(final HttpServletRequest request) {
-        final String sid = request.getPathInfo();
+        // TEST 2
+        reset(mockRequest);
 
-        if (sid != null) {
-            final String modifiedSID = sid.substring(1, sid.length()); // strip leading /
-            final String[] parts = modifiedSID.split("/");
+        expect(mockRequest.getPathInfo()).andReturn("/COLLECTION/OBSID_PREV 256.JPG").once();
 
-            if (parts.length == 2) {
-                return new ObservationURI(parts[0], parts[1]);
-            }
-        }
+        replay(mockRequest);
 
-        return null;
+        final URL expectedURL2 =
+            new URL("http", "localhost",
+                "/data/pub/COLLECTION/OBSID_PREV+256.JPG");
+        final URL url2 = getTestSubject().create(dataServiceURL, mockRequest);
+        assertEquals("Expected URL is not what was generated.", expectedURL2, url2);
+
+        verify(mockRequest);
     }
 }

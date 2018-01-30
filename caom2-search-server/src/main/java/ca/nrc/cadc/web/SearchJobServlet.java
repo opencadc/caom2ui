@@ -75,6 +75,7 @@ import ca.nrc.cadc.caom2.ObsCoreQueryGenerator;
 import ca.nrc.cadc.config.ApplicationConfiguration;
 import ca.nrc.cadc.date.DateUtil;
 import ca.nrc.cadc.net.TransientException;
+import ca.nrc.cadc.profiler.Profiler;
 import ca.nrc.cadc.reg.client.RegistryClient;
 import ca.nrc.cadc.search.DefaultNameResolverClient;
 import ca.nrc.cadc.search.ObsModel;
@@ -101,6 +102,7 @@ import ca.nrc.cadc.uws.server.SyncOutput;
 import ca.nrc.cadc.uws.server.SyncServlet;
 import ca.nrc.cadc.uws.server.impl.PostgresJobPersistence;
 import ca.nrc.cadc.uws.web.JobCreator;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -119,12 +121,14 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.fileupload.FileUploadException;
-import org.apache.log4j.Logger;
 
 
+/**
+ * Main servlet to handle an actual search request from the Search Form.
+ */
 public class SearchJobServlet extends SyncServlet {
-    private static final Logger log = Logger.getLogger(SearchJobServlet.class);
     private static final String TAP_SERVICE_URI_PROPERTY_KEY = "org.opencadc.search.tap-service-id";
     private static final String ALT_TAP_SERVICE_URI_PROPERTY_KEY = "org.opencadc.search.maq-tap-service-id";
     private static final URI DEFAULT_TAP_SERVICE_URI = URI.create("ivo://cadc.nrc.ca/tap");
@@ -133,6 +137,7 @@ public class SearchJobServlet extends SyncServlet {
     private JobManager jobManager;
     private JobUpdater jobUpdater;
     private ApplicationConfiguration applicationConfiguration;
+    private final Profiler profiler = new Profiler(SearchJobServlet.class);
 
 
     @Override
@@ -203,17 +208,14 @@ public class SearchJobServlet extends SyncServlet {
      * @param response an {@link HttpServletResponse} object that
      *                 contains the response the servlet sends
      *                 to the client
-     * @throws IOException      if an input or output error is
-     *                          detected when the servlet handles
-     *                          the request
-     * @throws ServletException if the request for the POST
-     *                          could not be handled
+     * @throws IOException if an input or output error is
+     *                     detected when the servlet handles
+     *                     the request
      * @see ServletOutputStream
      * @see ServletResponse#setContentType
      */
     @Override
-    protected void doPost(final HttpServletRequest request, final HttpServletResponse response)
-        throws ServletException, IOException {
+    protected void doPost(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
         try {
             processRequest(request, response);
         } catch (TransientException ex) {
@@ -261,13 +263,14 @@ public class SearchJobServlet extends SyncServlet {
     private void processRequest(final HttpServletRequest request, final HttpServletResponse response)
         throws JobPersistenceException, TransientException, FileUploadException, IOException,
         PositionParserException, JobNotFoundException {
+        final String requestURI = request.getRequestURI();
+        profiler.checkpoint(String.format("%s processRequest() Start", requestURI));
         final Map<String, Object> uploadPayload = new HashMap<>();
         final List<Parameter> extraJobParameters = new ArrayList<>();
 
         final JobCreator jobCreator = new JobCreator(getInlineContentHandler()) {
             @Override
-            protected void processStream(final String name, final String contentType, final InputStream inputStream)
-                throws IOException {
+            protected void processStream(final String name, final String contentType, final InputStream inputStream) {
                 try {
                     final String[] nameParts = name.split("\\.");
                     final String paramName = nameParts[0];
@@ -297,6 +300,8 @@ public class SearchJobServlet extends SyncServlet {
         // Create the audit job.
         final Job auditJob = jobManager.create(jobCreator.create(request));
         auditJob.getParameterList().addAll(extraJobParameters);
+
+        profiler.checkpoint(String.format("%s processRequest() Create Audit Job", requestURI));
 
         final SyncOutput syncOutput = new HTTPResponseSyncOutput(response);
         final SyncTAPClient tapClient =
@@ -341,6 +346,7 @@ public class SearchJobServlet extends SyncServlet {
 
         runner.run();
         response.setStatus(HttpServletResponse.SC_OK);
+        profiler.checkpoint(String.format("%s processRequest() End", requestURI));
     }
 
     /**

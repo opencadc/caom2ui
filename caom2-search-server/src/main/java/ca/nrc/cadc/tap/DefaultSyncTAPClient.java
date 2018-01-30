@@ -31,6 +31,7 @@
  ****  C A N A D I A N   A S T R O N O M Y   D A T A   C E N T R E  *****
  ************************************************************************
  */
+
 package ca.nrc.cadc.tap;
 
 
@@ -58,8 +59,7 @@ import java.util.Map;
 /**
  * Extension of the TapClient to handle Synchronous access and job creation.
  */
-public class DefaultSyncTAPClient implements SyncTAPClient
-{
+public class DefaultSyncTAPClient implements SyncTAPClient {
     private static final Logger LOGGER = Logger.getLogger(DefaultSyncTAPClient.class);
 
 
@@ -67,14 +67,12 @@ public class DefaultSyncTAPClient implements SyncTAPClient
     private final RegistryClient registryClient;
 
 
-    public DefaultSyncTAPClient(final boolean followToResults, final RegistryClient registryClient)
-    {
+    public DefaultSyncTAPClient(final boolean followToResults, final RegistryClient registryClient) {
         this.followToResults = followToResults;
         this.registryClient = registryClient;
     }
 
-    private URL lookupServiceURL(final URI serviceURI) throws IOException, URISyntaxException
-    {
+    private URL lookupServiceURL(final URI serviceURI) throws IOException, URISyntaxException {
         final URL serviceURL = registryClient.getServiceURL(serviceURI, Standards.TAP_SYNC_11, AuthMethod.ANON);
         final URIBuilder builder = new URIBuilder(serviceURL.toURI());
         final URL tapServiceURL = builder.build().toURL();
@@ -91,30 +89,22 @@ public class DefaultSyncTAPClient implements SyncTAPClient
      * @param outputStream The OutputStream to write out results.
      */
     @Override
-    public void execute(final URI serviceURI, final Job job, final OutputStream outputStream)
-    {
-        try
-        {
+    public void execute(final URI serviceURI, final Job job, final OutputStream outputStream) {
+        try {
             final URL tapServiceURL = lookupServiceURL(serviceURI);
-            if (tapServiceURL == null)
-            {
+            if (tapServiceURL == null) {
                 throw new IllegalStateException("TAP Service URL not found in CADC Registry.");
             }
 
             // POST PHASE=RUN to execute on server
             postJob(tapServiceURL, job, outputStream);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             final String error = "Error executing job " + job.getID();
             LOGGER.error(error, e);
 
-            try
-            {
+            try {
                 outputStream.write(error.getBytes());
-            }
-            catch (IOException we)
-            {
+            } catch (IOException we) {
                 throw new IllegalStateException("Unable to write error > " + e, we);
             }
         }
@@ -123,15 +113,13 @@ public class DefaultSyncTAPClient implements SyncTAPClient
     /**
      * Build the payload to POST.
      *
-     * @param job      The Job to get the payload for.
-     * @return      Map of Parameter name:value.
+     * @param job The Job to get the payload for.
+     * @return Map of Parameter name:value.
      */
-    protected Map<String, Object> getQueryPayload(final Job job)
-    {
+    protected Map<String, Object> getQueryPayload(final Job job) {
         final Map<String, Object> payload = new HashMap<>();
 
-        if (StringUtil.hasText(job.getRunID()))
-        {
+        if (StringUtil.hasText(job.getRunID())) {
             payload.put(JobAttribute.RUN_ID.getAttributeName(), job.getRunID());
         }
 
@@ -140,8 +128,7 @@ public class DefaultSyncTAPClient implements SyncTAPClient
 
         final List<Parameter> parameters = job.getParameterList();
 
-        for (final Parameter parameter : parameters)
-        {
+        for (final Parameter parameter : parameters) {
             payload.put(parameter.getName(), parameter.getValue());
         }
 
@@ -152,46 +139,35 @@ public class DefaultSyncTAPClient implements SyncTAPClient
      * Make a POST request to the TAP Service to the given URL with the given
      * parameters.
      *
-     * @param job           The job to send.
-     * @param url           The URL to POST to.
-     * @throws IOException  For any IO errors.
+     * @param job The job to send.
+     * @param url The URL to POST to.
+     * @throws IOException For any IO errors.
      */
     private void postJob(final URL url, final Job job,
-                         final OutputStream outputStream) throws IOException
-    {
+                         final OutputStream outputStream) throws IOException {
         // POST the parameters to the tapServer.
         final HttpPost httpPost = getPoster(url, job, outputStream);
         httpPost.setFollowRedirects(followToResults);
         httpPost.run();
 
-        if (!followToResults)
-        {
+        if (!followToResults) {
             final URL redirectURL = httpPost.getRedirectURL();
 
-            if (redirectURL == null)
-            {
+            if (redirectURL == null) {
                 throw new IllegalStateException("No results found.");
-            }
-            else
-            {
+            } else {
                 outputStream.write(redirectURL.toExternalForm().getBytes());
                 LOGGER.debug("Done writing out Response Body.");
             }
         }
     }
 
-    private HttpPost getPoster(final URL url, final Job job,
-                               final OutputStream outputStream)
-            throws IOException
-    {
+    HttpPost getPoster(final URL url, final Job job, final OutputStream outputStream) {
         final HttpPost poster;
 
-        if (followToResults)
-        {
+        if (followToResults) {
             poster = new HttpPost(url, getQueryPayload(job), outputStream);
-        }
-        else
-        {
+        } else {
             poster = new HttpPost(url, getQueryPayload(job), false);
         }
 

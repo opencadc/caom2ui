@@ -35,36 +35,36 @@
 package ca.nrc.cadc.search;
 
 import ca.nrc.cadc.auth.AuthMethod;
-import ca.nrc.cadc.net.HttpDownload;
-import ca.nrc.cadc.net.NetUtil;
+import ca.nrc.cadc.profiler.Profiler;
 import ca.nrc.cadc.reg.Standards;
 import ca.nrc.cadc.reg.client.RegistryClient;
+import ca.nrc.cadc.search.util.DefaultJobURLCreator;
 import ca.nrc.cadc.web.ConfigurableServlet;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import java.io.BufferedOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
 
 
 public class PreviewServlet extends ConfigurableServlet {
-    public static final String DATA_URI = "ivo://cadc.nrc.ca/data";
+    private static final String DATA_URI = "ivo://cadc.nrc.ca/data";
 
-    URL dataServiceURL;
+    private final PreviewRequestHandler previewRequestHandler;
+    private final Profiler profiler;
 
 
     /**
      * Complete constructor.
      *
-     * @param dataServiceURL The URL of the Data Web Service.
+     * @param previewRequestHandler     Request handler for Preview requests.
+     * @param profiler                  The checkpoint profiler.
      */
-    public PreviewServlet(final URL dataServiceURL) {
-        this.dataServiceURL = dataServiceURL;
+    public PreviewServlet(final PreviewRequestHandler previewRequestHandler, final Profiler profiler) {
+        this.previewRequestHandler = previewRequestHandler;
+        this.profiler = profiler;
     }
 
     /**
@@ -73,75 +73,18 @@ public class PreviewServlet extends ConfigurableServlet {
      */
     public PreviewServlet() {
         final RegistryClient registryClient = new RegistryClient();
-        this.dataServiceURL = registryClient.getServiceURL(URI.create(DATA_URI), Standards.DATA_10, AuthMethod.COOKIE);
+        final URL dataServiceURL = registryClient.getServiceURL(URI.create(DATA_URI), Standards.DATA_10,
+            AuthMethod.COOKIE);
+        this.previewRequestHandler = new PreviewRequestHandler(dataServiceURL, new DefaultJobURLCreator());
+        this.profiler = new Profiler(PreviewServlet.class);
     }
+
 
     @Override
-    protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
-        final URL jobURL = this.createJobURL(req);
-        final OutputStream outputStream = new BufferedOutputStream(resp.getOutputStream());
-
-        try {
-            final HttpDownload download = createDownloader(jobURL, outputStream);
-
-            download.setFollowRedirects(true);
-            download.run();
-
-            final int responseCode = download.getResponseCode();
-
-            if (responseCode > 400) {
-                resp.setStatus(responseCode);
-            }
-        } finally {
-            outputStream.flush();
-        }
-    }
-
-    HttpDownload createDownloader(final URL url, final OutputStream outputStream) {
-        return new HttpDownload(url, outputStream);
-    }
-
-    /**
-     * Form the URL for the job as based on the given parameter.
-     *
-     * @param request The HTTP Request.
-     * @return A URL instance.
-     * @throws IOException If the URL cannot be created.
-     */
-    protected URL createJobURL(final HttpServletRequest request)
-        throws IOException {
-        final String path = request.getPathInfo();
-        final URL currentDataServiceURL = getDataServiceURL();
-        final URL jobURL = new URL(currentDataServiceURL + path);
-
-        return encodeURL(jobURL);
-    }
-
-    /**
-     * Encode the URL to be hit for the Preview.
-     *
-     * @param url The URL to encode the individual items for.
-     * @return URL encoded.
-     * @throws IOException If the URL cannot be read or encoded.
-     */
-    private URL encodeURL(final URL url) throws IOException {
-        final StringBuilder urlPathAndQueryString =
-            new StringBuilder(url.toExternalForm().length());
-
-        final String[] pathItems = url.getPath().split("/");
-
-        for (final String s : pathItems) {
-            urlPathAndQueryString.append(NetUtil.encode(s));
-            urlPathAndQueryString.append("/");
-        }
-
-        urlPathAndQueryString.replace(urlPathAndQueryString.lastIndexOf("/"),
-            urlPathAndQueryString.length(), "");
-
-        return new URL(url, urlPathAndQueryString.toString());
-    }
-
-    URL getDataServiceURL() {
-        return dataServiceURL;
+    protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+        final String requestPath = req.getPathInfo();
+        profiler.checkpoint(String.format("%s doGet() start", requestPath));
+        this.previewRequestHandler.get(req, resp);
+        profiler.checkpoint(String.format("%s doGet() end", requestPath));
     }
 }

@@ -1,6 +1,6 @@
 # caom2-meta-ui
-2017.11.27
-CAOM-2 web user interface for Observation details (v1008)
+
+CAOM-2 web user interface for Observation details (1.1.4)
 
 <a href="https://travis-ci.org/opencadc/caom2ui"><img src="https://travis-ci.org/opencadc/caom2ui.svg?branch=master" /></a>
 
@@ -22,12 +22,4 @@ The Gradle build file contains necessary items to build your own image.
 gradle -Pdocker_image_name=myuser/myimage clean dockerize
 ```
 
-Will create an image called `myuser/myimage`.
-
-## API
-
-### HTTP GET
-
-The only supported operation is a GET in the form of `view?ID=<CAOM2_PUBLISHER_ID>`, like so:
-
-http://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/caom2ui/view?ID=ivo%3A%2F%2Fcadc.nrc.ca%2FDAO%3Fdao_c122_2017_020890%2Fdao_c122_2017_020890
+This command will create an image called `myuser/myimage`.

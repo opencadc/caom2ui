@@ -6,12 +6,12 @@
  *
  * jenkinsd 2014.12.01
  */
-(function ($)
-{
+;(function($, undefined) {
+  'use strict'
   // register namespace
   $.extend(true, $.fn, {
-    "cadcVOTV_filter_default": cadcVOTV_filter_default
-  });
+    cadcVOTV_filter_default: cadcVOTV_filter_default
+  })
 
   /**
    * Default filter for the Grid results.
@@ -19,23 +19,17 @@
    * @param _viewer       The VOTable viewer object.
    * @constructor
    */
-  function cadcVOTV_filter_default(_viewer)
-  {
-    var $inputField = $(this);
+  function cadcVOTV_filter_default(_viewer) {
+    var $inputField = $(this)
 
-    $inputField.on("change keyup",
-                   function (e)
-                   {
+    $inputField.on('change keyup', function(e) {
+      _viewer.doFilter($inputField.val() || '', $inputField.data('columnId'))
 
-                     _viewer.doFilter($inputField.val() || "",
-                                      $inputField.data("columnId"));
+      var grid = _viewer.getGrid()
+      grid.invalidateAllRows()
+      grid.resizeCanvas()
+    })
 
-                     var grid = _viewer.getGrid();
-                     grid.invalidateAllRows();
-                     grid.resizeCanvas();
-                   });
-
-    return this;
+    return this
   }
-})(jQuery);
-
+})(jQuery)

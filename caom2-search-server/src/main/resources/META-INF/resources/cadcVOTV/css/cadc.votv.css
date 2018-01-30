@@ -11,8 +11,6 @@
   -moz-opacity: 0.5;
   -khtml-opacity: 0.5;
   opacity: 0.5;
-  /*z-index: 10000;*/
-
 }
 
 .cadcvotv-empty-results-message {
@@ -60,7 +58,9 @@
   font-size: 0.9em;
 }
 
-.slick-header-column.slick-header-column-checkboxsel span.slick-column-name input {
+.slick-header-column.slick-header-column-checkboxsel
+  span.slick-column-name
+  input {
   margin-left: 3px;
   margin-bottom: 5px;
   vertical-align: middle;
@@ -68,11 +68,6 @@
 
 .slick-header-column.slick-header-column-checkboxsel {
   text-align: center;
-}
-
-.slick-header-column.ui-state-default {
-  height: 30px;
-  line-height: 24px;
 }
 
 /* Start */
@@ -104,20 +99,20 @@
   font-family: Arial, serif;
   font-size: 8pt;
   border: 1px solid gray;
-  background-color: #EEF3F5;
+  background-color: #eef3f5;
   color: black;
   height: 34px;
   line-height: 30px;
 }
 
-.grid-header label, .grid-header-label {
+.grid-header label,
+.grid-header-label {
   display: inline-block;
   font-family: Arial, serif;
   font-size: 8pt;
   margin: auto 12px auto 6px;
 }
 
-/* Default height of slick-headerrow-column is 100%. */
 .slick-headerrow-column {
   background: #f8f8ff !important;
 }
@@ -126,6 +121,7 @@
   margin: 0;
   padding: 0;
   width: 100%;
+  /* height: 20px; */
   -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
@@ -155,7 +151,7 @@ select.slick-header-unit-pulldown {
   white-space: nowrap;
 
   /* Be generous with spacing. */
-  font-size: 1.2em;
+  font-size: 1.4em;
 }
 
 /* End */

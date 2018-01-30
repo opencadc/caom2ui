@@ -74,6 +74,7 @@ import ca.nrc.cadc.config.ApplicationConfiguration;
 import static org.easymock.EasyMock.*;
 
 import ca.nrc.cadc.auth.AuthMethod;
+import ca.nrc.cadc.net.HttpPost;
 import ca.nrc.cadc.reg.Standards;
 import ca.nrc.cadc.reg.client.RegistryClient;
 import ca.nrc.cadc.uws.Job;
@@ -85,29 +86,41 @@ import java.net.URI;
 import java.net.URL;
 
 
-public class DefaultSyncTAPClientTest extends AbstractUnitTest<DefaultSyncTAPClient>
-{
+public class DefaultSyncTAPClientTest extends AbstractUnitTest<DefaultSyncTAPClient> {
     @Test
-    public void execute() throws Exception
-    {
+    public void execute() throws Exception {
         final RegistryClient mockRegistryClient = createMock(RegistryClient.class);
+        final HttpPost mockPost = createMock(HttpPost.class);
 
-        testSubject = new DefaultSyncTAPClient(false, mockRegistryClient);
+        testSubject = new DefaultSyncTAPClient(false, mockRegistryClient) {
+            @Override
+            HttpPost getPoster(URL url, Job job, OutputStream outputStream) {
+                return mockPost;
+            }
+        };
 
         final URI testServiceURI = URI.create("ivo://www.site.com/tap/service");
         final OutputStream outputStream = new ByteArrayOutputStream();
         final Job testJob = new Job();
 
-        expect(mockRegistryClient.getServiceURL(
-                testServiceURI,
-                Standards.TAP_SYNC_11,
-                AuthMethod.ANON))
-                .andReturn(new URL("http://www.site.com/example/tap"));
+        mockPost.setFollowRedirects(false);
+        expectLastCall().once();
 
-        replay(mockRegistryClient);
+        mockPost.run();
+        expectLastCall().once();
+
+        expect(mockPost.getRedirectURL()).andReturn(new URL("http://www.site.com/tap/sync/endpoint")).once();
+
+        expect(mockRegistryClient.getServiceURL(
+            testServiceURI,
+            Standards.TAP_SYNC_11,
+            AuthMethod.ANON))
+            .andReturn(new URL("http://www.site.com/example/tap"));
+
+        replay(mockRegistryClient, mockPost);
 
         testSubject.execute(testServiceURI, testJob, outputStream);
 
-        verify(mockRegistryClient);
+        verify(mockRegistryClient, mockPost);
     }
 }

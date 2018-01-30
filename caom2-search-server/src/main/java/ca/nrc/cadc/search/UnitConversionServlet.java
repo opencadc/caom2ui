@@ -55,7 +55,6 @@ import ca.nrc.cadc.search.parser.TargetParser;
 import ca.nrc.cadc.search.parser.exception.TargetParserException;
 import ca.nrc.cadc.util.StringUtil;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -84,13 +83,12 @@ public class UnitConversionServlet extends HttpServlet
      *
      * @param req  The Request.
      * @param resp The Response.
-     * @throws ServletException If anything went wrong servlet-side.
      * @throws IOException      Any other unforeseen errors.
      */
     @Override
     protected void doGet(final HttpServletRequest req,
                          final HttpServletResponse resp)
-            throws ServletException, IOException
+            throws IOException
     {
         writeSourceJSON(getUType(req.getPathInfo()), req, resp);
     }
