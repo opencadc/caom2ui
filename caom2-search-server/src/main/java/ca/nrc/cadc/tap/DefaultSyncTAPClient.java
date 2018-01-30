@@ -75,7 +75,7 @@ public class DefaultSyncTAPClient implements SyncTAPClient {
     private URL lookupServiceURL(final URI serviceURI) throws IOException, URISyntaxException {
         final URL serviceURL = registryClient.getServiceURL(
             serviceURI,
-            Standards.TAP_10,
+            Standards.TAP_SYNC_11,
             AuthMethod.ANON,
             Standards.INTERFACE_UWS_SYNC);
         final URIBuilder builder = new URIBuilder(serviceURL.toURI());
