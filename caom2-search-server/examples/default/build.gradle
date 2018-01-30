@@ -16,7 +16,7 @@ repositories {
 dependencies {
     compile 'log4j:log4j:1.2.+'
 
-    compile 'org.opencadc:caom2-search-server:[2.4.6, )'
+    compile 'org.opencadc:caom2-search-server:[2.4.8, )'
 
     providedCompile 'javax.servlet:javax.servlet-api:3.1.+'
     providedCompile 'javax.servlet:javax.servlet-api:3.0.+'
@@ -45,7 +45,7 @@ ext {
 
 sourceCompatibility = 1.7
 group = 'org.opencadc'
-version = '2018'
+version = '2019'
 apply from: '../../../_shared.gradle'
 
 war {
