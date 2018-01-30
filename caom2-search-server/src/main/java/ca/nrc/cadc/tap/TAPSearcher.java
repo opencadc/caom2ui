@@ -37,6 +37,7 @@ package ca.nrc.cadc.tap;
 import ca.nrc.cadc.auth.AuthenticationUtil;
 import ca.nrc.cadc.caom2.IntervalSearch;
 import ca.nrc.cadc.caom2.SpatialSearch;
+import ca.nrc.cadc.profiler.Profiler;
 import ca.nrc.cadc.search.*;
 import ca.nrc.cadc.search.cutout.Cutout;
 import ca.nrc.cadc.search.cutout.stc.STCCutoutImpl;
@@ -44,7 +45,6 @@ import ca.nrc.cadc.search.form.FormErrors;
 import ca.nrc.cadc.search.parser.Resolver;
 import ca.nrc.cadc.search.parser.TargetData;
 import ca.nrc.cadc.search.parser.TargetParser;
-import ca.nrc.cadc.search.parser.exception.PositionParserException;
 import ca.nrc.cadc.search.parser.exception.TargetParserException;
 import ca.nrc.cadc.search.parser.resolver.ResolverImpl;
 import ca.nrc.cadc.search.upload.UploadResults;
@@ -100,7 +100,7 @@ public class TAPSearcher implements Searcher
      * @param queryGenerator The generator to use to handle queries
      */
     public TAPSearcher(final SyncResponseWriter writer, final JobUpdater jobUpdater, final SyncTAPClient tapClient,
-                       final QueryGenerator queryGenerator) throws PositionParserException
+                       final QueryGenerator queryGenerator)
     {
         this.syncResponseWriter = writer;
         this.jobUpdater = jobUpdater;
@@ -128,11 +128,9 @@ public class TAPSearcher implements Searcher
      * @param job                The Job to execute.
      * @param serviceURI         The Service URI to use.
      * @param syncResponseWriter The writer to write to.
-     * @throws Exception Any unforeseen errors.
      */
     @Override
     public void search(final Job job, final URI serviceURI, final SyncResponseWriter syncResponseWriter)
-            throws Exception
     {
         // Validate search form.
         final FormData formData = new FormData(job);
@@ -200,8 +198,14 @@ public class TAPSearcher implements Searcher
             // Just a simple OutputStream to hold the results URL.
             final OutputStream outputStream = new ByteArrayOutputStream();
 
-            // Run the TAP job to do the ADQL query.
-            queryTAP(serviceURI, createTAPJob(job, queryGenerator.generate(templates).toString()), outputStream);
+            // Store the TAP Job to prepare to be run.
+            final Profiler tapJobProfiler = new Profiler(TAPSearcher.class);
+
+            // A Job to encapsulate the parameters to be sent to TAP.  This Job is just created to bundle the
+            // necessary items to be sent off.  The Job doesn't even have an ID.  It can be simplified
+            final Job tapJob = createTAPJob(job, queryGenerator.generate(templates).toString());
+            queryTAP(serviceURI, tapJob, outputStream);
+            tapJobProfiler.checkpoint(String.format("%s: Store TAP Job", job.getID()));
 
             final String resultsURLValue = outputStream.toString();
             final URL tapResultsURL = new URL(resultsURLValue);
@@ -229,6 +233,7 @@ public class TAPSearcher implements Searcher
 
             // Include the upload information.
             writeUploadInfoJSON(job, jsonWriter);
+            tapJobProfiler.checkpoint(String.format("%s: JSON Results", job.getID()));
         }
     }
 
