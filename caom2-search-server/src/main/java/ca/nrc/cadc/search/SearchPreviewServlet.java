@@ -35,6 +35,7 @@
 package ca.nrc.cadc.search;
 
 import ca.nrc.cadc.auth.AuthMethod;
+import ca.nrc.cadc.auth.AuthenticationUtil;
 import ca.nrc.cadc.profiler.Profiler;
 import ca.nrc.cadc.reg.Standards;
 import ca.nrc.cadc.reg.client.RegistryClient;
@@ -45,6 +46,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.http.client.utils.URIBuilder;
@@ -55,17 +57,15 @@ public class SearchPreviewServlet extends ConfigurableServlet {
     private static final URI DEFAULT_CAOM2LINK_SERVICE_URI = URI.create("ivo://cadc.nrc.ca/caom2ops");
 
     private PreviewRequestHandler previewRequestHandler;
-    private final Profiler profiler;
+    private Profiler profiler = null;
 
     /**
      * Complete constructor.
      *
      * @param previewRequestHandler Request handler for Preview requests.
-     * @param profiler              The checkpoint profiler.
      */
-    public SearchPreviewServlet(final PreviewRequestHandler previewRequestHandler, final Profiler profiler) {
+    public SearchPreviewServlet(final PreviewRequestHandler previewRequestHandler) {
         this.previewRequestHandler = previewRequestHandler;
-        this.profiler = profiler;
     }
 
     /**
@@ -107,11 +107,9 @@ public class SearchPreviewServlet extends ConfigurableServlet {
              */
             @Override
             public URL create(final URL dataServiceURL, final HttpServletRequest request) throws IOException {
-                return new URL(dataServiceURL + "?" + request.getQueryString());
+                return new URL(dataServiceURL + "?id=" + request.getParameter("id"));
             }
         });
-
-        this.previewRequestHandler.get(req, resp);
-        profiler.checkpoint(String.format("%s doGet() end", uri));
     }
+
 }
