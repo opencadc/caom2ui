@@ -129,11 +129,18 @@ public class PackageServlet extends ConfigurableServlet {
         }
 
         String IDValue = idValues[0];
-        if (IDValue.length() > 0) {
+        if (IDValue.length() > 0 ) {
             // split the ID parameter on '?' to pull off the query string.
             // use the first part (resourceid) in the getServiceURL
             String[] uri_parts = IDValue.split("\\?");
-            final URL serviceURL = registryClient.getServiceURL(new URI(uri_parts[0]), Standards.PKG_10, AuthMethod.COOKIE);
+            if (uri_parts.length < 2) {
+                throw new UnsupportedOperationException("Invalid Publisher ID in package lookup.");
+            }
+
+            final URL serviceURL = registryClient.getServiceURL(
+                new URI(uri_parts[0]),
+                Standards.PKG_10,
+                AuthMethod.COOKIE);
             final URIBuilder builder = new URIBuilder(serviceURL.toURI());
             builder.addParameter("ID", IDValue);
 

@@ -50,9 +50,12 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.log4j.Logger;
 
 
 public class SearchPreviewServlet extends ConfigurableServlet {
+    private static Logger log = Logger.getLogger(SearchPreviewServlet.class);
+
     private static final String CAOM2LINK_SERVICE_URI_PROPERTY_KEY = "org.opencadc.search.caom2link-service-id";
     private static final URI DEFAULT_CAOM2LINK_SERVICE_URI = URI.create("ivo://cadc.nrc.ca/caom2ops");
 
@@ -79,21 +82,30 @@ public class SearchPreviewServlet extends ConfigurableServlet {
     @Override
     protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
         final RegistryClient registryClient = new RegistryClient();
-        final String uri = req.getParameter("id");
+        final String uriStr = req.getParameter("id");
         URL serviceURL = null;
-        profiler.checkpoint(String.format("%s doGet() start", uri));
+        profiler.checkpoint(String.format("%s doGet() start", uriStr));
 
-        if (uri.length() > 0) {
+        // PublisherID format expected: ivo://<resourceID>?<query string>
+        if (uriStr.length() > 0) {
             try {
                 // split the ID parameter on '?' to pull off the query string.
-                // use the first part (resourceid) in the getServiceURL
-                String[] uri_parts = uri.split("\\?");
-                serviceURL = registryClient.getServiceURL(new URI(uri_parts[0]), Standards.DATALINK_LINKS_10, AuthMethod.COOKIE);
+                // use the first part (resourceid) in the getServiceURL.
+                String[] uri_parts = uriStr.split("\\?");
+                if (uri_parts.length < 2) {
+                    throw new UnsupportedOperationException("Invalid Publisher ID in package lookup.");
+                }
+
+                serviceURL = registryClient.getServiceURL(
+                    new URI(uri_parts[0]),
+                    Standards.DATALINK_LINKS_10,
+                    AuthMethod.COOKIE);
+                log.info("serviceURL to use: " + serviceURL);
             } catch (URISyntaxException use) {
                 throw new UnsupportedOperationException(use);
             }
         } else {
-            throw new UnsupportedOperationException("Invalid ID in package lookup.");
+            throw new UnsupportedOperationException("Invalid Publisher ID in package lookup.");
         }
 
         previewRequestHandler = new PreviewRequestHandler(serviceURL, new JobURLCreator() {
@@ -107,9 +119,15 @@ public class SearchPreviewServlet extends ConfigurableServlet {
              */
             @Override
             public URL create(final URL dataServiceURL, final HttpServletRequest request) throws IOException {
-                return new URL(dataServiceURL + "?id=" + request.getParameter("id"));
+                URL handlerUrl = new URL(dataServiceURL + "?id=" + request.getParameter("id"));
+                log.info("handlerUrl: " + handlerUrl);
+//                return new URL(dataServiceURL + "?id=" + request.getParameter("id"));
+                return handlerUrl;
             }
         });
+
+        this.previewRequestHandler.get(req, resp);
+        profiler.checkpoint(String.format("%s doGet() end", uriStr));
     }
 
 }
