@@ -43,18 +43,19 @@ import ca.nrc.cadc.web.ConfigurableServlet;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.http.client.utils.URIBuilder;
 
 
 public class SearchPreviewServlet extends ConfigurableServlet {
     private static final String CAOM2LINK_SERVICE_URI_PROPERTY_KEY = "org.opencadc.search.caom2link-service-id";
     private static final URI DEFAULT_CAOM2LINK_SERVICE_URI = URI.create("ivo://cadc.nrc.ca/caom2ops");
 
-    private final PreviewRequestHandler previewRequestHandler;
+    private PreviewRequestHandler previewRequestHandler;
     private final Profiler profiler;
-
 
     /**
      * Complete constructor.
@@ -72,13 +73,30 @@ public class SearchPreviewServlet extends ConfigurableServlet {
      * location.
      */
     public SearchPreviewServlet() {
+        this.profiler = new Profiler(SearchPreviewServlet.class);
+    }
+
+    @Override
+    protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
         final RegistryClient registryClient = new RegistryClient();
-        final URL dataServiceURL = registryClient.getServiceURL(
-            getServiceID(
-                CAOM2LINK_SERVICE_URI_PROPERTY_KEY,
-                DEFAULT_CAOM2LINK_SERVICE_URI),
-            Standards.DATALINK_LINKS_10, AuthMethod.COOKIE);
-        this.previewRequestHandler = new PreviewRequestHandler(dataServiceURL, new JobURLCreator() {
+        final String uri = req.getParameter("id");
+        URL serviceURL = null;
+        profiler.checkpoint(String.format("%s doGet() start", uri));
+
+        if (uri.length() > 0) {
+            try {
+                // split the ID parameter on '?' to pull off the query string.
+                // use the first part (resourceid) in the getServiceURL
+                String[] uri_parts = uri.split("\\?");
+                serviceURL = registryClient.getServiceURL(new URI(uri_parts[0]), Standards.DATALINK_LINKS_10, AuthMethod.COOKIE);
+            } catch (URISyntaxException use) {
+                throw new UnsupportedOperationException(use);
+            }
+        } else {
+            throw new UnsupportedOperationException("Invalid ID in package lookup.");
+        }
+
+        previewRequestHandler = new PreviewRequestHandler(serviceURL, new JobURLCreator() {
             /**
              * Create a Job URL.
              *
@@ -92,13 +110,7 @@ public class SearchPreviewServlet extends ConfigurableServlet {
                 return new URL(dataServiceURL + "?" + request.getQueryString());
             }
         });
-        this.profiler = new Profiler(SearchPreviewServlet.class);
-    }
 
-    @Override
-    protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-        final String uri = req.getParameter("id");
-        profiler.checkpoint(String.format("%s doGet() start", uri));
         this.previewRequestHandler.get(req, resp);
         profiler.checkpoint(String.format("%s doGet() end", uri));
     }

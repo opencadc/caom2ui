@@ -30,18 +30,18 @@
                 }
               }
             },
-            "CAOM2": {
-              "FormConfiguration": CAOM2FormConfiguration,
-              "config": {
-                "id": "CAOM2",
-                "download_access_key": "caom2:Plane.publisherID.downloadable",
-                "default_sort_column": "caom2:Plane.time.bounds.lower",
-                "collection_select_id": "Observation.collection",
-                "footprint_column_id": "caom2:Plane.position.bounds",
-                "ra_column_id": "caom2:Plane.position.bounds.cval1",
-                "dec_column_id": "caom2:Plane.position.bounds.cval2",
-                "fov_column_id": "caom2:Plane.position.bounds.area",
-                "uri_column_id": "caom2:Plane.uri"
+            CAOM2: {
+              FormConfiguration: CAOM2FormConfiguration,
+              config: {
+                id: 'CAOM2',
+                download_access_key: 'caom2:Plane.publisherID.downloadable',
+                default_sort_column: 'caom2:Plane.time.bounds.lower',
+                collection_select_id: 'Observation.collection',
+                footprint_column_id: 'caom2:Plane.position.bounds',
+                ra_column_id: 'caom2:Plane.position.bounds.cval1',
+                dec_column_id: 'caom2:Plane.position.bounds.cval2',
+                fov_column_id: 'caom2:Plane.position.bounds.area',
+                uri_column_id: 'caom2:Plane.uri'
               }
             },
             ObsCore: {
@@ -63,17 +63,16 @@
                   'obscore:Char.SpatialAxis.Coverage.Bounds.Extent.diameter'
               }
             },
-
-            "types": {
-              "CAOM2": {
-                "id": "CAOM2",
-                "download_access_key": "caom2:Plane.publisherID.downloadable",
-                "default_sort_column": "caom2:Plane.time.bounds.lower",
-                "collection_select_id": "Observation.collection",
-                "footprint_column_id": "caom2:Plane.position.bounds",
-                "ra_column_id": "caom2:Plane.position.bounds.cval1",
-                "dec_column_id": "caom2:Plane.position.bounds.cval2",
-                "fov_column_id": "caom2:Plane.position.bounds.area"
+            types: {
+              CAOM2: {
+                id: 'CAOM2',
+                download_access_key: 'caom2:Plane.publisherID.downloadable',
+                default_sort_column: 'caom2:Plane.time.bounds.lower',
+                collection_select_id: 'Observation.collection',
+                footprint_column_id: 'caom2:Plane.position.bounds',
+                ra_column_id: 'caom2:Plane.position.bounds.cval1',
+                dec_column_id: 'caom2:Plane.position.bounds.cval2',
+                fov_column_id: 'caom2:Plane.position.bounds.area'
               },
               ObsCore: {
                 id: 'ObsCore',
@@ -318,10 +317,10 @@
             xtype,
             order
           )
-        } else if (uType === 'caom2:Plane.uri') {
-          order = allColumnIDs.indexOf('caom2:Plane.uri.downloadable')
+        } else if (uType === 'caom2:Plane.publisherID') {
+          order = allColumnIDs.indexOf('caom2:Plane.publisherID.downloadable')
           this._addFieldsForUType(
-            'caom2:Plane.uri.downloadable',
+            'caom2:Plane.publisherID.downloadable',
             ucd,
             unit,
             datatype,
@@ -376,7 +375,7 @@
       var utypeFields = this.columnOptions[_uType]
       var tableMD = this.tableMetadata
 
-      if (tableMD.hasFieldWithID(_uType) === false && !utypeFields.extended) {
+      if (utypeFields != null && tableMD.hasFieldWithID(_uType) === false && !utypeFields.extended) {
         tableMD.insertField(
           _order,
           new cadc.vot.Field(
