@@ -48,6 +48,7 @@
                 asyncFormatter: function(cellNode, row, dataContext) {
                   var $cell = $(cellNode)
                   var planeURIValue = dataContext['caom2:Plane.uri']
+                  var planePublisherIdValue = dataContext['caom2:Plane.publisherID']
 
                   /**
                    * Create a link for a preview.
@@ -95,7 +96,8 @@
                     thumbnailUrls,
                     collection,
                     observationID,
-                    productID
+                    productID,
+                    publisherId
                   ) {
                     // Create the preview link
                     var $link = createLink(
@@ -117,10 +119,13 @@
                           ).text('collection: ' + collection)
                           var $obsId = $(
                             '<p style="text-align: center;"></p>'
-                          ).text('ObservationID: ' + observationID)
+                          ).text('observationID: ' + observationID)
                           var $pdctId = $(
-                            '<p style="text-align: center;"></p>'
+                              '<p style="text-align: center;"></p>'
                           ).text('productID: ' + productID)
+                          var $pubId = $(
+                              '<p style="text-align: center;"></p>'
+                          ).text('publisherID: ' + publisherId)
 
                           var $previews = $('<div></div>')
 
@@ -134,7 +139,7 @@
                             $previews.append($preview, '<br>')
                           }
 
-                          $content.append($col, $obsId, $pdctId, $previews)
+                          $content.append($col, $obsId, $pdctId, $pubId, $previews)
                         } else {
                           var lang = $('html').attr('lang')
                           $content.append(
@@ -172,7 +177,7 @@
                     }
                   }
 
-                  if (planeURIValue) {
+                  if (planePublisherIdValue) {
                     var previewURI = new cadc.web.util.URI(planeURIValue)
                     var pathItems = previewURI.getPathItems()
                     var collection, observationID, productID
@@ -208,7 +213,7 @@
                         ca.nrc.cadc.search.DATALINK_URL_SUFFIX,
                       dataType: 'xml',
                       data: {
-                        id: planeURIValue,
+                        id: planePublisherIdValue,
                         request: 'downloads-only',
                         runid: runID
                       },
@@ -330,7 +335,8 @@
                                 observationID,
                                 productID,
                                 256,
-                                runID
+                                runID,
+                                planePublisherIdValue
                               )
 
                               var addMainPreview = function(thumbnailURL) {
@@ -339,7 +345,8 @@
                                   observationID,
                                   productID,
                                   1024,
-                                  runID
+                                  runID,
+                                  planePublisherIdValue
                                 )
 
                                 preview.getPreview(function(previewURL) {
@@ -373,7 +380,8 @@
                                 thumbnailUrls,
                                 collection,
                                 observationID,
-                                productID
+                                productID,
+                                planePublisherIdValue
                               )
                             }
                           }
@@ -535,9 +543,9 @@
                 label: 'CAOM Plane URI',
                 tap_column_name: 'Plane.planeURI'
               },
-              'caom2:Plane.uri.downloadable': {
+              'caom2:Plane.publisherID.downloadable': {
                 label: 'DOWNLOADABLE',
-                tap_column_name: 'isDownloadable(Plane.planeURI)'
+                tap_column_name: 'isDownloadable(Plane.publisherID)'
               },
               'caom2:Plane.productID': {
                 label: 'Product ID',
@@ -938,6 +946,11 @@
                     }
                   ]
                 }
+              },
+              "caom2:Plane.publisherID": {
+                "fitMax": true,
+                "label": "Publisher ID",
+                "tap_column_name": "Plane.publisherID"
               },
               'obscore:Char.SpatialAxis.Coverage.Bounds.Extent.diameter': {
                 fitMax: true,

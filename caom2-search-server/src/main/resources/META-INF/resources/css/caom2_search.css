@@ -146,7 +146,7 @@ div.align-middle.column-picker-icon
 }
 
 .one-click-download-link {
-  padding-left: 4px;
+  margin-left: 5px;
   vertical-align: middle;
 }
 
@@ -611,5 +611,6 @@ canvas.aladin-imageCanvas {
   font-weight: normal;
   font-size: 9pt;
 }
+
 
 
