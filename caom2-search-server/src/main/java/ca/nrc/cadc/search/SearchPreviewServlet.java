@@ -86,7 +86,7 @@ public class SearchPreviewServlet extends ConfigurableServlet {
         URL serviceURL = null;
         profiler.checkpoint(String.format("%s doGet() start", uriStr));
 
-        // PublisherID format expected: ivo://<resourceID>?<query string>
+        // PublisherID format expected: <resourceID>?<query string>
         if (uriStr.length() > 0) {
             try {
                 // split the ID parameter on '?' to pull off the query string.
