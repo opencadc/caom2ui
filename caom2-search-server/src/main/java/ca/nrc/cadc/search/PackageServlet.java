@@ -72,6 +72,7 @@ import ca.nrc.cadc.auth.AuthMethod;
 import ca.nrc.cadc.reg.Standards;
 import ca.nrc.cadc.reg.client.RegistryClient;
 import ca.nrc.cadc.web.ConfigurableServlet;
+import java.util.List;
 import org.apache.http.client.utils.URIBuilder;
 
 import javax.servlet.http.HttpServletRequest;
@@ -119,16 +120,34 @@ public class PackageServlet extends ConfigurableServlet {
      */
     void get(final HttpServletRequest request, final HttpServletResponse response, final RegistryClient registryClient)
         throws IOException, URISyntaxException {
-        final URL serviceURL = registryClient.getServiceURL(getServiceID(CAOM2PKG_SERVICE_URI_PROPERTY_KEY,
-                                                                         DEFAULT_CAOM2PKG_SERVICE_URI),
-                                                            Standards.PKG_10, AuthMethod.COOKIE);
 
-        final URIBuilder builder = new URIBuilder(serviceURL.toURI());
-
-        for (final String IDValue : request.getParameterValues("ID")) {
-            builder.addParameter("ID", IDValue);
+        // TODO: prior to version 2.5.0, this servlet supported multiple IDs.
+        // Consider how this might be supported in future.
+        String[] idValues = request.getParameterValues("ID");
+        if (idValues.length > 1) {
+            throw new UnsupportedOperationException("Multiple IDs in package lookup.");
         }
 
-        response.sendRedirect(builder.build().toURL().toExternalForm());
+        String IDValue = idValues[0];
+        if (IDValue.length() > 0 ) {
+            // split the ID parameter on '?' to pull off the query string.
+            // use the first part (resourceid) in the getServiceURL
+            String[] uri_parts = IDValue.split("\\?");
+            if (uri_parts.length < 2) {
+                throw new UnsupportedOperationException("Invalid Publisher ID in package lookup.");
+            }
+
+            final URL serviceURL = registryClient.getServiceURL(
+                new URI(uri_parts[0]),
+                Standards.PKG_10,
+                AuthMethod.COOKIE);
+            final URIBuilder builder = new URIBuilder(serviceURL.toURI());
+            builder.addParameter("ID", IDValue);
+
+            response.sendRedirect(builder.build().toURL().toExternalForm());
+        } else {
+            throw new UnsupportedOperationException("Invalid ID in package lookup.");
+        }
+
     }
 }

@@ -101,16 +101,18 @@ public class PackageServletTest extends AbstractUnitTest<PackageServlet>
         
         setTestSubject(new PackageServlet());
 
-        final String[] requestParameterValues = new String[]{"caom://my/obs"};
+        // Publisher IDs accepted.
+        String validPublisherId = "ivo://cadc.nrc.ca/CGPS?FOO/foo_um";
+        final String[] requestParameterValues = new String[]{validPublisherId};
         expect(mockRequest.getParameterValues("ID")).andReturn(
                 requestParameterValues).once();
 
-        final String encodedIDParameter = URLEncoder.encode("caom://my/obs", "UTF-8");
+        final String encodedIDParameter = URLEncoder.encode(validPublisherId, "UTF-8");
         mockResponse.sendRedirect("http://mysite.com/pkg?ID=" + encodedIDParameter);
         expectLastCall().once();
 
         expect(mockRegistryClient.getServiceURL(
-            URI.create("ivo://cadc.nrc.ca/caom2ops"),
+            URI.create("ivo://cadc.nrc.ca/CGPS"),
             Standards.PKG_10,
             AuthMethod.COOKIE)).andReturn(
             new URL("http://mysite.com/pkg"))
