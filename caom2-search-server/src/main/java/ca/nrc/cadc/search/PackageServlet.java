@@ -121,7 +121,7 @@ public class PackageServlet extends ConfigurableServlet {
     void get(final HttpServletRequest request, final HttpServletResponse response, final RegistryClient registryClient)
         throws IOException, URISyntaxException {
 
-        // TODO: prior to version 2.5, this servlet supported multiple IDs.
+        // TODO: prior to version 2.5.0, this servlet supported multiple IDs.
         // Consider how this might be supported in future.
         String[] idValues = request.getParameterValues("ID");
         if (idValues.length > 1) {
