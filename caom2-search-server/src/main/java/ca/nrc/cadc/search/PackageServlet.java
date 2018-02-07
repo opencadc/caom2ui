@@ -69,6 +69,7 @@
 package ca.nrc.cadc.search;
 
 import ca.nrc.cadc.auth.AuthMethod;
+import ca.nrc.cadc.caom2.PublisherID;
 import ca.nrc.cadc.reg.Standards;
 import ca.nrc.cadc.reg.client.RegistryClient;
 import ca.nrc.cadc.web.ConfigurableServlet;
@@ -87,24 +88,17 @@ import java.net.URL;
  * download of a single CAOM-2 URI.
  */
 public class PackageServlet extends ConfigurableServlet {
-    private static final String CAOM2PKG_SERVICE_URI_PROPERTY_KEY = "org.opencadc.search.caom2pkg-service-id";
-    private static final URI DEFAULT_CAOM2PKG_SERVICE_URI = URI.create("ivo://cadc.nrc.ca/caom2ops");
-
     /**
      * Only supported method.  This will accept an ID parameter in the request
      * to query on.
      *
      * @param request  The HTTP Request.
      * @param response The HTTP Response.
-     * @throws IOException      Any other errors.
+     * @throws IOException Any other errors.
      */
     @Override
     protected void doGet(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
-        try {
-            get(request, response, new RegistryClient());
-        } catch (URISyntaxException e) {
-            throw new IOException(e);
-        }
+        get(request, response, new RegistryClient());
     }
 
 
@@ -115,20 +109,34 @@ public class PackageServlet extends ConfigurableServlet {
      * @param response       The HTTP Response.
      * @param registryClient The RegistryClient to do lookups.
      * @throws IOException        Any request access problems.
-     * @throws URISyntaxException For uri issues.
      */
     void get(final HttpServletRequest request, final HttpServletResponse response, final RegistryClient registryClient)
-        throws IOException, URISyntaxException {
-        final URL serviceURL = registryClient.getServiceURL(getServiceID(CAOM2PKG_SERVICE_URI_PROPERTY_KEY,
-                                                                         DEFAULT_CAOM2PKG_SERVICE_URI),
-                                                            Standards.PKG_10, AuthMethod.COOKIE);
+        throws IOException {
 
-        final URIBuilder builder = new URIBuilder(serviceURL.toURI());
+        // TODO: prior to version 2.5.0, this servlet supported multiple IDs.
+        // TODO: Consider how this might be supported in future.
+        final String[] idValues = request.getParameterValues("ID");
+        if (idValues.length > 1) {
+            throw new UnsupportedOperationException("Multiple IDs in package lookup.");
+        } else {
+            final String IDValue = idValues[0];
+            if (IDValue.length() > 0) {
+                try {
+                    final PublisherID publisherID = new PublisherID(URI.create(IDValue));
 
-        for (final String IDValue : request.getParameterValues("ID")) {
-            builder.addParameter("ID", IDValue);
+                    final URL serviceURL = registryClient.getServiceURL(
+                        publisherID.getResourceID(), Standards.PKG_10, AuthMethod.COOKIE);
+
+                    final URIBuilder builder = new URIBuilder(serviceURL.toURI());
+                    builder.addParameter("ID", IDValue);
+
+                    response.sendRedirect(builder.build().toURL().toExternalForm());
+                } catch (URISyntaxException e) {
+                    throw new IOException(String.format("Service URL from %s is invalid.", IDValue), e);
+                }
+            } else {
+                throw new UnsupportedOperationException("Invalid ID in package lookup.");
+            }
         }
-
-        response.sendRedirect(builder.build().toURL().toExternalForm());
     }
 }
