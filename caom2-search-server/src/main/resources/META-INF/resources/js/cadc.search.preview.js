@@ -31,6 +31,7 @@
    * @param {String} [_endpoint]  The endpoint for previews service.  This is not configurable yet!
    * @constructor
    */
+
   function Preview(
     _collection,
     _observationID,

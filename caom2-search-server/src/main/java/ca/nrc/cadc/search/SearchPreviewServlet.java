@@ -35,7 +35,7 @@
 package ca.nrc.cadc.search;
 
 import ca.nrc.cadc.auth.AuthMethod;
-import ca.nrc.cadc.auth.AuthenticationUtil;
+import ca.nrc.cadc.caom2.PublisherID;
 import ca.nrc.cadc.profiler.Profiler;
 import ca.nrc.cadc.reg.Standards;
 import ca.nrc.cadc.reg.client.RegistryClient;
@@ -44,18 +44,19 @@ import ca.nrc.cadc.web.ConfigurableServlet;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.log4j.Logger;
+
 
 public class SearchPreviewServlet extends ConfigurableServlet {
-    private static final String CAOM2LINK_SERVICE_URI_PROPERTY_KEY = "org.opencadc.search.caom2link-service-id";
-    private static final URI DEFAULT_CAOM2LINK_SERVICE_URI = URI.create("ivo://cadc.nrc.ca/caom2ops");
+    private static Logger log = Logger.getLogger(SearchPreviewServlet.class);
 
-    private final PreviewRequestHandler previewRequestHandler;
-
+    private PreviewRequestHandler previewRequestHandler;
 
     /**
      * Complete constructor.
@@ -70,36 +71,53 @@ public class SearchPreviewServlet extends ConfigurableServlet {
      * Constructor to use the Registry Client to obtain the Data Web Service
      * location.
      */
-    public SearchPreviewServlet() {
-        final RegistryClient registryClient = new RegistryClient();
-        final URL dataServiceURL = registryClient.getServiceURL(
-            getServiceID(
-                CAOM2LINK_SERVICE_URI_PROPERTY_KEY,
-                DEFAULT_CAOM2LINK_SERVICE_URI),
-            Standards.DATALINK_LINKS_10, AuthMethod.COOKIE);
-        this.previewRequestHandler = new PreviewRequestHandler(dataServiceURL, new JobURLCreator() {
-            /**
-             * Create a Job URL.
-             *
-             * @param dataServiceURL The URL for the Data service.
-             * @param request        The HTTP Servlet Request.
-             * @return URL instance.  Never null.
-             * @throws IOException For any IO errors.
-             */
-            @Override
-            public URL create(final URL dataServiceURL, final HttpServletRequest request) throws IOException {
-                return new URL(dataServiceURL + "?id=" + request.getParameter("id"));
-            }
-        });
-    }
+    public SearchPreviewServlet() { }
 
     @Override
     protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-        final Set<String> userIDs = AuthenticationUtil.getUseridsFromSubject();
-        final String userIDCheckpoint = userIDs.isEmpty() ? "Anonymous" : userIDs.toString();
-        final String checkpointID = userIDCheckpoint + "/" + req.getParameter("id");
+        final RegistryClient registryClient = new RegistryClient();
+        final String uriStr = req.getParameter("id");
         final Profiler profiler = new Profiler(SearchPreviewServlet.class);
-        this.previewRequestHandler.get(req, resp);
-        profiler.checkpoint(String.format("%s doGet()", checkpointID));
+        profiler.checkpoint(String.format("%s doGet() start", uriStr));
+
+        // PublisherID format expected: <resourceID>?<query string>
+        if (uriStr.length() > 0) {
+            final PublisherID publisherID = new PublisherID(URI.create(uriStr));
+
+            final URL serviceURL = registryClient.getServiceURL(
+                publisherID.getResourceID(), Standards.DATALINK_LINKS_10, AuthMethod.COOKIE);
+            log.info("serviceURL to use: " + serviceURL);
+
+            previewRequestHandler = new PreviewRequestHandler(serviceURL, new JobURLCreator() {
+                /**
+                 * Create a Job URL.
+                 *
+                 * @param dataServiceURL The URL for the Data service.
+                 * @param request        The HTTP Servlet Request.
+                 * @return URL instance.  Never null.
+                 * @throws IOException For any IO errors.
+                 */
+                @Override
+                public URL create(final URL dataServiceURL, final HttpServletRequest request) throws IOException {
+                    final String IDValue = request.getParameter("id");
+                    try {
+                        final URIBuilder builder = new URIBuilder(dataServiceURL.toURI());
+                        builder.addParameter("ID", IDValue);
+
+                        final URL handlerUrl = builder.build().toURL();
+                        log.info("handlerUrl: " + handlerUrl);
+                        return handlerUrl;
+                    } catch (URISyntaxException e) {
+                        throw new IOException(String.format("Service URL from %s is invalid.", IDValue), e);
+                    }
+                }
+            });
+
+            this.previewRequestHandler.get(req, resp);
+            profiler.checkpoint(String.format("%s doGet() end", uriStr));
+        } else {
+            throw new UnsupportedOperationException("Invalid Publisher ID in package lookup.");
+        }
     }
+
 }
