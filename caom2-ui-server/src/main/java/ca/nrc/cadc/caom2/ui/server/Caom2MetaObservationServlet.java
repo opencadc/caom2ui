@@ -88,7 +88,7 @@ import java.io.IOException;
  */
 public class Caom2MetaObservationServlet extends HttpServlet
 {
-    private final long serialVersionUID = -917406909288899339L;
+    private static final long serialVersionUID = -917406909288899339L;
     private static Logger log = Logger.getLogger(Caom2MetaObservationServlet.class);
 
     private static final String ERROR_MESSAGE_NOT_FOUND_FORBIDDEN =
