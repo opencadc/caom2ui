@@ -47,7 +47,6 @@
                 },
                 asyncFormatter: function(cellNode, row, dataContext) {
                   var $cell = $(cellNode)
-                  var planeURIValue = dataContext['caom2:Plane.uri']
                   var planePublisherIdValue = dataContext['caom2:Plane.publisherID']
 
                   /**
@@ -178,7 +177,7 @@
                   }
 
                   if (planePublisherIdValue) {
-                    var previewURI = new cadc.web.util.URI(planeURIValue)
+                    var previewURI = new cadc.web.util.URI(planePublisherIdValue)
                     var pathItems = previewURI.getPathItems()
                     var collection, observationID, productID
 
@@ -538,10 +537,6 @@
                 label: 'planeID',
                 tap_column_name: 'Plane.planeID',
                 extended: true
-              },
-              'caom2:Plane.uri': {
-                label: 'CAOM Plane URI',
-                tap_column_name: 'Plane.planeURI'
               },
               'caom2:Plane.publisherID.downloadable': {
                 label: 'DOWNLOADABLE',

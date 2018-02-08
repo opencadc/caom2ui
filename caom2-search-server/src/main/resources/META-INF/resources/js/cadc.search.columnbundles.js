@@ -62,8 +62,7 @@
                   "caom2:Plane.provenance.lastExecuted",
                   "caom2:Plane.provenance.inputs",
                   "caom2:Plane.id",
-                  "caom2:Plane.publisherID.downloadable",
-                  "caom2:Plane.uri",
+                  "caom2:Plane.publisherID.downloadable",                  
                   "caom2:Plane.publisherID"
 	              ],
                 "unitTypes": {
@@ -126,7 +125,6 @@
                   "caom2:Observation.requirements.flag",
                   "caom2:Plane.id",
                   "caom2:Plane.publisherID.downloadable",
-                  "caom2:Plane.uri",
                   "caom2:Plane.publisherID"
 	              ],
                 "unitTypes": {
@@ -188,8 +186,7 @@
                   "caom2:Plane.energy.restwav",
                   "caom2:Observation.requirements.flag",
                   "caom2:Plane.id",
-                  "caom2:Plane.publisherID.downloadable",
-                  "caom2:Plane.uri",
+                  "caom2:Plane.publisherID.downloadable",                  
                   "caom2:Plane.publisherID"
 	              ],
                 "unitTypes": {
@@ -241,7 +238,6 @@
                   "caom2:Plane.energy.restwav",
                   "caom2:Plane.id",
                   "caom2:Plane.publisherID.downloadable",
-                  "caom2:Plane.uri",
                   "caom2:Plane.publisherID"
                 ],
                 "unitTypes": {
@@ -304,7 +300,7 @@
                   "caom2:Observation.requirements.flag",
                   "caom2:Plane.id",
                   "caom2:Plane.publisherID.downloadable",
-                  "caom2:Plane.uri",
+                  
                   "caom2:Plane.publisherID"
                 ],
                 "size": 13
@@ -364,7 +360,6 @@
                   "caom2:Observation.requirements.flag",
                   "caom2:Plane.id",
                   "caom2:Plane.publisherID.downloadable",
-                  "caom2:Plane.uri",
                   "caom2:Plane.publisherID"
                 ],
                 "size": 10
@@ -425,7 +420,6 @@
                   "caom2:Observation.requirements.flag",
                   "caom2:Plane.id",
                   "caom2:Plane.publisherID.downloadable",
-                  "caom2:Plane.uri",
                   "caom2:Plane.publisherID"
 	              ],
                 "unitTypes": {

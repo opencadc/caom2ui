@@ -40,8 +40,7 @@
                 footprint_column_id: 'caom2:Plane.position.bounds',
                 ra_column_id: 'caom2:Plane.position.bounds.cval1',
                 dec_column_id: 'caom2:Plane.position.bounds.cval2',
-                fov_column_id: 'caom2:Plane.position.bounds.area',
-                uri_column_id: 'caom2:Plane.uri'
+                fov_column_id: 'caom2:Plane.position.bounds.area'
               }
             },
             ObsCore: {
@@ -582,7 +581,7 @@
      * Obtain the concrete (base) config.
      *
      * @return {true.ca.nrc.cadc.search.CAOM2.config|{id, download_access_key, default_sort_column,
-     *     collection_select_id, footprint_column_id, ra_column_id, dec_column_id, fov_column_id, uri_column_id}|*}
+     *     collection_select_id, footprint_column_id, ra_column_id, dec_column_id, fov_column_id}|*}
      */
     this.getConfig = function() {
       return this.config

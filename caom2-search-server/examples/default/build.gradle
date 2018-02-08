@@ -46,7 +46,7 @@ ext {
 
 sourceCompatibility = 1.7
 group = 'org.opencadc'
-version = '2020'
+version = '2021'
 apply from: '../../../_shared.gradle'
 
 war {
