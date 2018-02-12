@@ -14,6 +14,7 @@
             DETAILS_CSS: 'details_tooltip_link',
             DATALINK_URL_SUFFIX: '/datalink',
             columns: {
+              PUBLISHER_ID_UTYPE: 'caom2:Plane.publisherID'
               OBSERVATION_URI_UTYPE: 'caom2:Observation.uri',
               OBSERVATION_ID_UTYPE: 'caom2:Observation.observationID',
               ColumnManager: ColumnManager
@@ -31,7 +32,7 @@
                 formatter: function(row, cell, value, columnDef, dataContext) {
                   var obsURI =
                     dataContext[
-                      ca.nrc.cadc.search.columns.OBSERVATION_URI_UTYPE
+                      ca.nrc.cadc.search.columns.PUBLISHER_ID_UTYPE
                     ]
                   return formatDetailsCell(value, obsURI, columnDef, row)
                 }
@@ -47,7 +48,7 @@
                 },
                 asyncFormatter: function(cellNode, row, dataContext) {
                   var $cell = $(cellNode)
-                  var planePublisherIdValue = dataContext['caom2:Plane.publisherID']
+                  var planePublisherIdValue = dataContext[ca.nrc.cadc.search.columns.PUBLISHER_ID_UTYPE]
 
                   /**
                    * Create a link for a preview.
