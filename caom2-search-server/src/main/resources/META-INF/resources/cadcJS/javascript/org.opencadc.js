@@ -88,7 +88,7 @@
      * @returns {boolean}
      */
     function hasLength(_str) {
-      return _str != null && _str.length > 0
+      return _str != null && String(_str).length > 0
     }
 
     /**
@@ -97,8 +97,7 @@
      * @returns {boolean}
      */
     function hasText(_str) {
-      var wrapper = String(_str)
-      return hasLength(wrapper) && $.trim(wrapper) !== ''
+      return this.hasLength(_str) && String(_str).trim() !== ''
     }
 
     /**
