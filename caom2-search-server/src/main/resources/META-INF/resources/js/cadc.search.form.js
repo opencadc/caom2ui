@@ -374,7 +374,11 @@
       var utypeFields = this.columnOptions[_uType]
       var tableMD = this.tableMetadata
 
-      if (utypeFields != null && tableMD.hasFieldWithID(_uType) === false && !utypeFields.extended) {
+      if (
+        utypeFields != null &&
+        tableMD.hasFieldWithID(_uType) === false &&
+        !utypeFields.extended
+      ) {
         tableMD.insertField(
           _order,
           new cadc.vot.Field(
@@ -691,7 +695,7 @@
         .prop('id')
 
       $currForm.find('.search_criteria_input').on(
-        'change keyup',
+        'change input',
         function(event) {
           this._searchCriteriaChanged($(event.target))
         }.bind(this)
@@ -940,7 +944,11 @@
           resolverPopover.options.title = ''
           resolverPopover.options.content = ''
           resolverPopover.hide()
-          resolverPopover.$tip.find('.popover-title').hide()
+
+          // If the tip has not been initialized yet, the $tip field will not be present.
+          if (resolverPopover.$tip) {
+            resolverPopover.$tip.find('.popover-title').hide()
+          }
 
           $targetNameResolutionStatus.addClass('target_not_found')
           this._decorate($targetNameResolutionStatus, { status: 'NOT_FOUND' })
@@ -1179,7 +1187,7 @@
 
         this.toggleDisabled($("input[id='" + id + "_targetList']"), hasValue)
 
-        if (hasValue && resolver !== 'NONE') {
+        if (hasValue === true && resolver !== 'NONE') {
           this.clearTimeout()
 
           // Give the user a little more time to type stuff in.
@@ -1240,7 +1248,7 @@
                   }.bind(this)
                 )
             }.bind(this),
-            700
+            1000
           )
         } else {
           this._clearTargetNameResolutionStatus()
