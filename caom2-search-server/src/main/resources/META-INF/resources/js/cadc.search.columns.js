@@ -14,6 +14,7 @@
             DETAILS_CSS: 'details_tooltip_link',
             DATALINK_URL_SUFFIX: '/datalink',
             columns: {
+              PUBLISHER_ID_UTYPE: 'caom2:Plane.publisherID',
               OBSERVATION_URI_UTYPE: 'caom2:Observation.uri',
               OBSERVATION_ID_UTYPE: 'caom2:Observation.observationID',
               ColumnManager: ColumnManager
@@ -29,11 +30,12 @@
                 label: 'Obs. ID',
                 fitMax: true,
                 formatter: function(row, cell, value, columnDef, dataContext) {
-                  var obsURI =
+                  var publisherID =
                     dataContext[
-                      ca.nrc.cadc.search.columns.OBSERVATION_URI_UTYPE
+                      ca.nrc.cadc.search.columns.PUBLISHER_ID_UTYPE
                     ]
-                  return formatDetailsCell(value, obsURI, columnDef, row)
+                  var observationURI = dataContext[ca.nrc.cadc.search.columns.OBSERVATION_URI_UTYPE]
+                  return formatDetailsCell(value, observationURI, publisherID, columnDef, row)
                 }
               },
               'caom2:Observation.uri': {
@@ -47,7 +49,7 @@
                 },
                 asyncFormatter: function(cellNode, row, dataContext) {
                   var $cell = $(cellNode)
-                  var planePublisherIdValue = dataContext['caom2:Plane.publisherID']
+                  var planePublisherIdValue = dataContext[ca.nrc.cadc.search.columns.PUBLISHER_ID_UTYPE]
 
                   /**
                    * Create a link for a preview.
@@ -546,12 +548,12 @@
                 label: 'Product ID',
                 fitMax: true,
                 formatter: function(row, cell, value, columnDef, dataContext) {
-                  var obsURI =
+                  var publisherID =
                     dataContext[
-                      ca.nrc.cadc.search.columns.OBSERVATION_URI_UTYPE
+                      ca.nrc.cadc.search.columns.PUBLISHER_ID_UTYPE
                     ]
-
-                  return formatDetailsCell(value, obsURI, columnDef, row)
+                   var observationURI = dataContext[ca.nrc.cadc.search.columns.OBSERVATION_URI_UTYPE]
+                  return formatDetailsCell(value, observationURI, publisherID, columnDef, row)
                 }
               },
               'caom2:Plane.metaRelease': {
@@ -1307,16 +1309,18 @@
   /**
    * Format the details link for details about the current Observation.
    * @param {String} value           The link text.
-   * @param {String} observationURI  The URI of the observation to build.
+   * @param {String} observationURI  The URI of the Observation to build.
+   * @param {String} publisherID  The URI of the publisher ID to build.
    * @param {{}} column          The column object.
    * @param {Number} rowNum          The row number.
    * @returns {string}
    */
-  function formatDetailsCell(value, observationURI, column, rowNum) {
+  function formatDetailsCell(value, observationURI, publisherID, column, rowNum) {
     var $link = $('<a></a>')
-    var obsURI = new cadc.web.util.URI(observationURI)
+    var observationURIObj = new cadc.web.util.URI(observationURI)
+    var publisherIDURI = new cadc.web.util.URI(publisherID)
     var detailsURI = new cadc.web.util.URI(
-      ca.nrc.cadc.search.DETAILS_BASE_URL + obsURI.getPath()
+      ca.nrc.cadc.search.DETAILS_BASE_URL + observationURIObj.getPath() + '?ID=' + publisherIDURI.uri
     )
 
     $link.text(value)
@@ -1326,8 +1330,8 @@
       .addClass('no-propagate-event')
     $link.prop('target', '_observation_details')
     $link.prop('href', detailsURI.toString())
-    $link.data('observation-uri', observationURI)
-    $link.attr('data-observation-uri', observationURI)
+    $link.data('publisher-id-uri', publisherIDURI)
+    $link.attr('data-publisher-id-uri', publisherIDURI)
 
     var $cellSpan = $('<span />')
     $cellSpan.addClass('cellValue')

@@ -1,9 +1,10 @@
+
 /*
  ************************************************************************
  *******************  CANADIAN ASTRONOMY DATA CENTRE  *******************
  **************  CENTRE CANADIEN DE DONNÉES ASTRONOMIQUES  **************
  *
- *  (c) 2017.                            (c) 2017.
+ *  (c) 2018.                            (c) 2018.
  *  Government of Canada                 Gouvernement du Canada
  *  National Research Council            Conseil national de recherches
  *  Ottawa, Canada, K1A 0R6              Ottawa, Canada, K1A 0R6
@@ -66,76 +67,46 @@
  ************************************************************************
  */
 
-package ca.nrc.cadc.caom2.ui.server.client;
+package ca.nrc.cadc.caom2.util;
 
 
-import ca.nrc.cadc.caom2.ObservationURI;
+import javax.servlet.http.HttpServletRequest;
+
 import ca.nrc.cadc.caom2.PublisherID;
-import ca.nrc.cadc.net.HttpDownload;
-import ca.nrc.cadc.net.NetUtil;
-
-import javax.security.auth.Subject;
-import java.net.URI;
-import java.net.URL;
+import ca.nrc.cadc.caom2.ui.server.client.ObservationUtil;
 
 import org.junit.Test;
 
-import static org.easymock.EasyMock.*;
+import java.net.URI;
+
 import static org.junit.Assert.*;
+import static org.easymock.EasyMock.*;
 
-
-public class Caom2MetaClientTest {
+public class ObservationUtilTest {
     @Test
-    public void getObservation() {
-        final HttpDownload mockDownload = createMock(HttpDownload.class);
+    public void getPublisherIDNull() {
+        final HttpServletRequest mockRequest = createMock(HttpServletRequest.class);
 
-        final Caom2MetaClient testSubject = new Caom2MetaClient() {
-            /**
-             * Place for testers to override.
-             *
-             * @return URL instance.
-             * @param resourceID
-             */
-            @Override
-            public URL getServiceURL(URI resourceID, URI standardID) {
-                try {
-                    return new URL("http://mysite.com");
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
+        expect(mockRequest.getQueryString()).andReturn(null).once();
 
-            /**
-             * Obtain a new instance of a downloader.  Tests can override as needed.
-             *
-             * @param url        The URL to download from.
-             * @param readAction The read action to write to.
-             * @return HttpDownload instance.
-             */
-            @Override
-            public HttpDownload getDownloader(URL url, ReadAction readAction) {
-                return mockDownload;
-            }
-        };
+        replay(mockRequest);
 
-        final Subject subject = new Subject();
-        final PublisherID publisherID = new PublisherID(URI.create("ivo://cadc.nrc.ca/mirror/IRIS?f085h000/IRAS-12um"));
-        final ObservationURI observationURI = new ObservationURI(URI.create("caom:IRIS/f085h000"));
+        assertNull("Should be null.", ObservationUtil.getPublisherID(mockRequest));
 
-        mockDownload.run();
-        expectLastCall().once();
+        verify(mockRequest);
+    }
 
-        expect(mockDownload.getThrowable()).andReturn(null).once();
+    @Test
+    public void getPublisherID() {
+        final HttpServletRequest mockRequest = createMock(HttpServletRequest.class);
+        final PublisherID expected = new PublisherID(URI.create("ivo://cadc.nrc.ca/mirror/IRIS?f085h000/IRAS-12um"));
 
-        replay(mockDownload);
+        expect(mockRequest.getQueryString()).andReturn("ID=ivo://cadc.nrc.ca/mirror/IRIS?f085h000/IRAS-12um").once();
 
-        // Doesn't return anything.
-        testSubject.getObservation(subject, publisherID, observationURI);
+        replay(mockRequest);
 
-        final String expected = "?ID=" + NetUtil.encode("caom:IRIS/f085h000");
+        assertEquals("Should be the same.", expected, ObservationUtil.getPublisherID(mockRequest));
 
-        assertEquals("ID was not re-encoded.", expected, testSubject.path);
-
-        verify(mockDownload);
+        verify(mockRequest);
     }
 }

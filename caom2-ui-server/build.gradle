@@ -14,7 +14,7 @@ dependencies {
     compile 'log4j:log4j:1.2.+'
     compile 'com.opencsv:opencsv:3.+'
     compile 'org.jdom:jdom2:2.+'
-    compile 'org.json:json:20170516'
+    compile 'org.json:json:20180130'
 
     compile 'org.opencadc:cadc-access-control:1.+'
     compile 'org.opencadc:cadc-uws:1.+'
@@ -31,11 +31,10 @@ dependencies {
 
     testCompile 'junit:junit:4.+'
     testCompile 'org.easymock:easymock:3.+'
-
 }
 
 
 sourceCompatibility = '1.7'
 
 group = 'org.opencadc'
-version = '1.1.4'
+version = '1.1.5'

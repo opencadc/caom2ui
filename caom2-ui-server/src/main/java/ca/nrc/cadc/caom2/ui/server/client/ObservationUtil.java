@@ -69,8 +69,10 @@
 package ca.nrc.cadc.caom2.ui.server.client;
 
 import ca.nrc.cadc.caom2.ObservationURI;
+import ca.nrc.cadc.caom2.PublisherID;
 
 import javax.servlet.http.HttpServletRequest;
+import java.net.URI;
 
 
 public final class ObservationUtil {
@@ -86,6 +88,21 @@ public final class ObservationUtil {
             }
         }
 
+        return null;
+    }
+
+    public static PublisherID getPublisherID(final HttpServletRequest request) {
+        final String queryString = request.getQueryString();
+        if (queryString != null) {
+            final String[] kvPairs = queryString.split("&");
+
+            for (final String kvPair : kvPairs) {
+                final String[] pair = kvPair.split("=");
+                if ((pair.length == 2) && pair[0].equalsIgnoreCase("ID")) {
+                    return new PublisherID(URI.create(pair[1]));
+                }
+            }
+        }
         return null;
     }
 }
