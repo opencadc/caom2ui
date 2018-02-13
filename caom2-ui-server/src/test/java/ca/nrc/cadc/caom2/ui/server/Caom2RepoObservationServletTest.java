@@ -31,6 +31,7 @@
  ****  C A N A D I A N   A S T R O N O M Y   D A T A   C E N T R E  *****
  ************************************************************************
  */
+
 package ca.nrc.cadc.caom2.ui.server;
 
 import ca.nrc.cadc.caom2.Algorithm;
@@ -61,52 +62,46 @@ import ca.nrc.cadc.net.HttpDownload;
 import org.junit.Test;
 
 
-public class Caom2RepoObservationServletTest
-{
+public class Caom2RepoObservationServletTest {
     private final HttpServletRequest mockRequest =
-            createMock(HttpServletRequest.class);
+        createMock(HttpServletRequest.class);
     private final RequestDispatcher mockErrorDispatcher =
-            createMock(RequestDispatcher.class);
+        createMock(RequestDispatcher.class);
     private final RequestDispatcher mockDisplayDispatcher =
-            createMock(RequestDispatcher.class);
+        createMock(RequestDispatcher.class);
     private final HttpServletResponse mockResponse =
-            createMock(HttpServletResponse.class);
+        createMock(HttpServletResponse.class);
     private final ApplicationConfiguration mockConfiguration =
-            createMock(ApplicationConfiguration.class);
+        createMock(ApplicationConfiguration.class);
 
 
     @Test
-    public void doGetCollectionsList() throws Exception
-    {
+    public void doGetCollectionsList() throws Exception {
 
         final URL repoURL = new URL("http://mysite.com/caom2repo");
         final Subject currentUser = new Subject();
-        final List<String> collectionList = new ArrayList<String>();
+        final List<String> collectionList = new ArrayList<>();
         collectionList.add("TEST");
         collectionList.add("SANDBOX");
 
         final Caom2RepoClient testClient =
-                new Caom2RepoClient()
-                {
-                    @Override
-                    public Subject getCurrentSubject()
-                    {
-                        return currentUser;
-                    }
+            new Caom2RepoClient() {
+                @Override
+                public Subject getCurrentSubject() {
+                    return currentUser;
+                }
 
 
-                    @Override
-                    public List<String> getCollections()
-                    {
-                        return collectionList;
-                    }
+                @Override
+                public List<String> getCollections() {
+                    return collectionList;
+                }
 
-                    @Override
-                    public URL getServiceURL()
-                    {
-                        return repoURL;
-                    }
-                };
+                @Override
+                public URL getServiceURL() {
+                    return repoURL;
+                }
+            };
 
         expect(mockRequest.getPathInfo()).andReturn("/").anyTimes();
 
@@ -114,7 +109,7 @@ public class Caom2RepoObservationServletTest
         expectLastCall().once();
 
         expect(mockRequest.getRequestDispatcher("/collectionslist.jsp")).andReturn(
-                mockDisplayDispatcher).once();
+            mockDisplayDispatcher).once();
         mockDisplayDispatcher.forward(mockRequest, mockResponse);
         expectLastCall().once();
 
@@ -123,7 +118,7 @@ public class Caom2RepoObservationServletTest
                mockResponse);
 
         final Caom2RepoObservationServlet testSubject =
-                new Caom2RepoObservationServlet(testClient);
+            new Caom2RepoObservationServlet(testClient);
         testSubject.doGet(mockRequest, mockResponse);
 
         verify(mockRequest, mockDisplayDispatcher,
@@ -131,12 +126,11 @@ public class Caom2RepoObservationServletTest
     }
 
     @Test
-    public void doObservationList() throws Exception
-    {
+    public void doObservationList() throws Exception {
 
         final URL repoURL = new URL("http://mysite.com/caom2repo");
         final Subject currentUser = new Subject();
-        final List<ObsLink> observationList = new ArrayList<ObsLink>();
+        final List<ObsLink> observationList = new ArrayList<>();
 
         ObsLink obs1 = new ObsLink();
         obs1.lastModified = new Date();
@@ -145,27 +139,23 @@ public class Caom2RepoObservationServletTest
         observationList.add(obs1);
 
         final Caom2RepoClient testClient =
-                new Caom2RepoClient()
-                {
-                    @Override
-                    public Subject getCurrentSubject()
-                    {
-                        return currentUser;
-                    }
+            new Caom2RepoClient() {
+                @Override
+                public Subject getCurrentSubject() {
+                    return currentUser;
+                }
 
 
-                    @Override
-                    public List<ObsLink> getObservations(String collection)
-                    {
-                        return observationList;
-                    }
+                @Override
+                public List<ObsLink> getObservations(String collection) {
+                    return observationList;
+                }
 
-                    @Override
-                    public URL getServiceURL()
-                    {
-                        return repoURL;
-                    }
-                };
+                @Override
+                public URL getServiceURL() {
+                    return repoURL;
+                }
+            };
 
         expect(mockRequest.getPathInfo()).andReturn("/MYCOLLECTION/").anyTimes();
 
@@ -173,70 +163,66 @@ public class Caom2RepoObservationServletTest
         expectLastCall().once();
 
         expect(mockRequest.getRequestDispatcher("/obslist.jsp")).andReturn(
-                mockDisplayDispatcher).once();
+            mockDisplayDispatcher).once();
         mockDisplayDispatcher.forward(mockRequest, mockResponse);
         expectLastCall().once();
 
         replay(mockRequest, mockDisplayDispatcher,
-                mockResponse);
+               mockResponse);
 
         final Caom2RepoObservationServlet testSubject =
-                new Caom2RepoObservationServlet(testClient);
+            new Caom2RepoObservationServlet(testClient);
         testSubject.doGet(mockRequest, mockResponse);
 
         verify(mockRequest, mockDisplayDispatcher,
-                mockResponse);
+               mockResponse);
     }
 
 
     @Test
-    public void doGetNullObservation() throws Exception
-    {
+    public void doGetNullObservation() throws Exception {
         final Subject currentUser = new Subject();
         final Caom2RepoClient testClient =
-                new Caom2RepoClient()
-                {
+            new Caom2RepoClient() {
 
-                    @Override
-                    public Subject getCurrentSubject()
-                    {
-                        return currentUser;
-                    }
+                @Override
+                public Subject getCurrentSubject() {
+                    return currentUser;
+                }
 
-                    /**
-                     * Download the Observation for the given URI.
-                     *
-                     * @param subject   The Subject to download as.
-                     * @param uri       The Observation URI.
-                     * @return Observation instance.
-                     */
-                    @Override
-                    public Observation getObservation(Subject subject,
-                                                      ObservationURI uri)
-                    {
-                        return null;
-                    }
-                };
+                /**
+                 * Download the Observation for the given URI.
+                 *
+                 * @param subject   The Subject to download as.
+                 * @param uri       The Observation URI.
+                 * @return Observation instance.
+                 */
+                @Override
+                public Observation getObservation(Subject subject,
+                                                  ObservationURI uri) {
+                    return null;
+                }
+            };
 
         expect(mockRequest.getPathInfo()).andReturn("/MYARCHIVE/MYOBSID").
-                anyTimes();
+            anyTimes();
 
         mockRequest.setAttribute("errorMsg",
-                "Observation with URI 'caom:MYARCHIVE/MYOBSID' "
-                        + "not found, or you are forbidden from seeing it.  "
-                        + "Please login and try again. | l'Observation "
-                        + "'caom:MYARCHIVE/MYOBSID' pas trouvé, ou vous "
-                        + "n'avez pas permission.  S'il vous plaît "
-                        + "connecter et essayez à nouveau.");
+                                 "Observation with URI 'caom:MYARCHIVE/MYOBSID' "
+                                     + "not found, or you are forbidden from seeing it.  "
+                                     + "Please login and try again. | l'Observation "
+                                     + "'caom:MYARCHIVE/MYOBSID' pas trouvé, ou vous "
+                                     + "n'avez pas permission.  S'il vous plaît "
+                                     + "connecter et essayez à nouveau.");
         expectLastCall().once();
 
         expect(mockRequest.getRequestDispatcher("/error.jsp")).andReturn(
-                mockErrorDispatcher).once();
+            mockErrorDispatcher).once();
         mockErrorDispatcher.forward(mockRequest, mockResponse);
         expectLastCall().once();
 
         replay(mockRequest, mockErrorDispatcher, mockDisplayDispatcher,
-                mockResponse);
+               mockResponse);
 
 
         final Caom2RepoObservationServlet testSubject = new Caom2RepoObservationServlet(testClient);
@@ -244,80 +230,71 @@ public class Caom2RepoObservationServletTest
         testSubject.doGet(mockRequest, mockResponse);
 
         verify(mockRequest, mockErrorDispatcher, mockDisplayDispatcher,
-                mockResponse);
+               mockResponse);
     }
 
 
-
     @Test
-    public void doGetObservation() throws Exception
-    {
+    public void doGetObservation() throws Exception {
 
         final Subject currentUser = new Subject();
         final Observation result = new Observation("MYARCHIVE", "MYOBSID",
-                new Algorithm("exposure"))
-        {
+                                                   new Algorithm("exposure")) {
             @Override
-            public String toString()
-            {
+            public String toString() {
                 return super.toString();
             }
         };
 
         final Caom2RepoClient.ReadAction mockObservationReader =
-                createMock(Caom2RepoClient.ReadAction.class);
+            createMock(Caom2RepoClient.ReadAction.class);
         final URL repoURL = new URL("http://mysite.com/caom2repo");
         final HttpDownload mockDownloader = createMock(HttpDownload.class);
 
         final Caom2RepoClient testClient =
-                new Caom2RepoClient()
-                {
+            new Caom2RepoClient() {
 
-                    /**
-                     * Testers or subclasses can override this as needed.
-                     *
-                     * @return Subject instance.
-                     */
-                    @Override
-                    public Subject getCurrentSubject()
-                    {
-                        return currentUser;
-                    }
+                /**
+                 * Testers or subclasses can override this as needed.
+                 *
+                 * @return Subject instance.
+                 */
+                @Override
+                public Subject getCurrentSubject() {
+                    return currentUser;
+                }
 
-                    /**
-                     * Obtain a new instance of a downloader.  Tests can override as needed.
-                     *
-                     * @param url        The URL to download from.
-                     * @param readAction The read action to write to.
-                     * @return HttpDownload instance.
-                     */
-                    @Override
-                    public HttpDownload getDownloader(URL url,
-                                                      Caom2MetaClient.ReadAction readAction)
-                    {
-                        return mockDownloader;
-                    }
+                /**
+                 * Obtain a new instance of a downloader.  Tests can override as needed.
+                 *
+                 * @param url        The URL to download from.
+                 * @param readAction The read action to write to.
+                 * @return HttpDownload instance.
+                 */
+                @Override
+                public HttpDownload getDownloader(URL url,
+                                                  Caom2MetaClient.ReadAction readAction) {
+                    return mockDownloader;
+                }
 
-                    /**
-                     * Place for testers to override.
-                     *
-                     * @return ReadAction instance.
-                     */
-                    @Override
-                    public Caom2MetaClient.ReadAction getObservationReader()
-                    {
-                        return mockObservationReader;
-                    }
+                /**
+                 * Place for testers to override.
+                 *
+                 * @return ReadAction instance.
+                 */
+                @Override
+                public Caom2MetaClient.ReadAction getObservationReader() {
+                    return mockObservationReader;
+                }
 
-                    @Override
-                    public URL getServiceURL()
-                    {
-                        return repoURL;
-                    }
-                };
+                @Override
+                public URL getServiceURL() {
+                    return repoURL;
+                }
+            };
 
         expect(mockRequest.getPathInfo()).andReturn("/MYARCHIVE/MYOBSID").
-                anyTimes();
+            anyTimes();
 
         expect(mockObservationReader.getObs()).andReturn(result).once();
 
@@ -336,21 +313,21 @@ public class Caom2RepoObservationServletTest
         expectLastCall().once();
 
         expect(mockRequest.getRequestDispatcher("/display.jsp")).andReturn(
-                mockErrorDispatcher).once();
+            mockErrorDispatcher).once();
         mockErrorDispatcher.forward(mockRequest, mockResponse);
         expectLastCall().once();
 
 
         replay(mockRequest, mockErrorDispatcher, mockDisplayDispatcher,
-                mockResponse, mockDownloader,
-                mockObservationReader, mockConfiguration);
+               mockResponse, mockDownloader,
+               mockObservationReader, mockConfiguration);
 
         final Caom2RepoObservationServlet testSubject = new Caom2RepoObservationServlet(testClient);
 
         testSubject.doGet(mockRequest, mockResponse);
 
         verify(mockRequest, mockErrorDispatcher, mockDisplayDispatcher,
-                mockResponse, mockDownloader,
-                mockObservationReader, mockConfiguration);
+               mockResponse, mockDownloader,
+               mockObservationReader, mockConfiguration);
     }
 }

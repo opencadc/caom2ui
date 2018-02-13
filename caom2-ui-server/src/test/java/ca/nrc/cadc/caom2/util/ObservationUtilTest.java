@@ -69,5 +69,44 @@
 
 package ca.nrc.cadc.caom2.util;
 
+
+import javax.servlet.http.HttpServletRequest;
+
+import ca.nrc.cadc.caom2.PublisherID;
+import ca.nrc.cadc.caom2.ui.server.client.ObservationUtil;
+
+import org.junit.Test;
+
+import java.net.URI;
+
+import static org.junit.Assert.*;
+import static org.easymock.EasyMock.*;
+
 public class ObservationUtilTest {
+    @Test
+    public void getPublisherIDNull() {
+        final HttpServletRequest mockRequest = createMock(HttpServletRequest.class);
+
+        expect(mockRequest.getQueryString()).andReturn(null).once();
+
+        replay(mockRequest);
+
+        assertNull("Should be null.", ObservationUtil.getPublisherID(mockRequest));
+
+        verify(mockRequest);
+    }
+
+    @Test
+    public void getPublisherID() {
+        final HttpServletRequest mockRequest = createMock(HttpServletRequest.class);
+        final PublisherID expected = new PublisherID(URI.create("ivo://cadc.nrc.ca/mirror/IRIS?f085h000/IRAS-12um"));
+
+        expect(mockRequest.getQueryString()).andReturn("ID=ivo://cadc.nrc.ca/mirror/IRIS?f085h000/IRAS-12um").once();
+
+        replay(mockRequest);
+
+        assertEquals("Should be the same.", expected, ObservationUtil.getPublisherID(mockRequest));
+
+        verify(mockRequest);
+    }
 }

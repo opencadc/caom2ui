@@ -72,10 +72,8 @@ package ca.nrc.cadc.caom2.ui.server.client;
 import ca.nrc.cadc.auth.AuthMethod;
 import ca.nrc.cadc.auth.AuthenticationUtil;
 import ca.nrc.cadc.caom2.Observation;
-import ca.nrc.cadc.caom2.ObservationURI;
 import ca.nrc.cadc.caom2.xml.ObservationParsingException;
 import ca.nrc.cadc.caom2.xml.ObservationReader;
-import ca.nrc.cadc.config.ApplicationConfiguration;
 import ca.nrc.cadc.net.HttpDownload;
 import ca.nrc.cadc.net.InputStreamWrapper;
 import ca.nrc.cadc.reg.client.RegistryClient;
@@ -96,13 +94,7 @@ import java.security.PrivilegedAction;
  */
 public abstract class BaseClient {
     private static final Logger LOGGER = Logger.getLogger(BaseClient.class);
-    URI resourceId;
-    URI standardsURI;
     String path;
-    String propertyKey;
-
-    private static final String PROPERTIES_FILE_PATH = System.getProperty("user.home")
-        + "/config/org.opencadc.caom2ui.properties";
 
     private static final String ERROR_MESSAGE_NOT_FOUND_FORBIDDEN =
         "Observation with URI '%s' not found, or you are "
@@ -127,26 +119,20 @@ public abstract class BaseClient {
     /**
      * Place for testers to override.
      *
+     * @param resourceID The resourceID to lookup.
      * @return URL instance.
      */
-    public URL getServiceURL() {
+    public URL getServiceURL(final URI resourceID, final URI standardsURI) {
         try {
             // Discover client service URL
-            Subject subject = getCurrentSubject();
-            RegistryClient rc = new RegistryClient();
-            ApplicationConfiguration ac = new ApplicationConfiguration(PROPERTIES_FILE_PATH);
-
-            AuthMethod authMethod = AuthenticationUtil.getAuthMethodFromCredentials(subject);
-            if (authMethod == null) {
-                authMethod = AuthMethod.ANON;
-            }
-
-            final URL repoURL = rc
-                .getServiceURL(ac.lookupServiceURI(propertyKey, resourceId), standardsURI, authMethod);
+            final Subject subject = getCurrentSubject();
+            final RegistryClient rc = new RegistryClient();
+            final AuthMethod authMethod = AuthenticationUtil.getAuthMethodFromCredentials(subject);
+            final URL repoURL = rc.getServiceURL(resourceID, standardsURI, authMethod);
 
             return new URL(repoURL.toExternalForm() + path);
         } catch (MalformedURLException urie) {
-            String errMsg = "Can't get service URL for resource " + resourceId.toString() + " " + standardsURI
+            String errMsg = "Can't get service URL for resource " + resourceID.toString() + " " + standardsURI
                 .toString();
             LOGGER.error(errMsg);
             throw new RuntimeException(errMsg, urie);
@@ -198,13 +184,13 @@ public abstract class BaseClient {
 
 
     protected class GetAction implements PrivilegedAction<Void> {
-        private final ObservationURI uri;
+        private final String errorMessageID;
         private final HttpDownload downloader;
 
 
-        GetAction(final HttpDownload downloader, final ObservationURI uri) {
+        GetAction(final HttpDownload downloader, final String errorMessageID) {
             this.downloader = downloader;
-            this.uri = uri;
+            this.errorMessageID = errorMessageID;
         }
 
         public Void run() {
@@ -218,15 +204,16 @@ public abstract class BaseClient {
                 if (e instanceof FileNotFoundException) {
                     message = ERROR_MESSAGE_NOT_FOUND_FORBIDDEN;
                 } else {
-                    message = "Failed to get observation '%s' from '%s'. "
-                        + "| Impossible d'obtenir l'observation '%s' "
-                        + "de client.";
+                    message = "Failed to get observation with publisherID '%s' from '%s'. "
+                        + "| Impossible d'obtenir l'observation avec publisherID '%s' "
+                        + "de '%s'.";
                 }
 
                 throw new RuntimeException(
-                    String.format(message, uri,
-                        downloader.getURL().toExternalForm(),
-                        uri));
+                    String.format(message, errorMessageID,
+                                  downloader.getURL().toExternalForm(),
+                                  errorMessageID,
+                                  downloader.getURL().toExternalForm()));
             }
 
             return null;

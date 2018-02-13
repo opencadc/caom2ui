@@ -70,40 +70,37 @@ package ca.nrc.cadc.caom2.ui.server.client;
 
 
 import ca.nrc.cadc.caom2.ObservationURI;
+import ca.nrc.cadc.caom2.PublisherID;
 import ca.nrc.cadc.net.HttpDownload;
+import ca.nrc.cadc.net.NetUtil;
 
 import javax.security.auth.Subject;
 import java.net.URI;
 import java.net.URL;
 
 import org.junit.Test;
+
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 
-public class Caom2MetaClientTest
-{
+public class Caom2MetaClientTest {
     @Test
-    public void getObservation() throws Exception
-    {
+    public void getObservation() {
         final HttpDownload mockDownload = createMock(HttpDownload.class);
 
-        final Caom2MetaClient testSubject = new Caom2MetaClient()
-        {
+        final Caom2MetaClient testSubject = new Caom2MetaClient() {
             /**
              * Place for testers to override.
              *
              * @return URL instance.
+             * @param resourceID
              */
             @Override
-            public URL getServiceURL()
-            {
-                try
-                {
+            public URL getServiceURL(URI resourceID, URI standardID) {
+                try {
                     return new URL("http://mysite.com");
-                }
-                catch (Exception e)
-                {
+                } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             }
@@ -116,15 +113,14 @@ public class Caom2MetaClientTest
              * @return HttpDownload instance.
              */
             @Override
-            public HttpDownload getDownloader(URL url, ReadAction readAction)
-            {
+            public HttpDownload getDownloader(URL url, ReadAction readAction) {
                 return mockDownload;
             }
         };
 
         final Subject subject = new Subject();
-        final ObservationURI observationURI = new ObservationURI(URI.create("caom:ARCHIVE/G024.143.732+17.167"));
-
+        final PublisherID publisherID = new PublisherID(URI.create("ivo://cadc.nrc.ca/mirror/IRIS?f085h000/IRAS-12um"));
+        final ObservationURI observationURI = new ObservationURI(URI.create("caom:IRIS/f085h000"));
 
         mockDownload.run();
         expectLastCall().once();
@@ -134,10 +130,11 @@ public class Caom2MetaClientTest
         replay(mockDownload);
 
         // Doesn't return anything.
-        testSubject.getObservation(subject, observationURI);
+        testSubject.getObservation(subject, publisherID, observationURI);
 
-        assertEquals("ID was not re-encoded.", "?ID=caom%3AARCHIVE%2FG024.143.732%2B17.167",
-                     testSubject.path);
+        final String expected = "?ID=" + NetUtil.encode("caom:IRIS/f085h000");
+
+        assertEquals("ID was not re-encoded.", expected, testSubject.path);
 
         verify(mockDownload);
     }

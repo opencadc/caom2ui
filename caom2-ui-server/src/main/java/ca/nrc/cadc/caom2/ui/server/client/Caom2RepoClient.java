@@ -71,6 +71,7 @@ package ca.nrc.cadc.caom2.ui.server.client;
 
 import ca.nrc.cadc.caom2.Observation;
 import ca.nrc.cadc.caom2.ObservationURI;
+import ca.nrc.cadc.config.ApplicationConfiguration;
 import ca.nrc.cadc.date.DateUtil;
 import ca.nrc.cadc.net.HttpDownload;
 import ca.nrc.cadc.reg.Standards;
@@ -93,16 +94,14 @@ import java.util.List;
  */
 public class Caom2RepoClient extends BaseClient {
     private static final Logger log = Logger.getLogger(Caom2RepoClient.class);
-    private static final URI CAOM_REPO_RESOURCE_ID = URI.create("ivo://cadc.nrc.ca/caom2repo");
+    private static final String PROPERTIES_FILE_PATH = System.getProperty("user.home")
+        + "/config/org.opencadc.caom2ui.properties";
+    private static final URI DEFAULT_CAOM_REPO_RESOURCE_ID = URI.create("ivo://cadc.nrc.ca/caom2repo");
     private static final String CANT_GET_COLLECTIONS_LIST = "Unable to get collection list.";
     private static final String CANT_GET_OBSERVATION_LIST = "Unable to get observation list.";
     private static final String CAOM2REPO_SERVICE_URI_PROPERTY_KEY = "org.opencadc.caom2ui.client-service-id";
 
     public Caom2RepoClient() {
-        resourceId = CAOM_REPO_RESOURCE_ID;
-        propertyKey = CAOM2REPO_SERVICE_URI_PROPERTY_KEY;
-        standardsURI = Standards.CAOM2REPO_OBS_23;
-        // Set path at a point where collection and/or observation information is available
     }
 
 
@@ -190,6 +189,12 @@ public class Caom2RepoClient extends BaseClient {
         }
     }
 
+    public URL getServiceURL() {
+        final ApplicationConfiguration ac = new ApplicationConfiguration(PROPERTIES_FILE_PATH);
+        return getServiceURL(ac.lookupServiceURI(CAOM2REPO_SERVICE_URI_PROPERTY_KEY, DEFAULT_CAOM_REPO_RESOURCE_ID),
+                             Standards.CAOM2REPO_OBS_23);
+    }
+
     /**
      * Download the Observation for the given URI.
      *
@@ -199,12 +204,12 @@ public class Caom2RepoClient extends BaseClient {
      */
     public Observation getObservation(final Subject subject, final ObservationURI uri) {
         path = "/" + uri.getCollection() + "/" + uri.getObservationID();
-        URL serviceURL = getServiceURL();
+        final URL serviceURL = getServiceURL();
 
         final BaseClient.ReadAction ra = getObservationReader();
         final HttpDownload get = getDownloader(serviceURL, ra);
 
-        Subject.doAs(subject, new BaseClient.GetAction(get, uri));
+        Subject.doAs(subject, new BaseClient.GetAction(get, uri.toString()));
 
         return ra.getObs();
     }

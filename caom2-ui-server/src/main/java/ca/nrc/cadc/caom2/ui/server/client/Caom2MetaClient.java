@@ -71,13 +71,13 @@ package ca.nrc.cadc.caom2.ui.server.client;
 
 import ca.nrc.cadc.caom2.Observation;
 import ca.nrc.cadc.caom2.ObservationURI;
+import ca.nrc.cadc.caom2.PublisherID;
 import ca.nrc.cadc.net.HttpDownload;
 import ca.nrc.cadc.net.NetUtil;
 import ca.nrc.cadc.reg.Standards;
 import org.apache.log4j.Logger;
 
 import javax.security.auth.Subject;
-import java.net.URI;
 import java.net.URL;
 
 /**
@@ -86,35 +86,31 @@ import java.net.URL;
  * @author hjeeves
  */
 public class Caom2MetaClient extends BaseClient {
-    static final Logger LOGGER = Logger.getLogger(Caom2MetaClient.class);
-
-    static final String CAOM2META_SERVICE_URI_PROPERTY_KEY = "org.opencadc.caom2ui.caom2ops-service-id";
-    static final URI CAOM2META_RESOURCE_ID = URI.create("ivo://cadc.nrc.ca/caom2ops");
+    private static final Logger LOGGER = Logger.getLogger(Caom2MetaClient.class);
 
     public Caom2MetaClient() {
-        resourceId = CAOM2META_RESOURCE_ID;
-        propertyKey = CAOM2META_SERVICE_URI_PROPERTY_KEY;
-        standardsURI = Standards.CAOM2_OBS_20;
         // Set path at a point where observation information is available
     }
 
     /**
      * Download the Observation for the given URI.
      *
-     * @param subject The Subject to download as.
-     * @param uri     The Observation URI.
+     * @param subject        The Subject to download as.
+     * @param publisherID    The Publisher ID to lookup the service.
+     * @param observationURI The Observation URI.
      * @return Observation instance.
      */
-    public Observation getObservation(final Subject subject, final ObservationURI uri) {
-        path = "?ID=" + NetUtil.encode(uri.getURI().toString());
-        final URL serviceURL = getServiceURL();
+    public Observation getObservation(final Subject subject, final PublisherID publisherID,
+                                      final ObservationURI observationURI) {
+        path = "?ID=" + NetUtil.encode(observationURI.getURI().toString());
+        final URL serviceURL = getServiceURL(publisherID.getResourceID(), Standards.CAOM2_OBS_20);
 
         LOGGER.debug(String.format("Using service URL '%s'", serviceURL.toExternalForm()));
 
         final ReadAction ra = getObservationReader();
         final HttpDownload get = getDownloader(serviceURL, ra);
 
-        Subject.doAs(subject, new GetAction(get, uri));
+        Subject.doAs(subject, new GetAction(get, publisherID.getURI().toString()));
 
         return ra.getObs();
     }
