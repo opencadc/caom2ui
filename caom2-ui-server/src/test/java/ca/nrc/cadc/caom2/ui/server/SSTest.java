@@ -84,7 +84,7 @@ import static org.junit.Assert.*;
 public class SSTest {
 
     @Test
-    public void toStringProvenance() throws Exception {
+    public void toStringProvenance() {
         final Provenance provenance = new Provenance("TESTPROV");
 
         // November 25th, 1977.
@@ -93,6 +93,43 @@ public class SSTest {
         cal.set(Calendar.MILLISECOND, 0);
 
         provenance.reference = URI.create("http://mysite.com/reference");
+        provenance.project = "TESTPROJ";
+        provenance.producer = "TESTPRODUCER";
+        provenance.lastExecuted = cal.getTime();
+        provenance.getInputs().add(new PlaneURI(URI.create("caom:COLL1/PLANE1/123")));
+        provenance.getInputs().add(new PlaneURI(URI.create("caom:COLL1/PLANE2/123")));
+        provenance.getInputs().add(new PlaneURI(URI.create("caom:COLL1/PLANE2/456")));
+
+        final String out = SS.toString(provenance);
+        final String expected = "name: TESTPROV<br>version: null<br>producer: TESTPRODUCER<br>project: TESTPROJ<br>" +
+            "reference: <a class=\"provenance-reference\" href=\"http://mysite.com/reference\">http://mysite" +
+            ".com/reference</a><br>runID: null" +
+            "<br>lastExecuted: 1977-11-25 01:15:00.000<br>inputs: caom:COLL1/PLANE1/123 caom:COLL1/PLANE2/123 " +
+            "caom:COLL1/PLANE2/456 <br>keywords: ";
+
+        assertEquals("Wrong output.", expected, out);
+
+        provenance.reference = null;
+
+        final String out2 = SS.toString(provenance);
+        final String expected2 = "name: TESTPROV<br>version: null<br>producer: TESTPRODUCER<br>project: TESTPROJ<br>" +
+            "reference: null<br>runID: null" +
+            "<br>lastExecuted: 1977-11-25 01:15:00.000<br>inputs: caom:COLL1/PLANE1/123 caom:COLL1/PLANE2/123 " +
+            "caom:COLL1/PLANE2/456 <br>keywords: ";
+
+        assertEquals("Wrong output.", expected2, out2);
+    }
+
+    @Test
+    public void toStringProvenanceIncompleteReferenceURL() {
+        final Provenance provenance = new Provenance("TESTPROV");
+
+        // November 25th, 1977.
+        final Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+        cal.set(1977, Calendar.NOVEMBER, 25, 1, 15, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+
+        provenance.reference = URI.create("mysite.com/reference");
         provenance.project = "TESTPROJ";
         provenance.producer = "TESTPRODUCER";
         provenance.lastExecuted = cal.getTime();
