@@ -2,6 +2,7 @@
 package ca.nrc.cadc.caom2.ui.server;
 
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.MessageFormat;
@@ -68,7 +69,7 @@ public class SS {
                 sb.append("<br>").append("dimension: ").append(comp.dimension);
                 sb.append("<br>").append("sampleSize: ").append(comp.sampleSize);
                 sb.append("<br>").append("resolution: ")
-                    .append(comp.resolvingPower);
+                  .append(comp.resolvingPower);
                 sb.append("<br>").append("emBand: ").append(comp.emBand);
                 sb.append("<br>").append("transition: ").append(comp.transition);
             }
@@ -233,17 +234,16 @@ public class SS {
             m.sourceNumberDensity;
     }
 
-    public static String toMemberString(final String contextPath,
-                                        final Observation o) {
+    public static String toMemberString(final String contextPath, final Observation o, final String publisherID) {
         final StringBuilder sb = new StringBuilder();
 
         if ((o != null) && (o instanceof CompositeObservation)) {
-            CompositeObservation co = (CompositeObservation) o;
+            final CompositeObservation co = (CompositeObservation) o;
 
-            for (ObservationURI u : co.getMembers()) {
+            for (final ObservationURI u : co.getMembers()) {
                 sb.append("<a href=\"").append(contextPath).append("/view/");
                 sb.append(u.getCollection()).append("/")
-                    .append(u.getObservationID());
+                  .append(u.getObservationID()).append("?ID=").append(publisherID);
                 sb.append("\">");
                 sb.append(u.getURI().toASCIIString());
                 sb.append("</a> ");
@@ -253,8 +253,9 @@ public class SS {
         return sb.toString();
     }
 
-    public static String toString(URL url) {
+    public static String toString(final URI uri) throws MalformedURLException {
         final MessageFormat format = new MessageFormat("<a class=\"provenance-reference\" href=\"{0}\">{0}</a>");
+        final URL url = uri.isAbsolute() ? uri.toURL() : new URL("http://" + uri.toString());
         return format.format(new Object[] {url.toExternalForm()});
     }
 
@@ -271,11 +272,10 @@ public class SS {
             sb.append("<br>project: ");
             sb.append(p.project);
             sb.append("<br>reference: ");
-
             try {
-                sb.append((p.reference == null) ? "null" : SS.toString(p.reference.toURL()));
+                sb.append((p.reference == null) ? "null" : SS.toString(p.reference));
             } catch (MalformedURLException e) {
-                throw new IllegalArgumentException(e.getMessage(), e);
+                sb.append(String.format("Unable to display Reference URL %s", p.reference.toString()));
             }
 
             sb.append("<br>runID: ");

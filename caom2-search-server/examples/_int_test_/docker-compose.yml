@@ -30,14 +30,14 @@ services:
     environment:
       - CATALINA_OPTS=-Dca.nrc.cadc.reg.client.RegistryClient.host=proxy.cadc.dao.nrc.ca 
   uwspg.cadc.dao.nrc.ca:
-    image: opencadc/uws_postgres
+    image: opencadc/uws-postgres:alpine
     networks:
       - 'selenium'
     environment:
       - POSTGRES_USER=uws
       - POSTGRES_PASSWORD=astr0query
   caom2-meta-ui.cadc.dao.nrc.ca:
-    image: opencadc/caom2-meta-ui
+    image: opencadc/caom2-meta-ui:alpine
     ports:
       - '5556:5555'
     networks:

@@ -57,7 +57,7 @@ This JSP page renders an HTML table with the Observation metadata.
     </tr>
     <tr>
       <td>members</td>
-      <td><%= SS.toMemberString(request.getContextPath(), obs) %>
+      <td><%= SS.toMemberString(request.getContextPath(), obs, request.getParameter("ID")) %>
       </td>
     </tr>
     <tr class="even">
