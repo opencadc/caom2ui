@@ -105,7 +105,6 @@
                    *
                    * jenkinsd 2018.02.26
                    */
-
                   function insertPreviewLink(
                     previewUrls,
                     thumbnailUrls,
@@ -120,47 +119,37 @@
                     )
 
                     if (previewUrls.length > 0) {
+                      var pubIDQuery = new cadc.web.util.URI(publisherId).getQueryString().split('/')
+                      var observationID = pubIDQuery[0]
+                      var productID = pubIDQuery[1]
+
                       // Display the preview window
                       $link.click(function() {
                         var $content = $('<div id="scoped-content"></div>')
 
                         // Preview window content
-                        if (previewUrls.length > 0) {
-                          var pubIDQuery = new cadc.web.util.URI(publisherId).getQueryString().split('/')
-                          var observationID = pubIDQuery[0]
-                          var productID = pubIDQuery[1]
-                          var $obsId = $(
-                            '<p style="text-align: center;"></p>'
-                          ).text('observationID: ' + observationID)
-                          var $pdctId = $(
-                            '<p style="text-align: center;"></p>'
-                          ).text('productID: ' + productID)
-                          var $pubId = $(
-                            '<p style="text-align: center;"></p>'
-                          ).text('publisherID: ' + publisherId)
-                          var $previews = $('<div></div>')
+                        var $obsId = $(
+                          '<p style="text-align: center;"></p>'
+                        ).text('observationID: ' + observationID)
+                        var $pdctId = $(
+                          '<p style="text-align: center;"></p>'
+                        ).text('productID: ' + productID)
+                        var $pubId = $(
+                          '<p style="text-align: center;"></p>'
+                        ).text('publisherID: ' + publisherId)
+                        var $previews = $('<div></div>')
 
-                          for (var j = 0; j < previewUrls.length; j++) {
-                            var $preview = $(
-                              '<img style="display: block; margin: auto;"/>'
-                            )
-                            $preview.prop('id', observationID + '_preview_' + j)
-                            $preview.prop('src', previewUrls[j])
-                            $preview.addClass('image-actual')
-                            $previews.append($preview, '<br>')
-                          }
-
-                          $content.append($obsId, $pdctId, $pubId, $previews)
-                        } else {
-                          var lang = $('html').attr('lang')
-                          $content.append(
-                            $('<p style="text-align: center;"></p>').text(
-                              ca.nrc.cadc.search.preview.unauthorized_message[
-                                lang
-                              ]
-                            )
+                        for (var j = 0; j < previewUrls.length; j++) {
+                          var $preview = $(
+                            '<img style="display: block; margin: auto;"/>'
                           )
+                          $preview.prop('id', observationID + '_preview_' + j)
+                          $preview.prop('src', previewUrls[j])
+                          $preview.addClass('image-actual')
+                          $previews.append($preview, '<br>')
                         }
+
+                        $content.append($obsId, $pdctId, $pubId, $previews)
 
                         // name parameter (second one) passed in to open()
                         // leads to Safari not being able to focus on the document
