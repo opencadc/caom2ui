@@ -119,14 +119,15 @@
                     )
 
                     if (previewUrls.length > 0) {
+                      var pubIDQuery = new cadc.web.util.URI(publisherId).getQueryString().split('/')
+                      var observationID = pubIDQuery[0]
+                      var productID = pubIDQuery[1]
+
                       // Display the preview window
                       $link.click(function() {
                         var $content = $('<div id="scoped-content"></div>')
 
                         // Preview window content
-                        var pubIDQuery = new cadc.web.util.URI(publisherId).getQueryString().split('/')
-                        var observationID = pubIDQuery[0]
-                        var productID = pubIDQuery[1]
                         var $obsId = $(
                           '<p style="text-align: center;"></p>'
                         ).text('observationID: ' + observationID)
