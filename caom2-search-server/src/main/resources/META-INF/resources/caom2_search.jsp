@@ -47,6 +47,8 @@
                   type="checkbox"
                   checked data-toggle="toggle"
                   data-size="mini"
+                  data-on="<fmt:message key="YES_FORM_LABEL" bundle="${langBundle}"/>"
+                  data-off="<fmt:message key="NO_FORM_LABEL" bundle="${langBundle}"/>"
                   data-onstyle="success" />
           <label class="maq-label">
             <fmt:message key="USE_MAQ_FORM_LABEL" bundle="${langBundle}"/>&nbsp;&nbsp;

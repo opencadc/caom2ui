@@ -1,6 +1,6 @@
 {
   "useMaq": {
-    "tipHTML": "Use the MAQ TAP Service when querying archives.  The 'Additional Constraints' will reload."
+    "tipHTML": "Multi-Archive Querying (MAQ) allows the user to search for data hosted by other astronomical data centers in addition to data hosted by the CADC. The ‘Additional Constraints’ region of this page will reload with the additional MAQ content and existing selections will be reset."
   },
   "Observation.observationID": {
     "tipHTML":
