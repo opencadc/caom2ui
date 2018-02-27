@@ -43,12 +43,13 @@
       <!-- useMaq = true means display this checkbox -->
       <c:if test="${param.useMaq eq 'true'}">
         <div class="maq-div">
+          <input class="useMaq"
+                  type="checkbox"
+                  checked data-toggle="toggle"
+                  data-size="mini"
+                  data-onstyle="success" />
           <label class="maq-label">
-            <input class="useMaq"
-                   type="checkbox"
-                   checked data-toggle="toggle"
-                   data-size="mini"
-                   data-onstyle="success" />&nbsp;&nbsp;<fmt:message key="USE_MAQ_FORM_LABEL" bundle="${langBundle}"/>
+            <fmt:message key="USE_MAQ_FORM_LABEL" bundle="${langBundle}"/>&nbsp;&nbsp;
             <div data-toggle="popover"
                 data-utype="useMaq"
                 data-placement="right"

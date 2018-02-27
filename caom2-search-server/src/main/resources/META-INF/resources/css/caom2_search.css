@@ -603,8 +603,7 @@ canvas.aladin-imageCanvas {
 }
 
 .maq-div {
-  display: inline;
-  margin-left: 10px;
+  display: inline;  
 }
 
 .maq-label {
@@ -613,5 +612,6 @@ canvas.aladin-imageCanvas {
   font-size: 9pt;
 }
 
-
-
+.toggle {
+  margin-left: 20px;
+}

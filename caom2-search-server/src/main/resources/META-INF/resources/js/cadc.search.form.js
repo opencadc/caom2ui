@@ -850,15 +850,10 @@
           // in the form and results panel
           if (this.maqToggleEnabled === true) {
             // toggle results table header element
-            if (
+            this.setResultsMaqMode(
               event.currentTarget.checked === 'true' ||
-              event.currentTarget.checked === true
-            ) {
-              this.setResultsMaqMode(true)
-            } else {
-              this.setResultsMaqMode(false)
-            }
-
+                event.currentTarget.checked === true
+            )
             this.disableMaqToggle()
             this.dataTrain.setMaqMode(event.currentTarget.checked)
           }
