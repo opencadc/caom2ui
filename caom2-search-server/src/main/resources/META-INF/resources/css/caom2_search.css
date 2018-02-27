@@ -608,6 +608,7 @@ canvas.aladin-imageCanvas {
 }
 
 .maq-label {
+  vertical-align: bottom;
   font-weight: normal;
   font-size: 9pt;
 }
