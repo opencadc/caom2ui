@@ -4,6 +4,7 @@
       nrc: {
         cadc: {
           search: {
+            activateMAQSelector: '.activateMAQ',
             ignore_fields: ['collection', 'noexec'],
             CAOM2_TARGET_NAME_FIELD_ID: 'Plane.position.bounds',
             OBSCORE_TARGET_NAME_FIELD_ID:
@@ -128,7 +129,7 @@
    *
    * @constructor
    */
-  function FormConfiguration(_config, _options) {
+  function FormConfiguration (_config, _options) {    
     var stringUtil = new org.opencadc.StringUtil()
 
     this.config = _config
@@ -688,7 +689,7 @@
     /**
      * Initialize this form.
      */
-    this.init = function(useMaqDataTrain) {
+    this.init = function(activateMAQ) {
       var $currForm = this.$form
       this.targetNameFieldID = $currForm
         .find("input[name$='@Shape1.value']")
@@ -844,7 +845,7 @@
         }.bind(this)
       )
 
-      $currForm.find('.useMaq').change(
+      $currForm.find('.activateMAQ').change(
         function(event) {
           // This sets up or removes the MAQ mode display items
           // in the form and results panel
@@ -858,7 +859,7 @@
             this.dataTrain.setMaqMode(event.currentTarget.checked)
           }
         }.bind(this)
-      )
+      ).change()
 
       // Prevent closing details when a value is present.
       $currForm.find("details[id$='_details'] summary").click(function(event) {
@@ -954,14 +955,17 @@
 
       // Toggling the MAQ switch will trigger datatrain load
       // "" can mean it's not in the URL, or it's not enabled for this app
-      if (useMaqDataTrain === '') {
-        this.disableMaqToggle()
-        this.dataTrain.init()
-      } else {
-        this.maqToggleEnabled = true
-        this.setMaqToggle(useMaqDataTrain)
-        this.setResultsMaqMode(useMaqDataTrain)
-      }
+      // if (activateMAQ === false) {
+      //   this.disableMaqToggle()
+      //   this.dataTrain.init()
+      // } else {        
+      //   this.setMaqToggle(activateMAQ)
+      //   // this.disableMaqToggle()       
+      //   this.enableMaqToggle()
+      // }
+
+      this.setResultsMaqMode(activateMAQ)
+      this.dataTrain.init()
 
       try {
         this._trigger(ca.nrc.cadc.search.events.onInit, {})
@@ -971,33 +975,30 @@
     }
 
     this.setMaqToggle = function(setOn) {
-      if (setOn === 'true') {
-        this.$form.find('.useMaq').bootstrapToggle('on')
-      } else {
-        this.$form.find('.useMaq').bootstrapToggle('off')
-      }
+      this.$form.find(ca.nrc.cadc.search.activateMAQSelector).bootstrapToggle((setOn === true) ? 'on' : 'off')
       this.disableMaqToggle()
     }
 
     this.disableMaqToggle = function() {
-      this.maqToggleEnabled = false
-      var $useMaqEl = this.$form.find('.useMaq')
-      $useMaqEl.bootstrapToggle('disable')
+      this._toggleMAQToggle(false)
     }
 
     this.enableMaqToggle = function() {
-      this.maqToggleEnabled = true
-      var $useMaqEl = this.$form.find('.useMaq')
-      $useMaqEl.bootstrapToggle('enable')
+      this._toggleMAQToggle(true)
+    }
+
+    this._toggleMAQToggle = function (enabledFlag) {
+      this.maqToggleEnabled = enabledFlag
+      this.$form.find(ca.nrc.cadc.search.activateMAQSelector).bootstrapToggle(enabledFlag ? 'enable' : 'disable')
     }
 
     this.setResultsMaqMode = function(setOn) {
       if (setOn === true || setOn === 'true') {
         $('#resultsMaqEnabled').removeClass('cadc-display-none')
-        this.$form.find('.useMaqValue').val(true)
+        this.$form.find('.activateMAQValue').val(true)
       } else {
         $('#resultsMaqEnabled').addClass('cadc-display-none')
-        this.$form.find('.useMaqValue').val(false)
+        this.$form.find('.activateMAQValue').val(false)
       }
     }
 
@@ -1916,7 +1917,7 @@
 
       // Classname used instead of id for this element because it exists on both caom2 and obscore
       // search forms
-      if (_inputID === 'useMaq') {
+      if (_inputID === 'activateMAQ') {
         // Note that changing this box will kick off a data train update as well,
         // which may affect timing on Additional Constraints (hierarchy.js) fields that need to be updated
         $inputItem = this.$form.find("input[class='" + _inputID + "']")
@@ -1969,7 +1970,7 @@
 
     this.toggleMaqMode = function() {
       // check if toggle is enabled for application first
-      this.$form.find('.useMaq').click()
+      this.$form.find('.activateMAQ').click()
     }
 
     /**

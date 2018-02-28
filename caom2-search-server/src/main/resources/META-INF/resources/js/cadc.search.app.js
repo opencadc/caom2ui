@@ -90,7 +90,7 @@
 
     // For controlling MAQ Switch triggering data train load
     var isFirstLoad = true
-    var maqKey = 'useMaq'
+    var maqKey = 'activateMAQ'
 
     // Text area containing the ADQL query.
     var $queryCode = $('#query')
@@ -340,18 +340,17 @@
         this.options
       )
 
-      // this.options.useMaq is passed in from index.jsp, and denotes whether
-      // the toggle is being used at all
-      // - it'll have to be se
-      // Accessing useMaq value from toggle doesn't work here because the active tab hasn't
-      // been defined all that can be referenced here is the useMaq in the initial options.
+      // this.options.activateMAQ is passed in from index.jsp, and denotes whether
+      // the toggle is being used at all.
+      //
+      // this.options.activateMAQ signals the toggle switch is set to 'on'.
 
       $.get(
         this.options.tapSyncEndpoint,
         {
           REQUEST: 'doQuery',
           LANG: 'ADQL',
-          USEMAQ: this.options.useMaq,
+          USEMAQ: this.options.activateMAQ || false,
           QUERY: tapQuery,
           FORMAT: 'votable'
         },
@@ -1193,19 +1192,20 @@
       return currentURI.getQuery()
     }
 
-    this.getMaqParameterFromURI = function() {
-      // If the toggle is not displayed, return ''
-      // If the toggle is to be displayed, the default value is 'on' (return "true")
-      // If it is on and there is a URL query, return the value from URL
+    /**
+     * If the toggle is not displayed, return ''
+     * If the toggle is to be displayed, the default value is 'on' (return "true")
+     * If it is on and there is a URL query, return the value from URL
+     * 
+     * @returns {boolean}
+     */
+    this.hasMaqParameterInURI = function() {
+      var maqValue = false
 
-      var maqValue = ''
-      if (this.options.useMaq === 'true') {
+      if (this.options.enableMAQ === true) {
         var currentQuery = this.getQueryFromURI()
-        if (currentQuery.useMaq != undefined) {
-          maqValue = currentQuery.useMaq[0]
-        } else {
-          // Set the default
-          maqValue = 'true'
+        if (currentQuery.activateMAQ != undefined) {
+          maqValue = currentQuery.activateMAQ[0]
         }
       }
       return maqValue
@@ -1248,7 +1248,7 @@
                     decodeURIComponent(qValue.join())
                   )
                 } else if (qKey !== maqKey) {
-                  // useMaq has been handled prior to the data train being loaded
+                  // enableMAQ has been handled prior to the data train being loaded
                   activeSearchForm.setInputValue(
                     qKey,
                     decodeURIComponent(qValue.join())
@@ -1260,7 +1260,7 @@
             })
 
             $submitForm.find('input').each(function(item, index) {
-              // Explicitly skip the useMaq input toggle
+              // Explicitly skip the enableMAQ input toggle
               if (this.className !== maqKey) {
                 $(this).change()
               }
@@ -1447,9 +1447,9 @@
         }.bind(this)
       )
 
-      // if parameter function returns '' the toggle is not displayed
-      caomSearchForm.init(this.getMaqParameterFromURI())
-      obsCoreSearchForm.init(this.getMaqParameterFromURI())
+      // if parameter function returns false the toggle is off
+      caomSearchForm.init(this.hasMaqParameterInURI() === true)
+      obsCoreSearchForm.init(this.hasMaqParameterInURI() === true)
     }
 
     // End start method.

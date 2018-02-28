@@ -31,6 +31,7 @@
  ****  C A N A D I A N   A S T R O N O M Y   D A T A   C E N T R E  *****
  ************************************************************************
  */
+
 package ca.nrc.cadc.search.integration;
 
 
@@ -38,20 +39,17 @@ import org.junit.Test;
 import org.openqa.selenium.By;
 
 
-public class CAOMSearchBrowserTest extends AbstractAdvancedSearchIntegrationTest
-{
+public class CAOMSearchBrowserTest extends AbstractAdvancedSearchIntegrationTest {
     private static final By ONE_CLICK_DOWNLOAD_LINK_ROW_3_ID_BY = By.id("_one-click_vov_3");
 
 
-    public CAOMSearchBrowserTest() throws Exception
-    {
+    public CAOMSearchBrowserTest() throws Exception {
         super();
     }
 
 
     @Test
-    public void searchCAOM() throws Exception
-    {
+    public void searchCAOM() throws Exception {
         CAOMSearchFormPage searchFormPage = goTo(endpoint, null, CAOMSearchFormPage.class);
 
         searchFormPage.enterObservationID("692512");

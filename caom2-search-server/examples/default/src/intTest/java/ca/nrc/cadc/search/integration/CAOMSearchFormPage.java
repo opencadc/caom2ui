@@ -69,14 +69,12 @@
 package ca.nrc.cadc.search.integration;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.Select;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -85,17 +83,20 @@ public class CAOMSearchFormPage extends AbstractSearchFormPage
     private static final int DEFAULT_TIMEOUT_IN_SECONDS = 25;
     private static final By H1_HEADER = By.cssSelector("h1");
 
-    static final By DATA_TRAIN_LOCATOR = By.id("caom2@Hierarchy");
+    static final By DATA_TRAIN_LOCATOR = By.id("caom2_data_train");
     static final By DATA_TRAIN_COLLECTION_MENU = By.id("Observation.collection");
+    static final By DATA_TRAIN_INSTRUMENT_MENU = By.id("Observation.instrument.name");
     static final By TARGET_INPUT = By.id("Plane.position.bounds");
     static final By TARGET_FORM_GROUP = By.id("Plane.position.bounds_details");
     static final By TARGET_RESOLUTION_STATUS_ICON_BY = By.className("target_name_resolution_status");
     static final By TARGET_RESOLUTION_STATUS_GOOD_ICON_BY = By.className("target_ok");
+    static final By TARGET_RESOLUTION_POPOVER_BY = By.className("resolver-popover");
     static final By SSOIS_LINK_BY = By.id("ssois_link");
     static final String SPECTRAL_COVERAGE_INPUT_ID = "Plane.energy.bounds.samples";
     static final String OBSERVATION_DATE_INPUT_ID = "Plane.time.bounds.samples";
     static final String PIXEL_SCALE_INPUT_ID = "Plane.position.sampleSize";
     static final By RESET_BUTTON_SELECTOR = By.cssSelector("button[type=\"reset\"]");
+    static final By MAQ_TOGGLE_SWITCH_BY = By.cssSelector("div.toggle");
 
     private static final By ACCESS_ACTIONS_DROPDOWN_BY = By.cssSelector("a.access-actions");
     private static final By LOGIN_DROPDOWN_BY = By.cssSelector("a.login-form");
@@ -107,7 +108,7 @@ public class CAOMSearchFormPage extends AbstractSearchFormPage
 
 
 
-    @FindBy(id = "caom2@Hierarchy")
+    @FindBy(id = "caom2_data_train")
     WebElement dataTrain;
 
     @FindBy(id = "Observation.observationID")
@@ -124,6 +125,9 @@ public class CAOMSearchFormPage extends AbstractSearchFormPage
 
     @FindBy(id = "ssois_link")
     WebElement ssoisLink;
+
+    @FindBy(css = "div.toggle")
+    WebElement maqToggleSwitch;
 
 
 
@@ -143,6 +147,7 @@ public class CAOMSearchFormPage extends AbstractSearchFormPage
         waitForElementPresent(By.id(SPECTRAL_COVERAGE_INPUT_ID));
         waitForElementPresent(By.id(OBSERVATION_DATE_INPUT_ID));
         waitForElementPresent(SSOIS_LINK_BY);
+        waitForElementPresent(MAQ_TOGGLE_SWITCH_BY);
         waitForElementPresent(By.id("Observation.observationID"));
 
         PageFactory.initElements(driver, this);
@@ -170,6 +175,8 @@ public class CAOMSearchFormPage extends AbstractSearchFormPage
         waitForElementVisible(TARGET_RESOLUTION_STATUS_ICON_BY);
         waitForElementPresent(TARGET_RESOLUTION_STATUS_GOOD_ICON_BY);
         waitForElementVisible(TARGET_RESOLUTION_STATUS_GOOD_ICON_BY);
+        waitForElementPresent(TARGET_RESOLUTION_POPOVER_BY);
+        closeTooltip();
     }
 
     void enterCollection(final String collection) throws Exception
@@ -179,6 +186,26 @@ public class CAOMSearchFormPage extends AbstractSearchFormPage
         // Unselect the 'All' option
         collSelect.deselectByIndex(0);
         collSelect.selectByValue(collection);
+    }
+
+    public void enterInstrument(final String instrumentName) {
+        final Select instrumentSelect = new Select(dataTrain.findElement(DATA_TRAIN_INSTRUMENT_MENU));
+
+        // Unselect the 'All' option
+        instrumentSelect.deselectByIndex(0);
+        instrumentSelect.selectByValue(instrumentName);
+    }
+
+    void enableMAQ() throws Exception {
+        check(maqToggleSwitch);
+        waitForMAQActivated();
+    }
+
+    void waitForMAQActivated() throws Exception {
+        waitForElementPresent(By.cssSelector("div.toggle.btn-success"));
+        verifyTrue(find(By.className("activateMAQValue")).getAttribute("value").equals("true"));
+        waitFor(1000L);
+        waitForElementPresent(DATA_TRAIN_COLLECTION_MENU);
     }
 
     int findDataTrainValueIndex(final By menuLocator, final String value, final boolean ignoreCase)

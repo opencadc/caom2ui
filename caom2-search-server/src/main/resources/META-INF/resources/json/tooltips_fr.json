@@ -1,5 +1,5 @@
 {
-  "useMaq": {
+  "activateMAQ": {
     "tipHTML": "Le syst&eagrave;me d'interrogation multi-archive (MAQ) permet aux utilisateurs d'effectuer une recherche sur d'autres archives astronomiques en plus des collections propres au CCDA. La section 'Contraintes supplémentaires' de cette page sera modifi&eacute;e pour afficher des contraintes suppl&eacute;mentaires requis pour le MAQ."
   },  
   "Observation.observationID": {

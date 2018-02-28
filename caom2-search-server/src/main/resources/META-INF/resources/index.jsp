@@ -16,9 +16,14 @@
   final int maxRowLimit = configuration.lookupInt("org.opencadc.search.max-row-count", defaultMaxRowLimit);
   final boolean showObsCoreTab = configuration.lookupBoolean("org.opencadc.search.obs-core", true);
   final String applicationEndpoint = configuration.lookup("org.opencadc.search.app-service-endpoint", "/search");
-  final String maqServiceId = configuration.lookup("org.opencadc.search.maq-tap-service-id","");
+  final String maqServiceId = configuration.lookup("org.opencadc.search.maq-tap-service-id");
 
-  boolean useMaq = StringUtil.hasText(maqServiceId);
+  final boolean enableMAQ = StringUtil.hasText(maqServiceId);
+  final String activateMAQParam = request.getParameter("activateMAQ");
+  final boolean activateMAQ = enableMAQ && (configuration.lookup("org.opencadc.search.maq-activated", false) 
+                                            || (StringUtil.hasText(activateMAQParam) 
+                                                && activateMAQParam.equals("true")));
+
   final String tapSyncEndpoint = applicationEndpoint + "/tap/sync";
 %>
 
@@ -91,13 +96,13 @@
 
   <div class="tab-content">
       <!-- CAOM2 Search Query Tab -->
-      <c:import url='<%= "caom2_search.jsp?maxRowLimit=" + maxRowLimit  + "&useMaq=" + useMaq %>' />
+      <c:import url='<%= "caom2_search.jsp?maxRowLimit=" + maxRowLimit  + "&enableMAQ=" + enableMAQ + "&activateMAQ=" + activateMAQ %>' />
 
       <!-- ObsCore Query Tab -->
-      <c:import url='<%= "obscore_search.jsp?maxRowLimit=" + maxRowLimit  + "&useMaq=" + useMaq %>' />
+      <c:import url='<%= "obscore_search.jsp?maxRowLimit=" + maxRowLimit  + "&enableMAQ=" + enableMAQ + "&activateMAQ=" + activateMAQ %>' />
 
       <!-- Result Tab -->
-      <c:import url='<%= "results.jsp?maxRowLimit=" + maxRowLimit + "&useMaq=" + useMaq %>' />
+      <c:import url='<%= "results.jsp?maxRowLimit=" + maxRowLimit + "&enableMAQ=" + enableMAQ %>' />
 
   <!-- Error Tab -->
   <div role="tabpanel" class="tab-pane" id="errorTableTab">
@@ -279,7 +284,8 @@
                                                                                "pageLanguage": $("html").prop("lang"),
                                                                                "autoInitFlag": false,
                                                                                "applicationEndpoint": "<%= applicationEndpoint %>",
-                                                                                "useMaq" : "<%= useMaq %>"
+                                                                               "enableMAQ" : <%= enableMAQ %>,
+                                                                               "activateMAQ": <%= activateMAQ %>
                                                                              });
 
                                 searchApp.subscribe(ca.nrc.cadc.search.events.onAdvancedSearchInit,

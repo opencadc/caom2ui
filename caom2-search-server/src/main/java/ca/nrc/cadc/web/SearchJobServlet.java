@@ -81,7 +81,6 @@ import ca.nrc.cadc.reg.client.RegistryClient;
 import ca.nrc.cadc.search.DefaultNameResolverClient;
 import ca.nrc.cadc.search.ObsModel;
 import ca.nrc.cadc.search.QueryGenerator;
-import ca.nrc.cadc.search.parser.exception.PositionParserException;
 import ca.nrc.cadc.search.upload.StreamingVOTableWriter;
 import ca.nrc.cadc.search.upload.UploadResults;
 import ca.nrc.cadc.tap.DefaultSyncTAPClient;
@@ -263,7 +262,7 @@ public class SearchJobServlet extends SyncServlet {
 
     private void processRequest(final HttpServletRequest request, final HttpServletResponse response)
         throws JobPersistenceException, TransientException, FileUploadException, IOException,
-        PositionParserException, JobNotFoundException {
+        JobNotFoundException {
 
         final Set<String> userIDs = AuthenticationUtil.getUseridsFromSubject();
         final String userIDCheckpoint = userIDs.isEmpty() ? "Anonymous" : userIDs.toString();
@@ -333,8 +332,8 @@ public class SearchJobServlet extends SyncServlet {
         final URI tapServiceURI;
         final String tapServiceKey;
 
-        if ((request.getParameter("useMaq") != null)
-            && (request.getParameter("useMaq").equals("true"))) {
+        if ((request.getParameter("activateMAQ") != null)
+            && (request.getParameter("activateMAQ").equals("true"))) {
             tapServiceURI = ALTERNATE_TAP_SERVICE_URI;
             tapServiceKey = ALT_TAP_SERVICE_URI_PROPERTY_KEY;
         } else {

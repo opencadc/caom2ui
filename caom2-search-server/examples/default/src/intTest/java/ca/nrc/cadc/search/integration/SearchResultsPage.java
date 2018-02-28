@@ -85,8 +85,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-public class SearchResultsPage extends AbstractTestWebPage
-{
+public class SearchResultsPage extends AbstractTestWebPage {
     static final Pattern ROW_COUNT_PATTERN = Pattern.compile("\\d+");
 
     static final By IQ_COLUMN_HEADER = By.cssSelector("div[id$='caom2:Plane.position.resolution']");
@@ -94,6 +93,7 @@ public class SearchResultsPage extends AbstractTestWebPage
     static final By PROPOSAL_PROJECT_COLUMN_HEADER = By.cssSelector("div[id$='caom2:Observation.proposal.project']");
     static final By REST_FRAME_ENERGY_UNIT_SELECT_LOCATOR = By.id("caom2:Plane.energy.restwav_unitselect");
     static final By IQ_UNIT_SELECT_LOCATOR = By.id("caom2:Plane.position.resolution_unitselect");
+    private static final By MAQ_LABEL_BY = By.id("resultsMaqEnabled");
     private static final By FILTER_FILTER_BY = By.id("caom2:Plane.energy.bandpassName_filter");
     private static final By RA_FILTER_BY = By.id("caom2:Plane.position.bounds.cval1_filter");
     private static final By DEC_FILTER_BY = By.id("caom2:Plane.position.bounds.cval2_filter");
@@ -123,8 +123,7 @@ public class SearchResultsPage extends AbstractTestWebPage
     private WebElement gridContainer;
 
 
-    public SearchResultsPage(final WebDriver driver) throws Exception
-    {
+    public SearchResultsPage(final WebDriver driver) throws Exception {
         super(driver);
 
         waitForGridToLoad();
@@ -133,49 +132,42 @@ public class SearchResultsPage extends AbstractTestWebPage
     }
 
 
-    void includeHiddenColumn(final String uType) throws Exception
-    {
+    void includeHiddenColumn(final String uType) throws Exception {
         click(gridContainer.findElement(CHANGE_COLUMNS_BY));
         waitForElementVisible(CHANGE_COLUMNS_POPUP_BY);
         waitForElementPresent(CHANGE_COLUMNS_AVAILABLE_COLUMNS_LIST_BY);
 
         final WebElement changeColumnsPopupElement = find(CHANGE_COLUMNS_POPUP_BY);
         final WebElement availableColumnsListElement = changeColumnsPopupElement.findElement(
-                CHANGE_COLUMNS_AVAILABLE_COLUMNS_LIST_BY);
+            CHANGE_COLUMNS_AVAILABLE_COLUMNS_LIST_BY);
         final WebElement selectedColumnsListElement =
-                changeColumnsPopupElement.findElement(CHANGE_COLUMNS_SELECTED_COLUMNS_LIST_BY);
+            changeColumnsPopupElement.findElement(CHANGE_COLUMNS_SELECTED_COLUMNS_LIST_BY);
         final String listItemID = "ITEM_" + uType;
         final String listItemSelector = "#" + listItemID;
 
-        scrollVerticallyIntoView(listItemID, "cadc_columnpicker_available_items");
         final WebElement listItem = availableColumnsListElement.findElement(By.id(listItemID));
+        scrollIntoView(listItem);
         waitForElementVisible(listItem);
 
-        if (listItem == null)
-        {
+        if (listItem == null) {
             throw new RuntimeException("Unable to locate list item in change columns for " + listItemSelector);
-        }
-        else
-        {
+        } else {
             // check that the drag-and-drop changed the ordinal of the column
-            (new Actions(driver)).dragAndDrop(listItem, selectedColumnsListElement).build().perform();
+            (new Actions(driver)).dragAndDrop(listItem, selectedColumnsListElement).perform();
             waitForElementVisible(selectedColumnsListElement.findElement(By.id(listItemID)));
             click(changeColumnsPopupElement.findElement(By.id("column_manager_close")));
         }
     }
 
-    void waitForGridToLoad() throws Exception
-    {
+    void waitForGridToLoad() throws Exception {
         waitForElementPresent(GRID_LOCATOR);
         waitForElementPresent(GRID_HEADER_LOCATOR);
         waitForElementPresent(GRID_HEADER_ICON);
         waitForElementPresent(CHANGE_COLUMNS_BY);
 
-        waitUntil(new ExpectedCondition<Boolean>()
-        {
+        waitUntil(new ExpectedCondition<Boolean>() {
             @Override
-            public Boolean apply(final WebDriver webDriver)
-            {
+            public Boolean apply(final WebDriver webDriver) {
                 final String srcAttribute = webDriver.findElement(GRID_HEADER_ICON).getAttribute("src");
                 return srcAttribute.endsWith(ICON_IDLE_SRC);
             }
@@ -185,38 +177,32 @@ public class SearchResultsPage extends AbstractTestWebPage
         waitForElementPresent(FIRST_QUICKSEARCH_TARGET_LINK);
     }
 
-    SearchResultsPage quickSearchTarget() throws Exception
-    {
+    SearchResultsPage quickSearchTarget() throws Exception {
         click(FIRST_QUICKSEARCH_TARGET_LINK);
         return new SearchResultsPage(driver);
     }
 
-    <T extends AbstractTestWebPage> T clickPreview(final String windowName, final Class<T> pageClass) throws Exception
-    {
+    <T extends AbstractTestWebPage> T clickPreview(final String windowName, final Class<T> pageClass) throws Exception {
         click(By.className("preview_tooltip_link"));
 
-        final Class[] constructorArgTypes = new Class[]{WebDriver.class};
+        final Class[] constructorArgTypes = new Class[] {WebDriver.class};
         final Constructor<T> constructor = pageClass.getConstructor(constructorArgTypes);
         return constructor.newInstance(selectWindow(windowName));
     }
 
-    WebElement getGridHeader() throws Exception
-    {
+    WebElement getGridHeader() throws Exception {
         return gridContainer.findElement(GRID_HEADER_LOCATOR);
     }
 
-    WebElement getGrid() throws Exception
-    {
+    WebElement getGrid() throws Exception {
         return gridContainer.findElement(GRID_LOCATOR);
     }
 
-    String getPagerStatusText() throws Exception
-    {
+    String getPagerStatusText() throws Exception {
         return getGridHeader().findElement(GRID_HEADER_LABEL_LOCATOR).getText();
     }
 
-    int getCurrentResultsRowCount() throws Exception
-    {
+    int getCurrentResultsRowCount() throws Exception {
         final Matcher matcher = ROW_COUNT_PATTERN.matcher(getPagerStatusText());
         return matcher.find() ? Integer.parseInt(matcher.group()) : -1;
     }
@@ -227,73 +213,67 @@ public class SearchResultsPage extends AbstractTestWebPage
      * @param checkForResults Whether to check for a row count > 0.
      * @throws Exception
      */
-    void verifyGridHeaderLabelHasIntegerValue(final boolean checkForResults) throws Exception
-    {
+    void verifyGridHeaderLabelHasIntegerValue(final boolean checkForResults) throws Exception {
         final String result = getPagerStatusText();
         verifyTrue(result.startsWith("Showing "));
         verifyTrue(result.indexOf(" rows") > 0);
 
         final int rowCount = getCurrentResultsRowCount();
 
-        if (checkForResults)
-        {
+        if (checkForResults) {
             verifyTrue(rowCount > 0);
         }
     }
 
     CAOMObservationDetailsPage openObservationDetails(final int rowNumber)
-            throws Exception
-    {
+        throws Exception {
         click(By.id(String.format(OBSERVATION_DETAILS_LINK_LOCATOR, rowNumber)));
 
         return new CAOMObservationDetailsPage(driver);
     }
 
-    CAOMSearchFormPage queryTab() throws Exception
-    {
+    CAOMSearchFormPage queryTab() throws Exception {
         click(QUERY_TAB_LOCATOR);
         return new CAOMSearchFormPage(driver);
     }
 
-    WebElement getIQColumnHeader() throws Exception
-    {
+    WebElement getIQColumnHeader() throws Exception {
         return getGrid().findElement(IQ_COLUMN_HEADER);
     }
 
-    WebElement getRestFrameEnergyColumnHeader() throws Exception
-    {
+    WebElement getRestFrameEnergyColumnHeader() throws Exception {
         return getGrid().findElement(REST_FRAME_COLUMN_HEADER);
     }
 
-    void confirmFootprintViewer() throws Exception
-    {
+    void confirmFootprintViewer() throws Exception {
         click(FOOTPRINT_VIEWER_TOGGLE_LINK);
         waitForElementVisible(FOOTPRINT_VIEWER);
         click(FOOTPRINT_VIEWER_TOGGLE_LINK);
         waitForElementInvisible(FOOTPRINT_VIEWER);
     }
 
-    void confirmProposalProjectColumnHeader() throws Exception
-    {
+    void confirmProposalProjectColumnHeader() throws Exception {
         waitForElementVisible(getGrid().findElement(PROPOSAL_PROJECT_COLUMN_HEADER));
     }
 
-    String getSelectedRestFrameEnergyUnit() throws Exception
-    {
+    String getSelectedRestFrameEnergyUnit() throws Exception {
         final Select rfUnitSelect = new Select(gridContainer.findElement(REST_FRAME_ENERGY_UNIT_SELECT_LOCATOR));
         final WebElement rfUnitSelectedOption = rfUnitSelect.getFirstSelectedOption();
 
         return rfUnitSelectedOption.getText();
     }
 
-    String getSelectIQUnit() throws Exception
-    {final Select iqUnitSelectElement = new Select(gridContainer.findElement(
-                IQ_UNIT_SELECT_LOCATOR));
+    String getSelectIQUnit() throws Exception {
+        final Select iqUnitSelectElement = new Select(gridContainer.findElement(
+            IQ_UNIT_SELECT_LOCATOR));
         return iqUnitSelectElement.getFirstSelectedOption().getText();
     }
 
-    void filterOnRA(final String value) throws Exception
-    {
+    void filterOnRA(final String value) throws Exception {
         sendKeys(find(RA_FILTER_BY), value);
+    }
+
+    void ensureMAQEnabled() throws Exception {
+        waitForElementVisible(MAQ_LABEL_BY);
     }
 }

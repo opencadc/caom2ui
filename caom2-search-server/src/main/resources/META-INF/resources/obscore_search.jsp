@@ -23,8 +23,7 @@
     <input type="hidden" name="SelectList" class="ObsCore_selectlist"/>
     <input type="hidden" name="MaxRecords" value="${param.maxRowLimit}"/>
     <input type="hidden" name="format" value="csv"/>
-    <input type="hidden" class="useMaqValue" name="useMaq" value="${param.useMaq}"/>
-
+    <input type="hidden" class="activateMAQValue" name="activateMAQ" value="${param.activateMAQ}"/>
 
     <div class="col-sm-12 button-holder">
       <button type="submit"
@@ -38,20 +37,21 @@
         <fmt:message key="RESET_BUTTON_LABEL" bundle="${langBundle}"/>
       </button>
 
-      <!-- useMaq = true means display this checkbox -->
-      <c:if test="${param.useMaq eq 'true'}">
+      <!-- enableMAQ = true means display this checkbox -->
+      <c:if test="${param.enableMAQ eq 'true'}">
         <div class="maq-div">
-          <input class="useMaq"
+          <input class="activateMAQ obscore"
+                  name="activateMAQ"
                   type="checkbox"
-                  checked data-toggle="toggle"
+                  data-toggle="toggle"
                   data-size="mini"
                   data-on="<fmt:message key="YES_FORM_LABEL" bundle="${langBundle}"/>"
                   data-off="<fmt:message key="NO_FORM_LABEL" bundle="${langBundle}"/>"                  
-                  data-onstyle="success" />
+                  data-onstyle="success" <c:if test="${param.activateMAQ eq 'true'}">checked="checked"</c:if> />
           <label class="maq-label">
             <fmt:message key="USE_MAQ_FORM_LABEL" bundle="${langBundle}"/>&nbsp;&nbsp;
             <div data-toggle="popover"
-                data-utype="useMaq"
+                data-utype="activateMAQ"
                 data-placement="right"
                 data-title="<fmt:message key="USE_MAQ_FORM_LABEL" bundle="${langBundle}"/>"
                 class="advancedsearch-tooltip glyphicon glyphicon-question-sign popover-blue popover-right">

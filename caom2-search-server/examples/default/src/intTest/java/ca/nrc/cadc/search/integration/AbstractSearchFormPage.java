@@ -83,10 +83,10 @@ abstract class AbstractSearchFormPage extends AbstractTestWebPage
     private static final String DETAILS_LOCATOR_XPATH = "//details[@id='%s']";
     private static final String CONTENT_LOCATOR_XPATH = "//*[@id='%s']/summary/label/span";
 
-    @FindBy(className = "submit-query")
+    @FindBy(xpath = "//*[@id=\"queryForm\"]/div[1]/button[@type=\"submit\"]")
     private WebElement topSubmitButton;
 
-    @FindBy(className = "reset-query-form")
+    @FindBy(xpath = "//*[@id=\"queryForm\"]/div[1]/button[2]")
     private WebElement topResetButton;
 
 
@@ -94,6 +94,7 @@ abstract class AbstractSearchFormPage extends AbstractTestWebPage
     {
         super(driver);
 
+        waitForElementClickable(By.cssSelector("button[type=\"reset\"]"));
         PageFactory.initElements(driver, this);
     }
 
@@ -216,7 +217,7 @@ abstract class AbstractSearchFormPage extends AbstractTestWebPage
      */
     void showInputField(final String inputID) throws Exception
     {
-        final WebElement element = find(By.xpath(String.format(DETAILS_LOCATOR_XPATH, (inputID + "_details"))));
+        final WebElement element = find(By.id(inputID + "_details"));
 
         if (!find(By.id(inputID)).isDisplayed())
         {
@@ -233,7 +234,7 @@ abstract class AbstractSearchFormPage extends AbstractTestWebPage
      */
     void hideInputField(final String inputID) throws Exception
     {
-        final WebElement element = find(By.xpath(String.format(DETAILS_LOCATOR_XPATH, (inputID + "_details"))));
+        final WebElement element = find(By.id(inputID + "_details"));
 
         if (find(By.id(inputID)).isDisplayed())
         {
