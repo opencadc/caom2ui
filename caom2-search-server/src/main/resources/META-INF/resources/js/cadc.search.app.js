@@ -316,7 +316,18 @@
       }
 
       return adqlText
-    }
+    };
+
+    this._getTargetUpload = function() {
+      var jobString = sessionStorage.getItem('uws_job');
+      var upload;
+      if (jobString) {
+        var jobJSON = JSON.parse(jobString);
+        var uwsJobParser = new ca.nrc.cadc.search.uws.json.UWSJobParser(jobJSON);
+        upload = uwsJobParser.getJob().getParameterValue('UPLOAD');
+      }
+      return upload;
+    };
 
     /**
      * Initialize the form configurations.
@@ -1595,8 +1606,9 @@
         '?LANG=ADQL&REQUEST=doQuery&' +
         queryParam
 
-      if (jobParams.upload_url && jobParams.upload_url !== null) {
-        votableURL += '&UPLOAD=' + encodeURIComponent(jobParams.upload_url)
+      var upload = this._getTargetUpload()
+      if (upload) {
+        votableURL += '&UPLOAD=' + upload
       }
 
       for (
