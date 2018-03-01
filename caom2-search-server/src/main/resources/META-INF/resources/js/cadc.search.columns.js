@@ -31,11 +31,18 @@
                 fitMax: true,
                 formatter: function(row, cell, value, columnDef, dataContext) {
                   var publisherID =
+                    dataContext[ca.nrc.cadc.search.columns.PUBLISHER_ID_UTYPE]
+                  var observationURI =
                     dataContext[
-                      ca.nrc.cadc.search.columns.PUBLISHER_ID_UTYPE
+                      ca.nrc.cadc.search.columns.OBSERVATION_URI_UTYPE
                     ]
-                  var observationURI = dataContext[ca.nrc.cadc.search.columns.OBSERVATION_URI_UTYPE]
-                  return formatDetailsCell(value, observationURI, publisherID, columnDef, row)
+                  return formatDetailsCell(
+                    value,
+                    observationURI,
+                    publisherID,
+                    columnDef,
+                    row
+                  )
                 }
               },
               'caom2:Observation.uri': {
@@ -49,7 +56,8 @@
                 },
                 asyncFormatter: function(cellNode, row, dataContext) {
                   var $cell = $(cellNode)
-                  var planePublisherIdValue = dataContext[ca.nrc.cadc.search.columns.PUBLISHER_ID_UTYPE]
+                  var planePublisherIdValue =
+                    dataContext[ca.nrc.cadc.search.columns.PUBLISHER_ID_UTYPE]
 
                   /**
                    * Create a link for a preview.
@@ -92,12 +100,14 @@
                     return $link
                   }
 
+                  /**
+                   * Create a link object and append it to the row.
+                   *
+                   * jenkinsd 2018.02.26
+                   */
                   function insertPreviewLink(
                     previewUrls,
                     thumbnailUrls,
-                    collection,
-                    observationID,
-                    productID,
                     publisherId
                   ) {
                     // Create the preview link
@@ -109,48 +119,37 @@
                     )
 
                     if (previewUrls.length > 0) {
+                      var pubIDQuery = new cadc.web.util.URI(publisherId).getQueryString().split('/')
+                      var observationID = pubIDQuery[0]
+                      var productID = pubIDQuery[1]
+
                       // Display the preview window
                       $link.click(function() {
                         var $content = $('<div id="scoped-content"></div>')
 
                         // Preview window content
-                        if (previewUrls.length > 0) {
-                          var $col = $(
-                            '<p style="text-align: center;"></p>'
-                          ).text('collection: ' + collection)
-                          var $obsId = $(
-                            '<p style="text-align: center;"></p>'
-                          ).text('observationID: ' + observationID)
-                          var $pdctId = $(
-                              '<p style="text-align: center;"></p>'
-                          ).text('productID: ' + productID)
-                          var $pubId = $(
-                              '<p style="text-align: center;"></p>'
-                          ).text('publisherID: ' + publisherId)
+                        var $obsId = $(
+                          '<p style="text-align: center;"></p>'
+                        ).text('observationID: ' + observationID)
+                        var $pdctId = $(
+                          '<p style="text-align: center;"></p>'
+                        ).text('productID: ' + productID)
+                        var $pubId = $(
+                          '<p style="text-align: center;"></p>'
+                        ).text('publisherID: ' + publisherId)
+                        var $previews = $('<div></div>')
 
-                          var $previews = $('<div></div>')
-
-                          for (var j = 0; j < previewUrls.length; j++) {
-                            var $preview = $(
-                              '<img style="display: block; margin: auto;"/>'
-                            )
-                            $preview.prop('id', observationID + '_preview_' + j)
-                            $preview.prop('src', previewUrls[j])
-                            $preview.addClass('image-actual')
-                            $previews.append($preview, '<br>')
-                          }
-
-                          $content.append($col, $obsId, $pdctId, $pubId, $previews)
-                        } else {
-                          var lang = $('html').attr('lang')
-                          $content.append(
-                            $('<p style="text-align: center;"></p>').text(
-                              ca.nrc.cadc.search.preview.unauthorized_message[
-                                lang
-                              ]
-                            )
+                        for (var j = 0; j < previewUrls.length; j++) {
+                          var $preview = $(
+                            '<img style="display: block; margin: auto;"/>'
                           )
+                          $preview.prop('id', observationID + '_preview_' + j)
+                          $preview.prop('src', previewUrls[j])
+                          $preview.addClass('image-actual')
+                          $previews.append($preview, '<br>')
                         }
+
+                        $content.append($obsId, $pdctId, $pubId, $previews)
 
                         // name parameter (second one) passed in to open()
                         // leads to Safari not being able to focus on the document
@@ -176,10 +175,12 @@
                         return false
                       })
                     }
-                  }
+                  } // End of insertPreviewLink
 
                   if (planePublisherIdValue) {
-                    var previewURI = new cadc.web.util.URI(planePublisherIdValue)
+                    var previewURI = new cadc.web.util.URI(
+                      planePublisherIdValue
+                    )
                     var pathItems = previewURI.getPathItems()
                     var collection, observationID, productID
 
@@ -379,9 +380,6 @@
                               insertPreviewLink(
                                 previewUrls,
                                 thumbnailUrls,
-                                collection,
-                                observationID,
-                                productID,
                                 planePublisherIdValue
                               )
                             }
@@ -549,11 +547,18 @@
                 fitMax: true,
                 formatter: function(row, cell, value, columnDef, dataContext) {
                   var publisherID =
+                    dataContext[ca.nrc.cadc.search.columns.PUBLISHER_ID_UTYPE]
+                  var observationURI =
                     dataContext[
-                      ca.nrc.cadc.search.columns.PUBLISHER_ID_UTYPE
+                      ca.nrc.cadc.search.columns.OBSERVATION_URI_UTYPE
                     ]
-                   var observationURI = dataContext[ca.nrc.cadc.search.columns.OBSERVATION_URI_UTYPE]
-                  return formatDetailsCell(value, observationURI, publisherID, columnDef, row)
+                  return formatDetailsCell(
+                    value,
+                    observationURI,
+                    publisherID,
+                    columnDef,
+                    row
+                  )
                 }
               },
               'caom2:Plane.metaRelease': {
@@ -944,10 +949,10 @@
                   ]
                 }
               },
-              "caom2:Plane.publisherID": {
-                "fitMax": true,
-                "label": "Publisher ID",
-                "tap_column_name": "Plane.publisherID"
+              'caom2:Plane.publisherID': {
+                fitMax: true,
+                label: 'Publisher ID',
+                tap_column_name: 'Plane.publisherID'
               },
               'obscore:Char.SpatialAxis.Coverage.Bounds.Extent.diameter': {
                 fitMax: true,
@@ -1315,12 +1320,21 @@
    * @param {Number} rowNum          The row number.
    * @returns {string}
    */
-  function formatDetailsCell(value, observationURI, publisherID, column, rowNum) {
+  function formatDetailsCell(
+    value,
+    observationURI,
+    publisherID,
+    column,
+    rowNum
+  ) {
     var $link = $('<a></a>')
     var observationURIObj = new cadc.web.util.URI(observationURI)
     var publisherIDURI = new cadc.web.util.URI(publisherID)
     var detailsURI = new cadc.web.util.URI(
-      ca.nrc.cadc.search.DETAILS_BASE_URL + observationURIObj.getPath() + '?ID=' + publisherIDURI.uri
+      ca.nrc.cadc.search.DETAILS_BASE_URL +
+        observationURIObj.getPath() +
+        '?ID=' +
+        publisherIDURI.uri
     )
 
     $link.text(value)
