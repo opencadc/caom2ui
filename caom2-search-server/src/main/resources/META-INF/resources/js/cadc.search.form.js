@@ -129,7 +129,7 @@
    *
    * @constructor
    */
-  function FormConfiguration (_config, _options) {    
+  function FormConfiguration(_config, _options) {
     var stringUtil = new org.opencadc.StringUtil()
 
     this.config = _config
@@ -689,7 +689,7 @@
     /**
      * Initialize this form.
      */
-    this.init = function(activateMAQ) {
+    this.init = function() {
       var $currForm = this.$form
       this.targetNameFieldID = $currForm
         .find("input[name$='@Shape1.value']")
@@ -845,21 +845,28 @@
         }.bind(this)
       )
 
-      $currForm.find('.activateMAQ').change(
-        function(event) {
-          // This sets up or removes the MAQ mode display items
-          // in the form and results panel
-          if (this.maqToggleEnabled === true) {
-            // toggle results table header element
-            this.setResultsMaqMode(
+      $currForm
+        .find('.activateMAQ')
+        .change(
+          function(event) {
+            var maqSelectedFlag =
               event.currentTarget.checked === 'true' ||
-                event.currentTarget.checked === true
-            )
-            this.disableMaqToggle()
-            this.dataTrain.setMaqMode(event.currentTarget.checked)
-          }
-        }.bind(this)
-      ).change()
+              event.currentTarget.checked === true
+            // This sets up or removes the MAQ mode display items
+            // in the form and results panel
+            // if (this.maqToggleEnabled === true) {
+            // toggle results table header element
+            this.setResultsMaqMode(maqSelectedFlag)
+
+            // Don't reload the train if nothing has changed.
+            if (this.dataTrain.isMAQMode() !== maqSelectedFlag) {
+              this.disableMaqToggle()
+              this.dataTrain.setMaqMode(maqSelectedFlag)
+              this.enableMaqToggle()
+            }
+            // }
+          }.bind(this)
+        )
 
       // Prevent closing details when a value is present.
       $currForm.find("details[id$='_details'] summary").click(function(event) {
@@ -953,18 +960,6 @@
         }
       )
 
-      // Toggling the MAQ switch will trigger datatrain load
-      // "" can mean it's not in the URL, or it's not enabled for this app
-      // if (activateMAQ === false) {
-      //   this.disableMaqToggle()
-      //   this.dataTrain.init()
-      // } else {        
-      //   this.setMaqToggle(activateMAQ)
-      //   // this.disableMaqToggle()       
-      //   this.enableMaqToggle()
-      // }
-
-      this.setResultsMaqMode(activateMAQ)
       this.dataTrain.init()
 
       try {
@@ -975,7 +970,9 @@
     }
 
     this.setMaqToggle = function(setOn) {
-      this.$form.find(ca.nrc.cadc.search.activateMAQSelector).bootstrapToggle((setOn === true) ? 'on' : 'off')
+      this.$form
+        .find(ca.nrc.cadc.search.activateMAQSelector)
+        .bootstrapToggle(setOn === true ? 'on' : 'off')
       this.disableMaqToggle()
     }
 
@@ -987,18 +984,20 @@
       this._toggleMAQToggle(true)
     }
 
-    this._toggleMAQToggle = function (enabledFlag) {
+    this._toggleMAQToggle = function(enabledFlag) {
       this.maqToggleEnabled = enabledFlag
-      this.$form.find(ca.nrc.cadc.search.activateMAQSelector).bootstrapToggle(enabledFlag ? 'enable' : 'disable')
+      this.$form
+        .find(ca.nrc.cadc.search.activateMAQSelector)
+        .bootstrapToggle(enabledFlag ? 'enable' : 'disable')
     }
 
     this.setResultsMaqMode = function(setOn) {
       if (setOn === true || setOn === 'true') {
         $('#resultsMaqEnabled').removeClass('cadc-display-none')
-        this.$form.find('.activateMAQValue').val(true)
+        // this.$form.find('.activateMAQValue').val(true)
       } else {
         $('#resultsMaqEnabled').addClass('cadc-display-none')
-        this.$form.find('.activateMAQValue').val(false)
+        // this.$form.find('.activateMAQValue').val(false)
       }
     }
 

@@ -86,6 +86,7 @@ import ca.nrc.cadc.search.upload.UploadResults;
 import ca.nrc.cadc.tap.DefaultSyncTAPClient;
 import ca.nrc.cadc.tap.SyncTAPClient;
 import ca.nrc.cadc.tap.TAPSearcher;
+import ca.nrc.cadc.util.StringUtil;
 import ca.nrc.cadc.uws.AdvancedRunner;
 import ca.nrc.cadc.uws.ExecutionPhase;
 import ca.nrc.cadc.uws.HTTPResponseSyncOutput;
@@ -331,9 +332,9 @@ public class SearchJobServlet extends SyncServlet {
 
         final URI tapServiceURI;
         final String tapServiceKey;
+        final String maqActivatedParam = request.getParameter("activateMAQ");
 
-        if ((request.getParameter("activateMAQ") != null)
-            && (request.getParameter("activateMAQ").equals("true"))) {
+        if (StringUtil.hasText(maqActivatedParam) && maqActivatedParam.equals("on")) {
             tapServiceURI = ALTERNATE_TAP_SERVICE_URI;
             tapServiceKey = ALT_TAP_SERVICE_URI_PROPERTY_KEY;
         } else {

@@ -175,7 +175,7 @@
     this.$dataTrainDOM = $("div[id='" + this.modelDataSource + "_data_train']")
     this.$dtTableDOM = $('.' + this.modelDataSource + '_dtTableDiv')
     this.uType = this.$dataTrainDOM.find('.hierarchy_utype').text()
-    this.activateMAQ = this.$dataTrainDOM.find('.load_maq_data_train').text()
+    this.activateMAQ = this.$dataTrainDOM.find('.load_maq_data_train').text() === 'true'
     this.groups = []
     this.freshInstruments = []
 
@@ -357,13 +357,17 @@
 
     /**
      * Load MAQ data into DataTrain if activateMAQ = true
-     * @param activateMAQ
+     * @param {boolean} activateMAQ
      */
     this.setMaqMode = function(activateMAQ) {
       this._clearTable()
       this._toggleLoading(true)
       this.activateMAQ = activateMAQ
       this._loadDataTrain()
+    }
+
+    this.isMAQMode = function () {
+      return this.activateMAQ
     }
 
     /**

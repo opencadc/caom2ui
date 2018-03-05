@@ -1459,8 +1459,8 @@
       )
 
       // if parameter function returns false the toggle is off
-      caomSearchForm.init(this.hasMaqParameterInURI() === true)
-      obsCoreSearchForm.init(this.hasMaqParameterInURI() === true)
+      caomSearchForm.init()
+      obsCoreSearchForm.init()
     }
 
     // End start method.
