@@ -46,7 +46,8 @@
                   data-toggle="toggle"
                   data-size="mini"
                   data-on="<fmt:message key="YES_FORM_LABEL" bundle="${langBundle}"/>"
-                  data-off="<fmt:message key="NO_FORM_LABEL" bundle="${langBundle}"/>"                  
+                  data-off="<fmt:message key="NO_FORM_LABEL" bundle="${langBundle}"/>"
+                  value="${param.activateMAQ}"
                   data-onstyle="success" <c:if test="${param.activateMAQ eq 'true'}">checked="checked"</c:if> />
           <label class="maq-label">
             <fmt:message key="USE_MAQ_FORM_LABEL" bundle="${langBundle}"/>&nbsp;&nbsp;

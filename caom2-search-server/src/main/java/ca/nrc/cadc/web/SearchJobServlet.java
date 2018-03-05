@@ -334,7 +334,8 @@ public class SearchJobServlet extends SyncServlet {
         final String tapServiceKey;
         final String maqActivatedParam = request.getParameter("activateMAQ");
 
-        if (StringUtil.hasText(maqActivatedParam) && maqActivatedParam.equals("on")) {
+        if (StringUtil.hasText(maqActivatedParam) && (maqActivatedParam.equals("on") || maqActivatedParam.equals
+            ("true"))) {
             tapServiceURI = ALTERNATE_TAP_SERVICE_URI;
             tapServiceKey = ALT_TAP_SERVICE_URI_PROPERTY_KEY;
         } else {

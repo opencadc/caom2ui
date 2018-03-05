@@ -4,6 +4,7 @@
       nrc: {
         cadc: {
           search: {
+            activateMAQName: 'activateMAQ',
             activateMAQSelector: '.activateMAQ',
             ignore_fields: ['collection', 'noexec'],
             CAOM2_TARGET_NAME_FIELD_ID: 'Plane.position.bounds',
@@ -1824,10 +1825,10 @@
      */
     this.resetFields = function() {
       // function that resets all fields to default values
-      this.$form.find('input:text').val('')
-      $('#UPLOAD').remove()
+      this.$form.find('input:text').val('')  
 
-      $('#include_proprietary').removeAttr('checked')
+      $('#UPLOAD').remove()
+      $('#include_proprietary').removeAttr('checked')    
 
       this._clearTargetList()
 
@@ -1916,7 +1917,7 @@
 
       // Classname used instead of id for this element because it exists on both caom2 and obscore
       // search forms
-      if (_inputID === 'activateMAQ') {
+      if (_inputID === ca.nrc.cadc.search.activateMAQName) {
         // Note that changing this box will kick off a data train update as well,
         // which may affect timing on Additional Constraints (hierarchy.js) fields that need to be updated
         $inputItem = this.$form.find("input[class='" + _inputID + "']")
