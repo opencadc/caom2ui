@@ -23,7 +23,7 @@
     <input type="hidden" name="SelectList" class="ObsCore_selectlist"/>
     <input type="hidden" name="MaxRecords" value="${param.maxRowLimit}"/>
     <input type="hidden" name="format" value="csv"/>
-    <input type="hidden" class="activateMAQValue" name="activateMAQ" value="${param.activateMAQ}"/>
+    <%-- <input type="hidden" class="activateMAQValue" name="activateMAQ" value="${param.activateMAQ}"/> --%>
 
     <div class="col-sm-12 button-holder">
       <button type="submit"
@@ -46,7 +46,8 @@
                   data-toggle="toggle"
                   data-size="mini"
                   data-on="<fmt:message key="YES_FORM_LABEL" bundle="${langBundle}"/>"
-                  data-off="<fmt:message key="NO_FORM_LABEL" bundle="${langBundle}"/>"                  
+                  data-off="<fmt:message key="NO_FORM_LABEL" bundle="${langBundle}"/>"
+                  value="${param.activateMAQ}"
                   data-onstyle="success" <c:if test="${param.activateMAQ eq 'true'}">checked="checked"</c:if> />
           <label class="maq-label">
             <fmt:message key="USE_MAQ_FORM_LABEL" bundle="${langBundle}"/>&nbsp;&nbsp;

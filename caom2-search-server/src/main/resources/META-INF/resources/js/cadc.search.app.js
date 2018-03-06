@@ -1152,6 +1152,10 @@
       $(':reset').click(
         function() {
           this._getActiveForm().resetFields()
+          this._getActiveForm().getForm().find(ca.nrc.cadc.search.activateMAQSelector).each(function (index, item) {
+            var $maqToggle = $(item)
+            $maqToggle.prop('checked', $maqToggle.prop('defaultValue')).change()
+          })   
         }.bind(this)
       )
 
@@ -1459,8 +1463,8 @@
       )
 
       // if parameter function returns false the toggle is off
-      caomSearchForm.init(this.hasMaqParameterInURI() === true)
-      obsCoreSearchForm.init(this.hasMaqParameterInURI() === true)
+      caomSearchForm.init()
+      obsCoreSearchForm.init()
     }
 
     // End start method.

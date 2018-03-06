@@ -36,7 +36,6 @@ package ca.nrc.cadc.search.integration;
 
 
 import org.junit.Test;
-import org.openqa.selenium.By;
 
 
 public class MAQCAOMSearchBrowserTest extends AbstractAdvancedSearchIntegrationTest {
@@ -48,8 +47,8 @@ public class MAQCAOMSearchBrowserTest extends AbstractAdvancedSearchIntegrationT
     @Test
     public void searchCAOM() throws Exception {
         CAOMSearchFormPage searchFormPage = goTo(endpoint, null, CAOMSearchFormPage.class);
+        searchFormPage.checkMAQ();
 
-        searchFormPage.enableMAQ();
         searchFormPage.enterCollection("CHANDRA");
         searchFormPage.enterInstrument("HRC-S");
 
