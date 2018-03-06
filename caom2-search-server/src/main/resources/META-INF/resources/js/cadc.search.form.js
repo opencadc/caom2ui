@@ -1825,9 +1825,15 @@
      */
     this.resetFields = function() {
       // function that resets all fields to default values
-      this.$form.find('input:text').val('')  
+      this.$form.find('input:text').val('')
+      this.$form.find(ca.nrc.cadc.search.activateMAQSelector).val(function () {
+        var $self = $(this)
+        $self.prop('checked', $self.prop('defaultValue')).change()      
+        return this.defaultValue
+      })
 
       $('#UPLOAD').remove()
+
       $('#include_proprietary').removeAttr('checked')    
 
       this._clearTargetList()
