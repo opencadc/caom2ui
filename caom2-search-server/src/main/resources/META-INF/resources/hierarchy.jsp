@@ -12,11 +12,11 @@
     <div class="panel-heading">
       <fmt:message key="DATA_ACQUISITION_LABEL" bundle="${langBundle}"/></div>
     <div class="panel-body">
-      <div id="${param.modelDataSource}@Hierarchy"
+      <div id="${param.modelDataSource}_data_train"
            class="width-100 text-align advanced_search_data_train modelDataSource_${param.modelDataSource} ${param.colcount}"
            data-utypes="${param.utyifpe}">
         <div class="hidden hierarchy_utype">${param.utype}</div>
-        <div class="hidden load_maq_data_train">${param.useMaq}</div>
+        <div class="hidden load_maq_data_train">${param.activateMAQ}</div>
 
         <div id="${param.utype}.building" class="loading">
           <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span> <fmt:message key="LOADING_MESSAGE" bundle="${langBundle}"/>

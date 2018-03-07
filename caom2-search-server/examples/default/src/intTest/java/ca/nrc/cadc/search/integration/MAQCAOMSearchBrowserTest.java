@@ -24,35 +24,41 @@
  *
  *
  * @author jenkinsd
- * 15/05/14 - 2:17 PM
+ * 15/05/14 - 1:19 PM
  *
  *
  *
  ****  C A N A D I A N   A S T R O N O M Y   D A T A   C E N T R E  *****
  ************************************************************************
  */
+
 package ca.nrc.cadc.search.integration;
+
 
 import org.junit.Test;
 
 
-public class ResolverTooltipBrowserTest extends AbstractAdvancedSearchIntegrationTest
-{
-    public ResolverTooltipBrowserTest() throws Exception
-    {
+public class MAQCAOMSearchBrowserTest extends AbstractAdvancedSearchIntegrationTest {
+    public MAQCAOMSearchBrowserTest() throws Exception {
         super();
     }
 
-    /**
-     * Tooltip for the Name resolver
-     * @throws Exception        Any issue at all.
-     */
-    @Test
-    public void resolverToolTipTest() throws Exception
-    {
-        final CAOMSearchFormPage searchFormPage = goTo(endpoint, null, CAOMSearchFormPage.class);
 
-        searchFormPage.enterValidTarget("m101");
-        searchFormPage.resetForm();
+    @Test
+    public void searchMAQ() throws Exception {
+        CAOMSearchFormPage searchFormPage = goTo(endpoint, null, CAOMSearchFormPage.class);
+        if (searchFormPage.isMAQEnabled()) {
+            searchMAQ(searchFormPage);
+        }
+    }
+
+    private void searchMAQ(final CAOMSearchFormPage searchFormPage) throws Exception {
+        searchFormPage.checkMAQ();
+
+        searchFormPage.enterCollection("CHANDRA");
+        searchFormPage.enterInstrument("HRC-S");
+
+        final SearchResultsPage resultsPage = searchFormPage.submitSuccess();
+        resultsPage.ensureMAQEnabled();
     }
 }

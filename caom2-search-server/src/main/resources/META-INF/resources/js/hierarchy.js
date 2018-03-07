@@ -26,136 +26,138 @@
  ************************************************************************
  */
 
-(function ($, window)
-{
+; (function ($, window) {
   $.extend(true, window, {
-    "ca": {
-      "nrc": {
-        "cadc": {
-          "search": {
-            "datatrain": {
-              "URI_MATCH_REGEX": /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/,
-              "SELECT_DISPLAY_OPTION_COUNT": 12,
-              "SPACER_CHAR": "&#9472;",
+    ca: {
+      nrc: {
+        cadc: {
+          search: {
+            datatrain: {
+              URI_MATCH_REGEX: /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/,
+              SELECT_DISPLAY_OPTION_COUNT: 12,
+              SPACER_CHAR: '&#9472;',
               /**
                * Obtain a spacer formatter.
                *
                * @returns {string}
                * @constructor
                */
-              "SPACER": function ()
-              {
-                var val = "";
-                for (var s = 0; s < 20; s++)
-                {
-                  val += ca.nrc.cadc.search.datatrain.SPACER_CHAR;
+              SPACER: function () {
+                var val = ''
+                for (var s = 0; s < 20; s++) {
+                  val += ca.nrc.cadc.search.datatrain.SPACER_CHAR
                 }
 
-                return val;
+                return val
               },
-              "tap": {
-                "QUERY_TEMPLATE": "SELECT {1}, CASE WHEN {2} >= {3} THEN 1 ELSE 0 END FROM {4}",
-                "INSTRUMENT_FRESH_MJD_FIELD_NAME": {
-                  "caom2": "max_time_bounds_cval1",
-                  "obscore": "max_t_min"
+              tap: {
+                QUERY_TEMPLATE:
+                  'SELECT {1}, CASE WHEN {2} >= {3} THEN 1 ELSE 0 END FROM {4}',
+                INSTRUMENT_FRESH_MJD_FIELD_NAME: {
+                  caom2: 'max_time_bounds_cval1',
+                  obscore: 'max_t_min'
                 },
-                "TABLE": {
-                  "caom2": "caom2.enumfield",
-                  "obscore": "caom2.obscoreenumfield"
+                TABLE: {
+                  caom2: 'caom2.enumfield',
+                  obscore: 'caom2.obscoreenumfield'
                 }
               },
-              "CALIBRATION_LEVEL_MAP": {
-                0: "Raw Instrumental",
-                1: "Raw Standard",
-                2: "Calibrated",
-                3: "Product"
+              CALIBRATION_LEVEL_MAP: {
+                0: 'Raw Instrumental',
+                1: 'Raw Standard',
+                2: 'Calibrated',
+                3: 'Product'
               },
-              "COLLECTION_ORDER": [
-                "CFHT",
-                "CFHTMEGAPIPE",
-                "CFHTTERAPIX",
-                "CFHTWIRWOLF",
-                "HST",
-                "HSTHLA",
-                "GEMINI",
-                "JCMT",
-                "JCMTLS",
-                "DAO",
-                "DAOPLATES"
+              COLLECTION_ORDER: [
+                'CFHT',
+                'CFHTMEGAPIPE',
+                'CFHTTERAPIX',
+                'CFHTWIRWOLF',
+                'HST',
+                'HSTHLA',
+                'GEMINI',
+                'JCMT',
+                'JCMTLS',
+                'DAO',
+                'DAOPLATES'
               ],
-              "sortCollections": function (val1, val2)
-              {
-                var val1Index = ca.nrc.cadc.search.datatrain.COLLECTION_ORDER.indexOf(val1);
-                var val2Index = ca.nrc.cadc.search.datatrain.COLLECTION_ORDER.indexOf(val2);
+              sortCollections: function (val1, val2) {
+                var val1Index = ca.nrc.cadc.search.datatrain.COLLECTION_ORDER.indexOf(
+                  val1
+                )
+                var val2Index = ca.nrc.cadc.search.datatrain.COLLECTION_ORDER.indexOf(
+                  val2
+                )
 
-                var placement;
-
-                // Put garbage at the bottom
-                if (val2Index < 0)
-                {
-                  placement = -1;
-                }
-                else if (val1Index < 0)
-                {
-                  placement = 1;
-                }
-                else
-                {
-                  placement = val1Index - val2Index;
-                }
-
-                return placement;
-              },
-              "sortNumericDescending": function (val1, val2)
-              {
-                var descVal;
+                var placement
 
                 // Put garbage at the bottom
-                if ((val1 === null) || isNaN(val1))
-                {
-                  descVal = 1;
-                }
-                else if ((val2 === null) || isNaN(val2))
-                {
-                  descVal = -1;
-                }
-                else
-                {
-                  descVal = val2 - val1;
+                if (val2Index < 0) {
+                  placement = -1
+                } else if (val1Index < 0) {
+                  placement = 1
+                } else {
+                  placement = val1Index - val2Index
                 }
 
-                return descVal;
+                return placement
               },
-              "CUSTOM_SORT_UTYPES": {
-                "Observation.collection": function (val1, val2)
-                {
-                  return ca.nrc.cadc.search.datatrain.sortCollections(val1, val2);
+              sortNumericDescending: function (val1, val2) {
+                var descVal
+
+                // Put garbage at the bottom
+                if (val1 === null || isNaN(val1)) {
+                  descVal = 1
+                } else if (val2 === null || isNaN(val2)) {
+                  descVal = -1
+                } else {
+                  descVal = val2 - val1
+                }
+
+                return descVal
+              },
+              CUSTOM_SORT_UTYPES: {
+                'Observation.collection': function (val1, val2) {
+                  return ca.nrc.cadc.search.datatrain.sortCollections(
+                    val1,
+                    val2
+                  )
                 },
-                "DataID.Collection": function (val1, val2)
-                {
-                  return ca.nrc.cadc.search.datatrain.sortCollections(val1, val2);
+                'DataID.Collection': function (val1, val2) {
+                  return ca.nrc.cadc.search.datatrain.sortCollections(
+                    val1,
+                    val2
+                  )
                 },
-                "Plane.calibrationLevel": function (val1, val2)
-                {
-                  return ca.nrc.cadc.search.datatrain.sortNumericDescending(val1, val2);
+                'Plane.calibrationLevel': function (val1, val2) {
+                  return ca.nrc.cadc.search.datatrain.sortNumericDescending(
+                    val1,
+                    val2
+                  )
                 },
-                "Obs.calibLevel": function (val1, val2)
-                {
-                  return ca.nrc.cadc.search.datatrain.sortNumericDescending(val1, val2);
+                'Obs.calibLevel': function (val1, val2) {
+                  return ca.nrc.cadc.search.datatrain.sortNumericDescending(
+                    val1,
+                    val2
+                  )
                 }
               },
-              "ENDPOINT": "/tap/sync",
-              "DataTrain": DataTrain,
-              "events": {
-                "onDataTrainLoaded": new jQuery.Event("AdvancedSearch:onDataTrainLoaded"),
-                "onDataTrainLoadFail": new jQuery.Event("AdvancedSearch:onDataTrainLoadFail")
+              ENDPOINT: '/tap/sync',
+              DataTrain: DataTrain,
+              events: {
+                onDataTrainLoaded: new jQuery.Event(
+                  'AdvancedSearch:onDataTrainLoaded'
+                ),
+                onDataTrainLoadFail: new jQuery.Event(
+                  'AdvancedSearch:onDataTrainLoadFail'
+                )
               }
             }
           }
         }
       }
     }
-  });
+  })
 
   /**
    * @param {String} _modelDataSource   Name of the data source [caom2 | obscore]
@@ -165,27 +167,26 @@
    * @param {String} [_options.tapSyncEndpoint=/search/tap/sync]    TAP Endpoint.
    * @constructor
    */
-  function DataTrain(_modelDataSource, _columnManager, _options)
-  {
-    var stringUtil = new org.opencadc.StringUtil();
+  function DataTrain(_modelDataSource, _columnManager, _options) {
+    var stringUtil = new org.opencadc.StringUtil()
 
-    this.modelDataSource = _modelDataSource;
-    this.pageLanguage = $("html").attr("lang");
-    this.$dataTrainDOM = $("div[id='" + this.modelDataSource + "@Hierarchy']");
-    this.$dtTableDOM = $("." + this.modelDataSource + "_dtTableDiv");
-    this.uType = this.$dataTrainDOM.find(".hierarchy_utype").text();
-    this.useMaq = this.$dataTrainDOM.find(".load_maq_data_train").text();
-    this.groups = [];
-    this.freshInstruments = [];
+    this.modelDataSource = _modelDataSource
+    this.pageLanguage = $('html').attr('lang')
+    this.$dataTrainDOM = $("div[id='" + this.modelDataSource + "_data_train']")
+    this.$dtTableDOM = $('.' + this.modelDataSource + '_dtTableDiv')
+    this.uType = this.$dataTrainDOM.find('.hierarchy_utype').text()
+    this.activateMAQ = this.$dataTrainDOM.find('.load_maq_data_train').text() === 'true'
+    this.groups = []
+    this.freshInstruments = []
 
     this.defaults = {
       autoInit: false,
-      tapSyncEndpoint: "/search/tap/sync",
-      useMaq: this.useMaq
-    };
+      tapSyncEndpoint: '/search/tap/sync',
+      activateMAQ: this.activateMAQ
+    }
 
-    this.options = $.extend({}, true, this.defaults, _options);
-    this.columnManager = _columnManager;
+    this.options = $.extend({}, true, this.defaults, _options)
+    this.columnManager = _columnManager
 
     /**
      * Obtain a column configuration object.
@@ -193,43 +194,56 @@
      * @return {{}}
      * @private
      */
-    this._getColumnConfig = function(_uType)
-    {
-      return this.columnManager.getColumnOptions()[this.modelDataSource + ":" + _uType];
-    };
+    this._getColumnConfig = function (_uType) {
+      return this.columnManager.getColumnOptions()[
+        this.modelDataSource + ':' + _uType
+      ]
+    }
 
     /**
      * Initialize this DataTrain.
      */
-    this.init = function ()
-    {
-      this._toggleLoading(true);
-      this._loadDataTrain();
-    };
+    this.init = function () {
+      this._toggleLoading(true)
+      this._loadDataTrain()
+    }
 
     /**
      * Make call to server to get TAP data to load into DataTrain
      * @private
      */
-    this._loadDataTrain = function() {
-      var tapQuery = this._createTAPQuery();
+    this._loadDataTrain = function () {
+      var tapQuery = this._createTAPQuery()
 
       $.get(this.options.tapSyncEndpoint, {
-          "LANG": "ADQL",
-          "FORMAT": "CSV",
-          "USEMAQ": this.useMaq,
-          "QUERY": tapQuery
-        }).done(function (data)
+        LANG: 'ADQL',
+        FORMAT: 'CSV',
+        USEMAQ: this.activateMAQ,
+        QUERY: tapQuery
+      },
         {
-
-          this.groups = [];
-          this._trigger(ca.nrc.cadc.search.datatrain.events.onDataTrainLoaded, {data: data});
-        }.bind(this))
-        .fail(function (jqXHR)
-        {
-          this._trigger(ca.nrc.cadc.search.datatrain.events.onDataTrainLoadFail, {responseText: jqXHR.responseText});
-        }.bind(this)
-      );
+          xhrFields: {
+            withCredentials: true
+          },
+          jsonp: false
+        })
+        .done(
+          function (data) {
+            this.groups = []
+            this._trigger(
+              ca.nrc.cadc.search.datatrain.events.onDataTrainLoaded,
+              { data: data }
+            )
+          }.bind(this)
+        )
+        .fail(
+          function (jqXHR) {
+            this._trigger(
+              ca.nrc.cadc.search.datatrain.events.onDataTrainLoadFail,
+              { responseText: jqXHR.responseText }
+            )
+          }.bind(this)
+        )
     }
 
     /**
@@ -237,40 +251,52 @@
      * @returns {string}
      * @private
      */
-    this._createTAPQuery = function ()
-    {
-      var uTypes = this.uType.split("/");
-      var tapColumns = [];
+    this._createTAPQuery = function () {
+      var uTypes = this.uType.split('/')
+      var tapColumns = []
 
-      for (var i = 0, ul = uTypes.length; i < ul; i++)
-      {
-        var nextUType = uTypes[i];
-        if (nextUType === "useMaq")
-        {
-          continue;
+      for (var i = 0, ul = uTypes.length; i < ul; i++) {
+        var nextUType = uTypes[i]
+        if (nextUType === 'activateMAQ') {
+          continue
         }
-        var colOpts = this._getColumnConfig(nextUType);
+        var colOpts = this._getColumnConfig(nextUType)
 
-        if (colOpts.hasOwnProperty("tap_column_name"))
-        {
-          tapColumns.push(colOpts.tap_column_name);
-        }
-        else
-        {
-          tapColumns.push(nextUType.substring(nextUType.indexOf(".") + 1).replace(".", "_"));
+        if (colOpts.hasOwnProperty('tap_column_name')) {
+          tapColumns.push(colOpts.tap_column_name)
+        } else {
+          tapColumns.push(
+            nextUType.substring(nextUType.indexOf('.') + 1).replace('.', '_')
+          )
         }
       }
 
-      var now = new Date();
-      var dateThreshold = new Date(now.getFullYear() - 5, now.getMonth(), now.getDate(), now.getHours(),
-                                   now.getMinutes(), now.getSeconds(), now.getMilliseconds());
-      var mjdConverter = new ca.nrc.cadc.search.unitconversion.MJDConverter(dateThreshold);
+      var now = new Date()
+      var dateThreshold = new Date(
+        now.getFullYear() - 5,
+        now.getMonth(),
+        now.getDate(),
+        now.getHours(),
+        now.getMinutes(),
+        now.getSeconds(),
+        now.getMilliseconds()
+      )
+      var mjdConverter = new ca.nrc.cadc.search.unitconversion.MJDConverter(
+        dateThreshold
+      )
 
-      return stringUtil.format(ca.nrc.cadc.search.datatrain.tap.QUERY_TEMPLATE,
-                               [tapColumns.join(","),
-                                ca.nrc.cadc.search.datatrain.tap.INSTRUMENT_FRESH_MJD_FIELD_NAME[this.modelDataSource],
-                                mjdConverter.convert(), ca.nrc.cadc.search.datatrain.tap.TABLE[_modelDataSource]]);
-    };
+      return stringUtil.format(
+        ca.nrc.cadc.search.datatrain.tap.QUERY_TEMPLATE,
+        [
+          tapColumns.join(','),
+          ca.nrc.cadc.search.datatrain.tap.INSTRUMENT_FRESH_MJD_FIELD_NAME[
+          this.modelDataSource
+          ],
+          mjdConverter.convert(),
+          ca.nrc.cadc.search.datatrain.tap.TABLE[_modelDataSource]
+        ]
+      )
+    }
 
     /**
      * Do an initial load of all of the groupings.  This will parse the given
@@ -278,81 +304,85 @@
      *
      * @param {String} data                The CSV data from the response.
      */
-    this.load = function (data)
-    {
-      var arrayOfRows = $.csv.toArrays(data);
-      var firstRow = arrayOfRows[0];
+    this.load = function (data) {
+      var arrayOfRows = $.csv.toArrays(data)
+      var firstRow = arrayOfRows[0]
 
       // Skip the first row (Start at 1).
-      arrayOfRows = arrayOfRows.slice(1);
+      arrayOfRows = arrayOfRows.slice(1)
 
       // The instrument name is handled separately.
-      var instrumentNameIndex = firstRow.indexOf("instrument_name");
+      var instrumentNameIndex = firstRow.indexOf('instrument_name')
 
       // RegEx for '+' character.
-      var plus = /\+/g;
+      var plus = /\+/g
 
       // Add id for this div.
-      var group = {};
+      var group = {}
 
       // Put an array of uType names into an array.
-      group.uTypes = this.uType.split("/");
+      group.uTypes = this.uType.split('/')
 
       // Put an array of uType values into an array.
-      group.values = [];
+      group.values = []
 
-      for (var i = 0, al = arrayOfRows.length; i < al; i++)
-      {
-        group.values[i] = arrayOfRows[i];
-        var groupValues = group.values[i];
+      for (var i = 0, al = arrayOfRows.length; i < al; i++) {
+        group.values[i] = arrayOfRows[i]
+        var groupValues = group.values[i]
 
-        for (var j = 0, gvl = groupValues.length; j < (gvl - 1); j++)
-        {
+        for (var j = 0, gvl = groupValues.length; j < gvl - 1; j++) {
           // Last column is the state.
-          var val = $.trim(groupValues[j]);
-          var formattedVal = ((val === null) || (val === "")) ? "null" : groupValues[j].replace(plus, " ");
+          var val = $.trim(groupValues[j])
+          var formattedVal =
+            val === null || val === ''
+              ? 'null'
+              : groupValues[j].replace(plus, ' ')
 
-          var freshFlag = (groupValues[gvl - 1] === "1");
-          var instrumentName = groupValues[instrumentNameIndex];
+          var freshFlag = groupValues[gvl - 1] === '1'
+          var instrumentName = groupValues[instrumentNameIndex]
 
-          if ((freshFlag === true) && (this.freshInstruments.indexOf(instrumentName) < 0))
-          {
-            this.freshInstruments.push(instrumentName);
+          if (
+            freshFlag === true &&
+            this.freshInstruments.indexOf(instrumentName) < 0
+          ) {
+            this.freshInstruments.push(instrumentName)
           }
 
-          group.values[i][j] = formattedVal;
+          group.values[i][j] = formattedVal
         }
       }
 
       // Add the group object to the global groups.
-      this.groups.push(group);
+      this.groups.push(group)
 
       // Build the table with the selects and get the first select.
-      var select = this._buildTable(group);
+      var select = this._buildTable(group)
 
-      this.updateLists(select, true);
-    };
+      this.updateLists(select, true)
+    }
 
     /**
-     * Load MAQ data into DataTrain if useMaq = true
-     * @param useMaq
+     * Load MAQ data into DataTrain if activateMAQ = true
+     * @param {boolean} activateMAQ
      */
-    this.setMaqMode = function(useMaq)
-    {
-      this._clearTable();
-      this._toggleLoading(true);
-      this.useMaq = useMaq;
-      this._loadDataTrain();
+    this.setMaqMode = function (activateMAQ) {
+      this._clearTable()
+      this._toggleLoading(true)
+      this.activateMAQ = activateMAQ
+      this._loadDataTrain()
+    }
+
+    this.isMAQMode = function () {
+      return this.activateMAQ
     }
 
     /**
      * Clear the existing set of data train tables
      * @private
      */
-    this._clearTable = function()
-    {
+    this._clearTable = function () {
       if (this.$dtTableDOM.children().length > 0) {
-        this.$dtTableDOM.empty();
+        this.$dtTableDOM.empty()
       }
     }
 
@@ -362,57 +392,54 @@
      * @returns {*}
      * @private
      */
-    this._buildTable = function (_group)
-    {
+    this._buildTable = function (_group) {
       // Keep track of the first non-hidden select.
-      var firstSelect;
+      var firstSelect
 
       // Loop through each attribute.
-      for (var i = 0, groupUTypesLength = _group.uTypes.length; i < groupUTypesLength; i++)
-      {
+      for (
+        var i = 0, groupUTypesLength = _group.uTypes.length;
+        i < groupUTypesLength;
+        i++
+      ) {
         // Get the JSON text from hidden input and
         // eval into an enumerated object.
-        var row = _group.values[i];
+        var row = _group.values[i]
 
         // Create either hidden or select input.
-        var select;
-        var containerElement = document.createElement("div");
-        containerElement.className = "text-left col-md-1 hierarchy";
+        var select
+        var containerElement = document.createElement('div')
+        containerElement.className = 'text-left col-md-1 hierarchy'
 
-        if (i === 0)
-        {
-          containerElement.className += " row-start";
-        }
-        // Last item
-        else if (i === (groupUTypesLength - 1))
-        {
-          containerElement.className += " row-end";
+        if (i === 0) {
+          containerElement.className += ' row-start'
+        } else if (i === groupUTypesLength - 1) {
+          // Last item
+          containerElement.className += ' row-end'
         }
 
-        select = this._buildSelect(_group.uTypes[i], containerElement);
+        select = this._buildSelect(_group.uTypes[i], containerElement)
 
-        if (firstSelect === undefined)
-        {
-          firstSelect = select.childNodes[1];
+        if (firstSelect === undefined) {
+          firstSelect = select.childNodes[1]
         }
 
         // Add <select> to the data train table div
-        this.$dtTableDOM.append(select);
+        this.$dtTableDOM.append(select)
       }
 
       // Return first select.
-      return firstSelect;
-    };
+      return firstSelect
+    }
 
     /**
      * Toggle the loading icon.
      * @private
      */
-    this._toggleLoading = function (turnOn)
-    {
-      var building = document.getElementById(this.uType + ".building");
-      building.className = (turnOn == true) ? "" : "hidden";
-    };
+    this._toggleLoading = function (turnOn) {
+      var building = document.getElementById(this.uType + '.building')
+      building.className = turnOn == true ? '' : 'hidden'
+    }
 
     /**
      * Creates a select Input Object, assigning values from the
@@ -423,63 +450,62 @@
      * @returns {*}
      * @private
      */
-    this._buildSelect = function (uType, containerElement)
-    {
-      var label = document.createElement("label");
+    this._buildSelect = function (uType, containerElement) {
+      var label = document.createElement('label')
 
-      var hidden = document.createElement("input");
-      hidden.type = "hidden";
-      hidden.value = uType + "@Enumerated";
-      hidden.name = "Form.name";
+      var hidden = document.createElement('input')
+      hidden.type = 'hidden'
+      hidden.value = uType + '@Enumerated'
+      hidden.name = 'Form.name'
 
-      var labelSpanFieldName = document.createElement("span");
-      var select = document.createElement("select");
-      select.id = uType;
-      select.name = select.id;
-      select.title = this._getDataTrainHeader(this._getColumnConfig(uType).label);
+      var labelSpanFieldName = document.createElement('span')
+      var select = document.createElement('select')
+      select.id = uType
+      select.name = select.id
+      select.title = this._getDataTrainHeader(
+        this._getColumnConfig(uType).label
+      )
 
-      labelSpanFieldName.className = "indent-small field-name";
-      labelSpanFieldName.innerHTML = select.title;
+      labelSpanFieldName.className = 'indent-small field-name'
+      labelSpanFieldName.innerHTML = select.title
 
-      label.appendChild(labelSpanFieldName);
-      label.setAttribute("for", select.id);
+      label.appendChild(labelSpanFieldName)
+      label.setAttribute('for', select.id)
 
-      select.label = label;
-      select.size = ca.nrc.cadc.search.datatrain.SELECT_DISPLAY_OPTION_COUNT;
-      select.multiple = true;
+      select.label = label
+      select.size = ca.nrc.cadc.search.datatrain.SELECT_DISPLAY_OPTION_COUNT
+      select.multiple = true
 
-      select.onchange = function (e)
-      {
-        this.updateLists(e.target, false);
-      }.bind(this);
+      select.onchange = function (e) {
+        this.updateLists(e.target, false)
+      }.bind(this)
 
-      select.className = "form-control hierarchy_select";
+      select.className = 'form-control hierarchy_select'
 
-      containerElement.appendChild(label);
-      containerElement.appendChild(select);
-      containerElement.appendChild(hidden);
+      containerElement.appendChild(label)
+      containerElement.appendChild(select)
+      containerElement.appendChild(hidden)
 
-      return containerElement;
-    };
+      return containerElement
+    }
 
-    this.getFrenchDataTrainHeaderMap = function ()
-    {
+    this.getFrenchDataTrainHeaderMap = function () {
       return {
-        "All": "Tout",
-        "Band": "Domaine d'énergie",
-        "Collection": "Collection",
-        "Instrument": "Instrument",
-        "Filter": "Filtre",
-        "Cal. Lev.": "Niveau de calibration",
-        "Data Type": "Type de donnée",
-        "Obs. Type": "Type d'observation",
-        "obs_collection": "obs_collection",
-        "facility_name": "facility_name",
-        "instrument_name": "instrument_name",
-        "calib_level": "calib_level",
-        "dataproduct_type": "dataproduct_type"
+        All: 'Tout',
+        Band: "Domaine d'énergie",
+        Collection: 'Collection',
+        Instrument: 'Instrument',
+        Filter: 'Filtre',
+        'Cal. Lev.': 'Niveau de calibration',
+        'Data Type': 'Type de donnée',
+        'Obs. Type': "Type d'observation",
+        obs_collection: 'obs_collection',
+        facility_name: 'facility_name',
+        instrument_name: 'instrument_name',
+        calib_level: 'calib_level',
+        dataproduct_type: 'dataproduct_type'
       }
-    };
+    }
 
     /**
      * Obtain the header for OLA.
@@ -488,10 +514,11 @@
      * @return {String}   Header text.
      * @private
      */
-    this._getDataTrainHeader = function (name)
-    {
-      return (this.pageLanguage === "fr") ? this.getFrenchDataTrainHeaderMap()[name] : name;
-    };
+    this._getDataTrainHeader = function (name) {
+      return this.pageLanguage === 'fr'
+        ? this.getFrenchDataTrainHeaderMap()[name]
+        : name
+    }
 
     /**
      * Return the group when the group utype contains the given utype,
@@ -502,24 +529,20 @@
      * @returns {Object} group object or null if not found.
      * @private
      */
-    this._getGroupByUType = function (_groups, _uType)
-    {
+    this._getGroupByUType = function (_groups, _uType) {
       // Loop through the group names looking for name.
-      for (var i = 0, gl = _groups.length; i < gl; i++)
-      {
-        var group = _groups[i];
-        var groupUTypes = group.uTypes;
-        for (var j = 0, gutl = groupUTypes.length; j < gutl; j++)
-        {
-          if (groupUTypes[j] === _uType)
-          {
-            return group;
+      for (var i = 0, gl = _groups.length; i < gl; i++) {
+        var group = _groups[i]
+        var groupUTypes = group.uTypes
+        for (var j = 0, gutl = groupUTypes.length; j < gutl; j++) {
+          if (groupUTypes[j] === _uType) {
+            return group
           }
         }
       }
 
-      return null;
-    };
+      return null
+    }
 
     /**
      * Updates the selects. If updateAllOptions is true then all selects are
@@ -531,31 +554,36 @@
      * @param _updateAllOptionsFlag {boolean} update all selects if true,
      * otherwise update the given select and any selects to the right.
      */
-    this.updateLists = function (_select, _updateAllOptionsFlag)
-    {
+    this.updateLists = function (_select, _updateAllOptionsFlag) {
       // Parse out the unique id for the hierarchy and the attribute name.
-      var uType = _select.id;
+      var uType = _select.id
 
       // Find the group for this single uType.
-      var group = this._getGroupByUType(this.groups, uType);
+      var group = this._getGroupByUType(this.groups, uType)
 
       // Find the index in group.utypes array for this enumerated utype,
       // gives index of the select.
-      var selectIndex = this._getSelectIndex(group, uType);
+      var selectIndex = this._getSelectIndex(group, uType)
 
       // Get the selected options.
       var selected = _updateAllOptionsFlag
-          ? this._getSelectedOptions(group, group.uTypes.length)
-          : this._getSelectedOptions(group, selectIndex);
+        ? this._getSelectedOptions(group, group.uTypes.length)
+        : this._getSelectedOptions(group, selectIndex)
 
       // Get the options for the selects being updated.
       var options = _updateAllOptionsFlag
-          ? this._getAllOptions(group, selected)
-          : this._getOptions(group, selected, selectIndex);
+        ? this._getAllOptions(group, selected)
+        : this._getOptions(group, selected, selectIndex)
 
       // Update the selects with new options.
-      this._setOptions(group, selectIndex, selected, options, _updateAllOptionsFlag);
-    };
+      this._setOptions(
+        group,
+        selectIndex,
+        selected,
+        options,
+        _updateAllOptionsFlag
+      )
+    }
 
     /**
      * Find the index in the group.uTypes array for this uType.
@@ -566,27 +594,25 @@
      * @return {number}   index of the uType in group.uTypes array.
      * @private
      */
-    this._getSelectIndex = function (group, uType)
-    {
+    this._getSelectIndex = function (group, uType) {
       // Loop through the group names looking for name.
-      var selectIndex = -1;
-      for (var i = 0, gutl = group.uTypes.length; i < gutl; i++)
-      {
-        if (group.uTypes[i] === uType)
-        {
-          selectIndex = i;
-          break;
+      var selectIndex = -1
+      for (var i = 0, gutl = group.uTypes.length; i < gutl; i++) {
+        if (group.uTypes[i] === uType) {
+          selectIndex = i
+          break
         }
       }
 
       // If the attribute is not found in the group.utypes throw an error.
-      if (selectIndex === -1)
-      {
-        throw new Error(uType + " not found in group names[" + group.uTypes + "]");
+      if (selectIndex === -1) {
+        throw new Error(
+          uType + ' not found in group names[' + group.uTypes + ']'
+        )
       }
 
-      return selectIndex;
-    };
+      return selectIndex
+    }
 
     /**
      * Creates and returns an array of the selected options for the group.
@@ -596,43 +622,35 @@
      * @returns {[]} array of all selected options.
      * @private
      */
-    this._getSelectedOptions = function (group, selectIndex)
-    {
+    this._getSelectedOptions = function (group, selectIndex) {
       // 2D array to hold selected options arrays.
-      var selected = [];
+      var selected = []
 
       // We want to include the selectIndex values as well.
-      if (selectIndex < group.uTypes.length)
-      {
-        selectIndex++;
+      if (selectIndex < group.uTypes.length) {
+        selectIndex++
       }
 
       // Loop through the selects and get the selected options from each.
-      for (var i = 0; i < selectIndex; i++)
-      {
-        var select = document.getElementById(group.uTypes[i]);
+      for (var i = 0; i < selectIndex; i++) {
+        var select = document.getElementById(group.uTypes[i])
 
-        if (select === null)
-        {
+        if (select === null) {
           // If select is null it must be a hidden attribute,
           // selected values are then the attribute group values.
-          selected[i] = [];
-          for (var j = 0; j < group.values.length; j++)
-          {
-            var v = group.values[j][i];
-            if (!this._arrayContains(selected[i], v))
-            {
-              selected[i][selected[i].length] = v;
+          selected[i] = []
+          for (var j = 0; j < group.values.length; j++) {
+            var v = group.values[j][i]
+            if (!this._arrayContains(selected[i], v)) {
+              selected[i][selected[i].length] = v
             }
           }
-        }
-        else if (select instanceof HTMLSelectElement)
-        {
-          selected[i] = this._getSelected(select);
+        } else if (select instanceof HTMLSelectElement) {
+          selected[i] = this._getSelected(select)
         }
       }
-      return selected;
-    };
+      return selected
+    }
 
     /**
      * Creates and returns an array of the selected option values
@@ -641,49 +659,39 @@
      * @param {HTMLSelectElement} select    select element.
      * @returns {[]} array of selected options.
      */
-    this._getSelected = function (select)
-    {
+    this._getSelected = function (select) {
       // Array to hold selected options from this select.
-      var selected = [];
+      var selected = []
 
       // Check if multiple options can be selected.
-      var multiple = (select.type === "select-multiple");
+      var multiple = select.type === 'select-multiple'
 
       // Read selected options into an array.
-      if (multiple)
-      {
-        for (var i = 0; i < select.options.length; i++)
-        {
-          if (select.options[i].selected)
-          {
-            var option = select.options[i].value;
-            selected[selected.length] = option;
+      if (multiple) {
+        for (var i = 0; i < select.options.length; i++) {
+          if (select.options[i].selected) {
+            var option = select.options[i].value
+            selected[selected.length] = option
 
             // If top empty option is selected, don't allow
-            if ((option.length > 4) && option.substring(3, 0) === "All")
-            {
-              break;
+            if (option.length > 4 && option.substring(3, 0) === 'All') {
+              break
             }
           }
         }
-      }
-      else
-      {
-        if (select.selectedIndex !== -1)
-        {
-          selected[selected.length] = select.options[select.selectedIndex].value;
+      } else {
+        if (select.selectedIndex !== -1) {
+          selected[selected.length] = select.options[select.selectedIndex].value
         }
       }
 
       // If no option(s) are selected, select the top empty header option.
-      if (selected.length === 0)
-      {
-        selected[0] = "";
+      if (selected.length === 0) {
+        selected[0] = ''
       }
 
-      return selected;
-    };
-
+      return selected
+    }
 
     /**
      * Get the options for the selects being updated.
@@ -694,24 +702,22 @@
      * @returns {[]} 2d array of options.
      * @private
      */
-    this._getOptions = function (group, selected, selectIndex)
-    {
+    this._getOptions = function (group, selected, selectIndex) {
       // Arrays to hold the options for the selects to be updated.
-      var options = [];
+      var options = []
 
-      for (var i = selectIndex, gutl = group.uTypes.length; i < gutl; i++)
-      {
-        options[i] = [];
+      for (var i = selectIndex, gutl = group.uTypes.length; i < gutl; i++) {
+        options[i] = []
       }
 
       // Get the options for the current select.
-      this.getCurrentOptions(options, group, selected, selectIndex);
+      this.getCurrentOptions(options, group, selected, selectIndex)
 
       // Get the options for any child selects.
-      this.getChildOptions(options, group, selected, selectIndex);
+      this.getChildOptions(options, group, selected, selectIndex)
 
-      return options;
-    };
+      return options
+    }
 
     /**
      * Get the options for the current select.
@@ -721,84 +727,65 @@
      * @param {[]} selected   2d array of selected option values.
      * @param {number}  selectIndex   index into the group.utypes array.
      */
-    this.getCurrentOptions = function (options, group, selected, selectIndex)
-    {
-
+    this.getCurrentOptions = function (options, group, selected, selectIndex) {
       // The first select should always show all of the select options.
-      if (selectIndex === 0)
-      {
-        for (var i = 0, gvl = group.values.length; i < gvl; i++)
-        {
-          if (!this._arrayContains(options[0], group.values[i][0]))
-          {
-            options[0][options[0].length] = group.values[i][0];
+      if (selectIndex === 0) {
+        for (var i = 0, gvl = group.values.length; i < gvl; i++) {
+          if (!this._arrayContains(options[0], group.values[i][0])) {
+            options[0][options[0].length] = group.values[i][0]
           }
         }
-      }
-      else
-      {
-
+      } else {
         // Loop through the group values.
-        for (i = 0; i < group.values.length; i++)
-        {
-
+        for (i = 0; i < group.values.length; i++) {
           // Get this group of values.
-          var values = group.values[i];
+          var values = group.values[i]
 
           // Indicates if values found that match selected options.
-          var found = false;
+          var found = false
 
           // Loop through the values that represent the selects not being
           // updated,
           // including the current select, and use matches between values and
           // selected options to determine which values to display in the
           // current select.
-          for (var j = 0; j < selectIndex; j++)
-          {
-
+          for (var j = 0; j < selectIndex; j++) {
             // Get one of the possible values for this select.
-            var value = values[j];
+            var value = values[j]
 
             // Loop through the selected options and check if this value
             // is one of the selected options.
-            for (var k = 0; k < selected[j].length; k++)
-            {
-              var sel = selected[j][k];
+            for (var k = 0; k < selected[j].length; k++) {
+              var sel = selected[j][k]
 
               // If the header '' is selected, or if the value matches
               // the selected option, no need to check rest of selected options.
-              if (sel === "" || sel === value)
-              {
-                found = true;
-                break;
-              }
-              else
-              {
-                found = false;
+              if (sel === '' || sel === value) {
+                found = true
+                break
+              } else {
+                found = false
               }
             }
 
             // Group value doesn't match any selected options,
             // no need to continue with this group.
-            if (!found)
-            {
-              break;
+            if (!found) {
+              break
             }
           }
 
           // If all group values tested are found in the selected options, add
           // the selectIndex values to the selectIndex options
-          if (found)
-          {
-            value = values[selectIndex];
-            if (!this._arrayContains(options[j], value))
-            {
-              options[selectIndex][options[selectIndex].length] = value;
+          if (found) {
+            value = values[selectIndex]
+            if (!this._arrayContains(options[j], value)) {
+              options[selectIndex][options[selectIndex].length] = value
             }
           }
         }
       }
-    };
+    }
 
     /**
      * Get the options for the child selects of the current select.
@@ -808,74 +795,64 @@
      * @param {[]} selected   2d array of selected option values.
      * @param {number}  selectIndex   index into the group.utypes array.
      */
-    this.getChildOptions = function (options, group, selected, selectIndex)
-    {
+    this.getChildOptions = function (options, group, selected, selectIndex) {
       // If the current select is the last select, no children selects.
-      if (selectIndex < (group.uTypes.length - 1))
-      {
+      if (selectIndex < group.uTypes.length - 1) {
         // Loop through the group values.
-        for (var i = 0, gvl = group.values.length; i < gvl; i++)
-        {
+        for (var i = 0, gvl = group.values.length; i < gvl; i++) {
           // Get this group of values.
-          var values = group.values[i];
+          var values = group.values[i]
 
           // Indicates if values found that match selected options.
-          var found = false;
+          var found = false
 
           // Loop through the values that represent the selects not being
           // updated, and use matches between values and selected options to
           // determine which values to display in the selects being updated.
-          for (var j = 0; j <= selectIndex; j++)
-          {
-
+          for (var j = 0; j <= selectIndex; j++) {
             // Get one of the possible values for this select.
-            var value = values[j];
+            var value = values[j]
 
             // Loop through the selected options and check if this value
             // is one of the selected options.
-            for (var k = 0; k < selected[j].length; k++)
-            {
-              var sel = selected[j][k];
+            for (var k = 0; k < selected[j].length; k++) {
+              var sel = selected[j][k]
 
               // If the header '' is selected, or if the value matches
               // the selected option, no need to check rest of selected options.
-              if (sel === "" || sel === value)
-              {
-                found = true;
-                break;
-              }
-              else
-              {
-                found = false;
+              if (sel === '' || sel === value) {
+                found = true
+                break
+              } else {
+                found = false
               }
             }
 
             // Group value doesn't match any selected options,
             // no need to continue with this group.
-            if (!found)
-            {
-              break;
+            if (!found) {
+              break
             }
           }
 
           // If all group values tested are found in the selected options, add
           // the rest of the group values to the selects for updating.
-          if (found)
-          {
+          if (found) {
             // Loop through the remaining values and add to options arrays.
-            for (var l = selectIndex + 1, gutl = group.uTypes.length; l < gutl;
-                 l++)
-            {
-              value = values[l];
-              if (!this._arrayContains(options[l], value))
-              {
-                options[l][options[l].length] = value;
+            for (
+              var l = selectIndex + 1, gutl = group.uTypes.length;
+              l < gutl;
+              l++
+            ) {
+              value = values[l]
+              if (!this._arrayContains(options[l], value)) {
+                options[l][options[l].length] = value
               }
             }
           }
         }
       }
-    };
+    }
 
     /**
      * Get the options for all selects.
@@ -884,17 +861,15 @@
      * @param {[]} selected   2d array of selected option values.
      * @returns {[]} 2d array of options.
      */
-    this._getAllOptions = function (group, selected)
-    {
-      var options = [];
-      for (var i = 0, gutl = group.uTypes.length; i < gutl; i++)
-      {
-        var o = this._getOptions(group, selected, i);
-        options[i] = o[i];
+    this._getAllOptions = function (group, selected) {
+      var options = []
+      for (var i = 0, gutl = group.uTypes.length; i < gutl; i++) {
+        var o = this._getOptions(group, selected, i)
+        options[i] = o[i]
       }
 
-      return options;
-    };
+      return options
+    }
 
     /**
      * Updates the selects with the options.
@@ -907,77 +882,78 @@
      * selectIndex.
      * @private
      */
-    this._setOptions = function (group, selectIndex, selected, options, updateAllOptions)
-    {
-      if (updateAllOptions)
-      {
-        selectIndex = 0;
+    this._setOptions = function (
+      group,
+      selectIndex,
+      selected,
+      options,
+      updateAllOptions
+    ) {
+      if (updateAllOptions) {
+        selectIndex = 0
       }
 
       // Update the selects with new options.
-      for (var i = selectIndex, gul = group.uTypes.length; i < gul; i++)
-      {
+      for (var i = selectIndex, gul = group.uTypes.length; i < gul; i++) {
         // Build the id for the next select.
-        var id = group.uTypes[i];
+        var id = group.uTypes[i]
 
         // Get the select element.
-        var select = document.getElementById(id);
-        var selectItems = options[i];
+        var select = document.getElementById(id)
+        var selectItems = options[i]
 
         // If select is null, hidden attribute, can't update.
-        if (select !== null)
-        {
-          var customSorter;
+        if (select !== null) {
+          var customSorter
 
-          if (ca.nrc.cadc.search.datatrain.CUSTOM_SORT_UTYPES.hasOwnProperty(group.uTypes[i]))
-          {
-            customSorter = ca.nrc.cadc.search.datatrain.CUSTOM_SORT_UTYPES[group.uTypes[i]];
-          }
-          else if (/Instrument\.name/i.test(id))
-          {
+          if (
+            ca.nrc.cadc.search.datatrain.CUSTOM_SORT_UTYPES.hasOwnProperty(
+              group.uTypes[i]
+            )
+          ) {
+            customSorter =
+              ca.nrc.cadc.search.datatrain.CUSTOM_SORT_UTYPES[group.uTypes[i]]
+          } else if (/Instrument\.name/i.test(id)) {
             // Obtain only those fresh instruments that are part of the
             // selected items.
-            var currFreshInstruments = this.freshInstruments.sort().filter(function (i)
-                                                                           {
-                                                                             return (selectItems.indexOf(i) >= 0);
-                                                                           });
-            var staleInstruments = selectItems.filter(function (i)
-                                                      {
-                                                        return (currFreshInstruments.indexOf(i) < 0);
-                                                      }).sort();
+            var currFreshInstruments = this.freshInstruments
+              .sort()
+              .filter(function (i) {
+                return selectItems.indexOf(i) >= 0
+              })
+            var staleInstruments = selectItems
+              .filter(function (i) {
+                return currFreshInstruments.indexOf(i) < 0
+              })
+              .sort()
 
-            selectItems = [];
+            selectItems = []
 
-            selectItems = selectItems.concat(currFreshInstruments);
-            if (currFreshInstruments.length > 0)
-            {
-              selectItems.push(ca.nrc.cadc.search.datatrain.SPACER());
+            selectItems = selectItems.concat(currFreshInstruments)
+            if (currFreshInstruments.length > 0) {
+              selectItems.push(ca.nrc.cadc.search.datatrain.SPACER())
             }
-            selectItems = selectItems.concat(staleInstruments);
+            selectItems = selectItems.concat(staleInstruments)
 
-            customSorter = "NONE";
-          }
-          else
-          {
-            customSorter = undefined;
+            customSorter = 'NONE'
+          } else {
+            customSorter = undefined
           }
 
-          if (customSorter !== "NONE")
-          {
+          if (customSorter !== 'NONE') {
             // Use the custom sorter if it's available.
-            selectItems.sort(customSorter);
+            selectItems.sort(customSorter)
           }
 
           // Add the new options to the child select.
-          this._setSelectOptions(select, selectItems, selected[i]);
+          this._setSelectOptions(select, selectItems, selected[i])
         }
       }
-    };
+    }
 
-    this.setGroups = function (_groups)
-    {
-      this.groups = _groups;
-    };
+    this.setGroups = function (_groups) {
+      this.groups = _groups
+    }
 
     /**
      * Create a new HTML Option object as a jQuery object.
@@ -987,25 +963,21 @@
      * @param {Boolean} _selectedFlag     Boolean selected or not.
      * @returns {*|jQuery|HTMLElement}
      */
-    this._createOption = function (_label, _value, _selectedFlag)
-    {
-      var $option = $("<option>");
+    this._createOption = function (_label, _value, _selectedFlag) {
+      var $option = $('<option>')
 
-      $option.val(_value);
-      if (_label.indexOf("&") === 0)
-      {
-        $option.html(_label);
-      }
-      else
-      {
-        $option.text(_label);
+      $option.val(_value)
+      if (_label.indexOf('&') === 0) {
+        $option.html(_label)
+      } else {
+        $option.text(_label)
       }
 
-      $option.prop("selected", _selectedFlag);
-      $option.attr("selected", _selectedFlag);
+      $option.prop('selected', _selectedFlag)
+      $option.attr('selected', _selectedFlag)
 
-      return $option;
-    };
+      return $option
+    }
 
     /**
      * Updates the select with the options.
@@ -1015,86 +987,76 @@
      * @param selected - array of selected option values for this select.
      * @private
      */
-    this._setSelectOptions = function (select, options, selected)
-    {
+    this._setSelectOptions = function (select, options, selected) {
       // Remove all the current options for this select.
-      var $select = $(select);
-      $select.empty();
+      var $select = $(select)
+      $select.empty()
 
-      var title = this._getDataTrainHeader("All");
-      var name = title + "  (" + options.length + ")";
-      var highlight = false;
-      var isHighlighted = false;
+      var title = this._getDataTrainHeader('All')
+      var name = title + '  (' + options.length + ')'
+      var highlight = false
+      var isHighlighted = false
 
-      var selectName = $select.attr("name");
-      var $allOption = this._createOption(name, "", false);
-      $select.append($allOption);
+      var selectName = $select.attr('name')
+      var $allOption = this._createOption(name, '', false)
+      $select.append($allOption)
 
       // Add the new options to the select.
-      for (var i = 0, ol = options.length; i < ol; i++)
-      {
-        var optionValue = options[i];
-        highlight = false;
-        if (this._arrayContains(selected, options[i]))
-        {
-          highlight = true;
-          isHighlighted = true;
+      for (var i = 0, ol = options.length; i < ol; i++) {
+        var optionValue = options[i]
+        highlight = false
+        if (this._arrayContains(selected, options[i])) {
+          highlight = true
+          isHighlighted = true
         }
 
-        var optionName;
+        var optionName
 
-        if ((selectName.indexOf("dataProductType") >= 0) && (optionValue === "null"))
-        {
-          optionName = "Other";
-        }
-        else if (ca.nrc.cadc.search.datatrain.URI_MATCH_REGEX.test(optionValue))
-        {
-          optionName = new cadc.web.util.URI(optionValue).getHash();
-        }
-        else if ((selectName === "Plane.energy.emBand") && (optionValue === "null"))
-        {
-          optionName = "Unknown";
-        }
-        else if (/calib.*Level/.test(selectName))
-        {
-          if (optionValue === "null")
-          {
-            optionName = "Unknown";
-          }
-          else
-          {
+        if (
+          selectName.indexOf('dataProductType') >= 0 &&
+          optionValue === 'null'
+        ) {
+          optionName = 'Other'
+        } else if (
+          ca.nrc.cadc.search.datatrain.URI_MATCH_REGEX.test(optionValue)
+        ) {
+          optionName = new cadc.web.util.URI(optionValue).getHash()
+        } else if (
+          selectName === 'Plane.energy.emBand' &&
+          optionValue === 'null'
+        ) {
+          optionName = 'Unknown'
+        } else if (/calib.*Level/.test(selectName)) {
+          if (optionValue === 'null') {
+            optionName = 'Unknown'
+          } else {
             var calLevelName =
-                ca.nrc.cadc.search.datatrain.CALIBRATION_LEVEL_MAP[optionValue];
-            if (calLevelName)
-            {
-              optionName = "(" + optionValue + ") " + calLevelName;
+              ca.nrc.cadc.search.datatrain.CALIBRATION_LEVEL_MAP[optionValue]
+            if (calLevelName) {
+              optionName = '(' + optionValue + ') ' + calLevelName
             }
           }
-        }
-        else
-        {
-          optionName = optionValue;
+        } else {
+          optionName = optionValue
         }
 
-        var $opt = this._createOption(optionName, optionValue, highlight);
+        var $opt = this._createOption(optionName, optionValue, highlight)
 
-        if (ca.nrc.cadc.search.datatrain.SPACER() === optionValue)
-        {
-          $opt.val("SPACER");
-          $opt.attr("id", selectName + "_SPACER");
-          $opt.prop("disabled", true);
-          $opt.attr("disabled", "disabled");
+        if (ca.nrc.cadc.search.datatrain.SPACER() === optionValue) {
+          $opt.val('SPACER')
+          $opt.attr('id', selectName + '_SPACER')
+          $opt.prop('disabled', true)
+          $opt.attr('disabled', 'disabled')
         }
 
-        $select.append($opt);
+        $select.append($opt)
       }
 
-      if (!isHighlighted)
-      {
-        $allOption.prop("selected", true);
-        $allOption.attr("selected", true);
+      if (!isHighlighted) {
+        $allOption.prop('selected', true)
+        $allOption.attr('selected', true)
       }
-    };
+    }
 
     /**
      * Searches an array for the given value. Returns true if the value is
@@ -1104,21 +1066,17 @@
      * @param {*}  value  Value to search for.
      * @returns {boolean} true if the value exists in the array, false otherwise.
      */
-    this._arrayContains = function (array, value)
-    {
-      if (array)
-      {
-        for (var i = 0; i < array.length; i++)
-        {
-          if (array[i] === value)
-          {
-            return true;
+    this._arrayContains = function (array, value) {
+      if (array) {
+        for (var i = 0; i < array.length; i++) {
+          if (array[i] === value) {
+            return true
           }
         }
       }
 
-      return false;
-    };
+      return false
+    }
 
     /**
      * Fire an event.  Taken from the slick.grid Object.
@@ -1128,13 +1086,12 @@
      * @returns {*}       The event notification result.
      * @private
      */
-    this._trigger = function (_event, _args)
-    {
-      var args = _args || {};
-      args.dataTrain = this;
+    this._trigger = function (_event, _args) {
+      var args = _args || {}
+      args.dataTrain = this
 
-      return $(this).trigger(_event, _args);
-    };
+      return $(this).trigger(_event, _args)
+    }
 
     /**
      * Subscribe to one of this form's events.
@@ -1142,32 +1099,34 @@
      * @param _event      Event object.
      * @param __handler   Handler function.
      */
-    this.subscribe = function (_event, __handler)
-    {
-      $(this).on(_event.type, __handler);
-    };
+    this.subscribe = function (_event, __handler) {
+      $(this).on(_event.type, __handler)
+    }
 
     // Subsribe to events before init is called.
-    this.subscribe(ca.nrc.cadc.search.datatrain.events.onDataTrainLoaded,
-                   function (event, args)
-                   {
-                     var dt = args.dataTrain;
-                     dt.load(args.data);
-                     dt._toggleLoading(false);
-                   });
+    this.subscribe(
+      ca.nrc.cadc.search.datatrain.events.onDataTrainLoaded,
+      function (event, args) {
+        var dt = args.dataTrain
+        dt.load(args.data)
+        dt._toggleLoading(false)
+      }
+    )
 
-    this.subscribe(ca.nrc.cadc.search.datatrain.events.onDataTrainLoadFail,
-                   function (event, args)
-                   {
-                     alert("Error while querying TAP to initialize the page: " + args.responseText);
-                     var dt = args.dataTrain;
-                     dt._toggleLoading(false);
-                   });
+    this.subscribe(
+      ca.nrc.cadc.search.datatrain.events.onDataTrainLoadFail,
+      function (event, args) {
+        alert(
+          'Error while querying TAP to initialize the page: ' +
+          args.responseText
+        )
+        var dt = args.dataTrain
+        dt._toggleLoading(false)
+      }
+    )
 
-    if (this.options.autoInit === true)
-    {
-      this.init();
+    if (this.options.autoInit === true) {
+      this.init()
     }
   }
-
-})(jQuery, window);
+})(jQuery, window)
