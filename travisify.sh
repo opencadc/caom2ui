@@ -9,4 +9,4 @@ cd ../_int_test_
 docker-compose up -d
 docker ps -a
 cd ../default
-gradle -i -PintTest_selenium_server_url=http://localhost:4444 -PintTest_web_app_url=http://proxy.cadc.dao.nrc.ca -PintTest_web_app_endpoint=/search/ intTestFirefox
+gradle -i -PintTest_selenium_server_url=http://localhost:4444 -PintTest_web_app_url=http://localhost -PintTest_web_app_endpoint=/search/ intTestFirefox

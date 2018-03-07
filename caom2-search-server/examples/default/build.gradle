@@ -23,13 +23,12 @@ dependencies {
     providedCompile 'javax.servlet:javax.servlet-api:3.0.+'
 
     runtime 'commons-logging:commons-logging:1.+'
-    runtime 'org.postgresql:postgresql:42.1.4.jre7'
+    runtime 'org.postgresql:postgresql:42.2.1.jre7'
     runtime 'jstl:jstl:1.+'
 
     testCompile 'junit:junit:4.+'
     testCompile 'org.skyscreamer:jsonassert:1.+'
-    testCompile 'org.seleniumhq.selenium:selenium-java:2.53.+'
-    testCompile 'org.opencadc:cadc-web-test:[1.0.6, )'
+    testCompile 'org.opencadc:cadc-web-test:[2.0.0, )'
     testCompile 'org.easymock:easymock:3.+'
 }
 

@@ -26,7 +26,7 @@
  ************************************************************************
  */
 
-;(function($, window) {
+; (function ($, window) {
   $.extend(true, window, {
     ca: {
       nrc: {
@@ -42,7 +42,7 @@
                * @returns {string}
                * @constructor
                */
-              SPACER: function() {
+              SPACER: function () {
                 var val = ''
                 for (var s = 0; s < 20; s++) {
                   val += ca.nrc.cadc.search.datatrain.SPACER_CHAR
@@ -81,7 +81,7 @@
                 'DAO',
                 'DAOPLATES'
               ],
-              sortCollections: function(val1, val2) {
+              sortCollections: function (val1, val2) {
                 var val1Index = ca.nrc.cadc.search.datatrain.COLLECTION_ORDER.indexOf(
                   val1
                 )
@@ -102,7 +102,7 @@
 
                 return placement
               },
-              sortNumericDescending: function(val1, val2) {
+              sortNumericDescending: function (val1, val2) {
                 var descVal
 
                 // Put garbage at the bottom
@@ -117,25 +117,25 @@
                 return descVal
               },
               CUSTOM_SORT_UTYPES: {
-                'Observation.collection': function(val1, val2) {
+                'Observation.collection': function (val1, val2) {
                   return ca.nrc.cadc.search.datatrain.sortCollections(
                     val1,
                     val2
                   )
                 },
-                'DataID.Collection': function(val1, val2) {
+                'DataID.Collection': function (val1, val2) {
                   return ca.nrc.cadc.search.datatrain.sortCollections(
                     val1,
                     val2
                   )
                 },
-                'Plane.calibrationLevel': function(val1, val2) {
+                'Plane.calibrationLevel': function (val1, val2) {
                   return ca.nrc.cadc.search.datatrain.sortNumericDescending(
                     val1,
                     val2
                   )
                 },
-                'Obs.calibLevel': function(val1, val2) {
+                'Obs.calibLevel': function (val1, val2) {
                   return ca.nrc.cadc.search.datatrain.sortNumericDescending(
                     val1,
                     val2
@@ -194,7 +194,7 @@
      * @return {{}}
      * @private
      */
-    this._getColumnConfig = function(_uType) {
+    this._getColumnConfig = function (_uType) {
       return this.columnManager.getColumnOptions()[
         this.modelDataSource + ':' + _uType
       ]
@@ -203,7 +203,7 @@
     /**
      * Initialize this DataTrain.
      */
-    this.init = function() {
+    this.init = function () {
       this._toggleLoading(true)
       this._loadDataTrain()
     }
@@ -212,7 +212,7 @@
      * Make call to server to get TAP data to load into DataTrain
      * @private
      */
-    this._loadDataTrain = function() {
+    this._loadDataTrain = function () {
       var tapQuery = this._createTAPQuery()
 
       $.get(this.options.tapSyncEndpoint, {
@@ -220,9 +220,15 @@
         FORMAT: 'CSV',
         USEMAQ: this.activateMAQ,
         QUERY: tapQuery
-      })
+      },
+        {
+          xhrFields: {
+            withCredentials: true
+          },
+          jsonp: false
+        })
         .done(
-          function(data) {
+          function (data) {
             this.groups = []
             this._trigger(
               ca.nrc.cadc.search.datatrain.events.onDataTrainLoaded,
@@ -231,7 +237,7 @@
           }.bind(this)
         )
         .fail(
-          function(jqXHR) {
+          function (jqXHR) {
             this._trigger(
               ca.nrc.cadc.search.datatrain.events.onDataTrainLoadFail,
               { responseText: jqXHR.responseText }
@@ -245,7 +251,7 @@
      * @returns {string}
      * @private
      */
-    this._createTAPQuery = function() {
+    this._createTAPQuery = function () {
       var uTypes = this.uType.split('/')
       var tapColumns = []
 
@@ -284,7 +290,7 @@
         [
           tapColumns.join(','),
           ca.nrc.cadc.search.datatrain.tap.INSTRUMENT_FRESH_MJD_FIELD_NAME[
-            this.modelDataSource
+          this.modelDataSource
           ],
           mjdConverter.convert(),
           ca.nrc.cadc.search.datatrain.tap.TABLE[_modelDataSource]
@@ -298,7 +304,7 @@
      *
      * @param {String} data                The CSV data from the response.
      */
-    this.load = function(data) {
+    this.load = function (data) {
       var arrayOfRows = $.csv.toArrays(data)
       var firstRow = arrayOfRows[0]
 
@@ -359,7 +365,7 @@
      * Load MAQ data into DataTrain if activateMAQ = true
      * @param {boolean} activateMAQ
      */
-    this.setMaqMode = function(activateMAQ) {
+    this.setMaqMode = function (activateMAQ) {
       this._clearTable()
       this._toggleLoading(true)
       this.activateMAQ = activateMAQ
@@ -374,7 +380,7 @@
      * Clear the existing set of data train tables
      * @private
      */
-    this._clearTable = function() {
+    this._clearTable = function () {
       if (this.$dtTableDOM.children().length > 0) {
         this.$dtTableDOM.empty()
       }
@@ -386,7 +392,7 @@
      * @returns {*}
      * @private
      */
-    this._buildTable = function(_group) {
+    this._buildTable = function (_group) {
       // Keep track of the first non-hidden select.
       var firstSelect
 
@@ -430,7 +436,7 @@
      * Toggle the loading icon.
      * @private
      */
-    this._toggleLoading = function(turnOn) {
+    this._toggleLoading = function (turnOn) {
       var building = document.getElementById(this.uType + '.building')
       building.className = turnOn == true ? '' : 'hidden'
     }
@@ -444,7 +450,7 @@
      * @returns {*}
      * @private
      */
-    this._buildSelect = function(uType, containerElement) {
+    this._buildSelect = function (uType, containerElement) {
       var label = document.createElement('label')
 
       var hidden = document.createElement('input')
@@ -470,7 +476,7 @@
       select.size = ca.nrc.cadc.search.datatrain.SELECT_DISPLAY_OPTION_COUNT
       select.multiple = true
 
-      select.onchange = function(e) {
+      select.onchange = function (e) {
         this.updateLists(e.target, false)
       }.bind(this)
 
@@ -483,7 +489,7 @@
       return containerElement
     }
 
-    this.getFrenchDataTrainHeaderMap = function() {
+    this.getFrenchDataTrainHeaderMap = function () {
       return {
         All: 'Tout',
         Band: "Domaine d'énergie",
@@ -508,7 +514,7 @@
      * @return {String}   Header text.
      * @private
      */
-    this._getDataTrainHeader = function(name) {
+    this._getDataTrainHeader = function (name) {
       return this.pageLanguage === 'fr'
         ? this.getFrenchDataTrainHeaderMap()[name]
         : name
@@ -523,7 +529,7 @@
      * @returns {Object} group object or null if not found.
      * @private
      */
-    this._getGroupByUType = function(_groups, _uType) {
+    this._getGroupByUType = function (_groups, _uType) {
       // Loop through the group names looking for name.
       for (var i = 0, gl = _groups.length; i < gl; i++) {
         var group = _groups[i]
@@ -548,7 +554,7 @@
      * @param _updateAllOptionsFlag {boolean} update all selects if true,
      * otherwise update the given select and any selects to the right.
      */
-    this.updateLists = function(_select, _updateAllOptionsFlag) {
+    this.updateLists = function (_select, _updateAllOptionsFlag) {
       // Parse out the unique id for the hierarchy and the attribute name.
       var uType = _select.id
 
@@ -588,7 +594,7 @@
      * @return {number}   index of the uType in group.uTypes array.
      * @private
      */
-    this._getSelectIndex = function(group, uType) {
+    this._getSelectIndex = function (group, uType) {
       // Loop through the group names looking for name.
       var selectIndex = -1
       for (var i = 0, gutl = group.uTypes.length; i < gutl; i++) {
@@ -616,7 +622,7 @@
      * @returns {[]} array of all selected options.
      * @private
      */
-    this._getSelectedOptions = function(group, selectIndex) {
+    this._getSelectedOptions = function (group, selectIndex) {
       // 2D array to hold selected options arrays.
       var selected = []
 
@@ -653,7 +659,7 @@
      * @param {HTMLSelectElement} select    select element.
      * @returns {[]} array of selected options.
      */
-    this._getSelected = function(select) {
+    this._getSelected = function (select) {
       // Array to hold selected options from this select.
       var selected = []
 
@@ -696,7 +702,7 @@
      * @returns {[]} 2d array of options.
      * @private
      */
-    this._getOptions = function(group, selected, selectIndex) {
+    this._getOptions = function (group, selected, selectIndex) {
       // Arrays to hold the options for the selects to be updated.
       var options = []
 
@@ -721,7 +727,7 @@
      * @param {[]} selected   2d array of selected option values.
      * @param {number}  selectIndex   index into the group.utypes array.
      */
-    this.getCurrentOptions = function(options, group, selected, selectIndex) {
+    this.getCurrentOptions = function (options, group, selected, selectIndex) {
       // The first select should always show all of the select options.
       if (selectIndex === 0) {
         for (var i = 0, gvl = group.values.length; i < gvl; i++) {
@@ -789,7 +795,7 @@
      * @param {[]} selected   2d array of selected option values.
      * @param {number}  selectIndex   index into the group.utypes array.
      */
-    this.getChildOptions = function(options, group, selected, selectIndex) {
+    this.getChildOptions = function (options, group, selected, selectIndex) {
       // If the current select is the last select, no children selects.
       if (selectIndex < group.uTypes.length - 1) {
         // Loop through the group values.
@@ -855,7 +861,7 @@
      * @param {[]} selected   2d array of selected option values.
      * @returns {[]} 2d array of options.
      */
-    this._getAllOptions = function(group, selected) {
+    this._getAllOptions = function (group, selected) {
       var options = []
       for (var i = 0, gutl = group.uTypes.length; i < gutl; i++) {
         var o = this._getOptions(group, selected, i)
@@ -876,7 +882,7 @@
      * selectIndex.
      * @private
      */
-    this._setOptions = function(
+    this._setOptions = function (
       group,
       selectIndex,
       selected,
@@ -912,11 +918,11 @@
             // selected items.
             var currFreshInstruments = this.freshInstruments
               .sort()
-              .filter(function(i) {
+              .filter(function (i) {
                 return selectItems.indexOf(i) >= 0
               })
             var staleInstruments = selectItems
-              .filter(function(i) {
+              .filter(function (i) {
                 return currFreshInstruments.indexOf(i) < 0
               })
               .sort()
@@ -945,7 +951,7 @@
       }
     }
 
-    this.setGroups = function(_groups) {
+    this.setGroups = function (_groups) {
       this.groups = _groups
     }
 
@@ -957,7 +963,7 @@
      * @param {Boolean} _selectedFlag     Boolean selected or not.
      * @returns {*|jQuery|HTMLElement}
      */
-    this._createOption = function(_label, _value, _selectedFlag) {
+    this._createOption = function (_label, _value, _selectedFlag) {
       var $option = $('<option>')
 
       $option.val(_value)
@@ -981,7 +987,7 @@
      * @param selected - array of selected option values for this select.
      * @private
      */
-    this._setSelectOptions = function(select, options, selected) {
+    this._setSelectOptions = function (select, options, selected) {
       // Remove all the current options for this select.
       var $select = $(select)
       $select.empty()
@@ -1060,7 +1066,7 @@
      * @param {*}  value  Value to search for.
      * @returns {boolean} true if the value exists in the array, false otherwise.
      */
-    this._arrayContains = function(array, value) {
+    this._arrayContains = function (array, value) {
       if (array) {
         for (var i = 0; i < array.length; i++) {
           if (array[i] === value) {
@@ -1080,7 +1086,7 @@
      * @returns {*}       The event notification result.
      * @private
      */
-    this._trigger = function(_event, _args) {
+    this._trigger = function (_event, _args) {
       var args = _args || {}
       args.dataTrain = this
 
@@ -1093,14 +1099,14 @@
      * @param _event      Event object.
      * @param __handler   Handler function.
      */
-    this.subscribe = function(_event, __handler) {
+    this.subscribe = function (_event, __handler) {
       $(this).on(_event.type, __handler)
     }
 
     // Subsribe to events before init is called.
     this.subscribe(
       ca.nrc.cadc.search.datatrain.events.onDataTrainLoaded,
-      function(event, args) {
+      function (event, args) {
         var dt = args.dataTrain
         dt.load(args.data)
         dt._toggleLoading(false)
@@ -1109,10 +1115,10 @@
 
     this.subscribe(
       ca.nrc.cadc.search.datatrain.events.onDataTrainLoadFail,
-      function(event, args) {
+      function (event, args) {
         alert(
           'Error while querying TAP to initialize the page: ' +
-            args.responseText
+          args.responseText
         )
         var dt = args.dataTrain
         dt._toggleLoading(false)
