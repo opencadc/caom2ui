@@ -1208,25 +1208,6 @@
     }
 
     /**
-     * If the toggle is not displayed, return ''
-     * If the toggle is to be displayed, the default value is 'on' (return "true")
-     * If it is on and there is a URL query, return the value from URL
-     * 
-     * @returns {boolean}
-     */
-    this.hasMaqParameterInURI = function() {
-      var maqValue = false
-
-      if (this.options.enableMAQ === true) {
-        var currentQuery = this.getQueryFromURI()
-        if (currentQuery.activateMAQ != undefined) {
-          maqValue = currentQuery.activateMAQ[0]
-        }
-      }
-      return maqValue
-    }
-
-    /**
      * Start this application.  This will check for a quick submission.
      */
     this.start = function() {

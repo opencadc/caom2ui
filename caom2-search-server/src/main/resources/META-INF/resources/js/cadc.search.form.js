@@ -989,10 +989,8 @@
     this.setResultsMaqMode = function(setOn) {
       if (setOn === true || setOn === 'true') {
         $('#resultsMaqEnabled').removeClass('cadc-display-none')
-        // this.$form.find('.activateMAQValue').val(true)
       } else {
         $('#resultsMaqEnabled').addClass('cadc-display-none')
-        // this.$form.find('.activateMAQValue').val(false)
       }
     }
 
