@@ -102,15 +102,6 @@ public class CAOMSearchFormPage extends AbstractSearchFormPage
     static final By MAQ_TOGGLE_SWITCH_BY = By.cssSelector("div.toggle");
     static final By MAQ_CHECKBOX_BY = By.name("activateMAQ");
 
-    private static final By ACCESS_ACTIONS_DROPDOWN_BY = By.cssSelector("a.access-actions");
-    private static final By LOGIN_DROPDOWN_BY = By.cssSelector("a.login-form");
-    private static final By USERNAME_INPUT_BY = By.id("as-username");
-    private static final By PASSWORD_INPUT_BY = By.id("as-password");
-    private static final By LOGIN_SUBMIT_BUTTON_BY = By.id("submitLogin");
-    private static final By LOGOUT_LINK_BY = By.id("as-logout");
-    private static final By DISPLAY_USERNAME = By.className("auth-username");
-
-
 
     @FindBy(id = "caom2_data_train")
     WebElement dataTrain;
@@ -130,9 +121,8 @@ public class CAOMSearchFormPage extends AbstractSearchFormPage
     @FindBy(id = "ssois_link")
     WebElement ssoisLink;
 
-    @FindBy(css = "div.toggle")
-    WebElement maqToggleSwitch;
 
+    final boolean defaultMAQToggleFlag;
 
 
     /**
@@ -151,10 +141,20 @@ public class CAOMSearchFormPage extends AbstractSearchFormPage
         waitForElementPresent(By.id(SPECTRAL_COVERAGE_INPUT_ID));
         waitForElementPresent(By.id(OBSERVATION_DATE_INPUT_ID));
         waitForElementPresent(SSOIS_LINK_BY);
-        waitForElementPresent(MAQ_TOGGLE_SWITCH_BY);
         waitForElementPresent(By.id("Observation.observationID"));
 
         PageFactory.initElements(driver, this);
+
+        defaultMAQToggleFlag = isMAQEnabled() && Boolean.parseBoolean(findMAQToggleSwitch().findElement
+        (MAQ_CHECKBOX_BY).getAttribute("value"));
+    }
+
+    boolean isMAQEnabled() throws Exception {
+        return (findMAQToggleSwitch() != null);
+    }
+
+    WebElement findMAQToggleSwitch() throws Exception {
+        return find(MAQ_TOGGLE_SWITCH_BY);
     }
 
     void enterObservationID(final String observationIDValue) throws Exception
@@ -200,39 +200,6 @@ public class CAOMSearchFormPage extends AbstractSearchFormPage
         instrumentSelect.selectByValue(instrumentName);
     }
 
-    void checkMAQ() throws Exception {
-        if (maqToggleSwitch.findElement(MAQ_CHECKBOX_BY).isSelected()) {
-            LOGGER.warn(String.format("Checkbox at %s is already checked.", maqToggleSwitch));
-        } else {
-            click(maqToggleSwitch);
-        }
-
-        waitForMAQActivated();
-    }
-
-    void waitForMAQActivated() throws Exception {
-        waitForElementPresent(By.cssSelector("div.toggle.btn-success"));
-        verifyTrue(maqToggleSwitch.findElement(MAQ_CHECKBOX_BY).isSelected());
-        waitFor(1000L);
-        waitForElementPresent(DATA_TRAIN_COLLECTION_MENU);
-    }
-
-    void uncheckMAQ() throws Exception {
-        if (!maqToggleSwitch.findElement(MAQ_CHECKBOX_BY).isSelected()) {
-            LOGGER.warn(String.format("Checkbox at %s is already unchecked.", maqToggleSwitch));
-        } else {
-            click(maqToggleSwitch);
-        }
-        waitForMAQDeactivated();
-    }
-
-    void waitForMAQDeactivated() throws Exception {
-        waitForElementPresent(By.cssSelector("div.toggle.off"));
-        verifyFalse(maqToggleSwitch.findElement(MAQ_CHECKBOX_BY).isSelected());
-        waitFor(1000L);
-        waitForElementPresent(DATA_TRAIN_COLLECTION_MENU);
-    }
-
     int findDataTrainValueIndex(final By menuLocator, final String value, final boolean ignoreCase)
             throws Exception
     {
@@ -269,5 +236,60 @@ public class CAOMSearchFormPage extends AbstractSearchFormPage
 
         // Nav back to form
         selectWindow(curWindowTitle);
+    }
+
+    void checkMAQ() throws Exception {
+        final WebElement maqToggleSwitch = findMAQToggleSwitch();
+        if (isMAQEnabled()) {
+            if (maqToggleSwitch.findElement(MAQ_CHECKBOX_BY).isSelected()) {
+                LOGGER.warn(String.format("Checkbox at %s is already checked.", maqToggleSwitch));
+            } else {
+                click(maqToggleSwitch);
+            }
+
+            waitForMAQActivated();
+        }
+    }
+
+    void waitForMAQActivated() throws Exception {
+        if (isMAQEnabled()) {
+            waitForElementPresent(By.cssSelector("div.toggle.btn-success"));
+            verifyTrue(findMAQToggleSwitch().findElement(MAQ_CHECKBOX_BY).isSelected());
+            waitFor(1000L);
+            waitForElementPresent(DATA_TRAIN_COLLECTION_MENU);
+        }
+    }
+
+    void uncheckMAQ() throws Exception {
+        final WebElement maqToggleSwitch = findMAQToggleSwitch();
+
+        if (isMAQEnabled()) {
+            if (!maqToggleSwitch.findElement(MAQ_CHECKBOX_BY).isSelected()) {
+                LOGGER.warn(String.format("Checkbox at %s is already unchecked.", maqToggleSwitch));
+            } else {
+                click(maqToggleSwitch);
+            }
+            waitForMAQDeactivated();
+        }
+    }
+
+    void waitForMAQDeactivated() throws Exception {
+        if (isMAQEnabled()) {
+            waitForElementPresent(By.cssSelector("div.toggle.off"));
+            verifyFalse(findMAQToggleSwitch().findElement(MAQ_CHECKBOX_BY).isSelected());
+            waitFor(1000L);
+            waitForElementPresent(DATA_TRAIN_COLLECTION_MENU);
+        }
+    }
+
+    @Override
+    void waitForMAQToggleReset() throws Exception {
+        if (isMAQEnabled()) {
+            if (defaultMAQToggleFlag) {
+                waitForMAQActivated();
+            } else {
+                waitForMAQDeactivated();
+            }
+        }
     }
 }

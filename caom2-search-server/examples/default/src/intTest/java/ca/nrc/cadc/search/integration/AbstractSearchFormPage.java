@@ -253,5 +253,8 @@ abstract class AbstractSearchFormPage extends AbstractTestWebPage
     void reset() throws Exception
     {
         click(topResetButton);
+        waitForMAQToggleReset();
     }
+
+    abstract void waitForMAQToggleReset() throws Exception;
 }

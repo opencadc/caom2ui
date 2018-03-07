@@ -45,8 +45,14 @@ public class MAQCAOMSearchBrowserTest extends AbstractAdvancedSearchIntegrationT
 
 
     @Test
-    public void searchCAOM() throws Exception {
+    public void searchMAQ() throws Exception {
         CAOMSearchFormPage searchFormPage = goTo(endpoint, null, CAOMSearchFormPage.class);
+        if (searchFormPage.isMAQEnabled()) {
+            searchMAQ(searchFormPage);
+        }
+    }
+
+    private void searchMAQ(final CAOMSearchFormPage searchFormPage) throws Exception {
         searchFormPage.checkMAQ();
 
         searchFormPage.enterCollection("CHANDRA");
