@@ -20,9 +20,9 @@
 
   final boolean enableMAQ = StringUtil.hasText(maqServiceId);
   final String activateMAQParam = request.getParameter("activateMAQ");
-  final boolean activateMAQ = enableMAQ && (configuration.lookup("org.opencadc.search.maq-activated", false) 
-                                            || (StringUtil.hasText(activateMAQParam) 
-                                                && activateMAQParam.equals("true")));
+  final boolean activateMAQ = enableMAQ && (configuration.lookupBoolean("org.opencadc.search.maq-activated", false)
+                                            || (StringUtil.hasText(activateMAQParam)
+                                                && (activateMAQParam.equals("true") || activateMAQParam.equals("on"))));
 
   final String tapSyncEndpoint = applicationEndpoint + "/tap/sync";
 %>
