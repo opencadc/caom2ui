@@ -1,5 +1,5 @@
 
-### CAOM-2 Search interface v2.4.2
+### CAOM-2 Search interface v2.6.0
 
 <a href="https://travis-ci.org/opencadc/caom2ui"><img src="https://travis-ci.org/opencadc/caom2ui.svg?branch=master" /></a>
 
@@ -29,7 +29,7 @@ org.opencadc.search.tap-service-id = ivo://cadc.nrc.ca/tap
 # org.opencadc.search.maq-tap-service-id = ivo://cadc.nrc.ca/sc2tap
 
 # Alternate Datalink Service ID to resolve.
-org.opencadc.search.maq-datalink-service-id = ivo://cadc.nrc.ca/sc2links
+org.opencadc.search.maq-datalink-service-id = ivo://cadc.nrc.ca/sc2tap
 
 # The endpoint for this application. 
 org.opencadc.search.app-service-endpoint = /AdvancedSearch

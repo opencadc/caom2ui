@@ -1385,7 +1385,7 @@
       ? $(format(value, columnUType, value, toUnit))
       : $(formatOutputHTML(value, columnUType, value))
 
-    var maqKey = 'useMaq'
+    var maqKey = 'activateMAQ'
 
     if ($output.text()) {
       var currentURIStr = cadc.web.util.currentURI().toString()

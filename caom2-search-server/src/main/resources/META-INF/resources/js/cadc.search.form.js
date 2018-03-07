@@ -4,6 +4,8 @@
       nrc: {
         cadc: {
           search: {
+            activateMAQName: 'activateMAQ',
+            activateMAQSelector: '.activateMAQ',
             ignore_fields: ['collection', 'noexec'],
             CAOM2_TARGET_NAME_FIELD_ID: 'Plane.position.bounds',
             OBSCORE_TARGET_NAME_FIELD_ID:
@@ -688,7 +690,7 @@
     /**
      * Initialize this form.
      */
-    this.init = function(useMaqDataTrain) {
+    this.init = function() {
       var $currForm = this.$form
       this.targetNameFieldID = $currForm
         .find("input[name$='@Shape1.value']")
@@ -844,23 +846,19 @@
         }.bind(this)
       )
 
-      $currForm.find('.useMaq').change(
+      $currForm.find('.activateMAQ').change(
         function(event) {
-          // This sets up or removes the MAQ mode display items
-          // in the form and results panel
-          if (this.maqToggleEnabled === true) {
-            // toggle results table header element
-            if (
-              event.currentTarget.checked === 'true' ||
-              event.currentTarget.checked === true
-            ) {
-              this.setResultsMaqMode(true)
-            } else {
-              this.setResultsMaqMode(false)
-            }
+          var maqSelectedFlag =
+            event.currentTarget.checked === 'true' ||
+            event.currentTarget.checked === true
+          // toggle results table header element
+          this.setResultsMaqMode(maqSelectedFlag)
 
+          // Don't reload the train if nothing has changed.
+          if (this.dataTrain.isMAQMode() !== maqSelectedFlag) {
             this.disableMaqToggle()
-            this.dataTrain.setMaqMode(event.currentTarget.checked)
+            this.dataTrain.setMaqMode(maqSelectedFlag)
+            this.enableMaqToggle()
           }
         }.bind(this)
       )
@@ -957,16 +955,7 @@
         }
       )
 
-      // Toggling the MAQ switch will trigger datatrain load
-      // "" can mean it's not in the URL, or it's not enabled for this app
-      if (useMaqDataTrain === '') {
-        this.disableMaqToggle()
-        this.dataTrain.init()
-      } else {
-        this.maqToggleEnabled = true
-        this.setMaqToggle(useMaqDataTrain)
-        this.setResultsMaqMode(useMaqDataTrain)
-      }
+      this.dataTrain.init()
 
       try {
         this._trigger(ca.nrc.cadc.search.events.onInit, {})
@@ -976,33 +965,32 @@
     }
 
     this.setMaqToggle = function(setOn) {
-      if (setOn === 'true') {
-        this.$form.find('.useMaq').bootstrapToggle('on')
-      } else {
-        this.$form.find('.useMaq').bootstrapToggle('off')
-      }
+      this.$form
+        .find(ca.nrc.cadc.search.activateMAQSelector)
+        .bootstrapToggle(setOn === true ? 'on' : 'off')
       this.disableMaqToggle()
     }
 
     this.disableMaqToggle = function() {
-      this.maqToggleEnabled = false
-      var $useMaqEl = this.$form.find('.useMaq')
-      $useMaqEl.bootstrapToggle('disable')
+      this._toggleMAQToggle(false)
     }
 
     this.enableMaqToggle = function() {
-      this.maqToggleEnabled = true
-      var $useMaqEl = this.$form.find('.useMaq')
-      $useMaqEl.bootstrapToggle('enable')
+      this._toggleMAQToggle(true)
+    }
+
+    this._toggleMAQToggle = function(enabledFlag) {
+      this.maqToggleEnabled = enabledFlag
+      this.$form
+        .find(ca.nrc.cadc.search.activateMAQSelector)
+        .bootstrapToggle(enabledFlag ? 'enable' : 'disable')
     }
 
     this.setResultsMaqMode = function(setOn) {
       if (setOn === true || setOn === 'true') {
         $('#resultsMaqEnabled').removeClass('cadc-display-none')
-        this.$form.find('.useMaqValue').val(true)
       } else {
         $('#resultsMaqEnabled').addClass('cadc-display-none')
-        this.$form.find('.useMaqValue').val(false)
       }
     }
 
@@ -1830,6 +1818,12 @@
     this.resetFields = function() {
       // function that resets all fields to default values
       this.$form.find('input:text').val('')
+      this.$form.find(ca.nrc.cadc.search.activateMAQSelector).val(function() {
+        var $self = $(this)
+        $self.prop('checked', $self.prop('defaultValue')).change()
+        return this.defaultValue
+      })
+
       $('#UPLOAD').remove()
 
       $('#include_proprietary').removeAttr('checked')
@@ -1921,7 +1915,7 @@
 
       // Classname used instead of id for this element because it exists on both caom2 and obscore
       // search forms
-      if (_inputID === 'useMaq') {
+      if (_inputID === ca.nrc.cadc.search.activateMAQName) {
         // Note that changing this box will kick off a data train update as well,
         // which may affect timing on Additional Constraints (hierarchy.js) fields that need to be updated
         $inputItem = this.$form.find("input[class='" + _inputID + "']")
@@ -1974,7 +1968,7 @@
 
     this.toggleMaqMode = function() {
       // check if toggle is enabled for application first
-      this.$form.find('.useMaq').click()
+      this.$form.find('.activateMAQ').click()
     }
 
     /**

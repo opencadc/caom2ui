@@ -31,6 +31,7 @@
  ****  C A N A D I A N   A S T R O N O M Y   D A T A   C E N T R E  *****
  ************************************************************************
  */
+
 package ca.nrc.cadc.search.integration;
 
 
@@ -38,26 +39,24 @@ import org.junit.Test;
 import org.openqa.selenium.By;
 
 
-public class CAOMSearchBrowserTest extends AbstractAdvancedSearchIntegrationTest
-{
+public class CAOMSearchBrowserTest extends AbstractAdvancedSearchIntegrationTest {
     private static final By ONE_CLICK_DOWNLOAD_LINK_ROW_3_ID_BY = By.id("_one-click_vov_3");
 
 
-    public CAOMSearchBrowserTest() throws Exception
-    {
+    public CAOMSearchBrowserTest() throws Exception {
         super();
     }
 
 
     @Test
-    public void searchCAOM() throws Exception
-    {
+    public void searchCAOM() throws Exception {
         CAOMSearchFormPage searchFormPage = goTo(endpoint, null, CAOMSearchFormPage.class);
 
         searchFormPage.enterObservationID("692512");
         searchFormPage.enterValidTarget("210.05  54.3");
 
         searchFormPage.reset();
+        searchFormPage.uncheckMAQ();
 
         final int index = searchFormPage.findDataTrainValueIndex(By.id("Observation.instrument.name"), "SPACER",
                                                                  false);
@@ -86,6 +85,7 @@ public class CAOMSearchBrowserTest extends AbstractAdvancedSearchIntegrationTest
 
         searchFormPage = searchResultsPage.queryTab();
         searchFormPage.reset();
+        searchFormPage.uncheckMAQ();
 
         searchFormPage.enterTarget("M17");
         searchFormPage.enterCollection("JCMT");
@@ -95,6 +95,7 @@ public class CAOMSearchBrowserTest extends AbstractAdvancedSearchIntegrationTest
 
         searchFormPage = searchResultsPage.queryTab();
         searchFormPage.reset();
+        searchFormPage.uncheckMAQ();
 
         searchFormPage.enterCollection("CFHTMEGAPIPE");
         searchResultsPage = searchFormPage.submitSuccess();
@@ -103,6 +104,7 @@ public class CAOMSearchBrowserTest extends AbstractAdvancedSearchIntegrationTest
 
         searchFormPage = searchResultsPage.queryTab();
         searchFormPage.reset();
+        searchFormPage.uncheckMAQ();
 
         searchFormPage.enterCollection("IRIS");
         searchResultsPage = searchFormPage.submitSuccess();
@@ -115,6 +117,7 @@ public class CAOMSearchBrowserTest extends AbstractAdvancedSearchIntegrationTest
         // Nav back to query tab for next test
         searchFormPage = searchResultsPage.queryTab();
         searchFormPage.reset();
+        searchFormPage.uncheckMAQ();
 
         System.out.println("searchCAOM test complete.");
 

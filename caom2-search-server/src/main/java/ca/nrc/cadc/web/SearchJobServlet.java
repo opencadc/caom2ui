@@ -81,12 +81,12 @@ import ca.nrc.cadc.reg.client.RegistryClient;
 import ca.nrc.cadc.search.DefaultNameResolverClient;
 import ca.nrc.cadc.search.ObsModel;
 import ca.nrc.cadc.search.QueryGenerator;
-import ca.nrc.cadc.search.parser.exception.PositionParserException;
 import ca.nrc.cadc.search.upload.StreamingVOTableWriter;
 import ca.nrc.cadc.search.upload.UploadResults;
 import ca.nrc.cadc.tap.DefaultSyncTAPClient;
 import ca.nrc.cadc.tap.SyncTAPClient;
 import ca.nrc.cadc.tap.TAPSearcher;
+import ca.nrc.cadc.util.StringUtil;
 import ca.nrc.cadc.uws.AdvancedRunner;
 import ca.nrc.cadc.uws.ExecutionPhase;
 import ca.nrc.cadc.uws.HTTPResponseSyncOutput;
@@ -263,7 +263,7 @@ public class SearchJobServlet extends SyncServlet {
 
     private void processRequest(final HttpServletRequest request, final HttpServletResponse response)
         throws JobPersistenceException, TransientException, FileUploadException, IOException,
-        PositionParserException, JobNotFoundException {
+        JobNotFoundException {
 
         final Set<String> userIDs = AuthenticationUtil.getUseridsFromSubject();
         final String userIDCheckpoint = userIDs.isEmpty() ? "Anonymous" : userIDs.toString();
@@ -332,9 +332,10 @@ public class SearchJobServlet extends SyncServlet {
 
         final URI tapServiceURI;
         final String tapServiceKey;
+        final String maqActivatedParam = request.getParameter("activateMAQ");
 
-        if ((request.getParameter("useMaq") != null)
-            && (request.getParameter("useMaq").equals("true"))) {
+        if (StringUtil.hasText(maqActivatedParam) && (maqActivatedParam.equals("on") || maqActivatedParam.equals
+            ("true"))) {
             tapServiceURI = ALTERNATE_TAP_SERVICE_URI;
             tapServiceKey = ALT_TAP_SERVICE_URI_PROPERTY_KEY;
         } else {
