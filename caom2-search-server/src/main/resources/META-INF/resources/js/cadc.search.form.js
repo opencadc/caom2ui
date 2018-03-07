@@ -846,28 +846,22 @@
         }.bind(this)
       )
 
-      $currForm
-        .find('.activateMAQ')
-        .change(
-          function(event) {
-            var maqSelectedFlag =
-              event.currentTarget.checked === 'true' ||
-              event.currentTarget.checked === true
-            // This sets up or removes the MAQ mode display items
-            // in the form and results panel
-            // if (this.maqToggleEnabled === true) {
-            // toggle results table header element
-            this.setResultsMaqMode(maqSelectedFlag)
+      $currForm.find('.activateMAQ').change(
+        function(event) {
+          var maqSelectedFlag =
+            event.currentTarget.checked === 'true' ||
+            event.currentTarget.checked === true
+          // toggle results table header element
+          this.setResultsMaqMode(maqSelectedFlag)
 
-            // Don't reload the train if nothing has changed.
-            if (this.dataTrain.isMAQMode() !== maqSelectedFlag) {
-              this.disableMaqToggle()
-              this.dataTrain.setMaqMode(maqSelectedFlag)
-              this.enableMaqToggle()
-            }
-            // }
-          }.bind(this)
-        )
+          // Don't reload the train if nothing has changed.
+          if (this.dataTrain.isMAQMode() !== maqSelectedFlag) {
+            this.disableMaqToggle()
+            this.dataTrain.setMaqMode(maqSelectedFlag)
+            this.enableMaqToggle()
+          }
+        }.bind(this)
+      )
 
       // Prevent closing details when a value is present.
       $currForm.find("details[id$='_details'] summary").click(function(event) {
@@ -1826,15 +1820,15 @@
     this.resetFields = function() {
       // function that resets all fields to default values
       this.$form.find('input:text').val('')
-      this.$form.find(ca.nrc.cadc.search.activateMAQSelector).val(function () {
+      this.$form.find(ca.nrc.cadc.search.activateMAQSelector).val(function() {
         var $self = $(this)
-        $self.prop('checked', $self.prop('defaultValue')).change()      
+        $self.prop('checked', $self.prop('defaultValue')).change()
         return this.defaultValue
       })
 
       $('#UPLOAD').remove()
 
-      $('#include_proprietary').removeAttr('checked')    
+      $('#include_proprietary').removeAttr('checked')
 
       this._clearTargetList()
 
