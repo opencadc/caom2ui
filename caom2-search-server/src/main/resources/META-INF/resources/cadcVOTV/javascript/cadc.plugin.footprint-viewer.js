@@ -27,8 +27,6 @@
   function AladinLiteFootprintViewer(_inputs) {
     var POLYGON = 'Polygon'
     var CIRCLE = 'Circle'
-    // var POLYGON_SPLIT = POLYGON + ' ICRS'
-    // var CIRCLE_SPLIT = CIRCLE + ' ICRS'
     var DEFAULT_FOV_DEGREES = 180
     var DEFAULT_FOV_BUFFER = 500 / 100
 
@@ -389,7 +387,8 @@
           var selectedFootprint = selectedFootprints[i]
 
           if (selectedFootprint.region === CIRCLE) {
-            _self.currentFootprint.addFootprints(A.circle(selectedFootprint.coords[0], selectedFootprint.coords[1]))
+            _self.currentFootprint.addFootprints(A.circle(
+              selectedFootprint.coords[0], selectedFootprint.coords[1], selectedFootprint.coords[1]))
           }
           else if (selectedFootprint.region === POLYGON) {
             _self.currentFootprint.addFootprints(A.polygon(selectedFootprint.coords))
@@ -449,16 +448,13 @@
       if (_self.defaultDec === null && decValue !== null && decValue !== '') {
         _self.defaultDec = decValue
       }
-
-      // footprintValue = "Union ICRS (Polygon 22.870533 8.937613 22.869736 8.941107 22.867902 8.943593 22.865270 8.945237 22.862210 8.945809 22.859152 8.945228 22.856525 8.943575 22.854699 8.941084 22.853931 8.937072 22.854711 8.934094 22.856937 8.931267 22.859669 8.929790 22.862759 8.929409 22.865773 8.930179 22.868290 8.931991 22.869954 8.934591 Polygon 24.040157 9.410975 24.039578 9.413998 24.037911 9.416598 24.035392 9.418411 24.031850 9.419198 24.028306 9.418422 24.025780 9.416618 24.024105 9.414024 24.023532 9.410487 24.024302 9.407506 24.026131 9.405015 24.028761 9.403362 24.031823 9.402781 24.035367 9.403556 24.037893 9.405360 24.039568 9.407955 Circle 22.871000 8.935000 0.006)"
-      // footprintValue = "Union ICRS (Polygon 22.870533 8.937613 22.869736 8.941107 22.867902 8.943593 22.865270 8.945237 22.862210 8.945809 22.859152 8.945228 22.856525 8.943575 22.854699 8.941084 22.853931 8.937072 22.854711 8.934094 22.856937 8.931267 22.859669 8.929790 22.862759 8.929409 22.865773 8.930179 22.868290 8.931991 22.869954 8.934591 Polygon 24.040157 9.410975 24.039578 9.413998 24.037911 9.416598 24.035392 9.418411 24.031850 9.419198 24.028306 9.418422 24.025780 9.416618 24.024105 9.414024 24.023532 9.410487 24.024302 9.407506 24.026131 9.405015 24.028761 9.403362 24.031823 9.402781 24.035367 9.403556 24.037893 9.405360 24.039568 9.407955)"
-      // footprintValue = "Union ICRS (Circle 22.871000 8.935000 0.006)"
+      
       var footprints = _getFootprints(footprintValue)
       for (var i = 0; i < footprints.length; i++) {
         var footprint = footprints[i]
 
         if (footprint.region === CIRCLE) {
-          _self.aladinOverlay.add(A.circle(footprint.coords[0][0], footprint.coords[0][1], footprint.coords[1]))
+          _self.aladinOverlay.add(A.circle(footprint.coords[0], footprint.coords[1], footprint.coords[1]))
         }
         else if (footprint.region === POLYGON) {
           _self.aladinOverlay.add(A.polygon(footprint.coords))
@@ -525,9 +521,9 @@
               }
               coordinates = vertices
             }
-            else if (region === CIRCLE) {
-              coordinates = [[coordinates[0], coordinates[1]], coordinates[2]]
-            }
+            // else if (region === CIRCLE) {
+            //   coordinates = [[coordinates[0], coordinates[1]], coordinates[2]]
+            // }
             footprints.push({region: region, coords: coordinates})
             region = null
             coordinates = []
