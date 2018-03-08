@@ -25,7 +25,8 @@
    * @constructor
    */
   function AladinLiteFootprintViewer(_inputs) {
-    var POLYGON_SPLIT = 'Polygon ICRS'
+    var POLYGON = 'Polygon'
+    var CIRCLE = 'Circle'
     var DEFAULT_FOV_DEGREES = 180
     var DEFAULT_FOV_BUFFER = 500 / 100
 
@@ -296,17 +297,22 @@
      * @private
      */
     function _calculateFootprintFOV(_footprint) {
-      var footprintItems = $.trim(_footprint).split(' ')
-      var fl = footprintItems.length
       var raValues = []
       var decValues = []
 
-      for (var f = 0; f < fl; f++) {
-        // Even numbers are RA values.
-        if (f % 2 === 0) {
-          raValues.push(Number(footprintItems[f]))
-        } else {
-          decValues.push(Number(footprintItems[f]))
+      if (_footprint.region === CIRCLE) {
+        var ra = _footprint.coords[0]
+        var dec = _footprint.coords[1]
+        var radius = _footprint.coords[2]
+
+        raValues.push(ra + radius, ra - radius)
+        decValues.push(dec + radius, dec - radius)
+      }
+      else if (_footprint.region === POLYGON) {
+        for (var i = 0, len = _footprint.coords.length; i < len; i++) {
+          // Even numbers are RA values.
+          raValues.push(_footprint.coords[i][0])
+          decValues.push(_footprint.coords[i][1])
         }
       }
 
@@ -315,6 +321,27 @@
         minRA: Math.min.apply(null, raValues),
         maxDec: Math.max.apply(null, decValues),
         minDec: Math.min.apply(null, decValues)
+      }
+    }
+
+    function _calculateFootprintsFOV(_footprints) {
+      var maxRA = []
+      var minRA = []
+      var maxDec = []
+      var minDec = []
+      for (var i = 0, len = _footprints.length; i < len; i++) {
+        var footprint = _footprints[i]
+        var footprintFOV = _calculateFootprintFOV(footprint)
+        maxRA.push(footprintFOV.maxRA)
+        minRA.push(footprintFOV.minRA)
+        maxDec.push(footprintFOV.maxDec)
+        minDec.push(footprintFOV.minDec)
+      }
+      return {
+        maxRA: Math.max.apply(null, maxRA),
+        minRA: Math.min.apply(null, minRA),
+        maxDec: Math.max.apply(null, maxDec),
+        minDec: Math.min.apply(null, minDec)
       }
     }
 
@@ -349,74 +376,38 @@
       }
     }
 
-    function sanitizeFootprint(nextFootprint) {
-      var sanitizedFootprint
-
-      if (nextFootprint !== null && $.trim(nextFootprint).length > 0) {
-        var footprintElements = nextFootprint.split(/\s/)
-
-        for (var fei = 0, fel = footprintElements.length; fei < fel; fei++) {
-          var footprintElement = footprintElements[fei]
-
-          if (isNaN(footprintElement)) {
-            delete footprintElements[fei]
-          }
-        }
-
-        sanitizedFootprint =
-          footprintElements.length > 0
-            ? POLYGON_SPLIT + ' ' + footprintElements.join(' ')
-            : null
-      } else {
-        sanitizedFootprint = null
-      }
-
-      return sanitizedFootprint
-    }
-
     function _handleAction(_dataRow) {
       var raValue = _dataRow[_self.raFieldID]
       var decValue = _dataRow[_self.decFieldID]
 
-      if (
-        raValue !== null &&
-        $.trim(raValue) !== '' &&
-        decValue !== null &&
-        $.trim(decValue) !== ''
-      ) {
-        var selectedFootprint = sanitizeFootprint(
-          _dataRow[_self.footprintFieldID]
-        )
+      if (raValue !== null && $.trim(raValue) !== '' && decValue !== null && $.trim(decValue) !== '') {
+        var selectedFootprints = _getFootprints(_dataRow[_self.footprintFieldID])
 
-        if (selectedFootprint !== null) {
-          _self.currentFootprint.addFootprints(
-            _self.aladin.createFootprintsFromSTCS(selectedFootprint)
-          )
+        for (var i = 0, len = selectedFootprints.length; i < len; i++) {
+          var selectedFootprint = selectedFootprints[i]
 
-          if (inputs.navigateToSelected === true) {
-            _self.aladin.gotoRaDec(raValue, decValue)
-
-            var selectedRowFOVBox = _calculateFootprintFOV(
-              selectedFootprint.substr(POLYGON_SPLIT.length)
-            )
-            var fieldOfView = Math.max(
-              selectedRowFOVBox.maxRA - selectedRowFOVBox.minRA,
-              selectedRowFOVBox.maxDec - selectedRowFOVBox.minDec
-            )
-            _self.aladin.setFoV(
-              Math.min(
-                DEFAULT_FOV_DEGREES,
-                inputs.afterFOVCalculation(fieldOfView)
-              )
-            )
+          if (selectedFootprint.region === CIRCLE) {
+            _self.currentFootprint.addFootprints(A.circle(
+              selectedFootprint.coords[0], selectedFootprint.coords[1], selectedFootprint.coords[1]))
           }
-        } else {
-          console.warn(
-            'Unable to add footprint for (' + raValue + ', ' + decValue + ')'
-          )
+          else if (selectedFootprint.region === POLYGON) {
+            _self.currentFootprint.addFootprints(A.polygon(selectedFootprint.coords))
+          }
         }
-      } else {
-        console.warn('RA and Dec are invalid.')
+
+        if (inputs.navigateToSelected === true) {
+          _self.aladin.gotoRaDec(raValue, decValue)
+
+          var selectedRowFOVBox = _calculateFootprintsFOV(selectedFootprints)
+          var fieldOfView = Math.max(
+            selectedRowFOVBox.maxRA - selectedRowFOVBox.minRA,
+            selectedRowFOVBox.maxDec - selectedRowFOVBox.minDec
+          )
+          _self.aladin.setFoV(Math.min(DEFAULT_FOV_DEGREES, inputs.afterFOVCalculation(fieldOfView)))
+        }
+      }
+      else {
+        console.warn('Unable to add footprint for (' + raValue + ', ' + decValue + ')')
       }
 
       if (_self.aladin && _self.aladin.view) {
@@ -445,7 +436,7 @@
 
     function handleAddFootprint(e, args) {
       var _row = args.rowData
-      var polygonValue = _row[_self.footprintFieldID]
+      var footprintValue = _row[_self.footprintFieldID]
       var raValue = $.trim(_row[_self.raFieldID])
       var decValue = $.trim(_row[_self.decFieldID])
 
@@ -458,24 +449,85 @@
         _self.defaultDec = decValue
       }
 
-      if (polygonValue) {
-        var footprintValues = polygonValue.split(POLYGON_SPLIT)
-        var footprintValuesLength = footprintValues.length
+      var footprints = _getFootprints(footprintValue)
+      for (var i = 0, len = footprints.length; i < len; i++) {
+        var footprint = footprints[i]
 
-        for (var fpvi = 0; fpvi < footprintValuesLength; fpvi++) {
-          var nextFootprint = sanitizeFootprint(footprintValues[fpvi])
+        if (footprint.region === CIRCLE) {
+          _self.aladinOverlay.add(A.circle(footprint.coords[0], footprint.coords[1], footprint.coords[1]))
+        }
+        else if (footprint.region === POLYGON) {
+          _self.aladinOverlay.add(A.polygon(footprint.coords))
+        }
+        else {
+          console.log("Unknown footprint " + footprint)
+        }
 
-          if (nextFootprint !== null) {
-            _self.aladinOverlay.addFootprints(
-              _self.aladin.createFootprintsFromSTCS(nextFootprint)
-            )
+        if (!inputs.fov || inputs.fov === null) {
+          _updateFOV(footprint)
+        }
+      }
+    }
 
-            if (!inputs.fov || inputs.fov === null) {
-              _updateFOV(nextFootprint.substr(POLYGON_SPLIT.length))
+    function _getFootprints(footprintString) {
+      var footprints = []
+
+      if (footprintString) {
+        var region = null
+        var coordinates = []
+        var shapes = footprintString.split(/(Polygon|Circle)/)
+        for (var i = 0, len = shapes.length; i < len; i++) {
+
+          var shape = shapes[i].trim()
+          if (shape.length === 0) {
+            continue
+          }
+          if (shape === POLYGON || shape === CIRCLE) {
+            region = shape
+            continue
+          }
+          var coords = shape.split(/[\s()]+/)
+          if (coords.length < 3) {
+            continue
+          }
+          for (var j = 0, lenj = coords.length; j < lenj; j++) {
+            var coord = coords[j]
+            if (coord.length === 0) {
+              continue
             }
+            if (!isNaN(coord)) {
+              coordinates.push(Number(coord))
+            }
+          }
+
+          if (!region && coordinates.length > 0) {
+            var isPolygon = coordinates.length % 2 === 0
+            var isCircle = coordinates.length === 3
+
+            if (isPolygon) {
+              region = POLYGON
+            }
+            else if (isCircle) {
+              region = CIRCLE
+            }
+          }
+
+          if (region && coordinates.length > 0) {
+            // split polygon array into 2 segment chunks
+            if (region === POLYGON) {
+              var vertices = []
+              while (coordinates.length) {
+                vertices.push(coordinates.splice(0, 2))
+              }
+              coordinates = vertices
+            }
+            footprints.push({region: region, coords: coordinates})
+            region = null
+            coordinates = []
           }
         }
       }
+      return footprints
     }
 
     /**
