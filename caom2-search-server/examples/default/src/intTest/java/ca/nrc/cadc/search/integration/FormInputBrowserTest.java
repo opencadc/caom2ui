@@ -31,6 +31,7 @@
  ****  C A N A D I A N   A S T R O N O M Y   D A T A   C E N T R E  *****
  ************************************************************************
  */
+
 package ca.nrc.cadc.search.integration;
 
 import ca.nrc.cadc.util.StringUtil;
@@ -41,21 +42,18 @@ import org.openqa.selenium.By;
 /**
  * Verify form inputs
  */
-public class FormInputBrowserTest extends AbstractAdvancedSearchIntegrationTest
-{
-    public FormInputBrowserTest() throws Exception
-    {
+public class FormInputBrowserTest extends AbstractAdvancedSearchIntegrationTest {
+    public FormInputBrowserTest() throws Exception {
         super();
     }
 
     /**
      * Ensure the form inputs put error messages into the tooltips.
      *
-     * @throws Exception        Any errors.
+     * @throws Exception Any errors.
      */
     @Test
-    public void verifyFormInputs() throws Exception
-    {
+    public void verifyFormInputs() throws Exception {
         final CAOMSearchFormPage caomSearchFormPage = goTo(endpoint, "", CAOMSearchFormPage.class);
 
         caomSearchFormPage.reset();
@@ -78,11 +76,10 @@ public class FormInputBrowserTest extends AbstractAdvancedSearchIntegrationTest
 
         caomSearchFormPage.showInputField(CAOMSearchFormPage.OBSERVATION_DATE_INPUT_ID);
         caomSearchFormPage.select(By.id(CAOMSearchFormPage.OBSERVATION_DATE_INPUT_ID + "_PRESET"), "PAST_WEEK");
-        //TODO: uncomment when tooltip implementation is complete
-        caomSearchFormPage.verifyFormInputMessageMatches(CAOMSearchFormPage.OBSERVATION_DATE_INPUT_ID, false, "(.*)\\d\\.\\.\\d(.*)");
+        caomSearchFormPage.verifyFormInputMessageMatches(CAOMSearchFormPage.OBSERVATION_DATE_INPUT_ID, false, "(.*)" +
+            "\\d\\.\\.\\d(.*)");
 
         // Close it again.
-        //TODO: uncomment when tooltip implementation is complete
         caomSearchFormPage.hideInputField(CAOMSearchFormPage.OBSERVATION_DATE_INPUT_ID);
 
         verifyFormInput(caomSearchFormPage, CAOMSearchFormPage.SPECTRAL_COVERAGE_INPUT_ID, "aaa", true, null);
@@ -128,32 +125,22 @@ public class FormInputBrowserTest extends AbstractAdvancedSearchIntegrationTest
 
     private void verifyFormInput(final CAOMSearchFormPage caomSearchFormPage, final String inputID, final String entry,
                                  final boolean expectError, final String expectedLabelMessage)
-            throws Exception
-    {
-        if (StringUtil.hasText(entry))
-        {
+        throws Exception {
+        if (StringUtil.hasText(entry)) {
             caomSearchFormPage.waitForElementPresent(By.id(inputID));
             caomSearchFormPage.enterInputValue(caomSearchFormPage.find(By.id(inputID)), entry);
-        }
-        else
-        {
+        } else {
             caomSearchFormPage.clearInputValue(inputID);
         }
 
-        if (expectError)
-        {
+        if (expectError) {
             // Empty strings are valid as they represent cleared errors.
-            if (expectedLabelMessage != null)
-            {
+            if (expectedLabelMessage != null) {
                 caomSearchFormPage.verifyFormInputMessage(inputID, true, expectedLabelMessage);
-            }
-            else
-            {
+            } else {
                 caomSearchFormPage.verifyFormInputError(inputID);
             }
-        }
-        else
-        {
+        } else {
             caomSearchFormPage.verifyFormInputMessage(inputID, false, expectedLabelMessage);
         }
     }

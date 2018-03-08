@@ -78,43 +78,37 @@ import org.openqa.selenium.support.PageFactory;
 import java.util.Objects;
 
 
-abstract class AbstractSearchFormPage extends AbstractTestWebPage
-{
-    private static final String DETAILS_LOCATOR_XPATH = "//details[@id='%s']";
+abstract class AbstractSearchFormPage extends AbstractTestWebPage {
     private static final String CONTENT_LOCATOR_XPATH = "//*[@id='%s']/summary/label/span";
+    private static final By TOP_RESET_BUTTON_BY = By.xpath("//*[@id=\"queryForm\"]/div[1]/button[2]");
 
     @FindBy(xpath = "//*[@id=\"queryForm\"]/div[1]/button[@type=\"submit\"]")
-    private WebElement topSubmitButton;
-
-    @FindBy(xpath = "//*[@id=\"queryForm\"]/div[1]/button[2]")
-    private WebElement topResetButton;
+    WebElement topSubmitButton;
 
 
-    AbstractSearchFormPage(final WebDriver driver) throws Exception
-    {
+    AbstractSearchFormPage(final WebDriver driver) throws Exception {
         super(driver);
 
-        waitForElementClickable(By.cssSelector("button[type=\"reset\"]"));
+        waitForElementClickable(TOP_RESET_BUTTON_BY);
         PageFactory.initElements(driver, this);
     }
 
-    AbstractSearchFormPage(WebDriver driver, int timeoutInSeconds)
-    {
+    AbstractSearchFormPage(WebDriver driver, int timeoutInSeconds) throws Exception {
         super(driver, timeoutInSeconds);
 
+        waitForElementClickable(TOP_RESET_BUTTON_BY);
         PageFactory.initElements(driver, this);
     }
 
-    void enterInputValue(final WebElement inputElement, final String value) throws Exception
-    {
+
+    void enterInputValue(final WebElement inputElement, final String value) throws Exception {
         final String inputID = inputElement.getAttribute("id");
 
         summonTooltip(inputID);
         showInputField(inputID);
         waitForElementVisible(inputElement);
 
-        for (int i = 0; i < value.length(); i++)
-        {
+        for (int i = 0; i < value.length(); i++) {
             inputElement.sendKeys(Character.toString(value.charAt(i)));
             waitFor(150L);
         }
@@ -122,46 +116,35 @@ abstract class AbstractSearchFormPage extends AbstractTestWebPage
         closeTooltip();
     }
 
-    void clearInputValue(final String inputID) throws Exception
-    {
+    void clearInputValue(final String inputID) throws Exception {
         final WebElement inputElement = find(By.id(inputID));
 
-        if (inputElement.isDisplayed())
-        {
+        if (inputElement.isDisplayed()) {
             sendKeys(inputElement, "");
             hideInputField(inputID);
-        }
-        else
-        {
+        } else {
             throw new IllegalStateException("Input element " + inputID + " is not displayed.");
         }
     }
 
-    void verifyFormInputError(final String inputID) throws Exception
-    {
+    void verifyFormInputError(final String inputID) throws Exception {
         waitForElementPresent(By.xpath("//div[@id='" + inputID
-                                       + "_input_decorate'][contains(@class,'has-error')]"));
+                                           + "_input_decorate'][contains(@class,'has-error')]"));
     }
 
     void verifyFormInputMessage(final String inputID, final boolean errorExpected, final String expectedMessage)
-            throws Exception
-    {
-        if (errorExpected)
-        {
+        throws Exception {
+        if (errorExpected) {
             verifyFormInputError(inputID);
         }
 
         final By contents = By.xpath(String.format(CONTENT_LOCATOR_XPATH, (inputID + "_details")));
 
-        if (!Objects.equals(expectedMessage, ""))
-        {
+        if (!Objects.equals(expectedMessage, "")) {
             waitForTextPresent(contents, expectedMessage);
-        }
-        else
-        {
+        } else {
             WebElement contentEl = find(contents);
-            if (!contentEl.getText().equals(""))
-            {
+            if (!contentEl.getText().equals("")) {
                 throw new Exception();
             }
         }
@@ -169,24 +152,20 @@ abstract class AbstractSearchFormPage extends AbstractTestWebPage
 
 
     void verifyFormInputMessageMatches(final String inputID, final boolean errorExpected,
-                                       final String messageRegex) throws Exception
-    {
-        if (errorExpected)
-        {
+                                       final String messageRegex) throws Exception {
+        if (errorExpected) {
             verifyFormInputError(inputID);
         }
 
         verifyTextMatches(By.xpath(String.format(CONTENT_LOCATOR_XPATH, (inputID + "_details"))), messageRegex);
     }
 
-    void hideInputBox(final String inputID) throws Exception
-    {
+    void hideInputBox(final String inputID) throws Exception {
         click(By.xpath(String.format(CONTENT_LOCATOR_XPATH, (inputID + "_details"))));
         waitForElementInvisible(By.id(inputID));
     }
 
-    void summonTooltip(final String baseID) throws Exception
-    {
+    void summonTooltip(final String baseID) throws Exception {
         final By tooltipIconTriggerBy = By.xpath("//div[@id='" + baseID + "_formgroup']/div");
 
         waitForElementPresent(tooltipIconTriggerBy);
@@ -198,14 +177,11 @@ abstract class AbstractSearchFormPage extends AbstractTestWebPage
         waitForElementVisible(By.xpath("//div[@id='" + baseID + "_formgroup']/div[2]"));
     }
 
-    void closeTooltip() throws Exception
-    {
+    void closeTooltip() throws Exception {
         final By tooltipCloseLink = By.xpath("//*[contains(@class, 'glyphicon-remove-circle')]");
         waitForElementPresent(tooltipCloseLink);
         final WebElement tooltipClose = find(tooltipCloseLink);
-//        waitForElementVisible(tooltipClose);
         click(tooltipClose);
-//        waitForElementNotPresent(tooltipCloseLink);
     }
 
 
@@ -215,12 +191,10 @@ abstract class AbstractSearchFormPage extends AbstractTestWebPage
      * @param inputID The String ID locator.
      * @throws Exception Any error.
      */
-    void showInputField(final String inputID) throws Exception
-    {
+    void showInputField(final String inputID) throws Exception {
         final WebElement element = find(By.id(inputID + "_details"));
 
-        if (!find(By.id(inputID)).isDisplayed())
-        {
+        if (!find(By.id(inputID)).isDisplayed()) {
             // show the input box
             click(element);
         }
@@ -232,27 +206,23 @@ abstract class AbstractSearchFormPage extends AbstractTestWebPage
      * @param inputID The String ID locator.
      * @throws Exception Any error.
      */
-    void hideInputField(final String inputID) throws Exception
-    {
+    void hideInputField(final String inputID) throws Exception {
         final WebElement element = find(By.id(inputID + "_details"));
 
-        if (find(By.id(inputID)).isDisplayed())
-        {
+        if (find(By.id(inputID)).isDisplayed()) {
             // show the input box
             click(element);
         }
     }
 
-    SearchResultsPage submitSuccess() throws Exception
-    {
+    SearchResultsPage submitSuccess() throws Exception {
         click(topSubmitButton);
 
         return new SearchResultsPage(driver);
     }
 
-    void reset() throws Exception
-    {
-        click(topResetButton);
+    void reset() throws Exception {
+        click(TOP_RESET_BUTTON_BY);
         waitForMAQToggleReset();
     }
 

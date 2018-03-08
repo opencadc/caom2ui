@@ -1,7 +1,5 @@
 # Base Tomcat 8 JRE 8 image from CANFAR running on Alpine.
-FROM tomcat:8.5-alpine
-
-ENV JAVA_OPTS "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5555 -Djava.security.egd=file:/dev/./urandom -Djsse.enableSNIExtension=false"
+FROM opencadc/tomcat:alpine
 
 # Clear out the webapps directory.
 RUN rm -rf webapps \
