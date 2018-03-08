@@ -1820,7 +1820,10 @@
       this.$form.find('input:text').val('')
       this.$form.find(ca.nrc.cadc.search.activateMAQSelector).val(function() {
         var $self = $(this)
-        $self.prop('checked', $self.prop('defaultValue')).change()
+        var defaultVal = $self.prop('defaultValue')
+        $self
+          .prop('checked', defaultVal === true || defaultVal === 'true')
+          .change()
         return this.defaultValue
       })
 

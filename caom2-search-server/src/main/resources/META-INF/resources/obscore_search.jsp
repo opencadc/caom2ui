@@ -23,7 +23,6 @@
     <input type="hidden" name="SelectList" class="ObsCore_selectlist"/>
     <input type="hidden" name="MaxRecords" value="${param.maxRowLimit}"/>
     <input type="hidden" name="format" value="csv"/>
-    <%-- <input type="hidden" class="activateMAQValue" name="activateMAQ" value="${param.activateMAQ}"/> --%>
 
     <div class="col-sm-12 button-holder">
       <button type="submit"
