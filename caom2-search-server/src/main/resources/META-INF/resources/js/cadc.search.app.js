@@ -1152,10 +1152,6 @@
       $(':reset').click(
         function() {
           this._getActiveForm().resetFields()
-          this._getActiveForm().getForm().find(ca.nrc.cadc.search.activateMAQSelector).each(function (index, item) {
-            var $maqToggle = $(item)
-            $maqToggle.prop('checked', $maqToggle.prop('defaultValue')).change()
-          })   
         }.bind(this)
       )
 
