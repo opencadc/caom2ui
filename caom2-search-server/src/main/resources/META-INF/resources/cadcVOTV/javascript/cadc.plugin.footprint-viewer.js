@@ -301,18 +301,18 @@
       var decValues = []
 
       if (_footprint.region === CIRCLE) {
-        var ra = _footprint.coords[0][0]
-        var dec = _footprint.coords[0][1]
-        var radius = _footprint.coords[1]
+        var ra = _footprint.coords[0]
+        var dec = _footprint.coords[1]
+        var radius = _footprint.coords[2]
 
         raValues.push(ra + radius, ra - radius)
         decValues.push(dec + radius, dec - radius)
       }
       else if (_footprint.region === POLYGON) {
-        for (var f = 0; f < _footprint.coords.length; f++) {
+        for (var i = 0, len = _footprint.coords.length; i < len; i++) {
           // Even numbers are RA values.
-          raValues.push(_footprint.coords[f][0])
-          decValues.push(_footprint.coords[f][1])
+          raValues.push(_footprint.coords[i][0])
+          decValues.push(_footprint.coords[i][1])
         }
       }
 
@@ -329,7 +329,7 @@
       var minRA = []
       var maxDec = []
       var minDec = []
-      for (var i = 0; i < _footprints.length; i++) {
+      for (var i = 0, len = _footprints.length; i < len; i++) {
         var footprint = _footprints[i]
         var footprintFOV = _calculateFootprintFOV(footprint)
         maxRA.push(footprintFOV.maxRA)
@@ -383,7 +383,7 @@
       if (raValue !== null && $.trim(raValue) !== '' && decValue !== null && $.trim(decValue) !== '') {
         var selectedFootprints = _getFootprints(_dataRow[_self.footprintFieldID])
 
-        for (var i = 0; i < selectedFootprints.length; i++) {
+        for (var i = 0, len = selectedFootprints.length; i < len; i++) {
           var selectedFootprint = selectedFootprints[i]
 
           if (selectedFootprint.region === CIRCLE) {
@@ -448,9 +448,9 @@
       if (_self.defaultDec === null && decValue !== null && decValue !== '') {
         _self.defaultDec = decValue
       }
-      
+
       var footprints = _getFootprints(footprintValue)
-      for (var i = 0; i < footprints.length; i++) {
+      for (var i = 0, len = footprints.length; i < len; i++) {
         var footprint = footprints[i]
 
         if (footprint.region === CIRCLE) {
@@ -471,12 +471,12 @@
 
     function _getFootprints(footprintString) {
       var footprints = []
-      var region = null
-      var coordinates = []
 
       if (footprintString) {
+        var region = null
+        var coordinates = []
         var shapes = footprintString.split(/(Polygon|Circle)/)
-        for (var i = 0; i < shapes.length; i++) {
+        for (var i = 0, len = shapes.length; i < len; i++) {
 
           var shape = shapes[i].trim()
           if (shape.length === 0) {
@@ -490,7 +490,7 @@
           if (coords.length < 3) {
             continue
           }
-          for (var j = 0; j < coords.length; j++) {
+          for (var j = 0, lenj = coords.length; j < lenj; j++) {
             var coord = coords[j]
             if (coord.length === 0) {
               continue
@@ -505,7 +505,7 @@
             var isCircle = coordinates.length === 3
 
             if (isPolygon) {
-              region = POLYGON;
+              region = POLYGON
             }
             else if (isCircle) {
               region = CIRCLE
@@ -521,9 +521,6 @@
               }
               coordinates = vertices
             }
-            // else if (region === CIRCLE) {
-            //   coordinates = [[coordinates[0], coordinates[1]], coordinates[2]]
-            // }
             footprints.push({region: region, coords: coordinates})
             region = null
             coordinates = []
