@@ -31,71 +31,63 @@
  ****  C A N A D I A N   A S T R O N O M Y   D A T A   C E N T R E  *****
  ************************************************************************
  */
+
 package ca.nrc.cadc.search.parser;
 
 import ca.nrc.cadc.search.parser.exception.NumericParserException;
 import ca.nrc.cadc.util.StringUtil;
 
 import org.apache.log4j.Logger;
+
 import java.util.regex.PatternSyntaxException;
 
 
 /**
  * Accepts a radius entry and parses it out.
  */
-public class RadiusParser extends AbstractNumericParser
-{
+public class RadiusParser extends AbstractNumericParser {
     private static final Logger LOGGER = Logger.getLogger(RadiusParser.class);
-    private static final double MAX_RADIUS = 90.0;    
+    private static final double MAX_RADIUS = 90.0;
 
 
     private String radiusFormat;
 
-    
+
     /**
      * Complete constructor.
      *
      * @param val The String value to parse.
      */
-    public RadiusParser(final String val) throws NumericParserException
-    {
+    public RadiusParser(final String val) throws NumericParserException {
         super(val);
     }
 
 
     @Override
-    public void parse() throws NumericParserException
-    {
+    public void parse() throws NumericParserException {
         final Numeric result = new Numeric();
         final String rad = getSource();
 
-        if (StringUtil.hasText(rad))
-        {
-            try
-            {
+        if (StringUtil.hasText(rad)) {
+            try {
                 final Double radiusValue = parseDouble();
                 final String radiusUnit = parseUnit();
 
                 if (!StringUtil.hasText(radiusUnit)
-                    || radiusUnit.matches("^[dD]+[eE]?[gG]?.*$"))
-                {
+                    || radiusUnit.matches("^[dD]+[eE]?[gG]?.*$")) {
                     LOGGER.debug("parseRadius: " + rad
-                                 + " looks like a number in degrees");
+                                     + " looks like a number in degrees");
                     result.value = radiusValue;
-                }
-                else if (radiusUnit.matches("\"|''|^[aA]+[rR]?[cC]?[sS]+.*$"))
-                {
+                } else if (radiusUnit.matches("\"|''|^[aA]+[rR]?[cC]?[sS]+.*$")) {
                     LOGGER.debug("parseRadius: " + rad
-                                 + " looks like a number in arcsec");
+                                     + " looks like a number in arcsec");
 
                     result.value = radiusValue / 3600.0;
 
                     setRadiusFormat(buildNumberFormat(radiusUnit, 6));
-                }
-                else if (radiusUnit.matches("'|^[aA]+[rR]?[cC]?[mM]+.*$"))
-                {
+                } else if (radiusUnit.matches("'|^[aA]+[rR]?[cC]?[mM]+.*$")) {
                     LOGGER.debug("parseRadius: " + rad
-                                 + " looks like a number in arcmin");
+                                     + " looks like a number in arcmin");
 
                     result.value = radiusValue / 60.0;
 
@@ -103,27 +95,19 @@ public class RadiusParser extends AbstractNumericParser
                 }
 
                 LOGGER.debug("parseRadius: " + rad
-                          + " did not match any pattern/expectations");
-            }
-            catch (PatternSyntaxException pse)
-            {
+                                 + " did not match any pattern/expectations");
+            } catch (PatternSyntaxException pse) {
                 LOGGER.debug("Pattern syntax error for radius " + rad
-                          + pse.getMessage());
-            }
-            catch (NumberFormatException nfe)
-            {
+                                 + pse.getMessage());
+            } catch (NumberFormatException nfe) {
                 LOGGER.debug("Parsing error for radius " + rad + nfe.getMessage());
             }
         }
 
         if ((result.value != null)
-            && (new Double(result.value.doubleValue()).compareTo(MAX_RADIUS)
-                > 0))
-        {
+            && (Double.compare(result.value.doubleValue(), MAX_RADIUS) > 0)) {
             throw new NumericParserException("Radius is out of range.");
-        }
-        else
-        {
+        } else {
             setResult(result);
         }
     }
@@ -131,46 +115,39 @@ public class RadiusParser extends AbstractNumericParser
     /**
      * Creates a number format for the given String.
      *
-     * @param s         Create a human readable number for the given string.
-     * @param pad       How any decimal places to pad.
-     * @return          String with numeric content.
+     * @param s   Create a human readable number for the given string.
+     * @param pad How any decimal places to pad.
+     * @return String with numeric content.
      */
-    private String buildNumberFormat(final String s, final int pad)
-    {
+    private String buildNumberFormat(final String s, final int pad) {
         int decimals = pad;
-        String format = "##0";
+        final StringBuilder format = new StringBuilder("##0");
 
-        int index = s.indexOf('.');
-        if (index != -1)
-        {
-            int len = s.length();
-            if (len > index + 1)
-            {
+        final int index = s.indexOf('.');
+        if (index != -1) {
+            final int len = s.length();
+            if (len > index + 1) {
                 decimals += len - (index + 1);
             }
         }
 
-        if (decimals > 0)
-        {
-            format += ".";
+        if (decimals > 0) {
+            format.append(".");
         }
 
-        for (int i = 0; i < decimals; i++)
-        {
-            format += "0";
+        for (int i = 0; i < decimals; i++) {
+            format.append("0");
         }
 
-        return format;
+        return format.toString();
     }
 
 
-    public String getRadiusFormat()
-    {
+    public String getRadiusFormat() {
         return radiusFormat;
     }
 
-    private void setRadiusFormat(final String radiusFormat)
-    {
+    private void setRadiusFormat(final String radiusFormat) {
         this.radiusFormat = radiusFormat;
     }
 }

@@ -6,8 +6,8 @@ plugins {
 }
 
 repositories {
-    jcenter()
-    mavenLocal()
+    mavenLocal()    
+    jcenter()    
 }
 
 dependencies {
@@ -26,4 +26,4 @@ dependencies {
 
 sourceCompatibility = 1.7
 group = 'org.opencadc'
-version = '2.3.1'
+version = '2.3.2'
