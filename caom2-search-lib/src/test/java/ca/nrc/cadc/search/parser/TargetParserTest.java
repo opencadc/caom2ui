@@ -253,15 +253,16 @@ public class TargetParserTest extends AbstractUnitTest<TargetParser>
     @Test
     public final void parseRadius() throws Exception
     {
-        final String t = "12 34 56 56 43 21";
+        final String t = "12.34 33.50 21arcmin";
         final TargetParser parser = new TargetParser(mockResolver);
-        final TargetData data = parser.parse(t, "SIMBAD");
 
         replay(mockResolver);
 
-        assertEquals(188.7D, data.getRA(), 0.1D);
-        assertEquals(56.7D, data.getDec(), 0.1D);
-        assertEquals("Radius should be 0.0", 0.0, data.getRadius(), 0.0);
+        final TargetData data = parser.parse(t, "SIMBAD");
+
+        assertEquals(12.34D, data.getRA(), 0.1D);
+        assertEquals(33.50D, data.getDec(), 0.1D);
+        assertEquals("Radius should be 0.35", 0.35D, data.getRadius(), 0.0);
 
         verify(mockResolver);
     }
@@ -324,12 +325,11 @@ public class TargetParserTest extends AbstractUnitTest<TargetParser>
         final String resolver = "SIMBAD";
 
         reset(mockResolver);
-        final TargetParser testSubject =
-                new TargetParser(mockResolver);
+        final TargetParser testSubject = new TargetParser(mockResolver);
         final TargetData resolverData = new TargetData("M101 0.5",
                                                        13.5D, null, // raRange
                                                        -13.5D, null, // decRange
-                                                       0.5, // radius
+                                                       0.0, // radius
                                                        "COORD",
                                                        "SIMBAD",
                                                        88,
@@ -337,8 +337,7 @@ public class TargetParserTest extends AbstractUnitTest<TargetParser>
                                                        null,
                                                        null);
 
-        expect(mockResolver.resolveTarget(target, resolver)).andReturn(
-                resolverData).once();
+        expect(mockResolver.resolveTarget(target, resolver)).andReturn(resolverData).once();
 
         replay(mockResolver);
 

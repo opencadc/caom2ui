@@ -35,20 +35,21 @@ import org.apache.log4j.Logger;
 
 import ca.nrc.cadc.search.parser.exception.PositionParserException;
 import ca.nrc.cadc.search.parser.exception.TargetParserException;
+import ca.nrc.cadc.util.ArrayUtil;
 import ca.nrc.cadc.util.StringUtil;
 
 
 /**
  * ra [sep] dec [sep] [radius[unit]] [sep] [coordsys]
- *
+ * <p>
  * Class takes a String target value and attempts to parse
  * the target into R.A., Dec., and radius values. If it is
  * unable to parse the target into coordinates, it passes
  * the target to a name resolver to retrieve the coordinates.
- *
+ * <p>
  * If the name is simply an Object Name rather than a name that can be parsed,
  * then attempt all resolution, then give up.
- *
+ * <p>
  * 1 token is resolved to coordinates.
  * 2 tokens are a RA and DEC.
  * 3 tokens are a RA, DEC, and radius or coordinate system.
@@ -62,14 +63,11 @@ import ca.nrc.cadc.util.StringUtil;
  *
  * @author jburke
  */
-public class TargetParser
-{
+public class TargetParser {
     private static final Logger log = Logger.getLogger(TargetParser.class);
 
-    public static final String DEGREE_SYMBOL =
-            Character.toString((char) 0x00b0);
-    private static final String RA_DEC_SEPARATORS =
-            "'\"dhmsDHMS:" + DEGREE_SYMBOL;
+    private static final String DEGREE_SYMBOL = Character.toString((char) 0x00b0);
+    private static final String RA_DEC_SEPARATORS = "'\"dhmsDHMS:" + DEGREE_SYMBOL;
 
     private final Resolver resolver;
 
@@ -79,8 +77,7 @@ public class TargetParser
      *
      * @param resolver The resolver to use when resolving is needed.
      */
-    public TargetParser(final Resolver resolver)
-    {
+    public TargetParser(final Resolver resolver) {
         this.resolver = resolver;
     }
 
@@ -94,14 +91,10 @@ public class TargetParser
      * @throws TargetParserException If the query is null or cannot be parsed.
      */
     public TargetData parse(final String target, final String resolver)
-            throws TargetParserException
-    {
-        if (!StringUtil.hasText(target))
-        {
+        throws TargetParserException {
+        if (!StringUtil.hasText(target)) {
             throw new TargetParserException("Null or empty target");
-        }
-        else if (!StringUtil.hasText(resolver))
-        {
+        } else if (!StringUtil.hasText(resolver)) {
             throw new TargetParserException("Null or empty resolver");
         }
 
@@ -114,14 +107,12 @@ public class TargetParser
      * @param target The target value entered.
      * @return The sanitized value.
      */
-    protected String sanitizeTarget(final String target)
-    {
+    protected String sanitizeTarget(final String target) {
         return target.replace(",", "").replaceAll("(\\s*)(\\.{2,})(\\s*)",
                                                   "$2");
     }
 
-    public boolean isQueryInDegrees(final String query)
-    {
+    public boolean isQueryInDegrees(final String query) {
         boolean raIsDegrees = true;
         boolean decIsDegrees = true;
 
@@ -130,14 +121,12 @@ public class TargetParser
         String[] parts = temp.trim().split("\\s+");
 
         // More than 4 arguments, must be sexigesimal.
-        if (parts.length > 4)
-        {
+        if (parts.length > 4) {
             return false;
         }
 
         // Check if the RA is a single value.
-        if (parts.length > 0 && parts[0] != null)
-        {
+        if (parts.length > 0 && parts[0] != null) {
             String s = parts[0].trim();
             StringTokenizer st = new StringTokenizer(s, RA_DEC_SEPARATORS,
                                                      true);
@@ -145,11 +134,9 @@ public class TargetParser
         }
 
         // Check if the DEC is a single value.
-        if (parts.length > 1 && parts[1] != null)
-        {
-            String s = parts[1].trim();
-            StringTokenizer st = new StringTokenizer(s, RA_DEC_SEPARATORS,
-                                                     true);
+        if (parts.length > 1 && parts[1] != null) {
+            final String s = parts[1].trim();
+            final StringTokenizer st = new StringTokenizer(s, RA_DEC_SEPARATORS, true);
             decIsDegrees = (st.countTokens() == 1);
         }
 
@@ -165,47 +152,34 @@ public class TargetParser
      * @throws TargetParserException If the query is null or empty, or an
      *                               error in parsing occurs.
      */
-    private TargetData parseTarget(final String target,
-                                   final String resolverName)
-            throws TargetParserException
-    {
+    private TargetData parseTarget(final String target, final String resolverName) throws TargetParserException {
         TargetData targetData;
+        final PositionParser parser = new PositionParser();
 
         log.debug("parse: " + target);
 
-        try
-        {
-            final PositionParser parser = new PositionParser();
+        try {
             targetData = parser.parse(target);
 
             log.debug(parser);
-        }
-        catch (PositionParserException e)
-        {
-            try
-            {
+        } catch (PositionParserException e) {
+            try {
                 targetData = resolver.resolveTarget(target, resolverName);
 
-                if (targetData == null)
-                {
-                    throw new TargetParserException("Unable to resolve: "
-                                                    + target, e,
-                                                    TargetParserException.
-                                                            ExceptionType.
-                                                            NAMERESOLVER_TARGET_NOT_FOUND);
+                if (targetData == null) {
+                    throw new TargetParserException("Unable to resolve: " + target, e,
+                                                    TargetParserException.ExceptionType.NAMERESOLVER_TARGET_NOT_FOUND);
                 }
+            } catch (IOException re) {
+                throw new TargetParserException(String.format("Unable to resolve %s", target));
             }
-            catch (IOException re)
-            {
-                throw new TargetParserException("Unable to resolve "
-                                                + target);
-            }
-        }
-        catch (IllegalArgumentException iae)
-        {
+        } catch (IllegalArgumentException iae) {
             throw new TargetParserException("Illegal argument for target " +
-                                            iae.getMessage());
+                                                iae.getMessage());
         }
+
+        final String[] parts = parser.partition(target);
+        parser.parseRadius(parts[parts.length - 1], targetData);
 
         return targetData;
     }
