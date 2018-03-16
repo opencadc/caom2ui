@@ -128,6 +128,22 @@ public class TargetParserTest extends AbstractUnitTest<TargetParser>
         }
     }
 
+    @Test
+    public final void parseCoordinates() throws Exception {
+        final String target = "37.66671 72.95500";
+        final TargetParser parser = new TargetParser(mockResolver);
+
+        replay(mockResolver);
+
+        final TargetData data = parser.parse(target, "SIMBAD");
+
+        assertEquals("Wrong RA for " + target, 37.66671d, data.getRA(), 0.0d);
+        assertEquals("Wrong Dec for " + target, 72.95500, data.getDec(), 0.0d);
+        assertEquals("Wrong Radius for " + target, AbstractPositionParser.DEFAULT_RADIUS,
+                     data.getRadius(), 0.0d);
+
+        verify(mockResolver);
+    }
 
     @Test
     public final void parseCoordinatesAndRadius() throws Exception

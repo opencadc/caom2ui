@@ -74,7 +74,8 @@ public abstract class AbstractPositionParser {
     private static final Logger log = Logger
         .getLogger(AbstractPositionParser.class);
 
-    public static final double DEFAULT_RADIUS = 0.0;
+    // In degrees
+    public static final double DEFAULT_RADIUS = 0.000277778D;
 
     /**
      * No-arg constructor.
