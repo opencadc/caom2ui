@@ -1,6 +1,6 @@
 env:
   DOCKER_COMPOSE_VERSION: 1.19.0
-  CAOM2_SEARCH_SERVER_VERSION: 2.6.4
+  CAOM2_SEARCH_SERVER_VERSION: 2.6.5
 language: java
 group: edge
 jdk:
