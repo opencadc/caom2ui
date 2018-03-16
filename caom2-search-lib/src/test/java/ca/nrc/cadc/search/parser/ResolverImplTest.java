@@ -67,7 +67,7 @@ public class ResolverImplTest extends AbstractUnitTest<Resolver>
         final TargetData targetData1 =
                 getTestSubject().resolveTarget("zeta Aurora", "SIMBAD");
 
-        assertEquals("Radius is wrong.", 0.0d, targetData1.getRadius(), 0.0d);
+        assertEquals("Radius is wrong.", AbstractPositionParser.DEFAULT_RADIUS, targetData1.getRadius(), 0.0d);
         assertEquals("RA is wrong.", 88.0d, targetData1.getRA(), 0.0d);
 
         verify(getMockNameResolverClient());
@@ -90,7 +90,7 @@ public class ResolverImplTest extends AbstractUnitTest<Resolver>
         final TargetData targetData1 =
                 getTestSubject().resolveTarget("HD 19785", "SIMBAD");
 
-        assertEquals("Radius is wrong.", 0.0d, targetData1.getRadius(), 0.0d);
+        assertEquals("Radius is wrong.", AbstractPositionParser.DEFAULT_RADIUS, targetData1.getRadius(), 0.0d);
         assertEquals("RA is wrong.", 88.0d, targetData1.getRA(), 0.0d);
 
         verify(getMockNameResolverClient());

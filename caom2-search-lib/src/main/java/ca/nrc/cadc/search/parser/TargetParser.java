@@ -169,6 +169,9 @@ public class TargetParser {
                 if (targetData == null) {
                     throw new TargetParserException("Unable to resolve: " + target, e,
                                                     TargetParserException.ExceptionType.NAMERESOLVER_TARGET_NOT_FOUND);
+                } else {
+                    final String[] parts = parser.partition(target);
+                    parser.parseRadius(parts[parts.length - 1], targetData);
                 }
             } catch (IOException re) {
                 throw new TargetParserException(String.format("Unable to resolve %s", target));
@@ -177,9 +180,6 @@ public class TargetParser {
             throw new TargetParserException("Illegal argument for target " +
                                                 iae.getMessage());
         }
-
-        final String[] parts = parser.partition(target);
-        parser.parseRadius(parts[parts.length - 1], targetData);
 
         return targetData;
     }

@@ -194,7 +194,7 @@ public class AbstractPositionParserTest
         assertNotNull(data.getRadius());
         assertEquals(188.7D, data.getRA(), 0.1D);
         assertEquals(56.7D, data.getDec(), 0.1D);
-        assertEquals("Radius should be 0.0", 0.0, data.getRadius(), 0.0);
+        assertEquals("Radius should be 0.0", AbstractPositionParser.DEFAULT_RADIUS, data.getRadius(), 0.0);
 
         log.info("parseRadius() passed.");
     }
