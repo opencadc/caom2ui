@@ -34,6 +34,7 @@ import java.util.Collections;
 import java.util.List;
 
 import ca.nrc.cadc.caom2.types.*;
+import ca.nrc.cadc.search.parser.AbstractPositionParser;
 import ca.nrc.cadc.search.parser.resolver.ResolverImpl;
 import org.apache.log4j.Logger;
 
@@ -310,7 +311,7 @@ public class Shape1 extends AbstractFormConstraint implements SearchableFormCons
                 // Assumes default radius from TargetParser is 0.0d
                 if (targetData.getRaRange() != null &&
                     targetData.getDecRange() != null &&
-                    targetData.getRadius() != 0.0d)
+                    targetData.getRadius() != AbstractPositionParser.DEFAULT_RADIUS)
                 {
                     final String message =
                             String.format("A RA and Dec range cannot have a radius " +
@@ -337,7 +338,7 @@ public class Shape1 extends AbstractFormConstraint implements SearchableFormCons
 
                 // S1448: default radius from TargetParser is 0.0,
                 // change to 1 arcminute (1/60)
-                if (targetData.getRadius() == 0.0d)
+                if (targetData.getRadius() == AbstractPositionParser.DEFAULT_RADIUS)
                 {
                     setRadius(1.0d / 60.0d);
                 }
