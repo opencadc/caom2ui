@@ -37,6 +37,12 @@ ext {
 
 war {
     archiveName = 'caom2ui##' + project.version + '.war'
+
+    from(System.getenv('A') + '/etc/') {
+        into 'WEB-INF/classes'
+        include 'DelegationTokenKey.priv'
+        rename 'DelegationTokenKey.priv', 'RsaSignaturePriv.key'
+    }
 }
 
 apply from: '../_shared.gradle'
