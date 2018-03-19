@@ -114,7 +114,7 @@ public class SearchResultsPage extends AbstractTestWebPage {
     static final By GRID_HEADER_LABEL_LOCATOR = By.className("grid-header-label");
     static final String OBSERVATION_DETAILS_LINK_LOCATOR = "caom2:Observation.observationID_%d_observation_details";
     static final By FIRST_QUICKSEARCH_TARGET_LINK = By.cssSelector("a.quicksearch_link:nth-child(1)");
-    static final By QUERY_TAB_LOCATOR = By.id("queryFormTabLink");
+    static final By QUERY_TAB_LOCATOR = By.cssSelector("#tabList > li:nth-child(1)");
 
     // Switches between busy and transparent (idle).
     static final By GRID_HEADER_ICON = By.className("grid-header-icon");
@@ -234,6 +234,7 @@ public class SearchResultsPage extends AbstractTestWebPage {
 
     CAOMSearchFormPage queryTab() throws Exception {
         click(QUERY_TAB_LOCATOR);
+        waitFor(1000L);
         return new CAOMSearchFormPage(driver);
     }
 
