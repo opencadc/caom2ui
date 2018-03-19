@@ -14,7 +14,7 @@ services:
       - search.cadc.dao.nrc.ca
       - caom2-meta-ui.cadc.dao.nrc.ca   
   selenium-firefox:
-    image: selenium/standalone-firefox:3.10.0
+    image: selenium/standalone-firefox:3.9.1
     ports:
       - '4444:4444'
     networks:
