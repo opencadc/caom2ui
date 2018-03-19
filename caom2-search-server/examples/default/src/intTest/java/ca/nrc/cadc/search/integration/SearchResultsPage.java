@@ -127,6 +127,9 @@ public class SearchResultsPage extends AbstractTestWebPage {
         super(driver);
 
         waitForGridToLoad();
+        waitForElementPresent(QUERY_TAB_LOCATOR);
+        waitForElementVisible(QUERY_TAB_LOCATOR);
+        waitForElementClickable(QUERY_TAB_LOCATOR);
 
         PageFactory.initElements(driver, this);
     }

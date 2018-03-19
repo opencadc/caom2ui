@@ -80,7 +80,7 @@ import java.util.Objects;
 
 abstract class AbstractSearchFormPage extends AbstractTestWebPage {
     private static final String CONTENT_LOCATOR_XPATH = "//*[@id='%s']/summary/label/span";
-    private static final By TOP_RESET_BUTTON_BY = By.xpath("//*[@id=\"queryForm\"]/div[1]/button[2]");
+    private static final By TOP_RESET_BUTTON_BY = By.xpath("//*[@id=\"queryForm\"]/div[1]/button[@type=\"reset\"]");
 
     @FindBy(xpath = "//*[@id=\"queryForm\"]/div[1]/button[@type=\"submit\"]")
     WebElement topSubmitButton;
@@ -89,14 +89,16 @@ abstract class AbstractSearchFormPage extends AbstractTestWebPage {
     AbstractSearchFormPage(final WebDriver driver) throws Exception {
         super(driver);
 
-        waitForElementClickable(TOP_RESET_BUTTON_BY);
+        waitForElementPresent(TOP_RESET_BUTTON_BY);
+        waitForElementVisible(TOP_RESET_BUTTON_BY);
         PageFactory.initElements(driver, this);
     }
 
     AbstractSearchFormPage(WebDriver driver, int timeoutInSeconds) throws Exception {
         super(driver, timeoutInSeconds);
 
-        waitForElementClickable(TOP_RESET_BUTTON_BY);
+        waitForElementPresent(TOP_RESET_BUTTON_BY);
+        waitForElementVisible(TOP_RESET_BUTTON_BY);
         PageFactory.initElements(driver, this);
     }
 
