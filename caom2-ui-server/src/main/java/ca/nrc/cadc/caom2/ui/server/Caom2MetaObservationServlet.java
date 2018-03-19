@@ -131,7 +131,7 @@ public class Caom2MetaObservationServlet extends HttpServlet {
 
             // Parse the parameters given in the url.
             final PublisherID publisherID = ObservationUtil.getPublisherID(request);
-            if ((publisherID == null) || (observationURI == null)) {
+            if ((publisherID == null) && (observationURI == null)) {
                 errMsg = "Must specify observationID/productID in the path, and the publisherID in the query. | "
                     + "Le chemain manque le observationID/productID dans le chemin, ou le publisherID dans le "
                     + "query.";
@@ -139,9 +139,6 @@ public class Caom2MetaObservationServlet extends HttpServlet {
                 request.setAttribute("errorMsg", errMsg);
                 forward(request, response, "/error.jsp");
             } else {
-//                request.setAttribute("collection", publisherID.getCollection());
-//                request.setAttribute("observationID", publisherID.getObservationID());
-
                 final Observation obs = metaClient.getObservation(metaClient.getCurrentSubject(), publisherID,
                                                                   observationURI);
 

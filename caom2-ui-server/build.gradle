@@ -19,7 +19,6 @@ dependencies {
     compile 'org.opencadc:cadc-access-control:1.+'
     compile 'org.opencadc:cadc-uws:1.+'
     compile 'org.opencadc:cadc-adql:1.+'
-    compile 'org.opencadc:cadc-util:1.+'
     compile 'org.opencadc:cadc-web-util:1.+'
     compile 'org.opencadc:cadc-dali:1.+'
     compile 'org.opencadc:caom2:2.+'
@@ -33,8 +32,7 @@ dependencies {
     testCompile 'org.easymock:easymock:3.+'
 }
 
-
 sourceCompatibility = '1.7'
 
 group = 'org.opencadc'
-version = '1.1.6'
+version = '1.1.7'

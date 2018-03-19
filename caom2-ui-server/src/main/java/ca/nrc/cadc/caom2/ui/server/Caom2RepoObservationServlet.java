@@ -175,8 +175,7 @@ public class Caom2RepoObservationServlet extends HttpServlet {
             log.error("unexpected runtime exception", oops);
             request.setAttribute("runtimeException", oops);
             request.setAttribute("errorMsg", oops.getMessage());
-            RequestDispatcher dispatcher = request.getRequestDispatcher("/error.jsp");
-            dispatcher.forward(request, response);
+            forward(request, response, "/error.jsp");
         } finally {
             log.info("doGet[" + (System.currentTimeMillis() - start) + "ms]");
         }

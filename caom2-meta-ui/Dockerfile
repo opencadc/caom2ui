@@ -7,4 +7,4 @@ FROM opencadc/tomcat:alpine
 # For development purposes, pass the -v ${PATH_TO_LOCAL_BUILD_WAR_DIR}:/usr/local/tomcat/webapps to the run command
 #
 COPY *.war webapps/
-COPY org.opencadc.caom2ui.properties /root/config/
+COPY domains.properties /root/config/

@@ -97,7 +97,7 @@ public class Caom2MetaObservationServletTest {
             };
 
         expect(mockRequest.getQueryString()).andReturn(null).once();
-        expect(mockRequest.getPathInfo()).andReturn("obsID/productID").once();
+        expect(mockRequest.getPathInfo()).andReturn("").once();
 
         mockRequest.setAttribute("errorMsg",
                                  "Must specify observationID/productID in the path, and the publisherID in the query." +

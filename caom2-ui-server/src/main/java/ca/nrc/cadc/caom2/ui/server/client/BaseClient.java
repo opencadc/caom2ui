@@ -86,6 +86,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.security.AccessControlException;
 import java.security.PrivilegedAction;
 
 
@@ -201,7 +202,7 @@ public abstract class BaseClient {
             if (e != null) {
                 final String message;
 
-                if (e instanceof FileNotFoundException) {
+                if ((e instanceof FileNotFoundException) || (e instanceof AccessControlException)) {
                     message = ERROR_MESSAGE_NOT_FOUND_FORBIDDEN;
                 } else {
                     message = "Failed to get observation with publisherID '%s' from '%s'. "
