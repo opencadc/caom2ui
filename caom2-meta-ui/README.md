@@ -11,7 +11,7 @@ The Meta UI will show a detailed tree-like view of Observations.
 The default configuration will use the CAOM-2 Meta service at CADC.
 
 ```
-docker run --name meta-ui -p 8080:8080 --rm opencadc/caom2-meta-ui:1008
+docker run --name meta-ui -p 8080:8080 --rm opencadc/caom2-meta-ui:1010
 ```
 
 ### Build your own Docker image
