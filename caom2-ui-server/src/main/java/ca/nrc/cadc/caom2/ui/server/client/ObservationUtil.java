@@ -70,6 +70,7 @@ package ca.nrc.cadc.caom2.ui.server.client;
 
 import ca.nrc.cadc.caom2.ObservationURI;
 import ca.nrc.cadc.caom2.PublisherID;
+import ca.nrc.cadc.util.StringUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
@@ -79,7 +80,7 @@ public final class ObservationUtil {
     public static ObservationURI getURI(final HttpServletRequest request) {
         final String sid = request.getPathInfo();
 
-        if (sid != null) {
+        if (StringUtil.hasText(sid)) {
             final String modifiedSID = sid.substring(1, sid.length()); // strip leading /
             final String[] parts = modifiedSID.split("/");
 
