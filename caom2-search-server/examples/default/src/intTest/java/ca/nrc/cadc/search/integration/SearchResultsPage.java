@@ -236,6 +236,7 @@ public class SearchResultsPage extends AbstractTestWebPage {
     }
 
     CAOMSearchFormPage queryTab() throws Exception {
+        waitFor(1000L);
         click(QUERY_TAB_LOCATOR);
         waitFor(1000L);
         return new CAOMSearchFormPage(driver);
