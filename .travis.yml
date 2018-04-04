@@ -1,6 +1,7 @@
 env:
-  DOCKER_COMPOSE_VERSION: 1.19.0
-  CAOM2_SEARCH_SERVER_VERSION: 2.6.5
+  DOCKER_COMPOSE_VERSION: 1.20.1
+  CAOM2_SEARCH_SERVER_VERSION: 2.6.6
+  CAOM2_META_UI_VERSION: 1011
 language: java
 group: edge
 jdk:
@@ -23,10 +24,12 @@ before_install:
 - gradle -v
 script:
 - cd caom2-ui-server && gradle clean build javadoc install && cd ..
-- cd caom2-meta-ui && gradle clean dockerize && cd ..
-- cd caom2-search-server && gradle clean build install
+- cd caom2-meta-ui && gradle clean build
+- docker build -t opencadc/caom2-meta-ui:SNAPSHOT -t opencadc/caom2-meta-ui:alpine -t opencadc/caom2-meta-ui:${CAOM2_META_UI_VERSION} -f docker/Dockerfile docker/
+- cd ../caom2-search-server && gradle clean build install
 - cd examples/default
-- gradle -i -Pdocker_image_name=opencadc/archive-search:SNAPSHOT clean dockerize
+- gradle -i clean build
+- docker build -t opencadc/caom2-search:SNAPSHOT -t opencadc/caom2-search:alpine -t opencadc/caom2-search:${CAOM2_SEARCH_SERVER_VERSION} -f docker/Dockerfile docker/
 - cd ../_int_test_
 - docker-compose up -d
 - docker ps -a
@@ -35,9 +38,7 @@ script:
   -PintTest_web_app_endpoint=/search/ intTestFirefox
 after_success:
 - cd $TRAVIS_BUILD_DIR
-- if [ "$(. ./can-deploy.sh)" = "DEPLOY" ]; then docker login -u="$DOCKER_USERNAME"
-  -p="$DOCKER_PASSWORD"; docker tag opencadc/archive-search:SNAPSHOT opencadc/archive-search:$CAOM2_SEARCH_SERVER_VERSION;
-  docker push opencadc/archive-search-$CAOM2_SEARCH_SERVER_VERSION; fi
+- if [ "$(. ./can-deploy.sh)" = "DEPLOY" ]; then echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin; docker push opencadc/caom2-search:$CAOM2_SEARCH_SERVER_VERSION; docker push opencadc/caom2-search:alpine; docker push opencadc/caom2-meta-ui:$CAOM2_META_UI_VERSION; docker push opencadc/caom2-meta-ui:alpine fi
 - if [ "$(. ./can-deploy.sh)" != "DEPLOY" ]; then echo "Not deploying."; fi
 notifications:
   slack:
