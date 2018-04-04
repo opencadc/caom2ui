@@ -13,7 +13,7 @@ services:
       - search.cadc.dao.nrc.ca
       - caom2-meta-ui.cadc.dao.nrc.ca
   search.cadc.dao.nrc.ca:
-    image: opencadc/caom2-search:alpine
+    image: opencadc/caom2-search:alpine    
     networks:
       - 'search'
     depends_on:

@@ -18,12 +18,15 @@ services:
       - '4444:4444'
     networks:
       - 'selenium'
+    depends_on:
+      - proxy.cadc.dao.nrc.ca
   search.cadc.dao.nrc.ca:
     image: opencadc/caom2-search:SNAPSHOT
     networks:
       - 'selenium'
     depends_on:
       - uwspg.cadc.dao.nrc.ca
+      - caom2-meta-ui.cadc.dao.nrc.ca
     environment:
       CATALINA_OPTS: -Dca.nrc.cadc.reg.client.RegistryClient.host=proxy.cadc.dao.nrc.ca 
   uwspg.cadc.dao.nrc.ca:
