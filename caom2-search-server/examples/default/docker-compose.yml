@@ -18,7 +18,7 @@ services:
       - 'search'
     depends_on:
       - uwspg.cadc.dao.nrc.ca
-      - tap.cadc.dao.nrc.ca
+#      - tap.cadc.dao.nrc.ca
     environment:
       CATALINA_OPTS: -Dca.nrc.cadc.reg.client.RegistryClient.host=proxy.cadc.dao.nrc.ca
   uwspg.cadc.dao.nrc.ca:
@@ -40,12 +40,12 @@ services:
       - 'search'
     environment:
       CATALINA_OPTS: -Dca.nrc.cadc.reg.client.RegistryClient.host=proxy.cadc.dao.nrc.ca
-  tap.cadc.dao.nrc.ca:
-    image: opencadc/tap:alpine
-    networks:
-      - 'search'
-    environment:
-      CATALINA_OPTS: -Dca.nrc.cadc.reg.client.RegistryClient.host=proxy.cadc.dao.nrc.ca
+#  tap.cadc.dao.nrc.ca:
+#    image: opencadc/tap:alpine
+#    networks:
+#      - 'search'
+#    environment:
+#      CATALINA_OPTS: -Dca.nrc.cadc.reg.client.RegistryClient.host=proxy.cadc.dao.nrc.ca
 
 # Create the network 'selenium' for which this system will run within.
 networks:
