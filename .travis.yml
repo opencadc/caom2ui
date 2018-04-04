@@ -25,10 +25,12 @@ before_install:
 script:
 - cd caom2-ui-server && gradle clean build javadoc install && cd ..
 - cd caom2-meta-ui && gradle clean build
+- mkdir docker && cp Dockerfile docker/ && cp build/libs/*.war docker/
 - docker build -t opencadc/caom2-meta-ui:SNAPSHOT -t opencadc/caom2-meta-ui:alpine -t opencadc/caom2-meta-ui:${CAOM2_META_UI_VERSION} -f docker/Dockerfile docker/
 - cd ../caom2-search-server && gradle clean build install
 - cd examples/default
 - gradle -i clean build
+- mkdir docker && cp Dockerfile docker/ && cp build/libs/*.war docker/
 - docker build -t opencadc/caom2-search:SNAPSHOT -t opencadc/caom2-search:alpine -t opencadc/caom2-search:${CAOM2_SEARCH_SERVER_VERSION} -f docker/Dockerfile docker/
 - cd ../_int_test_
 - docker-compose up -d

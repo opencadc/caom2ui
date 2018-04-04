@@ -1,0 +1,52 @@
+version: '3.2'
+services:
+  proxy.cadc.dao.nrc.ca:
+    hostname: proxy.cadc.dao.nrc.ca
+    image: nginx:alpine
+    ports:
+      - '80:80'
+    networks:
+      - 'search'
+    volumes:
+      - './default.conf:/etc/nginx/conf.d/default.conf'
+    depends_on:
+      - search.cadc.dao.nrc.ca
+      - caom2-meta-ui.cadc.dao.nrc.ca
+  search.cadc.dao.nrc.ca:
+    image: opencadc/caom2-search:alpine
+    networks:
+      - 'search'
+    depends_on:
+      - uwspg.cadc.dao.nrc.ca
+      - tap.cadc.dao.nrc.ca
+    environment:
+      CATALINA_OPTS: -Dca.nrc.cadc.reg.client.RegistryClient.host=proxy.cadc.dao.nrc.ca
+  uwspg.cadc.dao.nrc.ca:
+    image: opencadc/uws-postgres:alpine
+    networks:
+      - 'search'
+    environment:
+      POSTGRES_USER: uws
+      POSTGRES_PASSWORD: astr0query
+  caom2-meta-ui.cadc.dao.nrc.ca:
+    image: opencadc/caom2-meta-ui:alpine
+    networks:
+      - 'search'
+    environment:
+      CATALINA_OPTS: -Dca.nrc.cadc.reg.client.RegistryClient.host=proxy.cadc.dao.nrc.ca
+  cadc-target-resolver.cadc.dao.nrc.ca:
+    image: opencadc/cadc-target-resolver:alpine
+    networks:
+      - 'search'
+    environment:
+      CATALINA_OPTS: -Dca.nrc.cadc.reg.client.RegistryClient.host=proxy.cadc.dao.nrc.ca
+  tap.cadc.dao.nrc.ca:
+    image: opencadc/tap:alpine
+    networks:
+      - 'search'
+    environment:
+      CATALINA_OPTS: -Dca.nrc.cadc.reg.client.RegistryClient.host=proxy.cadc.dao.nrc.ca
+
+# Create the network 'selenium' for which this system will run within.
+networks:
+  search:
