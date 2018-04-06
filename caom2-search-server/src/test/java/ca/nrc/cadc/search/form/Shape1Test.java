@@ -70,7 +70,7 @@ public class Shape1Test
         Job job = new Job();       
         Shape1 shape = new Shape1(job, uType);
         assertNull("resolveName should be null", shape.getResolverName());
-        assertTrue("formValue should be empty", shape.getFormValue().length() == 0);
+        assertEquals("formValue should be empty", 0, shape.getFormValue().length());
         assertNull("ra should be null", shape.getRA());
         assertNull("dec should be null", shape.getDec());
         assertNull("radius should be null", shape.getRadius());

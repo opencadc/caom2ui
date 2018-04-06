@@ -113,14 +113,13 @@ public class TemplatesTest extends AbstractUnitTest<Templates>
     }
 
     @Test
-    public void constructWithUnresolvedShape() throws Exception
+    public void constructWithUnresolvedShape()
     {
-        final List<SearchableFormConstraint> constraints = new ArrayList<SearchableFormConstraint>();
+        final List<SearchableFormConstraint> constraints = new ArrayList<>();
         final Job mockJob = createMock(Job.class);
-        final List<Parameter> jobParameters = new ArrayList<Parameter>();
+        final List<Parameter> jobParameters = new ArrayList<>();
 
-        jobParameters.add(new Parameter("Plane.position.bounds@Shape1.value",
-                                        "MYVAL"));
+        jobParameters.add(new Parameter("Plane.position.bounds@Shape1.value", "MYVAL"));
 
         expect(mockJob.getParameterList()).andReturn(jobParameters).once();
 
@@ -134,6 +133,30 @@ public class TemplatesTest extends AbstractUnitTest<Templates>
 
         assertEquals("Should transform to target name search.",
                      "TextSearch[Observation.target.name,MYVAL,MYVAL,false,true]",
+                     getTestSubject().getSearchTemplates().get(0).toString());
+    }
+
+    @Test
+    public void constructWithUnresolvedObsCoreShape()
+    {
+        final List<SearchableFormConstraint> constraints = new ArrayList<>();
+        final Job mockJob = createMock(Job.class);
+        final List<Parameter> jobParameters = new ArrayList<>();
+
+        jobParameters.add(new Parameter("Char.SpatialAxis.Coverage.Support.Area@Shape1.value", "MYVAL"));
+
+        expect(mockJob.getParameterList()).andReturn(jobParameters).once();
+
+        replay(mockJob);
+
+        constraints.add(new Shape1(mockJob, "Char.SpatialAxis.Coverage.Support.Area"));
+
+        verify(mockJob);
+
+        setTestSubject(new Templates(constraints));
+
+        assertEquals("Should transform to target name search.",
+                     "TextSearch[Target.Name,MYVAL,MYVAL,false,true]",
                      getTestSubject().getSearchTemplates().get(0).toString());
     }
 }
