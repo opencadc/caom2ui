@@ -263,11 +263,10 @@ public class Shape1 extends AbstractFormConstraint implements SearchableFormCons
             }
             else
             {
-                searchTemplate =
-                        new TextSearch("Observation.target.name",
-                                       getFormValue(),
-                                       ObsModel.isWildcardUtype(getUType()),
-                                       true);
+                // Plain target name search.  Mangle the UType to adjust for that.
+                final String searchUType = ObsModel.mangleTargetNameUType(getUType());
+                searchTemplate = new TextSearch(searchUType, getFormValue(), false,
+                                                true);
             }
         }
         catch (IllegalArgumentException e)

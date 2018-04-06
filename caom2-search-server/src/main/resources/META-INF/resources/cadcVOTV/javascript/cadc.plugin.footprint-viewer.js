@@ -307,8 +307,7 @@
 
         raValues.push(ra + radius, ra - radius)
         decValues.push(dec + radius, dec - radius)
-      }
-      else if (_footprint.region === POLYGON) {
+      } else if (_footprint.region === POLYGON) {
         for (var i = 0, len = _footprint.coords.length; i < len; i++) {
           // Even numbers are RA values.
           raValues.push(_footprint.coords[i][0])
@@ -380,18 +379,29 @@
       var raValue = _dataRow[_self.raFieldID]
       var decValue = _dataRow[_self.decFieldID]
 
-      if (raValue !== null && $.trim(raValue) !== '' && decValue !== null && $.trim(decValue) !== '') {
-        var selectedFootprints = _getFootprints(_dataRow[_self.footprintFieldID])
+      if (
+        raValue !== null &&
+        $.trim(raValue) !== '' &&
+        decValue !== null &&
+        $.trim(decValue) !== ''
+      ) {
+        var selectedFootprints = _getFootprints(
+          _dataRow[_self.footprintFieldID]
+        )
 
         for (var i = 0, len = selectedFootprints.length; i < len; i++) {
           var selectedFootprint = selectedFootprints[i]
 
           if (selectedFootprint.region === CIRCLE) {
-            _self.currentFootprint.addFootprints(A.circle(
-              selectedFootprint.coords[0], selectedFootprint.coords[1], selectedFootprint.coords[1]))
-          }
-          else if (selectedFootprint.region === POLYGON) {
-            _self.currentFootprint.addFootprints(A.polygon(selectedFootprint.coords))
+            _self.currentFootprint.add(
+              A.circle(
+                selectedFootprint.coords[0],
+                selectedFootprint.coords[1],
+                selectedFootprint.coords[2]
+              )
+            )
+          } else if (selectedFootprint.region === POLYGON) {
+            _self.currentFootprint.add(A.polygon(selectedFootprint.coords))
           }
         }
 
@@ -403,11 +413,17 @@
             selectedRowFOVBox.maxRA - selectedRowFOVBox.minRA,
             selectedRowFOVBox.maxDec - selectedRowFOVBox.minDec
           )
-          _self.aladin.setFoV(Math.min(DEFAULT_FOV_DEGREES, inputs.afterFOVCalculation(fieldOfView)))
+          _self.aladin.setFoV(
+            Math.min(
+              DEFAULT_FOV_DEGREES,
+              inputs.afterFOVCalculation(fieldOfView)
+            )
+          )
         }
-      }
-      else {
-        console.warn('Unable to add footprint for (' + raValue + ', ' + decValue + ')')
+      } else {
+        console.warn(
+          'Unable to add footprint for (' + raValue + ', ' + decValue + ')'
+        )
       }
 
       if (_self.aladin && _self.aladin.view) {
@@ -427,11 +443,17 @@
 
     function handleMouseEnter(e, args) {
       e.stopImmediatePropagation()
-      _handleAction(args.grid.getDataItem(args.cell.row))
+      var cell = args.grid.getCellFromEvent(e)
+      if (cell) {
+        _handleAction(args.grid.getDataItem(cell.row))
+      }  
     }
 
     function handleMouseLeave() {
       _resetCurrent()
+      if (_self.aladin && _self.aladin.view) {
+        _self.aladin.view.forceRedraw()
+      }
     }
 
     function handleAddFootprint(e, args) {
@@ -454,13 +476,17 @@
         var footprint = footprints[i]
 
         if (footprint.region === CIRCLE) {
-          _self.aladinOverlay.add(A.circle(footprint.coords[0], footprint.coords[1], footprint.coords[1]))
-        }
-        else if (footprint.region === POLYGON) {
+          _self.aladinOverlay.add(
+            A.circle(
+              footprint.coords[0],
+              footprint.coords[1],
+              footprint.coords[2]
+            )
+          )
+        } else if (footprint.region === POLYGON) {
           _self.aladinOverlay.add(A.polygon(footprint.coords))
-        }
-        else {
-          console.log("Unknown footprint " + footprint)
+        } else {
+          console.log('Unknown footprint ' + footprint)
         }
 
         if (!inputs.fov || inputs.fov === null) {
@@ -477,53 +503,50 @@
         var coordinates = []
         var shapes = footprintString.split(/(Polygon|Circle)/)
         for (var i = 0, len = shapes.length; i < len; i++) {
-
           var shape = shapes[i].trim()
           if (shape.length === 0) {
             continue
           }
+          
           if (shape === POLYGON || shape === CIRCLE) {
             region = shape
             continue
           }
           var coords = shape.split(/[\s()]+/)
-          if (coords.length < 3) {
-            continue
-          }
-          for (var j = 0, lenj = coords.length; j < lenj; j++) {
-            var coord = coords[j]
-            if (coord.length === 0) {
-              continue
-            }
-            if (!isNaN(coord)) {
-              coordinates.push(Number(coord))
-            }
-          }
-
-          if (!region && coordinates.length > 0) {
-            var isPolygon = coordinates.length % 2 === 0
-            var isCircle = coordinates.length === 3
-
-            if (isPolygon) {
-              region = POLYGON
-            }
-            else if (isCircle) {
-              region = CIRCLE
-            }
-          }
-
-          if (region && coordinates.length > 0) {
-            // split polygon array into 2 segment chunks
-            if (region === POLYGON) {
-              var vertices = []
-              while (coordinates.length) {
-                vertices.push(coordinates.splice(0, 2))
+          var lenj = coords.length
+          
+          if (lenj >= 3) {
+            for (var j = 0; j < lenj; j++) {
+              var coord = coords[j]
+              if (coord.length > 0 && !isNaN(coord)) {
+                coordinates.push(Number(coord))
               }
-              coordinates = vertices
             }
-            footprints.push({region: region, coords: coordinates})
-            region = null
-            coordinates = []
+  
+            if (!region && coordinates.length > 0) {
+              var isPolygon = coordinates.length % 2 === 0
+              var isCircle = coordinates.length === 3
+  
+              if (isPolygon) {
+                region = POLYGON
+              } else if (isCircle) {
+                region = CIRCLE
+              }
+            }
+  
+            if (region && coordinates.length > 0) {
+              // split polygon array into 2 segment chunks
+              if (region === POLYGON) {
+                var vertices = []
+                while (coordinates.length) {
+                  vertices.push(coordinates.splice(0, 2))
+                }
+                coordinates = vertices
+              }
+              footprints.push({ region: region, coords: coordinates })
+              region = null
+              coordinates = []
+            } 
           }
         }
       }

@@ -2,7 +2,7 @@ plugins {
     id 'maven'
     id 'java'
     id 'maven-publish'
-    id 'com.jfrog.bintray' version '1.7.3'
+    id 'com.jfrog.bintray' version '1.8.0'
 }
 
 repositories {
@@ -30,7 +30,7 @@ dependencies {
     compile 'org.apache.httpcomponents:httpclient:4.+'
     compile 'commons-net:commons-net:3.+'
 
-    runtime 'org.postgresql:postgresql:42.2.1.jre7'
+    runtime 'org.postgresql:postgresql:42.2.2.jre7'
     runtime 'jstl:jstl:1.+'
 
     testCompile 'junit:junit:4.+'
@@ -41,4 +41,4 @@ dependencies {
 sourceCompatibility = 1.7
 group = 'org.opencadc'
 
-version = '2.6.5'
+version = '2.6.6'

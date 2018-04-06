@@ -28,6 +28,7 @@
 
 package ca.nrc.cadc.search;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -37,6 +38,9 @@ import java.util.TreeMap;
  */
 public abstract class ObsModel
 {
+    // Store mangled (Translated) UType names.
+    private static final Map<String, String> MANGLED_UTYPE_NAMES = new HashMap<>();
+
      // Map of ObsCore utype to column name.
     private static final Map<String, String> OBS_CORE_UTYPE_NAMES = new TreeMap<>();
     static
@@ -95,6 +99,9 @@ public abstract class ObsModel
                 .put("Char.SpectralAxis.Coverage.Bounds.Limits", "em_coverage");
         OBS_CORE_UTYPE_NAMES
                 .put("Char.TimeAxis.Coverage.Bounds.Limits", "t_coverage");
+
+        MANGLED_UTYPE_NAMES.put("Plane.position.bounds", "Observation.target.name");
+        MANGLED_UTYPE_NAMES.put("Char.SpatialAxis.Coverage.Support.Area", "Target.Name");
     }
 
 
@@ -351,6 +358,16 @@ public abstract class ObsModel
     public static boolean isWildcardUtype(String utype)
     {
         return arrayContains(utype, WILDCARD_UTYPES);
+    }
+
+    /**
+     * Bit of a hoaky method to mangle the given Plane UType for a spatial bound to match a straight target name
+     * search.  This is necessary to convert the same field on the form from a Region style search, to a string search.
+     * @param fieldUType        The UType from the field.
+     * @return      String target name field.
+     */
+    public static String mangleTargetNameUType(final String fieldUType) {
+        return MANGLED_UTYPE_NAMES.get(fieldUType);
     }
 
     /**

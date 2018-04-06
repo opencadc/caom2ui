@@ -15,7 +15,7 @@
 
   <head>
     <meta charset="utf-8"/>
-    <title>Archive Search</title>
+    <title>CAOM-2 Search</title>
 
     <meta name="dcterms.creator"
           content="Government of Canada. National Research Council Canada"/>
