@@ -1,6 +1,6 @@
 {
   "activateMAQ": {
-    "tipHTML": "Multi-Archive Querying (MAQ) allows the user to search for data hosted by other astronomical data centers in addition to data hosted by the CADC. The ‘Additional Constraints’ region of this page will reload with the additional MAQ content and existing selections will be reset."
+    "tipHTML": "Multi-Archive Querying (MAQ) allows the user to search for data hosted by other astronomical data centres in addition to data hosted by the CADC. The ‘Additional Constraints’ region of this page will reload with appropriate content and existing selections will be reset when toggling MAQ."
   },
   "Observation.observationID": {
     "tipHTML":
