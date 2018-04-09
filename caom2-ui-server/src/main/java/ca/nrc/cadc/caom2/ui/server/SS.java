@@ -11,6 +11,7 @@ import java.util.*;
 import ca.nrc.cadc.caom2.*;
 import ca.nrc.cadc.caom2.wcs.*;
 import ca.nrc.cadc.date.DateUtil;
+import ca.nrc.cadc.net.NetUtil;
 
 
 /**
@@ -243,7 +244,7 @@ public class SS {
             for (final ObservationURI u : co.getMembers()) {
                 sb.append("<a href=\"").append(contextPath).append("/view/");
                 sb.append(u.getCollection()).append("/")
-                  .append(u.getObservationID()).append("?ID=").append(publisherID);
+                  .append(u.getObservationID()).append("?ID=").append(NetUtil.encode(publisherID));
                 sb.append("\">");
                 sb.append(u.getURI().toASCIIString());
                 sb.append("</a> ");

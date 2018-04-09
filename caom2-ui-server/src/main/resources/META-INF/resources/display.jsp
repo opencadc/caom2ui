@@ -1,10 +1,12 @@
+<%@ page pageEncoding="UTF-8" contentType="text/html; charset=UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-
 
 <jsp:useBean id="obs" scope="request" type="ca.nrc.cadc.caom2.Observation"/>
 
 <html>
   <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <title>CAOM Observation</title>
     <style rel="stylesheet">
       body
