@@ -74,6 +74,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import ca.nrc.cadc.caom2.PublisherID;
 import ca.nrc.cadc.caom2.ui.server.client.ObservationUtil;
+import ca.nrc.cadc.net.NetUtil;
 
 import org.junit.Test;
 
@@ -101,7 +102,8 @@ public class ObservationUtilTest {
         final HttpServletRequest mockRequest = createMock(HttpServletRequest.class);
         final PublisherID expected = new PublisherID(URI.create("ivo://cadc.nrc.ca/mirror/IRIS?f085h000/IRAS-12um"));
 
-        expect(mockRequest.getQueryString()).andReturn("ID=ivo://cadc.nrc.ca/mirror/IRIS?f085h000/IRAS-12um").once();
+        expect(mockRequest.getQueryString())
+            .andReturn("ID=" + NetUtil.encode("ivo://cadc.nrc.ca/mirror/IRIS?f085h000/IRAS-12um")).once();
 
         replay(mockRequest);
 

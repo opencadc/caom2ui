@@ -1334,7 +1334,7 @@
       ca.nrc.cadc.search.DETAILS_BASE_URL +
         observationURIObj.getPath() +
         '?ID=' +
-        publisherIDURI.uri
+        encodeURIComponent(publisherIDURI.uri)
     )
 
     $link.text(value)

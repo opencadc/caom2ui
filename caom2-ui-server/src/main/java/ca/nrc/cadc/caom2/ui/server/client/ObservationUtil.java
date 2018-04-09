@@ -70,6 +70,7 @@ package ca.nrc.cadc.caom2.ui.server.client;
 
 import ca.nrc.cadc.caom2.ObservationURI;
 import ca.nrc.cadc.caom2.PublisherID;
+import ca.nrc.cadc.net.NetUtil;
 import ca.nrc.cadc.util.StringUtil;
 
 import javax.servlet.http.HttpServletRequest;
@@ -100,7 +101,7 @@ public final class ObservationUtil {
             for (final String kvPair : kvPairs) {
                 final String[] pair = kvPair.split("=");
                 if ((pair.length == 2) && pair[0].equalsIgnoreCase("ID")) {
-                    return new PublisherID(URI.create(pair[1]));
+                    return new PublisherID(URI.create(NetUtil.decode(pair[1])));
                 }
             }
         }

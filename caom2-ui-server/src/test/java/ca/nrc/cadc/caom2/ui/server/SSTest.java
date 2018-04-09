@@ -69,15 +69,20 @@
 
 package ca.nrc.cadc.caom2.ui.server;
 
+import ca.nrc.cadc.caom2.CompositeObservation;
+import ca.nrc.cadc.caom2.ObservationURI;
 import ca.nrc.cadc.caom2.PlaneURI;
 import ca.nrc.cadc.caom2.Provenance;
 
 import java.net.URI;
 import java.util.Calendar;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.TimeZone;
 
 import org.junit.Test;
 
+import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 
@@ -155,5 +160,30 @@ public class SSTest {
             "caom:COLL1/PLANE2/456 <br>keywords: ";
 
         assertEquals("Wrong output.", expected2, out2);
+    }
+
+    @Test
+    public void toMemberString() {
+        final CompositeObservation mockCompositeObservation = createMock(CompositeObservation.class);
+        final Set<ObservationURI> members = new HashSet<>();
+
+        members.add(new ObservationURI(URI.create("caom:CFHT/2069333")));
+        members.add(new ObservationURI(URI.create("caom:CFHT/2069334")));
+
+        expect(mockCompositeObservation.getMembers()).andReturn(members).once();
+
+        replay(mockCompositeObservation);
+
+        final String out = SS.toMemberString("/caom2ui", mockCompositeObservation, "ivo://cadc.nrc" +
+            ".ca/CFHTMEGAPIPE?G025.045.358+41.104/G025.045.358+41.104.I3");
+
+        final String expected = "<a " +
+            "href=\"/caom2ui/view/CFHT/2069334?ID=ivo%3A%2F%2Fcadc.nrc.ca%2FCFHTMEGAPIPE%3FG025.045.358%2B41.104%2FG025.045.358%2B41.104.I3\">"
+            + "caom:CFHT/2069334</a> <a href=\"/caom2ui/view/CFHT/2069333?ID=ivo%3A%2F%2Fcadc.nrc.ca%2FCFHTMEGAPIPE%3FG025.045.358%2B41.104%2FG025.045.358%2B41.104.I3\">"
+            + "caom:CFHT/2069333</a> ";
+
+        assertEquals("Wrong member output", expected, out);
+
+        verify(mockCompositeObservation);
     }
 }
