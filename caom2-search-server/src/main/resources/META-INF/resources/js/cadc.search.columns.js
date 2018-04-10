@@ -119,7 +119,9 @@
                     )
 
                     if (previewUrls.length > 0) {
-                      var pubIDQuery = new cadc.web.util.URI(publisherId).getQueryString().split('/')
+                      var pubIDQuery = new cadc.web.util.URI(publisherId)
+                        .getQueryString()
+                        .split('/')
                       var observationID = pubIDQuery[0]
                       var productID = pubIDQuery[1]
 
@@ -181,26 +183,15 @@
                     var previewURI = new cadc.web.util.URI(
                       planePublisherIdValue
                     )
-                    var pathItems = previewURI.getPathItems()
-                    var collection, observationID, productID
 
-                    if (pathItems.length === 3) {
-                      collection = pathItems[0]
-                      observationID = pathItems[1]
-                      productID = pathItems[2]
-                    } else if (pathItems.length === 2) {
-                      collection = pathItems[0]
-                      observationID = pathItems[1]
-                      productID = ''
-                    } else if (pathItems.length === 1) {
-                      collection = pathItems[0]
-                      observationID = ''
-                      productID = ''
-                    } else {
-                      collection = ''
-                      observationID = ''
-                      productID = ''
-                    }
+                    var pathItems = previewURI.getPathItems()
+                    var pl = pathItems.length
+                    var queryItems = previewURI.getQueryString().split('/')
+
+                    // Last path item.
+                    var collection = pl && pathItems[pl - 1]
+                    var observationID = queryItems[0]
+                    var productID = queryItems[1]
 
                     var runID = $('#downloadForm')
                       .find("input[name='fragment']")
@@ -338,7 +329,7 @@
                                 productID,
                                 256,
                                 runID,
-                                planePublisherIdValue
+                                undefined
                               )
 
                               var addMainPreview = function(thumbnailURL) {
@@ -348,7 +339,7 @@
                                   productID,
                                   1024,
                                   runID,
-                                  planePublisherIdValue
+                                  undefined
                                 )
 
                                 preview.getPreview(function(previewURL) {
