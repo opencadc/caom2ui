@@ -19,6 +19,8 @@
       enableOneClickDownload: false,
       oneClickDownloadTitle: null,
       oneClickDownloadURL: null,
+      oneClickDownloadURLColumnID: null,
+      oneClickInvisibleDefault: false,
       width: 30
     }
 
@@ -195,26 +197,37 @@
           "' type='checkbox' " +
           (_selectedRowsLookup[row] ? "checked='checked' " : '') +
           '/>'
+        var downloadDatasetID =
+          _self.options.oneClickDownloadURLColumnID &&
+          dataContext[_self.options.oneClickDownloadURLColumnID]
 
+        // Check if the one-click is enabled, and that
         if (isOneClickDownloadEnabled()) {
           var linkURL = $.trim(_self.options.oneClickDownloadURL)
 
-          linkURL +=
-            '?ID=' +
-            encodeURIComponent(
-              dataContext[_self.options.oneClickDownloadURLColumnID]
-            )
+          // This will need to be set later if the downloadDatasetID does not exist.
+          // use $('a#_one-click_' + rowID).attr('href', '?ID=' + encodeURIComponent(dataset))
+          if (downloadDatasetID) {
+            linkURL += '?ID=' + encodeURIComponent(downloadDatasetID)
+          }
 
           cellOutput +=
-            "<a id='_one-click_" +
+            '<a id="_one-click_' +
             thisID +
-            "' href='" +
+            '" href="' +
             linkURL +
-            "'" +
+            '"' +
+            ' data-default-url="' +
+            linkURL +
+            '"' +
             (_self.options.oneClickDownloadTitle
-              ? " title='" + _self.options.oneClickDownloadTitle + "'"
+              ? ' title="' + _self.options.oneClickDownloadTitle + '"'
               : '') +
-            " class='no-propagate-event'><span aria-hidden='true' class='glyphicon glyphicon-download-alt one-click-download-link no-propagate-event'></span></a>"
+            ' class="no-propagate-event"' +
+            (_self.options.oneClickInvisibleDefault === true
+              ? ' style="display: none;"'
+              : '') +
+            '><span aria-hidden="true" class="glyphicon glyphicon-download-alt one-click-download-link no-propagate-event"></span></a>'
         }
 
         return cellOutput
