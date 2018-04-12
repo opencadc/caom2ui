@@ -1,11 +1,3 @@
-/**
- * User: jenkinsd
- * Date: 6/12/12
- * Time: 4:27 PM
- *
- * Story 962
- */
-
 ;(function($, window) {
   'use strict'
   // register namespace
@@ -25,13 +17,11 @@
    * @param {String} _collection      The Collection to use.
    * @param {String} _observationID   The CAOM-2 Observation ID.
    * @param {String} _productID       The Archive specific Product ID.
-   * @param {Number}  _size            The size of the thumbnail, usually 64, 256, or 1024
-   *                         pixels.
+   * @param {Number}  _size            The size of the thumbnail, usually 256, or 1024 pixels.
    * @param {String} _runID           The UWS Run ID to append to the URL.
    * @param {String} [_endpoint]  The endpoint for previews service.  This is not configurable yet!
    * @constructor
    */
-
   function Preview(
     _collection,
     _observationID,
@@ -75,84 +65,6 @@
         '?logkey=preview&logvalue=Observation&runid=' +
         this.runID
       )
-    }
-
-    /**
-     * GEMINI Preview converter.
-     *
-     * @return {String}       URL to obtain the preview.
-     * @private
-     */
-    this._convertGEMINI = function() {
-      var fileID =
-        this.observationID +
-        '_preview_' +
-        (this.size <= 512 ? '256' : '1024') +
-        '.jpg'
-      var adURI = new cadc.web.util.URI(
-        'ad:/' + this._getArchive() + '/' + fileID
-      )
-
-      return (
-        adURI.getPath() +
-        '?logkey=preview&logvalue=Observation&runid=' +
-        this.runID
-      )
-    }
-
-    /**
-     * CADC Preview converter.  This is the fallback converter for most archives.
-     *
-     * @return {String}       URL to obtain the preview.
-     * @private
-     */
-    this._convertCADC = function() {
-      var fileID = this.observationID + '_preview_'
-
-      if (this.size <= 128) {
-        fileID = fileID + '64'
-      } else if (this.size <= 512) {
-        fileID = fileID + '256'
-      } else {
-        fileID = fileID + '1024'
-      }
-
-      fileID = fileID + '.png'
-      var adURI = new cadc.web.util.URI(
-        'ad:/' + this._getArchive() + '/' + fileID
-      )
-
-      return (
-        adURI.getPath() +
-        '?logkey=preview&logvalue=Observation&runid=' +
-        this.runID
-      )
-    }
-
-    /**
-     * CFHT Preview converter.  Some logic is implemented pertaining to the size
-     * requested.
-     *
-     * @return {String}       URL to obtain the preview.
-     */
-    this._convertCFHT = function() {
-      var previewURL
-
-      if (this.size <= 512) {
-        var path = this.observationID + '_preview_256'
-        var adURI = new cadc.web.util.URI(
-          'ad:/' + this._getArchive() + '/' + path
-        )
-        previewURL =
-          adURI.getPath() +
-          '?logkey=preview&logvalue=Observation&runid=' +
-          this.runID
-      } else {
-        previewURL =
-          '/cadcbin/cfht/preview.html?collectionID=' + this.observationID
-      }
-
-      return previewURL
     }
 
     /**
@@ -241,47 +153,17 @@
     }
 
     // The Hash of Collections.  Each one will know its Archive, and Preview URL
-    // converter to use.
+    // converter to use. 
+    //
+    // Narrowed down to support only JCMT and HST(CA).
     this.PREVIEW_COLLECTION_CONFIGURATIONS = {
-      BLAST: { archive: 'BLAST', converter: this._convertCADC },
-      IRIS: { archive: 'IRIS', converter: this._convertCADC },
-      CGPS: { archive: 'CGPS', converter: this._convertCADC },
-      VGPS: { archive: 'VGPS', converter: this._convertCADC },
-      CFHT: { archive: 'CFHT', converter: this._convertCFHT },
       HST: { archive: 'HSTCA', converter: this._convertHST },
-      HSTHLA: { archive: 'HLADR2', converter: this._convertHST },
-      OMM: { archive: 'OMM', converter: this._convertHST },
-      DAO: {
-        archive: 'DAO',
-        converter: this._convertObservationIDProductID,
-        collectionName: 'DAO',
-        extension: '.png'
-      },
-      DAOPLATES: {
-        archive: 'DAO',
-        converter: this._convertObservationIDProductID,
-        collectionName: 'DAOPLATES',
-        extension: '.png'
-      },
       JCMT: {
         archive: 'JCMT',
         converter: this._convertObservationIDProductID,
         collectionName: 'jcmt',
         extension: '.png'
-      },
-      UKIRT: {
-        archive: 'UKIRT',
-        converter: this._convertObservationIDProductID,
-        collectionName: 'ukirt',
-        extension: '.png'
-      },
-      MOST: {
-        archive: 'MOST',
-        converter: this._convertObservationIDProductID,
-        collectionName: 'MOST',
-        extension: '.jpg'
-      },
-      GEMINI: { archive: 'GEMINI', converter: this._convertGEMINI }
+      }
     }
 
     this.previewCollectionConfiguration =

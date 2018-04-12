@@ -29,10 +29,7 @@
               unauthorized_message: {
                 en: 'You do not have permission to view this Preview image.',
                 fr: "Vous n'avez pas la permission de visualiser cette image"
-              },
-              datalink_exceptions: [
-                'JCMT', 'HST'
-              ]
+              }
             },
             columnOptions: {
               'caom2:Observation.observationID': {
@@ -350,18 +347,13 @@
                               $oneClickLink.attr('href', otherURLs[0]).show()
                             } else if (packageURLs.length >= 1) {
                               $oneClickLink.attr('href', packageURLs[0]).show()
-                            } else {
-                              $oneClickLink
-                                .attr('href', $oneClickLink.data('default-url'))
-                                .show()
                             }
 
                             // If datalink didn't provide thumbnail and preview URLs, create the urls and
                             // check if they exist.
                             if (
                               thumbnailURLs.length === 0 &&
-                              previewURLs.length === 0 &&
-                              ca.nrc.cadc.search.preview.datalink_exceptions.indexOf(collection) >= 0
+                              previewURLs.length === 0
                             ) {
                               var thumbnailPreview = new ca.nrc.cadc.search.Preview(
                                 collection,
