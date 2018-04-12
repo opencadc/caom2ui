@@ -1,4 +1,5 @@
 ;(function($, window) {
+  'use strict'
   $.extend(true, window, {
     ca: {
       nrc: {
@@ -18,6 +19,11 @@
               OBSERVATION_URI_UTYPE: 'caom2:Observation.uri',
               OBSERVATION_ID_UTYPE: 'caom2:Observation.observationID',
               ColumnManager: ColumnManager
+            },
+            datalink: {
+              thumbnail_uri: 'http://www.openadc.org/caom2#thumbnail',
+              pkg_uri: 'http://www.openadc.org/caom2#pkg',
+              preview_uri: '#preview'
             },
             preview: {
               unauthorized_message: {
@@ -52,7 +58,7 @@
                 sortable: false,
                 filterable: false,
                 formatter: function() {
-                  return "<span class='cellValue preview'></span>"
+                  return '<span class="cellValue preview"></span>'
                 },
                 asyncFormatter: function(cellNode, row, dataContext) {
                   var $cell = $(cellNode)
@@ -270,58 +276,84 @@
                             }
 
                             // Loop through the table rows
-                            var thumbnailUrls = []
-                            var previewUrls = []
-                            var tableRows = evaluator.evaluate(
-                              "/VOTABLE/RESOURCE[@type='results']/TABLE/DATA/TABLEDATA/TR"
+                            var rowID = dataContext['id']
+                            var thumbnailURLs = []
+                            var previewURLs = []
+                            var packageURLs = []
+                            var otherURLs = []
+                            var tableDataRows = evaluator.evaluate(
+                              '/VOTABLE/RESOURCE[@type="results"]/TABLE/DATA/TABLEDATA/TR'
                             )
+
                             for (
-                              var trIndex = 0, trl = tableRows.length;
+                              var trIndex = 0, trl = tableDataRows.length;
                               trIndex < trl;
                               trIndex++
                             ) {
-                              var tableDatas = tableRows[trIndex].children
+                              var tableDataCells =
+                                tableDataRows[trIndex].children
                               var errorMessage =
-                                tableDatas[errorMessageIndex].textContent
+                                tableDataCells[errorMessageIndex].textContent
+                              var readable =
+                                readableIndex >= 0 &&
+                                tableDataCells[readableIndex].textContent ===
+                                  'true'
 
                               if (errorMessage.length > 0) {
                                 console.error(
                                   'DataLink preview error: ' + errorMessage
                                 )
-                              } else {
-                                var readable =
-                                  readableIndex >= 0 &&
-                                  tableDatas[readableIndex].textContent ===
-                                    'true'
+                              } else if (readable === true) {
                                 var contentType =
-                                  tableDatas[contentTypeIndex].textContent
+                                  tableDataCells[contentTypeIndex].textContent
                                 var semantics =
-                                  tableDatas[semanticsIndex].textContent
-                                if (
-                                  semantics ===
-                                    'http://www.openadc.org/caom2#thumbnail' &&
-                                  readable === true
-                                ) {
-                                  thumbnailUrls.push(
-                                    tableDatas[accessUrlIndex].textContent
-                                  )
-                                } else if (
-                                  semantics === '#preview' &&
-                                  contentType.indexOf('image') >= 0 &&
-                                  readable === true
-                                ) {
-                                  previewUrls.push(
-                                    tableDatas[accessUrlIndex].textContent
-                                  )
+                                  tableDataCells[semanticsIndex].textContent
+                                var accessURL =
+                                  tableDataCells.length >= accessUrlIndex
+                                    ? tableDataCells[accessUrlIndex].textContent
+                                    : ''
+                                if (accessURL) {
+                                  if (
+                                    semantics ===
+                                    ca.nrc.cadc.search.datalink.thumbnail_uri
+                                  ) {
+                                    thumbnailURLs.push(accessURL)
+                                  } else if (
+                                    semantics ===
+                                      ca.nrc.cadc.search.datalink.preview_uri &&
+                                    contentType.indexOf('image') >= 0
+                                  ) {
+                                    previewURLs.push(accessURL)
+                                  } else if (
+                                    semantics ===
+                                    ca.nrc.cadc.search.datalink.pkg_uri
+                                  ) {
+                                    packageURLs.push(accessURL)
+                                  } else {
+                                    otherURLs.push(accessURL)
+                                  }
                                 }
                               }
+                            }
+
+                            // CADC Story 2288 - One Click Downloads
+                            // For those DataLink semantics that are not Previews or Thumbnails, keep track of
+                            // them and apply them as:
+                            // 1. If there is a single semantic left, then use it.
+                            // 2. If there are multiple semantics left with no #pkg semantic, disable one-click.
+                            // 3. Use the #pkg semantic URL.
+                            var $oneClickLink = $('a#_one-click_' + rowID)
+                            if (otherURLs.length === 1) {
+                              $oneClickLink.attr('href', otherURLs[0]).show()
+                            } else if (packageURLs.length >= 1) {
+                              $oneClickLink.attr('href', packageURLs[0]).show()
                             }
 
                             // If datalink didn't provide thumbnail and preview URLs, create the urls and
                             // check if they exist.
                             if (
-                              thumbnailUrls.length === 0 &&
-                              previewUrls.length === 0
+                              thumbnailURLs.length === 0 &&
+                              previewURLs.length === 0
                             ) {
                               var thumbnailPreview = new ca.nrc.cadc.search.Preview(
                                 collection,
@@ -369,8 +401,8 @@
                               )
                             } else {
                               insertPreviewLink(
-                                previewUrls,
-                                thumbnailUrls,
+                                previewURLs,
+                                thumbnailURLs,
                                 planePublisherIdValue
                               )
                             }

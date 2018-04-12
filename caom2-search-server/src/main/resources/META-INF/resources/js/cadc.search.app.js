@@ -928,6 +928,7 @@
           oneClickDownloadURLColumnID: activeForm
             .getConfiguration()
             .getDownloadAccessKey(),
+          oneClickInvisibleDefault: true,
           headerCheckboxLabel: 'Mark',
           rowManager: {
             onRowRendered: onRowRendered,

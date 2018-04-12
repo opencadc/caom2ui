@@ -999,7 +999,8 @@
           oneClickDownloadTitle: getOptions().oneClickDownloadTitle,
 
           // The ID of the column to pull the unique link from.
-          oneClickDownloadURLColumnID: getOptions().oneClickDownloadURLColumnID
+          oneClickDownloadURLColumnID: getOptions().oneClickDownloadURLColumnID,
+          oneClickInvisibleDefault: getOptions().oneClickInvisibleDefault
         })
       } else if (Slick.CheckboxSelectColumn) {
         checkboxSelector = new Slick.CheckboxSelectColumn({

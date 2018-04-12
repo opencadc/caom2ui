@@ -1,3 +1,20 @@
+## April 12th, 2018
+### 2.7.0
+
+* Added option to the [cadc-votv VOTable viewer](https://github.com/opencadc/web/tree/master/cadc-votv) to disable auto setting the one-click download link.  This will allow for setting it later on, as is done in Advanced Search now by reading the data from the DataLink server.
+* Added new logic when getting URLs for Previews.
+
+## April 11th, 2018
+### 2.6.9
+
+* Fix for previews not showing up for some collections
+* Encode the ID parameter of the request to /caom2ui
+
+## April 2nd, 2018
+### 2.6.8
+
+* Various small bug fixes.
+
 ## March 8th, 2018
 ### 2.6.1
 * Fix to the footprint viewer plugin to handle Circle footprints with an updated AladinLite plugin.
