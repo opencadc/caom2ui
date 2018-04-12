@@ -68,8 +68,7 @@
     }
 
     /**
-     * Preview converter by Observation ID and Product ID.  This is ONLY
-     * relevant in CAOM-2, and is used by JCMT and MOST.
+     * Preview converter by Observation ID and Product ID.  This is ONLY relevant in CAOM-2.
      *
      * This relies on the collectionName and extension to be set in the PREVIEW_COLLECTION_CONFIGURATIONS dictionary
      * above.

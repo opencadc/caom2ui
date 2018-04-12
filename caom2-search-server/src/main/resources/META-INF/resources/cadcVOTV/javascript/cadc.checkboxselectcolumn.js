@@ -197,13 +197,13 @@
           "' type='checkbox' " +
           (_selectedRowsLookup[row] ? "checked='checked' " : '') +
           '/>'
-        var downloadDatasetID =
-          _self.options.oneClickDownloadURLColumnID &&
-          dataContext[_self.options.oneClickDownloadURLColumnID]
 
-        // Check if the one-click is enabled, and that
+        // Check if the one-click is enabled
         if (isOneClickDownloadEnabled()) {
           var linkURL = $.trim(_self.options.oneClickDownloadURL)
+          var downloadDatasetID =
+            _self.options.oneClickDownloadURLColumnID &&
+            dataContext[_self.options.oneClickDownloadURLColumnID]
 
           // This will need to be set later if the downloadDatasetID does not exist.
           // use $('a#_one-click_' + rowID).attr('href', '?ID=' + encodeURIComponent(dataset))
