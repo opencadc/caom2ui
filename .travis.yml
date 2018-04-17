@@ -31,7 +31,7 @@ script:
 - gradle -i clean build
 - mkdir docker && cp Dockerfile docker/ && cp build/libs/*.war docker/ && cp *.properties docker/
 - docker build -t opencadc/caom2-search:SNAPSHOT -t opencadc/caom2-search:alpine -t opencadc/caom2-search:${CAOM2_SEARCH_SERVER_VERSION} -f docker/Dockerfile docker/
-- cd ../_int_test_
+- cd ../int-test
 - docker-compose up -d
 - docker ps -a
 - cd ../default
