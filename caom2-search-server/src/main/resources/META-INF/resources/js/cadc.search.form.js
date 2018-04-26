@@ -1191,7 +1191,7 @@
                 url:
                   this.configuration.options.targetResolverEndpoint + '/' + id,
                 data: {
-                  term: value,
+                  term: encodeURIComponent(value),
                   resolver: resolver.toLowerCase()
                 },
                 method: 'GET',
