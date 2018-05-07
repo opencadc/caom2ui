@@ -207,21 +207,6 @@
      * @private
      */
     this._getActiveForm = function() {
-      // could be a tab other than a form tab...
-      // if (
-      //   this._getActiveTabID()
-      //     .toLowerCase()
-      //     .indexOf('obscore') > 0
-      // ) {
-      //   activeFormID = this.getObsCoreSearchForm().getID()
-      // } else if (
-      //   this._getActiveTabID()
-      //     .toLowerCase()
-      //     .indexOf('queryform') > 0
-      // ) {
-      //   activeFormID = this.getCAOMSearchForm().getID()
-      // }
-
       return this.getCAOMSearchForm().isActive(this.activeFormID)
         ? this.getCAOMSearchForm()
         : this.getObsCoreSearchForm()
@@ -1583,10 +1568,9 @@
      */
     this._setJobParameters = function(jobParams, callback) {
       var queryParam = 'QUERY=' + encodeURIComponent(this._getADQL(true))
-      var votableURL =
-        this.options.tapSyncEndpoint +
-        '?LANG=ADQL&REQUEST=doQuery&' +
-        queryParam
+      var votableURL = this.options.tapSyncEndpoint
+        + '?LANG=ADQL&REQUEST=doQuery&USEMAQ=' + this.options.activateMAQ + '&'
+        + queryParam
 
       var upload = this._getTargetUpload()
       if (upload) {
