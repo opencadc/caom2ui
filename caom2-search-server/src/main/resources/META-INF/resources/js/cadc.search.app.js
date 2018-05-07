@@ -1568,10 +1568,9 @@
      */
     this._setJobParameters = function(jobParams, callback) {
       var queryParam = 'QUERY=' + encodeURIComponent(this._getADQL(true))
-      var votableURL =
-        this.options.tapSyncEndpoint +
-        '?LANG=ADQL&REQUEST=doQuery&USEMAQ=' + this.options.activateMAQ
-        queryParam
+      var votableURL = this.options.tapSyncEndpoint
+        + '?LANG=ADQL&REQUEST=doQuery&USEMAQ=' + this.options.activateMAQ + '&'
+        + queryParam
 
       var upload = this._getTargetUpload()
       if (upload) {
