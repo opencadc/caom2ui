@@ -213,16 +213,19 @@
             var filteredRows = v.getFilteredRows()
             var cdl = filteredRows.length
 
-            if (inputs.maxRowCount && cdl <= inputs.maxRowCount) {
+            if (inputs.maxRowCount && cdl <= inputs.maxRowCount && cdl > 0) {
               _enableButton()
 
               for (var cdi = 0; cdi < cdl; cdi++) {
                 handleAddFootprint(event, {
-                  rowData: filteredRows[cdi]
-                })
+                  rowData: filteredRows[cdi],
+                  forceUpdateFOV: true
+                })                
               }
 
-              _setFieldOfView()
+              _handleAction(filteredRows[0])
+
+              // _setFieldOfView()
             } else {
               _disableButton()
             }
@@ -426,10 +429,6 @@
           'Unable to add footprint for (' + raValue + ', ' + decValue + ')'
         )
       }
-
-      if (_self.aladin && _self.aladin.view) {
-        _self.aladin.view.forceRedraw()
-      }
     }
 
     function handleClick(e, args) {
@@ -490,7 +489,7 @@
           console.log('Unknown footprint ' + footprint)
         }
 
-        if (!inputs.fov || inputs.fov === null) {
+        if (args.forceUpdateFOV === true || (!inputs.fov || inputs.fov === null)) {
           _updateFOV(footprint)
         }
       }
