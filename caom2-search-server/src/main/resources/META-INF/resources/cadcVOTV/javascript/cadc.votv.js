@@ -512,6 +512,10 @@
       return getDataView().getItems()
     }
 
+    function getFilteredRows () {
+      return getDataView().getFilteredItems()
+    }
+
     function getGrid() {
       return _self.grid
     }
@@ -1735,6 +1739,7 @@
       getSelectedRows: getSelectedRows,
       getRow: getRow,
       getRows: getRows,
+      getFilteredRows: getFilteredRows,
       addRow: addRow,
       destroy: destroy,
       clearColumnFilters: clearColumnFilters,

@@ -68,6 +68,7 @@
 
 package ca.nrc.cadc.web;
 
+import org.apache.commons.fileupload.FileUploadException;
 import ca.nrc.cadc.auth.AuthenticationUtil;
 import ca.nrc.cadc.auth.HTTPIdentityManager;
 import ca.nrc.cadc.auth.IdentityManager;
@@ -78,6 +79,9 @@ import ca.nrc.cadc.date.DateUtil;
 import ca.nrc.cadc.net.TransientException;
 import ca.nrc.cadc.profiler.Profiler;
 import ca.nrc.cadc.reg.client.RegistryClient;
+//import ca.nrc.cadc.rest.InlineContentException;
+//import ca.nrc.cadc.rest.SyncInput;
+//import ca.nrc.cadc.rest.InlineContentHandler;
 import ca.nrc.cadc.search.DefaultNameResolverClient;
 import ca.nrc.cadc.search.ObsModel;
 import ca.nrc.cadc.search.QueryGenerator;
@@ -110,6 +114,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.URI;
+//import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -124,7 +129,6 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.fileupload.FileUploadException;
 
 
 /**
@@ -262,8 +266,7 @@ public class SearchJobServlet extends SyncServlet {
     }
 
     private void processRequest(final HttpServletRequest request, final HttpServletResponse response)
-        throws JobPersistenceException, TransientException, FileUploadException, IOException,
-        JobNotFoundException {
+        throws JobPersistenceException, TransientException, IOException, JobNotFoundException, FileUploadException {
 
         final Set<String> userIDs = AuthenticationUtil.getUseridsFromSubject();
         final String userIDCheckpoint = userIDs.isEmpty() ? "Anonymous" : userIDs.toString();
@@ -272,9 +275,10 @@ public class SearchJobServlet extends SyncServlet {
         final Map<String, Object> uploadPayload = new HashMap<>();
         final List<Parameter> extraJobParameters = new ArrayList<>();
 
-        final JobCreator jobCreator = new JobCreator(getInlineContentHandler()) {
+        final JobCreator jobCreator = new JobCreator() {
             @Override
-            protected void processStream(final String name, final String contentType, final InputStream inputStream) {
+            protected void processStream(final String name, final String contentType, final InputStream inputStream,
+                                         final ca.nrc.cadc.uws.web.InlineContentHandler inlineContentHandler) {
                 try {
                     final String[] nameParts = name.split("\\.");
                     final String paramName = nameParts[0];
@@ -300,9 +304,24 @@ public class SearchJobServlet extends SyncServlet {
             }
         };
 
+        // Hack to accommodate new required InlineContentHandler.
+//        final InlineContentHandler restInlineContentHandler = new InlineContentHandler() {
+//            @Override
+//            public Content accept(String name, String contentType, InputStream inputStream) throws InlineContentException, IOException {
+//                final URL url = getInlineContentHandler().accept(name, contentType, inputStream);
+//                final Content content = new Content();
+//
+//                content.name = name;
+//                content.value = url;
+//
+//                return content;
+//            }
+//        };
+
+//        final SyncInput syncInput = new SyncInput(request, restInlineContentHandler);
 
         // Create the audit job.
-        final Job auditJob = jobManager.create(jobCreator.create(request));
+        final Job auditJob = jobManager.create(jobCreator.create(request, getInlineContentHandler()));
         auditJob.getParameterList().addAll(extraJobParameters);
 
         profiler.checkpoint(String.format("%s processRequest() Create Audit Job", checkpointID));
