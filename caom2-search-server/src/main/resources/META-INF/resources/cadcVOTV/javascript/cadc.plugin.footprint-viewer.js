@@ -110,6 +110,30 @@
 
     this.fieldOfViewSetFlag = false
 
+    this.addHooks = function() {
+      // t75446 - Add VLASS to AladinLite Image laters
+      var hipsDir = 'http://archive-new.nrao.edu/vlass/HiPS/VLASS1.1/Quicklook/'
+      var label = 'VLASS1.1-QL-20180625'
+      var currA = _self.aladin
+      var currBaseImage = currA.getBaseImageLayer()
+
+      // Set the default image survey so that the new HiPS layer is initialized.
+      currA.setImageSurvey(
+        currA.createImageSurvey(label, label, hipsDir, 'equatorial', 9, {
+          imgFormat: 'png'
+        })
+      )
+
+      // Configure the new HiPS layer.
+      currA.getBaseImageLayer().getColorMap().update('rainbow')
+
+      // Set the default back to the previous one.
+      currA.setImageSurvey(currBaseImage)
+
+      currA.gotoRaDec(90.0, 40.0)
+      currA.setFoV(180.0)
+    }
+
     /**
      * Initialize with the Slick Grid instance.
      * @param {cadc.vot.Viewer} _viewer      The CADC VOTable Viewer instance.
@@ -220,7 +244,7 @@
                 handleAddFootprint(event, {
                   rowData: filteredRows[cdi],
                   forceUpdateFOV: true
-                })                
+                })
               }
 
               _handleAction(filteredRows[0])
@@ -232,6 +256,9 @@
           })
         }
       }
+
+      // Run hooks (i.e. add image survey layers, etc.)
+      _self.addHooks()
 
       if (inputs.onHover === true) {
         _self.handler.subscribe(_self.grid.onMouseEnter, handleMouseEnter)
@@ -489,7 +516,10 @@
           console.log('Unknown footprint ' + footprint)
         }
 
-        if (args.forceUpdateFOV === true || (!inputs.fov || inputs.fov === null)) {
+        if (
+          args.forceUpdateFOV === true ||
+          (!inputs.fov || inputs.fov === null)
+        ) {
           _updateFOV(footprint)
         }
       }
