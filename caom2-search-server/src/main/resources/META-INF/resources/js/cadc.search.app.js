@@ -301,18 +301,18 @@
       }
 
       return adqlText
-    };
+    }
 
     this._getTargetUpload = function() {
-      var jobString = sessionStorage.getItem('uws_job');
-      var upload;
+      var jobString = sessionStorage.getItem('uws_job')
+      var upload
       if (jobString) {
-        var jobJSON = JSON.parse(jobString);
-        var uwsJobParser = new ca.nrc.cadc.search.uws.json.UWSJobParser(jobJSON);
-        upload = uwsJobParser.getJob().getParameterValue('UPLOAD');
+        var jobJSON = JSON.parse(jobString)
+        var uwsJobParser = new ca.nrc.cadc.search.uws.json.UWSJobParser(jobJSON)
+        upload = uwsJobParser.getJob().getParameterValue('UPLOAD')
       }
-      return upload;
-    };
+      return upload
+    }
 
     /**
      * Initialize the form configurations.
@@ -1033,15 +1033,14 @@
           }.bind(this)
         )
 
-        downloadFormSubmit.click(function(event) {
+        downloadFormSubmit.off().click(function(event) {
           event.preventDefault()
 
           downloadForm.find("input[name='uri']").remove()
 
           if (resultsVOTV.getSelectedRows().length <= 0) {
-            alert(
-              downloadForm.find('span#NO_OBSERVATIONS_SELECTED_MESSAGE').text()
-            )
+            translated_message = downloadForm.find('span#NO_OBSERVATIONS_SELECTED_MESSAGE').text()
+            alert(translated_message)
           } else {
             var selectedRows = resultsVOTV.getSelectedRows()
             for (
@@ -1050,7 +1049,8 @@
               arrIndex++
             ) {
               var $nextRow = resultsVOTV.getRow(selectedRows[arrIndex])
-              var $nextPlaneURI = $nextRow['caom2:Plane.publisherID.downloadable']
+              var $nextPlaneURI =
+                $nextRow['caom2:Plane.publisherID.downloadable']
 
               var $input = $('<input>')
               $input.prop('type', 'hidden')
@@ -1568,9 +1568,12 @@
      */
     this._setJobParameters = function(jobParams, callback) {
       var queryParam = 'QUERY=' + encodeURIComponent(this._getADQL(true))
-      var votableURL = this.options.tapSyncEndpoint
-        + '?LANG=ADQL&REQUEST=doQuery&USEMAQ=' + this.options.activateMAQ + '&'
-        + queryParam
+      var votableURL =
+        this.options.tapSyncEndpoint +
+        '?LANG=ADQL&REQUEST=doQuery&USEMAQ=' +
+        this.options.activateMAQ +
+        '&' +
+        queryParam
 
       var upload = this._getTargetUpload()
       if (upload) {
