@@ -12,12 +12,14 @@
             OBSCORE_RESOLVER_VALUE_KEY:
               'Char.SpatialAxis.Coverage.Support.Area@Shape1Resolver.value',
             CAOM2_TARGET_NAME_VALUE_KEY: 'Plane.position.bounds@Shape1.value',
+            COLLECTION_VALUE_KEY: 'Observation.collection',
             DETAILS_CSS: 'details_tooltip_link',
             DATALINK_URL_SUFFIX: '/datalink',
             columns: {
               PUBLISHER_ID_UTYPE: 'caom2:Plane.publisherID',
               OBSERVATION_URI_UTYPE: 'caom2:Observation.uri',
               OBSERVATION_ID_UTYPE: 'caom2:Observation.observationID',
+              COLLECTION_UTYPE: 'caom2:Observation.collection',
               ColumnManager: ColumnManager
             },
             datalink: {
@@ -463,13 +465,19 @@
               },
               'caom2:Observation.proposal.id': {
                 label: 'Proposal ID',
-                formatter: function(row, cell, value, columnDef) {
+                formatter: function(row, cell, value, columnDef, dataContext) {
                   var utype = columnDef.utype
                   var uTypeName = utype.substr(utype.indexOf(':') + 1)
                   var valueObject = {}
 
                   if (value) {
                     valueObject[uTypeName] = value
+                  }
+
+                  var collection = dataContext[ca.nrc.cadc.search.columns.COLLECTION_UTYPE]
+
+                  if (collection) {
+                    valueObject[ca.nrc.cadc.search.COLLECTION_VALUE_KEY] = collection
                   }
 
                   return formatQuickSearchLink(value, valueObject, utype, null)
