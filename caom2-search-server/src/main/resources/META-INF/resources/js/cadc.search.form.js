@@ -1675,7 +1675,7 @@
     this._beforeSerialize = function() {
       $('#UPLOAD').remove()
 
-      var inputFile = this.$form.find("input:file[name='targetList']")
+      var inputFile = this.$form.find("input:file.target-list")
 
       if (
         inputFile.length > 0 &&

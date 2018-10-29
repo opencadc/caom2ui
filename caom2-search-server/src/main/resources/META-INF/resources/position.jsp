@@ -71,7 +71,7 @@
                        class="disabled" disabled><fmt:message key="TARGET_LIST_FORM_LABEL" bundle="${langBundle}" /><span
                             class="search_criteria_label_contents color-accent"></span></label>
                 <div>
-                  <input type="file" class="form-control file-form-control"
+                  <input type="file" class="form-control file-form-control target-list"
                          id="${param.utype}_targetList" name="targetList"
                          title="<fmt:message key="TARGET_LIST_TOOLTIP" bundle="${langBundle}" />" />
                 </div>
