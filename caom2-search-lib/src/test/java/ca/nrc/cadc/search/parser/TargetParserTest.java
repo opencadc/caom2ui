@@ -1,41 +1,41 @@
 /*
-************************************************************************
-*******************  CANADIAN ASTRONOMY DATA CENTRE  *******************
-**************  CENTRE CANADIEN DE DONN√âES ASTRONOMIQUES  **************
-*
-*  (c) 2009.                            (c) 2009.
-*  Government of Canada                 Gouvernement du Canada
-*  National Research Council            Conseil national de recherches
-*  Ottawa, Canada, K1A 0R6              Ottawa, Canada, K1A 0R6
-*  All rights reserved                  Tous droits r√©serv√©s
-*
-*  NRC disclaims any warranties,        Le CNRC d√©nie toute garantie
-*  expressed, implied, or               √©nonc√©e, implicite ou l√©gale,
-*  statutory, of any kind with          de quelque nature que ce
-*  respect to the software,             soit, concernant le logiciel,
-*  including without limitation         y compris sans restriction
-*  any warranty of merchantability      toute garantie de valeur
-*  or fitness for a particular          marchande ou de pertinence
-*  purpose. NRC shall not be            pour un usage particulier.
-*  liable in any event for any          Le CNRC ne pourra en aucun cas
-*  damages, whether direct or           √™tre tenu responsable de tout
-*  indirect, special or general,        dommage, direct ou indirect,
-*  consequential or incidental,         particulier ou g√©n√©ral,
-*  arising from the use of the          accessoire ou fortuit, r√©sultant
-*  software.  Neither the name          de l'utilisation du logiciel. Ni
-*  of the National Research             le nom du Conseil National de
-*  Council of Canada nor the            Recherches du Canada ni les noms
-*  names of its contributors may        de ses  participants ne peuvent
-*  be used to endorse or promote        √™tre utilis√©s pour approuver ou
-*  products derived from this           promouvoir les produits d√©riv√©s
-*  software without specific prior      de ce logiciel sans autorisation
-*  written permission.                  pr√©alable et particuli√®re
-*                                       par √©crit.
-*
-*  $Revision: 4 $
-*
-************************************************************************
-*/
+ ************************************************************************
+ *******************  CANADIAN ASTRONOMY DATA CENTRE  *******************
+ **************  CENTRE CANADIEN DE DONN√âES ASTRONOMIQUES  **************
+ *
+ *  (c) 2009.                            (c) 2009.
+ *  Government of Canada                 Gouvernement du Canada
+ *  National Research Council            Conseil national de recherches
+ *  Ottawa, Canada, K1A 0R6              Ottawa, Canada, K1A 0R6
+ *  All rights reserved                  Tous droits r√©serv√©s
+ *
+ *  NRC disclaims any warranties,        Le CNRC d√©nie toute garantie
+ *  expressed, implied, or               √©nonc√©e, implicite ou l√©gale,
+ *  statutory, of any kind with          de quelque nature que ce
+ *  respect to the software,             soit, concernant le logiciel,
+ *  including without limitation         y compris sans restriction
+ *  any warranty of merchantability      toute garantie de valeur
+ *  or fitness for a particular          marchande ou de pertinence
+ *  purpose. NRC shall not be            pour un usage particulier.
+ *  liable in any event for any          Le CNRC ne pourra en aucun cas
+ *  damages, whether direct or           √™tre tenu responsable de tout
+ *  indirect, special or general,        dommage, direct ou indirect,
+ *  consequential or incidental,         particulier ou g√©n√©ral,
+ *  arising from the use of the          accessoire ou fortuit, r√©sultant
+ *  software.  Neither the name          de l'utilisation du logiciel. Ni
+ *  of the National Research             le nom du Conseil National de
+ *  Council of Canada nor the            Recherches du Canada ni les noms
+ *  names of its contributors may        de ses  participants ne peuvent
+ *  be used to endorse or promote        √™tre utilis√©s pour approuver ou
+ *  products derived from this           promouvoir les produits d√©riv√©s
+ *  software without specific prior      de ce logiciel sans autorisation
+ *  written permission.                  pr√©alable et particuli√®re
+ *                                       par √©crit.
+ *
+ *  $Revision: 4 $
+ *
+ ************************************************************************
+ */
 
 package ca.nrc.cadc.search.parser;
 
@@ -45,6 +45,8 @@ import ca.nrc.cadc.search.parser.exception.TargetParserException;
 
 import org.junit.Test;
 
+import java.lang.annotation.Target;
+
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -52,53 +54,45 @@ import static org.junit.Assert.*;
 /**
  * @author jburke
  */
-public class TargetParserTest extends AbstractUnitTest<TargetParser>
-{
+public class TargetParserTest extends AbstractUnitTest<TargetParser> {
     private final Resolver mockResolver = createMock(Resolver.class);
 
-    public TargetParserTest()
-    {
+    public TargetParserTest() {
     }
 
     @Test
-    public void nullString() throws Exception
-    {
-        try
-        {
+    public void nullString() {
+        try {
             final TargetParser parser = new TargetParser(mockResolver);
             parser.parse(null, null);
 
             fail("Failed to throw TargetParserException parsing null string");
-        }
-        catch (TargetParserException e)
-        {
+        } catch (TargetParserException e) {
             // Good!
         }
     }
 
     @Test
-    public final void parseSexiCoordinates() throws Exception
-    {
+    public final void parseSexiCoordinates() throws Exception {
         final String[] targets =
-                {
-                        "12:34:56 56:43:21",   // colon
-                        "12h34m56s 56d43m21s",  // lower
-                        "12H34M56S 56D43M21S", // upper
-                        "12h34M56s 56D43m21S", // mixed case
-                        "12:34M56S 56:43m21S", // mixed everything
-                        "12h34:56S 56d43:21S", // mixed everything
-                        "12h34m56 56d43m21",   // mixed everything
-                        "12 34 56 56 43 21"    // colon
-                };
+            {
+                "12:34:56 56:43:21",   // colon
+                "12h34m56s 56d43m21s",  // lower
+                "12H34M56S 56D43M21S", // upper
+                "12h34M56s 56D43m21S", // mixed case
+                "12:34M56S 56:43m21S", // mixed everything
+                "12h34:56S 56d43:21S", // mixed everything
+                "12h34m56 56d43m21",   // mixed everything
+                "12 34 56 56 43 21"    // colon
+            };
 
         final String[] noSecondTargets =
-                {
-                        "12:34 56:43",         // missing sec
-                        "12h34 56d43"         // missing sec
-                };
+            {
+                "12:34 56:43",         // missing sec
+                "12h34 56d43"         // missing sec
+            };
 
-        for (final String t : targets)
-        {
+        for (final String t : targets) {
             reset(mockResolver);
             final TargetParser parser = new TargetParser(mockResolver);
 
@@ -112,8 +106,7 @@ public class TargetParserTest extends AbstractUnitTest<TargetParser>
             verify(mockResolver);
         }
 
-        for (final String t : noSecondTargets)
-        {
+        for (final String t : noSecondTargets) {
             reset(mockResolver);
             final TargetParser parser = new TargetParser(mockResolver);
 
@@ -146,25 +139,23 @@ public class TargetParserTest extends AbstractUnitTest<TargetParser>
     }
 
     @Test
-    public final void parseCoordinatesAndRadius() throws Exception
-    {
+    public final void parseCoordinatesAndRadius() throws Exception {
         final String[] targets =
-                {
-                        "123 45, 6",
-                        "123,45,6",
-                        "123 , 45 , 6"
-                };
+            {
+                "123 45, 6",
+                "123,45,6",
+                "123 , 45 , 6"
+            };
 
         final String[] arcSecondTargets =
-                {
-                        "123 , 45 , 6'"
-                };
+            {
+                "123 , 45 , 6'"
+            };
 
-        for (final String t : targets)
-        {
+        for (final String t : targets) {
             reset(mockResolver);
             final TargetParser parser =
-                    new TargetParser(mockResolver);
+                new TargetParser(mockResolver);
 
             replay(mockResolver);
 
@@ -177,11 +168,10 @@ public class TargetParserTest extends AbstractUnitTest<TargetParser>
             verify(mockResolver);
         }
 
-        for (final String t : arcSecondTargets)
-        {
+        for (final String t : arcSecondTargets) {
             reset(mockResolver);
             final TargetParser parser =
-                    new TargetParser(mockResolver);
+                new TargetParser(mockResolver);
 
             replay(mockResolver);
 
@@ -199,7 +189,7 @@ public class TargetParserTest extends AbstractUnitTest<TargetParser>
         reset(mockResolver);
         final String TARGET_1 = "123 , 45 , 6\"";
         final TargetParser parser =
-                new TargetParser(mockResolver);
+            new TargetParser(mockResolver);
 
         replay(mockResolver);
 
@@ -216,7 +206,7 @@ public class TargetParserTest extends AbstractUnitTest<TargetParser>
         reset(mockResolver);
         final String TARGET_2 = "12 34 56 56 43 21, 6''";
         final TargetParser parser2 =
-                new TargetParser(mockResolver);
+            new TargetParser(mockResolver);
 
         replay(mockResolver);
 
@@ -233,33 +223,31 @@ public class TargetParserTest extends AbstractUnitTest<TargetParser>
     }
 
     @Test
-    public final void parseCoordinatesRadiusAndCoordsys() throws Exception
-    {
+    public final void parseCoordinatesRadiusAndCoordsys() throws Exception {
         final String[] targets =
-                {
-                        "123 45, 6 ICRS",
-                        "123 45, 6 GAL",
-                        "123 45, 6 FK4",
-                        "123 45, 6 FK5",
-                        "123 45, 6 B1950",
-                        "123 45, 6 B1950.0",
-                        "123 45, 6 J2000",
-                        "12 34 56 56 43 21, 6'' ICRS",
-                        "12 34 56 56 43 21, 6'' FK4",
-                        "12 34 56 56 43 21, 6 GAL"
-                };
+            {
+                "123 45, 6 ICRS",
+                "123 45, 6 GAL",
+                "123 45, 6 FK4",
+                "123 45, 6 FK5",
+                "123 45, 6 B1950",
+                "123 45, 6 B1950.0",
+                "123 45, 6 J2000",
+                "12 34 56 56 43 21, 6'' ICRS",
+                "12 34 56 56 43 21, 6'' FK4",
+                "12 34 56 56 43 21, 6 GAL"
+            };
 
         double index = 0.0;
-        for (final String t : targets)
-        {
+        for (final String t : targets) {
             final TargetParser parser =
-                    new TargetParser(mockResolver);
+                new TargetParser(mockResolver);
             final TargetData data = parser.parse(t, "SIMBAD");
             final String equivalentTarget = targets[(int) index];
 
             assertEquals("Wrong Coordsys for " + t,
                          equivalentTarget.substring(
-                                 equivalentTarget.lastIndexOf(" ")).trim(),
+                             equivalentTarget.lastIndexOf(" ")).trim(),
                          data.getCoordsys());
 
             index++;
@@ -267,8 +255,7 @@ public class TargetParserTest extends AbstractUnitTest<TargetParser>
     }
 
     @Test
-    public final void parseRadius() throws Exception
-    {
+    public final void parseRadius() throws Exception {
         final String t = "12.34 33.50 21arcmin";
         final TargetParser parser = new TargetParser(mockResolver);
 
@@ -284,24 +271,22 @@ public class TargetParserTest extends AbstractUnitTest<TargetParser>
     }
 
     @Test
-    public final void isQueryInDegrees() throws Exception
-    {
+    public final void isQueryInDegrees() throws Exception {
         final String[] shouldPass =
-                {
-                        "20 20",
-                        "20 20 1",
-                        "20 20 1 ICRS",
-                        "123 45, 6 ICRS",
-                        "123 45, 6 GAL",
-                        "123 45, 6 FK4",
-                        "123 45, 6 FK5",
-                        "123 45, 6 B1950.0",
-                        "123 45, 6 J2000.0",
-                        "123 45, 6 B1950"
-                };
+            {
+                "20 20",
+                "20 20 1",
+                "20 20 1 ICRS",
+                "123 45, 6 ICRS",
+                "123 45, 6 GAL",
+                "123 45, 6 FK4",
+                "123 45, 6 FK5",
+                "123 45, 6 B1950.0",
+                "123 45, 6 J2000.0",
+                "123 45, 6 B1950"
+            };
 
-        for (final String t : shouldPass)
-        {
+        for (final String t : shouldPass) {
             reset(mockResolver);
             final TargetParser parser = new TargetParser(mockResolver);
 
@@ -312,17 +297,16 @@ public class TargetParserTest extends AbstractUnitTest<TargetParser>
         }
 
         final String[] shouldFail =
-                {
-                        "12 34 56 56 43 21",
-                        "12 34 56 56 43 21 6",
-                        "12 34 56 56 43 21, 6'' ICRS",
-                        "12 34 56 56 43 21, 6'' J2000",
-                        "12 34 56 56 43 21, 6'' FK4",
-                        "12 34 56 56 43 21, 6 GAL"
-                };
+            {
+                "12 34 56 56 43 21",
+                "12 34 56 56 43 21 6",
+                "12 34 56 56 43 21, 6'' ICRS",
+                "12 34 56 56 43 21, 6'' J2000",
+                "12 34 56 56 43 21, 6'' FK4",
+                "12 34 56 56 43 21, 6 GAL"
+            };
 
-        for (final String t : shouldFail)
-        {
+        for (final String t : shouldFail) {
             reset(mockResolver);
             final TargetParser parser = new TargetParser(mockResolver);
 
@@ -335,14 +319,13 @@ public class TargetParserTest extends AbstractUnitTest<TargetParser>
     }
 
     @Test
-    public final void parseNameRadius() throws Exception
-    {
+    public final void parseNameRadius() throws Exception {
         final String target = "M101 0.5";
         final String resolver = "SIMBAD";
 
         reset(mockResolver);
         final TargetParser testSubject = new TargetParser(mockResolver);
-        final TargetData resolverData = new TargetData("M101 0.5",
+        final TargetData resolverData = new TargetData("M101",
                                                        13.5D, null, // raRange
                                                        -13.5D, null, // decRange
                                                        0.0, // radius
@@ -361,6 +344,36 @@ public class TargetParserTest extends AbstractUnitTest<TargetParser>
 
         assertEquals("Wrong radius.", 0.5D, resultData.getRadius(), 0.0D);
         assertEquals("Wrong object name.", "M101", resultData.getObjectName());
+
+        verify(mockResolver);
+    }
+
+    @Test
+    public void parseTarget() throws Exception {
+        final String target = "Feig 86";
+        final String resolver = "ALL";
+
+        reset(mockResolver);
+        final TargetParser testSubject = new TargetParser(mockResolver);
+        final TargetData resolverData = new TargetData(target,
+                                                       13.5D, null, // raRange
+                                                       -13.5D, null, // decRange
+                                                       null, // radius
+                                                       "COORD",
+                                                       "SIMBAD",
+                                                       88,
+                                                       "OBJ",
+                                                       null,
+                                                       null);
+
+        expect(mockResolver.resolveTarget(target, resolver)).andReturn(resolverData).once();
+
+        replay(mockResolver);
+
+        final TargetData resultData = testSubject.parseTarget(target, resolver);
+
+        assertEquals("Wrong radius.", AbstractPositionParser.DEFAULT_RADIUS, resultData.getRadius(), 0.0D);
+        assertEquals("Wrong object name.", "OBJ", resultData.getObjectName());
 
         verify(mockResolver);
     }

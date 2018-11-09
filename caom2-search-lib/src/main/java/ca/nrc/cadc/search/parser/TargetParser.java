@@ -35,7 +35,6 @@ import org.apache.log4j.Logger;
 
 import ca.nrc.cadc.search.parser.exception.PositionParserException;
 import ca.nrc.cadc.search.parser.exception.TargetParserException;
-import ca.nrc.cadc.util.ArrayUtil;
 import ca.nrc.cadc.util.StringUtil;
 
 
@@ -152,7 +151,7 @@ public class TargetParser {
      * @throws TargetParserException If the query is null or empty, or an
      *                               error in parsing occurs.
      */
-    private TargetData parseTarget(final String target, final String resolverName) throws TargetParserException {
+    TargetData parseTarget(final String target, final String resolverName) throws TargetParserException {
         TargetData targetData;
         final PositionParser parser = new PositionParser();
 
@@ -170,7 +169,21 @@ public class TargetParser {
                     throw new TargetParserException("Unable to resolve: " + target, e,
                                                     TargetParserException.ExceptionType.NAMERESOLVER_TARGET_NOT_FOUND);
                 } else {
-                    final String[] parts = parser.partition(target);
+                    final String resolvedTarget = targetData.getTarget();
+                    final String targetRadiusCheck;
+                    if (StringUtil.hasText(resolvedTarget)) {
+                        final String lowerTarget = target.toLowerCase();
+                        final String lowerResolvedTarget = resolvedTarget.toLowerCase();
+                        if (lowerTarget.contains(lowerResolvedTarget)) {
+                            targetRadiusCheck = lowerTarget.substring(lowerResolvedTarget.length());
+                        } else {
+                            targetRadiusCheck = target;
+                        }
+                    } else {
+                        targetRadiusCheck = target;
+                    }
+
+                    final String[] parts = parser.partition(targetRadiusCheck);
                     parser.parseRadius(parts[parts.length - 1], targetData);
                 }
             } catch (IOException re) {

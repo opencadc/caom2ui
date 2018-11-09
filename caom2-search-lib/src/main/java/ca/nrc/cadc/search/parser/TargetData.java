@@ -31,8 +31,7 @@ package ca.nrc.cadc.search.parser;
 /**
  * Simple class to hold the results from parsing a Target.
  */
-public class TargetData
-{
+public class TargetData {
     private String target;
     private Double ra;
     private Range<Double> raRange;
@@ -49,8 +48,7 @@ public class TargetData
     /**
      * No-arg constructor.
      */
-    public TargetData()
-    {
+    public TargetData() {
     }
 
     /**
@@ -66,8 +64,8 @@ public class TargetData
      * @param service        the service that resolved the target.
      * @param time           the time to resolve the target.
      * @param objectName     long-form name of target from service.
-     * @param objectType        Object type.
-     * @param morphologyType    Morph type from resolver
+     * @param objectType     Object type.
+     * @param morphologyType Morph type from resolver
      */
     public TargetData(final String target,
                       final Double ra,
@@ -80,15 +78,14 @@ public class TargetData
                       final Integer time,
                       final String objectName,
                       final String objectType,
-                      final String morphologyType)
-    {
+                      final String morphologyType) {
         this.target = target;
         this.ra = ra;
         this.raRange = raRange;
         this.dec = dec;
         this.decRange = decRange;
         this.radius = (radius == null) ? AbstractPositionParser.DEFAULT_RADIUS
-                                       : radius;
+            : radius;
         this.coordsys = coordsys;
         this.service = service;
         this.time = time;
@@ -102,8 +99,7 @@ public class TargetData
      *
      * @return String of coordinates.
      */
-    public String getCoordinates()
-    {
+    public String getCoordinates() {
         return String.valueOf(ra) + " " + dec + " " + radius;
     }
 
@@ -111,152 +107,127 @@ public class TargetData
      * @return String representation of the object.
      */
     @Override
-    public String toString()
-    {
+    public String toString() {
         return "TargetResult[target=" +
-               target +
-               ",ra=" +
-               (ra == null ? "" : ra) +
-               ",raRange=" +
-               (raRange == null ? "" : raRange.getRange()) +
-               ",dec=" +
-               (dec == null ? "" : dec) +
-               ",decRange=" +
-               (decRange == null ? "" : decRange.getRange()) +
-               ",radius=" +
-               radius +
-               ",coordsys=" +
-               coordsys +
-               ",service=" +
-               service +
-               ",time=" +
-               time +
-               ",objectName=" +
-               objectName +
-               ",objectType=" +
-               objectType +
-               ",morphologyType=" +
-               morphologyType +
-               "]";
+            target +
+            ",ra=" +
+            (ra == null ? "" : ra) +
+            ",raRange=" +
+            (raRange == null ? "" : raRange.getRange()) +
+            ",dec=" +
+            (dec == null ? "" : dec) +
+            ",decRange=" +
+            (decRange == null ? "" : decRange.getRange()) +
+            ",radius=" +
+            radius +
+            ",coordsys=" +
+            coordsys +
+            ",service=" +
+            service +
+            ",time=" +
+            time +
+            ",objectName=" +
+            objectName +
+            ",objectType=" +
+            objectType +
+            ",morphologyType=" +
+            morphologyType +
+            "]";
     }
 
-    public String getTarget()
-    {
+    public String getTarget() {
         return target;
     }
 
-    public void setTarget(String target)
-    {
+    public void setTarget(String target) {
         this.target = target;
     }
 
-    public Double getRA()
-    {
+    public Double getRA() {
         return ra;
     }
 
-    public void setRA(Double ra)
-    {
+    public void setRA(Double ra) {
         this.ra = ra;
     }
 
-    public Range<Double> getRaRange()
-    {
+    public Range<Double> getRaRange() {
         return raRange;
     }
 
-    public void setRaRange(Range<Double> raRange)
-    {
+    public void setRaRange(Range<Double> raRange) {
         this.raRange = raRange;
     }
 
-    public Double getDec()
-    {
+    public Double getDec() {
         return dec;
     }
 
-    public void setDec(Double dec)
-    {
+    public void setDec(Double dec) {
         this.dec = dec;
     }
 
-    public Range<Double> getDecRange()
-    {
+    public Range<Double> getDecRange() {
         return decRange;
     }
 
-    public void setDecRange(Range<Double> decRange)
-    {
+    public void setDecRange(Range<Double> decRange) {
         this.decRange = decRange;
     }
 
-    public Double getRadius()
-    {
+    public Double getRadius() {
         return radius;
     }
 
-    public void setRadius(Double radius)
-    {
+    public void setRadius(Double radius) {
         this.radius = radius;
     }
 
-    public String getCoordsys()
-    {
+    public String getCoordsys() {
         return coordsys;
     }
 
-    public void setCoordsys(String coordsys)
-    {
+    public void setCoordsys(String coordsys) {
         this.coordsys = coordsys;
     }
 
-    public String getService()
-    {
+    public String getService() {
         return service;
     }
 
-    public void setService(String service)
-    {
+    public void setService(String service) {
         this.service = service;
     }
 
-    public Integer getTime()
-    {
+    public Integer getTime() {
         return time;
     }
 
-    public void setTime(Integer time)
-    {
+    public void setTime(Integer time) {
         this.time = time;
     }
 
-    public String getObjectName()
-    {
+    public String getObjectName() {
         return objectName;
     }
 
-    public void setObjectName(String objectName)
-    {
+    public void setObjectName(String objectName) {
         this.objectName = objectName;
     }
 
-    public String getObjectType()
-    {
+    public String getObjectType() {
         return objectType;
     }
 
-    public void setObjectType(String objectType)
-    {
+    public void setObjectType(String objectType) {
         this.objectType = objectType;
     }
 
-    public String getMorphologyType()
-    {
+    public String getMorphologyType() {
         return morphologyType;
     }
 
-    public void setMorphologyType(String morphologyType)
-    {
+    public void setMorphologyType(String morphologyType) {
         this.morphologyType = morphologyType;
     }
 

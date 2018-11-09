@@ -31,6 +31,7 @@
  ****  C A N A D I A N   A S T R O N O M Y   D A T A   C E N T R E  *****
  ************************************************************************
  */
+
 package ca.nrc.cadc.search;
 
 import java.io.IOException;
@@ -67,15 +68,13 @@ import javax.servlet.http.HttpServletResponse;
  * This feedback useful for users as input to building custom ADQL queries,
  * and for showing users the units for query execution.
  */
-public class UnitConversionServlet extends HttpServlet
-{
+public class UnitConversionServlet extends HttpServlet {
     static final String CAOM2_TIME_FIELD = "Plane.time.bounds.samples";
     static final String CAOM2_ENERGY_FIELD = "Plane.energy.bounds.samples";
     static final String CAOM2_TIME_PRESET_UTYPE = CAOM2_TIME_FIELD + "_PRESET";
 
     private static final DateFormat DATE_FORMATTER =
-            DateUtil.getDateFormat(DateUtil.ISO_DATE_FORMAT,
-                                   TimeZone.getTimeZone("UTC"));
+        DateUtil.getDateFormat(DateUtil.ISO_DATE_FORMAT, TimeZone.getTimeZone("UTC"));
 
 
     /**
@@ -83,13 +82,10 @@ public class UnitConversionServlet extends HttpServlet
      *
      * @param req  The Request.
      * @param resp The Response.
-     * @throws IOException      Any other unforeseen errors.
+     * @throws IOException Any other unforeseen errors.
      */
     @Override
-    protected void doGet(final HttpServletRequest req,
-                         final HttpServletResponse resp)
-            throws IOException
-    {
+    protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
         writeSourceJSON(getUType(req.getPathInfo()), req, resp);
     }
 
@@ -102,30 +98,21 @@ public class UnitConversionServlet extends HttpServlet
      * @throws IOException If any unforeseen exception occurs.
      */
     @SuppressWarnings("unchecked")
-    private void writeSourceJSON(final String utype,
-                                 final HttpServletRequest request,
-                                 final HttpServletResponse response)
-            throws IOException
-    {
+    private void writeSourceJSON(final String utype, final HttpServletRequest request,
+                                 final HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
         Writer writer = null;
 
-        try
-        {
+        try {
             writer = new OutputStreamWriter(response.getOutputStream());
             final JSONWriter jsonWriter = new JSONWriter(writer);
 
             writeJSON(utype, request.getParameter("term"), jsonWriter,
                       request.getParameterMap());
-        }
-        catch (JSONException e)
-        {
+        } catch (JSONException e) {
             throw new IOException("Unable to write out JSON.", e);
-        }
-        finally
-        {
-            if (writer != null)
-            {
+        } finally {
+            if (writer != null) {
                 writer.flush();
                 writer.close();
             }
@@ -144,58 +131,40 @@ public class UnitConversionServlet extends HttpServlet
      * @param requestParameters The parameters from the request.
      * @throws org.json.JSONException If anything goes wrong writing data.
      */
-    void writeJSON(final String uType, final String value,
-                   final JSONWriter jsonWriter,
-                   final Map<String, String[]> requestParameters)
-            throws JSONException
-    {
-        if (StringUtil.hasText(value))
-        {
+    void writeJSON(final String uType, final String value, final JSONWriter jsonWriter,
+                   final Map<String, String[]> requestParameters) throws JSONException {
+        if (StringUtil.hasText(value)) {
             final FormErrors formErrors = new FormErrors();
 
-            if (ObsModel.isUTCDateUtype(uType))
-            {
+            if (ObsModel.isUTCDateUtype(uType)) {
                 writeTimestamp(jsonWriter, formErrors,
                                new TimestampFormConstraint(value, uType));
-            }
-            else if (isObservationDateUType(uType))
-            {
+            } else if (isObservationDateUType(uType)) {
                 writeDate(jsonWriter, formErrors, new Date(value, uType, null));
-            }
-            else if (uType.equals("Plane.energy.restwav"))
-            {
+            } else if (uType.equals("Plane.energy.restwav")) {
                 writeNumericEnergy(new Number(value, uType), jsonWriter,
                                    formErrors);
-            }
-            else if (uType.equals(CAOM2_ENERGY_FIELD)
-                     || uType.equals("Char.SpectralAxis.Coverage.Bounds.Limits"))
-            {
+            } else if (uType.equals(CAOM2_ENERGY_FIELD)
+                || uType.equals("Char.SpectralAxis.Coverage.Bounds.Limits")) {
                 writeNumericEnergy(new Energy(value, uType), jsonWriter, formErrors);
-            }
-            else if (uType.equals("Plane.position.bounds") ||
-                     uType.equals("Char.SpatialAxis.Coverage.Support.Area"))
-            {
+            } else if (uType.equals("Plane.position.bounds") ||
+                uType.equals("Char.SpatialAxis.Coverage.Support.Area")) {
                 writeTargetResolution(jsonWriter, NetUtil.decode(value),
                                       (requestParameters.containsKey("resolver")
-                                       ? requestParameters.get("resolver")[0]
-                                       : "ALL"));
-            }
-            else
-            {
+                                          ? requestParameters.get("resolver")[0]
+                                          : "ALL"));
+            } else {
                 writeNumeric(uType, value, jsonWriter, formErrors);
             }
-        }
-        else
-        {
+        } else {
             jsonWriter.array().endArray();
         }
     }
 
-    private boolean isObservationDateUType(final String utype)
-    {
+    private boolean isObservationDateUType(final String utype) {
         return utype.equals(CAOM2_TIME_FIELD)
-               || utype.equals(CAOM2_TIME_PRESET_UTYPE)
-               || utype.startsWith("Char.TimeAxis.Coverage.Bounds.Limits");
+            || utype.equals(CAOM2_TIME_PRESET_UTYPE)
+            || utype.startsWith("Char.TimeAxis.Coverage.Bounds.Limits");
     }
 
     /**
@@ -206,16 +175,12 @@ public class UnitConversionServlet extends HttpServlet
      * @param number The constraint.
      * @return String value to display.
      */
-    String getNumericDisplayValue(final java.lang.Number number)
-    {
+    String getNumericDisplayValue(final java.lang.Number number) {
         final java.lang.Number safeNumber;
 
-        if (number == null)
-        {
+        if (number == null) {
             safeNumber = 0.0;
-        }
-        else
-        {
+        } else {
             safeNumber = number;
         }
 
@@ -225,8 +190,7 @@ public class UnitConversionServlet extends HttpServlet
         final DecimalFormat numberFormat;
 
         if ((indexOfDecimal >= 0) && (safeNumber.doubleValue() < 1.0d)
-            && (stringValue.substring(indexOfDecimal + 1).length() > 3))
-        {
+            && (stringValue.substring(indexOfDecimal + 1).length() > 3)) {
             numberFormat = new DecimalFormat("0.000E0");
             returnValue = numberFormat.format(number);
         }
@@ -241,23 +205,17 @@ public class UnitConversionServlet extends HttpServlet
         // the zeroes.
         //
         // jenkinsd 2015.01.21
-        else if (stringValue.indexOf("E") > 0)
-        {
+        else if (stringValue.indexOf("E") > 0) {
             returnValue = stringValue;
-        }
-        else
-        {
+        } else {
             numberFormat = new DecimalFormat();
 
             numberFormat.setGroupingUsed(false);
             numberFormat.setMaximumFractionDigits(6);
 
-            if (!(number instanceof Integer))
-            {
+            if (!(number instanceof Integer)) {
                 numberFormat.setMinimumFractionDigits(1);
-            }
-            else
-            {
+            } else {
                 numberFormat.setParseIntegerOnly(true);
             }
 
@@ -278,24 +236,18 @@ public class UnitConversionServlet extends HttpServlet
      * @return String of the converted range.
      */
     String getNumericRangeValue(
-            final AbstractNumericFormConstraint numericConstraint,
-            final String displayUnit)
-    {
+        final AbstractNumericFormConstraint numericConstraint,
+        final String displayUnit) {
         final String s;
 
-        switch (numericConstraint.getOperand())
-        {
-            case EQUALS:
-            {
+        switch (numericConstraint.getOperand()) {
+            case EQUALS: {
                 java.lang.Number n;
 
-                try
-                {
+                try {
                     n = NumberFormat.getInstance().parse(
-                            numericConstraint.getFormValue());
-                }
-                catch (ParseException e)
-                {
+                        numericConstraint.getFormValue());
+                } catch (ParseException e) {
                     n = Double.NaN;
                 }
 
@@ -304,36 +256,32 @@ public class UnitConversionServlet extends HttpServlet
                 break;
             }
 
-            case RANGE:
-            {
+            case RANGE: {
                 s = getNumericDisplayValue(numericConstraint.getLowerNumber())
                     + Operand.RANGE.getOperand()
                     + getNumericDisplayValue(
-                        numericConstraint.getUpperNumber());
+                    numericConstraint.getUpperNumber());
                 break;
             }
 
             case LESS_THAN:
-            case LESS_THAN_EQUALS:
-            {
+            case LESS_THAN_EQUALS: {
                 s = numericConstraint.getOperand().getOperand() + " "
                     + getNumericDisplayValue(
-                        numericConstraint.getUpperNumber());
+                    numericConstraint.getUpperNumber());
 
                 break;
             }
 
             case GREATER_THAN:
-            case GREATER_THAN_EQUALS:
-            {
+            case GREATER_THAN_EQUALS: {
                 s = numericConstraint.getOperand().getOperand() + " "
                     + getNumericDisplayValue(
-                        numericConstraint.getLowerNumber());
+                    numericConstraint.getLowerNumber());
                 break;
             }
 
-            default:
-            {
+            default: {
                 s = "";
             }
         }
@@ -341,8 +289,7 @@ public class UnitConversionServlet extends HttpServlet
         return " (" + s + " " + displayUnit + ")";
     }
 
-    private String formatDate(final java.util.Date date)
-    {
+    private String formatDate(final java.util.Date date) {
         return DATE_FORMATTER.format(date);
     }
 
@@ -357,66 +304,53 @@ public class UnitConversionServlet extends HttpServlet
     void writeTimestamp(final JSONWriter jsonWriter,
                         final FormErrors formErrors,
                         final TimestampFormConstraint timestampFormConstraint)
-            throws JSONException
-    {
+        throws JSONException {
         jsonWriter.array();
 
-        try
-        {
-            if (timestampFormConstraint.isValid(formErrors))
-            {
+        try {
+            if (timestampFormConstraint.isValid(formErrors)) {
                 String s;
-                switch (timestampFormConstraint.getOperand())
-                {
-                    case EQUALS:
-                    {
+                switch (timestampFormConstraint.getOperand()) {
+                    case EQUALS: {
                         s = timestampFormConstraint.getFormValue();
                         break;
                     }
 
-                    case RANGE:
-                    {
+                    case RANGE: {
                         s = formatDate(timestampFormConstraint
-                                               .getLowerDate()) + ".."
+                                           .getLowerDate()) + ".."
                             + formatDate(timestampFormConstraint
-                                                 .getUpperDate());
+                                             .getUpperDate());
                         break;
                     }
 
                     case LESS_THAN:
-                    case LESS_THAN_EQUALS:
-                    {
+                    case LESS_THAN_EQUALS: {
                         s = "<= "
                             + formatDate(timestampFormConstraint
-                                                 .getUpperDate());
+                                             .getUpperDate());
                         break;
                     }
 
                     case GREATER_THAN:
-                    case GREATER_THAN_EQUALS:
-                    {
+                    case GREATER_THAN_EQUALS: {
                         s = ">= "
                             + formatDate(timestampFormConstraint
-                                                 .getLowerDate());
+                                             .getLowerDate());
                         break;
                     }
 
-                    default:
-                    {
+                    default: {
                         s = "Invalid operand: "
                             + timestampFormConstraint.getFormValue();
                     }
                 }
                 jsonWriter.value(" (" + s + ")");
-            }
-            else
-            {
+            } else {
                 jsonWriter.value("Invalid: " + timestampFormConstraint
-                        .getFormValue());
+                    .getFormValue());
             }
-        }
-        finally
-        {
+        } finally {
             jsonWriter.endArray();
         }
     }
@@ -431,64 +365,51 @@ public class UnitConversionServlet extends HttpServlet
      */
     void writeDate(final JSONWriter jsonWriter,
                    final FormErrors formErrors,
-                   final Date dateConstraint) throws JSONException
-    {
+                   final Date dateConstraint) throws JSONException {
         jsonWriter.array();
 
-        try
-        {
-            if (dateConstraint.isValid(formErrors))
-            {
+        try {
+            if (dateConstraint.isValid(formErrors)) {
                 String s;
-                switch (dateConstraint.getOperand())
-                {
-                    case EQUALS:
-                    {
+                switch (dateConstraint.getOperand()) {
+                    case EQUALS: {
                         s = dateConstraint.getFormValue();
                         break;
                     }
 
-                    case RANGE:
-                    {
+                    case RANGE: {
                         s = getNumericDisplayValue(
-                                dateConstraint.getLowerNumber())
+                            dateConstraint.getLowerNumber())
                             + ".."
                             + getNumericDisplayValue(
-                                dateConstraint.getUpperNumber());
+                            dateConstraint.getUpperNumber());
                         break;
                     }
 
                     case LESS_THAN:
-                    case LESS_THAN_EQUALS:
-                    {
+                    case LESS_THAN_EQUALS: {
                         s = "<= " + getNumericDisplayValue(
-                                dateConstraint.getUpperNumber());
+                            dateConstraint.getUpperNumber());
                         break;
                     }
 
                     case GREATER_THAN:
-                    case GREATER_THAN_EQUALS:
-                    {
+                    case GREATER_THAN_EQUALS: {
                         s = ">= " + getNumericDisplayValue(
-                                dateConstraint.getLowerNumber());
+                            dateConstraint.getLowerNumber());
                         break;
                     }
 
-                    default:
-                    {
+                    default: {
                         s = "Invalid operand: "
                             + dateConstraint.getFormValue();
                     }
                 }
                 jsonWriter.value(" (" + s + " MJD)");
-            }
-            else
-            {
+            } else {
                 jsonWriter.value("Invalid: " + dateConstraint.getFormValue());
             }
-        }
-        finally
-        {
+        } finally {
             jsonWriter.endArray();
         }
     }
@@ -502,22 +423,17 @@ public class UnitConversionServlet extends HttpServlet
      * @throws JSONException Any JSON writing errors.
      */
     private void writeNumericEnergy(
-            final AbstractNumericFormConstraint numericFormConstraint,
-            final JSONWriter jsonWriter, final FormErrors formErrors)
-            throws JSONException
-    {
+        final AbstractNumericFormConstraint numericFormConstraint,
+        final JSONWriter jsonWriter, final FormErrors formErrors)
+        throws JSONException {
         jsonWriter.array();
 
-        try
-        {
-            if (numericFormConstraint.isValid(formErrors))
-            {
+        try {
+            if (numericFormConstraint.isValid(formErrors)) {
                 jsonWriter.value(getNumericRangeValue(numericFormConstraint,
                                                       "metres"));
             }
-        }
-        finally
-        {
+        } finally {
             jsonWriter.endArray();
         }
     }
@@ -534,18 +450,14 @@ public class UnitConversionServlet extends HttpServlet
     private void writeNumeric(final String utype, final String value,
                               final JSONWriter jsonWriter,
                               final FormErrors formErrors)
-            throws JSONException
-    {
+        throws JSONException {
         final Number number = new Number(value, utype);
 
         jsonWriter.array();
 
-        try
-        {
-            if (number.isValid(formErrors))
-            {
-                switch (utype)
-                {
+        try {
+            if (number.isValid(formErrors)) {
+                switch (utype) {
                     case "Plane.position.sampleSize":
                         jsonWriter.value(getNumericRangeValue(number,
                                                               "arcseconds"));
@@ -554,11 +466,11 @@ public class UnitConversionServlet extends HttpServlet
                     case "Char.SpectralAxis.Coverage.Bounds.Limits":
                     case "Plane.energy.sampleSize":
                         jsonWriter.value(
-                                getNumericRangeValue(number,
-                                                     (StringUtil.hasLength(
-                                                             number.getUnit())
-                                                      && number.getUnit().
-                                                             matches("^.*([Hh]+[Zz]+)"))
+                            getNumericRangeValue(number,
+                                                 (StringUtil.hasLength(
+                                                     number.getUnit())
+                                                     && number.getUnit().
+                                                     matches("^.*([Hh]+[Zz]+)"))
                                                      ? "Hz"
                                                      : "metres"));
                         break;
@@ -576,9 +488,7 @@ public class UnitConversionServlet extends HttpServlet
                         break;
                 }
             }
-        }
-        finally
-        {
+        } finally {
             jsonWriter.endArray();
         }
     }
@@ -591,13 +501,9 @@ public class UnitConversionServlet extends HttpServlet
      * @param resolverValue The resolver value desired.
      * @throws JSONException Any JSON writing errors.
      */
-    private void writeTargetResolution(final JSONWriter jsonWriter,
-                                       final String value,
-                                       final String resolverValue)
-            throws JSONException
-    {
-        try
-        {
+    private void writeTargetResolution(final JSONWriter jsonWriter, final String value, final String resolverValue)
+        throws JSONException {
+        try {
             jsonWriter.object();
             final TargetData targetData = resolveTarget(value.trim(),
                                                         resolverValue);
@@ -605,41 +511,36 @@ public class UnitConversionServlet extends HttpServlet
             jsonWriter.key("resolveStatus").value("GOOD");
             jsonWriter.key("resolveValue").value(targetData(targetData));
             jsonWriter.key("resolveTarget").value(targetData.getTarget());
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             jsonWriter.key("resolveStatus").value("NOT_FOUND");
             jsonWriter.key("resolveValue").value("");
             jsonWriter.key("resolveTarget").value("");
-        }
-        finally
-        {
+        } finally {
             jsonWriter.endObject();
         }
 
     }
 
-    private String targetData(final TargetData targetData)
-    {
+    private String targetData(final TargetData targetData) {
         return ((targetData.getTarget() == null)
-                ? "" : "target: " + targetData.getTarget())
-               + "\nDec: " + targetData.getDec() +
-               "\nRA: " + targetData.getRA() +
-               "\nRadius: " + ((targetData.getRadius() == null)
-                               || (targetData.getRadius().equals(Double.NaN))
-                               ? "N/A" : targetData.getRadius())
-               + ((targetData.getCoordsys() == null)
-                  ? "" : "\ncoordsys: " + targetData.getCoordsys())
-               + ((targetData.getService() == null)
-                  ? "" : "\nservice: " + targetData.getService())
-               + ((targetData.getTime() == null)
-                  ? "" : "\ntime: " + targetData.getTime())
-               + ((targetData.getObjectName() == null)
-                  ? "" : "\noname: " + targetData.getObjectName())
-               + ((targetData.getObjectType() == null)
-                  ? "" : "\notype: " + targetData.getObjectType())
-               + ((targetData.getMorphologyType() == null)
-                  ? "" : "\nmtype: " + targetData.getMorphologyType());
+            ? "" : "target: " + targetData.getTarget())
+            + "\nDec: " + targetData.getDec() +
+            "\nRA: " + targetData.getRA() +
+            "\nRadius: " + ((targetData.getRadius() == null)
+            || (targetData.getRadius().equals(Double.NaN))
+            ? "N/A" : targetData.getRadius())
+            + ((targetData.getCoordsys() == null)
+            ? "" : "\ncoordsys: " + targetData.getCoordsys())
+            + ((targetData.getService() == null)
+            ? "" : "\nservice: " + targetData.getService())
+            + ((targetData.getTime() == null)
+            ? "" : "\ntime: " + targetData.getTime())
+            + ((targetData.getObjectName() == null)
+            ? "" : "\noname: " + targetData.getObjectName())
+            + ((targetData.getObjectType() == null)
+            ? "" : "\notype: " + targetData.getObjectType())
+            + ((targetData.getMorphologyType() == null)
+            ? "" : "\nmtype: " + targetData.getMorphologyType());
     }
 
 
@@ -651,16 +552,13 @@ public class UnitConversionServlet extends HttpServlet
      * @return TargetData instance.
      * @throws TargetParserException If it cannot be resolved or parsed.
      */
-    protected TargetData resolveTarget(final String value, final String resolverValue)
-            throws TargetParserException
-    {
+    protected TargetData resolveTarget(final String value, final String resolverValue) throws TargetParserException {
         final TargetNameResolverClient nameResolverClient = new DefaultNameResolverClient();
         final TargetParser targetParser = new TargetParser(new ResolverImpl(nameResolverClient));
         return targetParser.parse(value, resolverValue);
     }
 
-    protected String getUType(final String path)
-    {
+    protected String getUType(final String path) {
         return (path.contains("/") ? path.substring(path.indexOf("/") + 1) : path);
     }
 }
