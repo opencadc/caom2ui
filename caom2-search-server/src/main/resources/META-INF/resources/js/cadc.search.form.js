@@ -1184,7 +1184,6 @@
               this._clearTargetNameResolutionStatusOnly()
 
               var $targetNameResolutionStatus = this._getTargetNameResolutionStatusObject()
-
               $targetNameResolutionStatus.addClass('busy')
 
               $.ajax({
@@ -1675,7 +1674,7 @@
     this._beforeSerialize = function() {
       $('#UPLOAD').remove()
 
-      var inputFile = this.$form.find("input:file.target-list")
+      var inputFile = this.$form.find('input:file.target-list')
 
       if (
         inputFile.length > 0 &&
@@ -1735,7 +1734,7 @@
       if (this._validate()) {
         var inputFile = this.$form.find('input:file')
         var isUpload = inputFile && inputFile.val() !== ''
-        this.toggleDisabled(this.$form.find("input[name='targetList']"), false)
+        this.toggleDisabled(this.$form.find('input:file.target-list'), false)
 
         var netStart = new Date().getTime()
 
