@@ -66,7 +66,8 @@
                 0: 'Raw Instrumental',
                 1: 'Raw Standard',
                 2: 'Calibrated',
-                3: 'Product'
+                3: 'Product',
+                4: 'Analysis Product'
               },
               COLLECTION_ORDER: [
                 'CFHT',
@@ -1031,6 +1032,8 @@
               ca.nrc.cadc.search.datatrain.CALIBRATION_LEVEL_MAP[optionValue]
             if (calLevelName) {
               optionName = '(' + optionValue + ') ' + calLevelName
+            } else {
+              optionName = 'Unknown (' + optionValue + ')'
             }
           }
         } else {
