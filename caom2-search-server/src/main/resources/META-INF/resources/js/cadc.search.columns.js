@@ -6,7 +6,7 @@
         cadc: {
           search: {
             URI_MATCH_REGEX: /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/,
-            DETAILS_BASE_URL: '/caom2ui/view/',
+            DETAILS_BASE_URL: '/caom2ui/view',
             CAOM2_RESOLVER_VALUE_KEY:
               'Plane.position.bounds@Shape1Resolver.value',
             OBSCORE_RESOLVER_VALUE_KEY:
@@ -1363,9 +1363,8 @@
     var publisherIDURI = new cadc.web.util.URI(publisherID)
     var detailsURI = new cadc.web.util.URI(
       ca.nrc.cadc.search.DETAILS_BASE_URL +
-        observationURIObj.getPath() +
         '?ID=' +
-        encodeURIComponent(publisherIDURI.uri)
+        encodeURIComponent(publisherID.substring(0, publisherID.lastIndexOf('/')))
     )
 
     $link.text(value)
