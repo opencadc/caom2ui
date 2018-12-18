@@ -124,10 +124,10 @@ public class DefaultSyncTAPClient implements SyncTAPClient {
         final Map<String, Object> payload = new HashMap<>();
 
         if (StringUtil.hasText(job.getRunID())) {
-            payload.put(JobAttribute.RUN_ID.getAttributeName(), job.getRunID());
+            payload.put(JobAttribute.RUN_ID.getValue(), job.getRunID());
         }
 
-        payload.put(JobAttribute.EXECUTION_PHASE.getAttributeName(), "RUN");
+        payload.put(JobAttribute.EXECUTION_PHASE.getValue(), "RUN");
         payload.put("REQUEST", "doQuery");
 
         final List<Parameter> parameters = job.getParameterList();

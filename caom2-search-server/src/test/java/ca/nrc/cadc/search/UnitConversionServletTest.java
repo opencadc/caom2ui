@@ -164,8 +164,8 @@ public class UnitConversionServletTest
             .writeJSON(CAOM2_ENERGY_FIELD, "800nm", jsonWriter,
                        parameters);
         assertEquals("Test 6 - Should be metres.",
-                     "[\" (= 8.000E-7 metres)\"]",
-                     stringWriter.toString());
+                     "[\" (= 8.000E-7 metres)\"]".toLowerCase(),
+                     stringWriter.toString().toLowerCase());
 
         resetDataMembers();
         getTestSubject()
@@ -180,16 +180,16 @@ public class UnitConversionServletTest
             .writeJSON(CAOM2_ENERGY_FIELD, "300..400GHz", jsonWriter,
                        parameters);
         assertEquals("Test 8 - Should be metres.",
-                     "[\" (7.495E-4..9.993E-4 metres)\"]",
-                     stringWriter.toString());
+                     "[\" (7.495E-4..9.993E-4 metres)\"]".toLowerCase(),
+                     stringWriter.toString().toLowerCase());
 
         resetDataMembers();
         getTestSubject()
             .writeJSON("Char.SpectralAxis.Coverage.Bounds.Limits",
                        "300..400GHz", jsonWriter, parameters);
         assertEquals("Test 8.1 - Should be metres from ObsCore.",
-                     "[\" (7.495E-4..9.993E-4 metres)\"]",
-                     stringWriter.toString());
+                     "[\" (7.495E-4..9.993E-4 metres)\"]".toLowerCase(),
+                     stringWriter.toString().toLowerCase());
 
         resetDataMembers();
         getTestSubject()
@@ -219,8 +219,8 @@ public class UnitConversionServletTest
             .writeJSON("Plane.energy.bounds.width", "< 1000A", jsonWriter,
                        parameters);
         assertEquals("Test 12 - Should be empty string.",
-                     "[\" (< 1.000E-7 metres)\"]",
-                     stringWriter.toString());
+                     "[\" (< 1.000E-7 metres)\"]".toLowerCase(),
+                     stringWriter.toString().toLowerCase());
 
         setTestSubject(new UnitConversionServlet() {
             /**
@@ -263,9 +263,9 @@ public class UnitConversionServletTest
     public void getNumericDisplayValue() {
         setTestSubject(new UnitConversionServlet());
 
-        assertEquals("Should be 9.893E-2", "9.893E-2",
+        assertEquals("Should be 9.893E-2", "9.893E-2".toLowerCase(),
                      getTestSubject().getNumericDisplayValue(
-                         0.09893083333333333));
+                         0.09893083333333333).toLowerCase());
 
         assertEquals("Should be 0.256", "0.256",
                      getTestSubject().getNumericDisplayValue(0.256));
@@ -309,7 +309,7 @@ public class UnitConversionServletTest
             getTestSubject().getNumericRangeValue(numberFormConstraint,
                                                   "metres");
         assertEquals("Should be (9.893E-2..9.993E-2 metres)",
-                     " (9.893E-2..9.993E-2 metres)", s1);
+                     " (9.893E-2..9.993E-2 metres)".toLowerCase(), s1.toLowerCase());
 
 
         // TEST 2
@@ -349,7 +349,7 @@ public class UnitConversionServletTest
             getTestSubject().getNumericRangeValue(numberFormConstraint2,
                                                   "Hz");
         assertEquals("Should be (9.893E-2..9.993E-2 Hz)",
-                     " (9.893E-2..9.993E-2 Hz)", s2);
+                     " (9.893E-2..9.993E-2 Hz)".toLowerCase(), s2.toLowerCase());
 
 
         // TEST 3

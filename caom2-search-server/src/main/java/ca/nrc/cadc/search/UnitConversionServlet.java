@@ -245,8 +245,9 @@ public class UnitConversionServlet extends HttpServlet {
                 java.lang.Number n;
 
                 try {
-                    n = NumberFormat.getInstance().parse(
-                        numericConstraint.getFormValue());
+                    final String formValue = StringUtil.hasLength(numericConstraint.getFormValue()) ?
+                        numericConstraint.getFormValue().toLowerCase() : "";
+                    n = NumberFormat.getInstance().parse(formValue);
                 } catch (ParseException e) {
                     n = Double.NaN;
                 }
