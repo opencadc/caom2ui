@@ -244,10 +244,14 @@ public class UnitConversionServlet extends HttpServlet {
             case EQUALS: {
                 java.lang.Number n;
 
+                /*
+                    TODO: JDK 11 specifies exponents as 'e' rather than 'E', and gets parsed incorrectly.  JDK 8,
+                    TODO: however, prefers 'E' over 'e', and parses incorrectly otherwise.  This will need to be fixed
+                    TODO: before moving to JDK 11.
+                    TODO: 2018.12.18
+                 */
                 try {
-                    final String formValue = StringUtil.hasLength(numericConstraint.getFormValue()) ?
-                        numericConstraint.getFormValue().toLowerCase() : "";
-                    n = NumberFormat.getInstance().parse(formValue);
+                    n = NumberFormat.getInstance().parse(numericConstraint.getFormValue());
                 } catch (ParseException e) {
                     n = Double.NaN;
                 }
