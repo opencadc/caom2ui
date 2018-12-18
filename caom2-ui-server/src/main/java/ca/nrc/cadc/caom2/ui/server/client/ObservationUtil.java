@@ -69,20 +69,20 @@
 package ca.nrc.cadc.caom2.ui.server.client;
 
 import ca.nrc.cadc.caom2.ObservationURI;
-import ca.nrc.cadc.caom2.PublisherID;
 import ca.nrc.cadc.net.NetUtil;
 import ca.nrc.cadc.util.StringUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
+import java.util.Objects;
 
 
 public final class ObservationUtil {
-    public static ObservationURI getURI(final HttpServletRequest request) {
+    public static ObservationURI extractObservationURIFromPath(final HttpServletRequest request) {
         final String sid = request.getPathInfo();
 
         if (StringUtil.hasText(sid)) {
-            final String modifiedSID = sid.substring(1, sid.length()); // strip leading /
+            final String modifiedSID = sid.substring(1); // strip leading /
             final String[] parts = modifiedSID.split("/");
 
             if (parts.length == 2) {
@@ -91,9 +91,31 @@ public final class ObservationUtil {
         }
 
         return null;
+
     }
 
-    public static PublisherID getPublisherID(final HttpServletRequest request) {
+    public static ObservationURI extractObservationURIFromQuery(final HttpServletRequest request) {
+        final URI extractedTargetURI = ObservationUtil.extractTargetURI(request);
+        final ObservationURI returnedURI;
+
+        if (extractedTargetURI == null) {
+            returnedURI = null;
+        } else {
+            final String[] pathItems = extractedTargetURI.getPath().split("/");
+            final String collection = pathItems[pathItems.length - 1];
+            final String observationID = extractedTargetURI.getQuery();
+
+            if (StringUtil.hasLength(collection) && StringUtil.hasLength(observationID)) {
+                returnedURI = new ObservationURI(collection, observationID);
+            } else {
+                returnedURI = null;
+            }
+        }
+
+        return returnedURI;
+    }
+
+    public static URI extractTargetURI(final HttpServletRequest request) {
         final String queryString = request.getQueryString();
         if (queryString != null) {
             final String[] kvPairs = queryString.split("&");
@@ -101,10 +123,59 @@ public final class ObservationUtil {
             for (final String kvPair : kvPairs) {
                 final String[] pair = kvPair.split("=");
                 if ((pair.length == 2) && pair[0].equalsIgnoreCase("ID")) {
-                    return new PublisherID(URI.create(NetUtil.decode(pair[1])));
+                    return URI.create(NetUtil.decode(pair[1]));
                 }
             }
         }
         return null;
+    }
+
+    public static TargetObservation extractTargetObservation(final HttpServletRequest request) {
+        final ObservationURI observationURI = ObservationUtil.extractObservationURIFromQuery(request);
+        final URI extractedTargetURI = ObservationUtil.extractTargetURI(request);
+
+        if (extractedTargetURI == null) {
+            return null;
+        } else {
+            final URI resourceID = URI.create(extractedTargetURI.getScheme() + "://" + extractedTargetURI.getAuthority()
+                                                  + extractedTargetURI.getPath());
+            return new TargetObservation(resourceID, observationURI);
+        }
+    }
+
+    public static final class TargetObservation {
+        private final URI resourceID;
+        private final ObservationURI observationURI;
+
+        public TargetObservation(URI resourceID, ObservationURI observationURI) {
+            this.resourceID = resourceID;
+            this.observationURI = observationURI;
+        }
+
+        public URI getResourceID() {
+            return resourceID;
+        }
+
+        public ObservationURI getObservationURI() {
+            return observationURI;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            TargetObservation that = (TargetObservation) o;
+            return Objects.equals(resourceID, that.resourceID) &&
+                Objects.equals(observationURI, that.observationURI);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(resourceID, observationURI);
+        }
     }
 }
