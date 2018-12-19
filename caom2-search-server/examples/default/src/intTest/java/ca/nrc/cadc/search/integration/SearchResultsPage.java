@@ -94,9 +94,7 @@ public class SearchResultsPage extends AbstractTestWebPage {
     static final By REST_FRAME_ENERGY_UNIT_SELECT_LOCATOR = By.id("caom2:Plane.energy.restwav_unitselect");
     static final By IQ_UNIT_SELECT_LOCATOR = By.id("caom2:Plane.position.resolution_unitselect");
     private static final By MAQ_LABEL_BY = By.id("resultsMaqEnabled");
-    private static final By FILTER_FILTER_BY = By.id("caom2:Plane.energy.bandpassName_filter");
     private static final By RA_FILTER_BY = By.id("caom2:Plane.position.bounds.cval1_filter");
-    private static final By DEC_FILTER_BY = By.id("caom2:Plane.position.bounds.cval2_filter");
     private static final By CHANGE_COLUMNS_BY = By.id("change_column_button");
     private static final By CHANGE_COLUMNS_POPUP_BY = By.id("column_manager");
     private static final String CHANGE_COLUMNS_AVAILABLE_COLUMNS_LIST_ID = "cadc_columnpicker_available_items";
@@ -106,12 +104,12 @@ public class SearchResultsPage extends AbstractTestWebPage {
     private static final By FOOTPRINT_VIEWER_TOGGLE_LINK = By.id("slick-visualize");
     private static final By FOOTPRINT_VIEWER = By.id("aladin-lite");
 
-    static final String ICON_BUSY_SRC = "cadcVOTV/images/PleaseWait-small.gif";
     static final String ICON_IDLE_SRC = "images/transparent-20.png";
 
     static final By GRID_LOCATOR = By.id("resultTable");
     static final By GRID_HEADER_LOCATOR = By.id("results-grid-header");
-    static final By GRID_HEADER_LABEL_LOCATOR = By.className("grid-header-label");
+    static final By RESULTS_GRID_HEADER_LABEL_CSS =
+        By.cssSelector("#results-grid-header > #downloadForm > span.grid-header-label");
     static final String OBSERVATION_DETAILS_LINK_LOCATOR = "caom2:Observation.observationID_%d_observation_details";
     static final By FIRST_QUICKSEARCH_TARGET_LINK = By.cssSelector("a.quicksearch_link:nth-child(1)");
     static final By QUERY_TAB_LOCATOR = By.cssSelector("#tabList > li:nth-child(1)");
@@ -176,7 +174,7 @@ public class SearchResultsPage extends AbstractTestWebPage {
             }
         });
 
-        waitForTextPresent(GRID_HEADER_LABEL_LOCATOR, "Showing");
+        waitForTextPresent(RESULTS_GRID_HEADER_LABEL_CSS, "Showing");
         waitForElementPresent(FIRST_QUICKSEARCH_TARGET_LINK);
     }
 
@@ -202,7 +200,7 @@ public class SearchResultsPage extends AbstractTestWebPage {
     }
 
     String getPagerStatusText() throws Exception {
-        return getGridHeader().findElement(GRID_HEADER_LABEL_LOCATOR).getText();
+        return getGridHeader().findElement(RESULTS_GRID_HEADER_LABEL_CSS).getText();
     }
 
     int getCurrentResultsRowCount() throws Exception {
