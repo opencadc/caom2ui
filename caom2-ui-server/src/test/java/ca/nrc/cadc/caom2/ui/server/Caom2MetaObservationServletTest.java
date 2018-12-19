@@ -37,7 +37,6 @@ package ca.nrc.cadc.caom2.ui.server;
 import ca.nrc.cadc.caom2.Algorithm;
 import ca.nrc.cadc.caom2.Observation;
 import ca.nrc.cadc.caom2.ObservationURI;
-import ca.nrc.cadc.caom2.PublisherID;
 import ca.nrc.cadc.caom2.ui.server.client.Caom2MetaClient;
 import ca.nrc.cadc.config.ApplicationConfiguration;
 import ca.nrc.cadc.net.HttpDownload;
@@ -80,29 +79,13 @@ public class Caom2MetaObservationServletTest {
                 public Subject getCurrentSubject() {
                     return currentUser;
                 }
-
-                /**
-                 * Download the Observation for the given URI.
-                 *
-                 * @param subject        The Subject to download as.
-                 * @param publisherID    The Publisher ID to lookup the service.
-                 * @param observationURI The Observation URI.
-                 * @return Observation instance.
-                 */
-                @Override
-                public Observation getObservation(Subject subject, PublisherID publisherID,
-                                                  ObservationURI observationURI) {
-                    return super.getObservation(subject, publisherID, observationURI);
-                }
             };
 
         expect(mockRequest.getQueryString()).andReturn(null).once();
-        expect(mockRequest.getPathInfo()).andReturn("").once();
 
         mockRequest.setAttribute("errorMsg",
-                                 "Must specify observationID/productID in the path, and the publisherID in the query." +
-                                     " | Le chemain manque le observationID/productID dans le chemin, ou le " +
-                                     "publisherID dans le query.");
+                                 "Must specify the target URI (ivo://<authority>?<observation id>) in the query. | "
+                                     + "Le chemain manque l'URI (ivo://<authority>?<observation id>)  dans le query.");
         expectLastCall().once();
 
         expect(mockRequest.getRequestDispatcher("/error.jsp")).andReturn(mockErrorDispatcher).once();
@@ -133,33 +116,24 @@ public class Caom2MetaObservationServletTest {
                 /**
                  * Download the Observation for the given URI.
                  *
-                 * @param subject   The Subject to download as.
-                 * @param publisherID       The Observation URI.
-                 * @param observationURI
+                 * @param subject        The Subject to download as.
+                 * @param resourceID     The Resource ID for the lookup.
+                 * @param observationURI The Publisher ID to lookup the service.
                  * @return Observation instance.
                  */
                 @Override
-                public Observation getObservation(Subject subject,
-                                                  PublisherID publisherID, ObservationURI observationURI) {
+                public Observation getObservation(Subject subject, URI resourceID, ObservationURI observationURI) {
                     return null;
                 }
             };
 
-        expect(mockRequest.getQueryString()).andReturn("ID=ivo://cadc.nrc.ca/mirror/IRIS?f085h000/IRAS-12um").once();
-        expect(mockRequest.getPathInfo()).andReturn("obsID/productID").once();
-
-//        mockRequest.setAttribute("collection", "MYARCHIVE");
-//        expectLastCall().once();
-//
-//        mockRequest.setAttribute("observationID", "MYOBSID");
-//        expectLastCall().once();
+        expect(mockRequest.getQueryString()).andReturn("ID=ivo://cadc.nrc.ca/mirror/IRIS?f085h000").times(3);
 
         mockRequest.setAttribute("errorMsg",
-                                 "Observation with Observation URI 'ivo://cadc.nrc.ca/mirror/IRIS?f085h000/IRAS-12um'" +
-                                     " not found, or you are forbidden from seeing it.  Please login and try again. |" +
-                                     " l'Observation avec le URI 'ivo://cadc.nrc.ca/mirror/IRIS?f085h000/IRAS-12um' " +
-                                     "pas trouvé, ou vous n'avez pas permission.  S'il vous plaît connecter et " +
-                                     "essayez à nouveau.");
+                                 "Observation with Observation URI 'caom:IRIS/f085h000' not found, or you are " +
+                                     "forbidden from seeing it.  Please login and try again. | l'Observation avec le " +
+                                     "URI 'caom:IRIS/f085h000' pas trouvé, ou vous n'avez pas permission.  S'il vous " +
+                                     "plaît connecter et essayez à nouveau.");
         expectLastCall().once();
 
         expect(mockRequest.getRequestDispatcher("/error.jsp")).andReturn(mockErrorDispatcher).once();
@@ -233,8 +207,7 @@ public class Caom2MetaObservationServletTest {
                 }
             };
 
-        expect(mockRequest.getQueryString()).andReturn("ID=ivo://cadc.nrc.ca/mirror/IRIS?f085h000/IRAS-12um").once();
-        expect(mockRequest.getPathInfo()).andReturn("obsID/productID").once();
+        expect(mockRequest.getQueryString()).andReturn("ID=ivo://cadc.nrc.ca/mirror/IRIS?f085h000").times(3);
 
         expect(mockObservationReader.getObs()).andReturn(result).once();
 
@@ -245,12 +218,6 @@ public class Caom2MetaObservationServletTest {
 
         mockRequest.setAttribute("obs", result);
         expectLastCall().once();
-
-//        mockRequest.setAttribute("collection", "MYARCHIVE");
-//        expectLastCall().once();
-//
-//        mockRequest.setAttribute("observationID", "MYOBSID");
-//        expectLastCall().once();
 
         expect(mockRequest.getRequestDispatcher("/display.jsp")).andReturn(mockErrorDispatcher).once();
         mockErrorDispatcher.forward(mockRequest, mockResponse);

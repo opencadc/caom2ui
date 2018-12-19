@@ -144,7 +144,7 @@ public class Caom2RepoObservationServlet extends HttpServlet {
                     break;
                 }
                 case OBSERVATION_VIEW: {
-                    final ObservationURI uri = ObservationUtil.getURI(request);
+                    final ObservationURI uri = ObservationUtil.extractObservationURIFromPath(request);
                     final Observation obs =
                         repoClient.getObservation(repoClient.getCurrentSubject(), uri);
 

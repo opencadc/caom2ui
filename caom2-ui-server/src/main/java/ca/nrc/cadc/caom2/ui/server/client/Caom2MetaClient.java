@@ -71,13 +71,13 @@ package ca.nrc.cadc.caom2.ui.server.client;
 
 import ca.nrc.cadc.caom2.Observation;
 import ca.nrc.cadc.caom2.ObservationURI;
-import ca.nrc.cadc.caom2.PublisherID;
 import ca.nrc.cadc.net.HttpDownload;
 import ca.nrc.cadc.net.NetUtil;
 import ca.nrc.cadc.reg.Standards;
 import org.apache.log4j.Logger;
 
 import javax.security.auth.Subject;
+import java.net.URI;
 import java.net.URL;
 
 /**
@@ -96,21 +96,21 @@ public class Caom2MetaClient extends BaseClient {
      * Download the Observation for the given URI.
      *
      * @param subject        The Subject to download as.
-     * @param publisherID    The Publisher ID to lookup the service.
-     * @param observationURI The Observation URI.
+     * @param resourceID     The Resource ID for the lookup.
+     * @param observationURI The Publisher ID to lookup the service.
      * @return Observation instance.
      */
-    public Observation getObservation(final Subject subject, final PublisherID publisherID,
+    public Observation getObservation(final Subject subject, final URI resourceID,
                                       final ObservationURI observationURI) {
         path = "?ID=" + NetUtil.encode(observationURI.getURI().toString());
-        final URL serviceURL = getServiceURL(publisherID.getResourceID(), Standards.CAOM2_OBS_20);
+        final URL serviceURL = getServiceURL(resourceID, Standards.CAOM2_OBS_20);
 
         LOGGER.debug(String.format("Using service URL '%s'", serviceURL.toExternalForm()));
 
         final ReadAction ra = getObservationReader();
         final HttpDownload get = getDownloader(serviceURL, ra);
 
-        Subject.doAs(subject, new GetAction(get, publisherID.getURI().toString()));
+        Subject.doAs(subject, new GetAction(get, observationURI.getURI().toString()));
 
         return ra.getObs();
     }

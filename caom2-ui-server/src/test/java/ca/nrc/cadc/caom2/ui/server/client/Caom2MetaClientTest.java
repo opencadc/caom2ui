@@ -70,7 +70,6 @@ package ca.nrc.cadc.caom2.ui.server.client;
 
 
 import ca.nrc.cadc.caom2.ObservationURI;
-import ca.nrc.cadc.caom2.PublisherID;
 import ca.nrc.cadc.net.HttpDownload;
 import ca.nrc.cadc.net.NetUtil;
 
@@ -94,7 +93,7 @@ public class Caom2MetaClientTest {
              * Place for testers to override.
              *
              * @return URL instance.
-             * @param resourceID
+             * @param resourceID    Resource ID for the service lookup.
              */
             @Override
             public URL getServiceURL(URI resourceID, URI standardID) {
@@ -119,7 +118,7 @@ public class Caom2MetaClientTest {
         };
 
         final Subject subject = new Subject();
-        final PublisherID publisherID = new PublisherID(URI.create("ivo://cadc.nrc.ca/mirror/IRIS?f085h000/IRAS-12um"));
+        final URI resourceID = URI.create("ivo://cadc.nrc.ca/mirror/IRIS");
         final ObservationURI observationURI = new ObservationURI(URI.create("caom:IRIS/f085h000"));
 
         mockDownload.run();
@@ -130,7 +129,7 @@ public class Caom2MetaClientTest {
         replay(mockDownload);
 
         // Doesn't return anything.
-        testSubject.getObservation(subject, publisherID, observationURI);
+        testSubject.getObservation(subject, resourceID, observationURI);
 
         final String expected = "?ID=" + NetUtil.encode("caom:IRIS/f085h000");
 

@@ -245,6 +245,10 @@
   <servlet-mapping>
     <servlet-name>SearchJobServlet</servlet-name>
     <url-pattern>/find/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>SearchJobServlet</servlet-name>
     <url-pattern>/find</url-pattern>
   </servlet-mapping>
 

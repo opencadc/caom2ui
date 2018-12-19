@@ -6,7 +6,7 @@
         cadc: {
           search: {
             URI_MATCH_REGEX: /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/,
-            DETAILS_BASE_URL: '/caom2ui/view/',
+            DETAILS_BASE_URL: '/caom2ui/view',
             CAOM2_RESOLVER_VALUE_KEY:
               'Plane.position.bounds@Shape1Resolver.value',
             OBSCORE_RESOLVER_VALUE_KEY:
@@ -40,13 +40,8 @@
                 formatter: function(row, cell, value, columnDef, dataContext) {
                   var publisherID =
                     dataContext[ca.nrc.cadc.search.columns.PUBLISHER_ID_UTYPE]
-                  var observationURI =
-                    dataContext[
-                      ca.nrc.cadc.search.columns.OBSERVATION_URI_UTYPE
-                    ]
                   return formatDetailsCell(
                     value,
-                    observationURI,
                     publisherID,
                     columnDef,
                     row
@@ -579,13 +574,8 @@
                 formatter: function(row, cell, value, columnDef, dataContext) {
                   var publisherID =
                     dataContext[ca.nrc.cadc.search.columns.PUBLISHER_ID_UTYPE]
-                  var observationURI =
-                    dataContext[
-                      ca.nrc.cadc.search.columns.OBSERVATION_URI_UTYPE
-                    ]
                   return formatDetailsCell(
                     value,
-                    observationURI,
                     publisherID,
                     columnDef,
                     row
@@ -1345,7 +1335,6 @@
   /**
    * Format the details link for details about the current Observation.
    * @param {String} value           The link text.
-   * @param {String} observationURI  The URI of the Observation to build.
    * @param {String} publisherID  The URI of the publisher ID to build.
    * @param {{}} column          The column object.
    * @param {Number} rowNum          The row number.
@@ -1353,19 +1342,16 @@
    */
   function formatDetailsCell(
     value,
-    observationURI,
     publisherID,
     column,
     rowNum
   ) {
     var $link = $('<a></a>')
-    var observationURIObj = new cadc.web.util.URI(observationURI)
     var publisherIDURI = new cadc.web.util.URI(publisherID)
     var detailsURI = new cadc.web.util.URI(
       ca.nrc.cadc.search.DETAILS_BASE_URL +
-        observationURIObj.getPath() +
         '?ID=' +
-        encodeURIComponent(publisherIDURI.uri)
+        encodeURIComponent(publisherID.substring(0, publisherID.lastIndexOf('/')))
     )
 
     $link.text(value)

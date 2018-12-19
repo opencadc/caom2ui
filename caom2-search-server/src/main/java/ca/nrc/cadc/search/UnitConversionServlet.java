@@ -97,7 +97,6 @@ public class UnitConversionServlet extends HttpServlet {
      * @param response The Response.
      * @throws IOException If any unforeseen exception occurs.
      */
-    @SuppressWarnings("unchecked")
     private void writeSourceJSON(final String utype, final HttpServletRequest request,
                                  final HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
@@ -245,9 +244,8 @@ public class UnitConversionServlet extends HttpServlet {
                 java.lang.Number n;
 
                 try {
-                    n = NumberFormat.getInstance().parse(
-                        numericConstraint.getFormValue());
-                } catch (ParseException e) {
+                    n = Float.valueOf(numericConstraint.getFormValue());
+                } catch (NumberFormatException e) {
                     n = Double.NaN;
                 }
 

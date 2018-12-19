@@ -72,7 +72,7 @@ package ca.nrc.cadc.caom2.util;
 
 import javax.servlet.http.HttpServletRequest;
 
-import ca.nrc.cadc.caom2.PublisherID;
+import ca.nrc.cadc.caom2.ObservationURI;
 import ca.nrc.cadc.caom2.ui.server.client.ObservationUtil;
 import ca.nrc.cadc.net.NetUtil;
 
@@ -83,32 +83,49 @@ import java.net.URI;
 import static org.junit.Assert.*;
 import static org.easymock.EasyMock.*;
 
+import org.mockito.Mockito;
+
 public class ObservationUtilTest {
     @Test
-    public void getPublisherIDNull() {
+    public void extractTargetURINull() {
         final HttpServletRequest mockRequest = createMock(HttpServletRequest.class);
 
         expect(mockRequest.getQueryString()).andReturn(null).once();
 
         replay(mockRequest);
 
-        assertNull("Should be null.", ObservationUtil.getPublisherID(mockRequest));
+        assertNull("Should be null.", ObservationUtil.extractTargetURI(mockRequest));
 
         verify(mockRequest);
     }
 
     @Test
-    public void getPublisherID() {
+    public void extractTargetURI() {
         final HttpServletRequest mockRequest = createMock(HttpServletRequest.class);
-        final PublisherID expected = new PublisherID(URI.create("ivo://cadc.nrc.ca/mirror/IRIS?f085h000/IRAS-12um"));
+        final URI expected = URI.create("ivo://cadc.nrc.ca/mirror/IRIS?f085h000");
 
         expect(mockRequest.getQueryString())
-            .andReturn("ID=" + NetUtil.encode("ivo://cadc.nrc.ca/mirror/IRIS?f085h000/IRAS-12um")).once();
+            .andReturn("ID=" + NetUtil.encode("ivo://cadc.nrc.ca/mirror/IRIS?f085h000")).once();
 
         replay(mockRequest);
 
-        assertEquals("Should be the same.", expected, ObservationUtil.getPublisherID(mockRequest));
+        assertEquals("Should be the same.", expected, ObservationUtil.extractTargetURI(mockRequest));
 
         verify(mockRequest);
+    }
+
+    @Test
+    public void extractTargetObservation() {
+        final HttpServletRequest mockRequest = Mockito.mock(HttpServletRequest.class);
+        final ObservationUtil.TargetObservation expected =
+            new ObservationUtil.TargetObservation(URI.create("ivo://cadc.nrc.ca/mirror/IRIS"),
+                                                  new ObservationURI(URI.create("caom:IRIS/f085h000")));
+
+        Mockito.when(mockRequest.getQueryString()).thenReturn("ID=" + NetUtil.encode("ivo://cadc.nrc" +
+                                                                                         ".ca/mirror/IRIS?f085h000"));
+
+        assertEquals("Should be the same.", expected, ObservationUtil.extractTargetObservation(mockRequest));
+
+        Mockito.verify(mockRequest, Mockito.times(2)).getQueryString();
     }
 }

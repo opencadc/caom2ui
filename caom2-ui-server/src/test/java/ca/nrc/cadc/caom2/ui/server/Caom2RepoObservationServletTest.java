@@ -52,11 +52,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.expectLastCall;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
+import static org.easymock.EasyMock.*;
 
 import ca.nrc.cadc.net.HttpDownload;
 import org.junit.Test;
@@ -204,8 +200,7 @@ public class Caom2RepoObservationServletTest {
                 }
             };
 
-        expect(mockRequest.getPathInfo()).andReturn("/MYARCHIVE/MYOBSID").
-            anyTimes();
+        expect(mockRequest.getPathInfo()).andReturn("/MYARCHIVE/MYOBSID").anyTimes();
 
         mockRequest.setAttribute("errorMsg",
                                  "Observation with URI 'caom:MYARCHIVE/MYOBSID' "
@@ -216,21 +211,18 @@ public class Caom2RepoObservationServletTest {
                                      + "connecter et essayez à nouveau.");
         expectLastCall().once();
 
-        expect(mockRequest.getRequestDispatcher("/error.jsp")).andReturn(
-            mockErrorDispatcher).once();
+        expect(mockRequest.getRequestDispatcher("/error.jsp")).andReturn(mockErrorDispatcher).once();
         mockErrorDispatcher.forward(mockRequest, mockResponse);
         expectLastCall().once();
 
-        replay(mockRequest, mockErrorDispatcher, mockDisplayDispatcher,
-               mockResponse);
+        replay(mockRequest, mockErrorDispatcher, mockDisplayDispatcher, mockResponse);
 
 
         final Caom2RepoObservationServlet testSubject = new Caom2RepoObservationServlet(testClient);
 
         testSubject.doGet(mockRequest, mockResponse);
 
-        verify(mockRequest, mockErrorDispatcher, mockDisplayDispatcher,
-               mockResponse);
+        verify(mockRequest, mockErrorDispatcher, mockDisplayDispatcher, mockResponse);
     }
 
 

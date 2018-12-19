@@ -71,7 +71,6 @@ package ca.nrc.cadc.caom2.ui.server;
 
 import ca.nrc.cadc.caom2.Observation;
 import ca.nrc.cadc.caom2.ObservationURI;
-import ca.nrc.cadc.caom2.PublisherID;
 import ca.nrc.cadc.caom2.ui.server.client.Caom2MetaClient;
 import ca.nrc.cadc.caom2.ui.server.client.ObservationUtil;
 import org.apache.log4j.Logger;
@@ -127,24 +126,24 @@ public class Caom2MetaObservationServlet extends HttpServlet {
         final String errMsg;
 
         try {
-            final ObservationURI observationURI = ObservationUtil.getURI(request);
-
             // Parse the parameters given in the url.
-            final PublisherID publisherID = ObservationUtil.getPublisherID(request);
-            if ((publisherID == null) && (observationURI == null)) {
-                errMsg = "Must specify observationID/productID in the path, and the publisherID in the query. | "
-                    + "Le chemain manque le observationID/productID dans le chemin, ou le publisherID dans le "
-                    + "query.";
+            final ObservationURI targetURI = ObservationUtil.extractObservationURIFromQuery(request);
+            if (targetURI == null) {
+                errMsg = "Must specify the target URI (ivo://<authority>?<observation id>) in the query. | "
+                    + "Le chemain manque l'URI (ivo://<authority>?<observation id>)  dans le query.";
                 log.error(errMsg);
                 request.setAttribute("errorMsg", errMsg);
                 forward(request, response, "/error.jsp");
             } else {
-                final Observation obs = metaClient.getObservation(metaClient.getCurrentSubject(), publisherID,
-                                                                  observationURI);
+                final ObservationUtil.TargetObservation targetObservation =
+                    ObservationUtil.extractTargetObservation(request);
+                final Observation obs = metaClient.getObservation(metaClient.getCurrentSubject(),
+                                                                  targetObservation.getResourceID(),
+                                                                  targetObservation.getObservationURI());
 
                 if (obs == null) {
-                    errMsg = String.format(ERROR_MESSAGE_NOT_FOUND_FORBIDDEN, publisherID.getURI().toString(),
-                                           publisherID.getURI().toString());
+                    errMsg = String.format(ERROR_MESSAGE_NOT_FOUND_FORBIDDEN, targetURI.toString(),
+                                           targetURI.toString());
                     log.error(errMsg);
                     request.setAttribute("errorMsg", errMsg);
                     forward(request, response, "/error.jsp");
