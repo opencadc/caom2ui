@@ -97,7 +97,6 @@ public class UnitConversionServlet extends HttpServlet {
      * @param response The Response.
      * @throws IOException If any unforeseen exception occurs.
      */
-    @SuppressWarnings("unchecked")
     private void writeSourceJSON(final String utype, final HttpServletRequest request,
                                  final HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
@@ -244,15 +243,9 @@ public class UnitConversionServlet extends HttpServlet {
             case EQUALS: {
                 java.lang.Number n;
 
-                /*
-                    TODO: JDK 11 specifies exponents as 'e' rather than 'E', and gets parsed incorrectly.  JDK 8,
-                    TODO: however, prefers 'E' over 'e', and parses incorrectly otherwise.  This will need to be fixed
-                    TODO: before moving to JDK 11.
-                    TODO: 2018.12.18
-                 */
                 try {
-                    n = NumberFormat.getInstance().parse(numericConstraint.getFormValue());
-                } catch (ParseException e) {
+                    n = Float.valueOf(numericConstraint.getFormValue());
+                } catch (NumberFormatException e) {
                     n = Double.NaN;
                 }
 
