@@ -31,7 +31,6 @@
     <init-param>
       <param-name>logLevelPackages</param-name>
       <param-value>
-        ca.nrc.cadc.log
         ca.nrc.cadc.caom2
       </param-value>
     </init-param>
