@@ -30,6 +30,7 @@ package ca.nrc.cadc.search;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.log4j.Logger;
 
@@ -46,8 +47,7 @@ import ca.nrc.cadc.search.form.SearchableFormConstraint;
  *
  * @author jburke
  */
-public class Templates
-{
+public class Templates {
     private static Logger log = Logger.getLogger(Templates.class);
     private static final int QUERY_LIMIT = 20000;
 
@@ -61,31 +61,26 @@ public class Templates
      * thrown creating the template are stored in a Map with the
      * Form attribute as the Map key and the exception message as
      * the Map value.
-     *
+     * <p>
      * If a ScalarTemplate is not created for an Enumerated Form
      * with a Collection attribute, then a ScalarTemplate is created
      * using the default Collections in the List cadcList.
-     *
+     * <p>
      * It is expected that the forms in the list have been validated.
      *
      * @param formConstraints List of forms.
      */
-    public Templates(final List<SearchableFormConstraint> formConstraints)
-    {
+    public Templates(final List<SearchableFormConstraint> formConstraints) {
         errorList = new ArrayList<>();
         searchTemplates = new ArrayList<>();
 
-        for (final SearchableFormConstraint formConstraint : formConstraints)
-        {
+        for (final SearchableFormConstraint formConstraint : formConstraints) {
             final SearchTemplate template =
-                    formConstraint.buildSearch(errorList);
-            if (template != null)
-            {
+                formConstraint.buildSearch(errorList);
+            if (template != null) {
                 searchTemplates.add(template);
                 log.debug(template);
-            }
-            else
-            {
+            } else {
                 log.debug("SearchTemplate is null");
             }
         }
@@ -102,10 +97,8 @@ public class Templates
      * @param formErrors The Form Errors.
      * @return boolean true if errorMap is empty.
      */
-    public boolean isValid(final FormErrors formErrors)
-    {
-        for (final FormError formError : errorList)
-        {
+    public boolean isValid(final FormErrors formErrors) {
+        for (final FormError formError : errorList) {
             formErrors.set(formError.name, formError);
         }
 
@@ -117,8 +110,7 @@ public class Templates
      *
      * @return Array of SearchTemplates.
      */
-    public List<SearchTemplate> getSearchTemplates()
-    {
+    public List<SearchTemplate> getSearchTemplates() {
         return searchTemplates;
     }
 
@@ -132,14 +124,11 @@ public class Templates
      */
     @SuppressWarnings("unchecked")
     public <T extends SearchTemplate> List<T> getSearchTemplates(
-            final Class<T> searchTemplateClass)
-    {
+        final Class<T> searchTemplateClass) {
         final List<T> searchTemplateClasses = new ArrayList<>();
 
-        for (final SearchTemplate searchTemplate : getSearchTemplates())
-        {
-            if (searchTemplate.getClass() == searchTemplateClass)
-            {
+        for (final SearchTemplate searchTemplate : getSearchTemplates()) {
+            if (searchTemplate.getClass() == searchTemplateClass) {
                 searchTemplateClasses.add((T) searchTemplate);
             }
         }
@@ -148,32 +137,24 @@ public class Templates
     }
 
     @Override
-    public boolean equals(Object o)
-    {
-        if (this == o)
-        {
+    public boolean equals(Object o) {
+        if (this == o) {
             return true;
-        }
-        else if ((o == null) || (getClass() != o.getClass()))
-        {
+        } else if ((o == null) || (getClass() != o.getClass())) {
             return false;
         }
 
         final Templates templates = (Templates) o;
 
-        return (errorList != null ? errorList.equals(templates.errorList) :
-                templates.errorList == null) && (searchTemplates != null ?
-                                                 searchTemplates
-                                                         .equals(templates.searchTemplates) :
-                                                 templates.searchTemplates == null);
+        return (Objects.equals(errorList, templates.errorList)) && (Objects.equals(searchTemplates,
+                                                                                   templates.searchTemplates));
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         int result = errorList != null ? errorList.hashCode() : 0;
         result = 31 * result + (searchTemplates != null ?
-                                searchTemplates.hashCode() : 0);
+            searchTemplates.hashCode() : 0);
         return result;
     }
 }

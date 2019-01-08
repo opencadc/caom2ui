@@ -1,4 +1,5 @@
-;(function($, window) {
+;
+(function ($, window) {
   // register namespace
   $.extend(true, window, {
     ca: {
@@ -36,10 +37,8 @@
               },
               fr: {
                 ONE_CLICK_DOWNLOAD_TIP: 'Seul fichier ou .tar si plusieurs',
-                ROW_COUNT_MESSAGE:
-                  "Affichage de {1} résultats ({2} avant l'application du filtre).",
-                CROSS_DOMAIN_ERROR:
-                  'French version of Server error retrieving data'
+                ROW_COUNT_MESSAGE: "Affichage de {1} résultats ({2} avant l'application du filtre).",
+                CROSS_DOMAIN_ERROR: 'French version of Server error retrieving data'
               }
             },
             QUICKSEARCH_SELECTOR: '.quicksearch_link',
@@ -128,7 +127,7 @@
     /**
      * @return {String}
      */
-    this.getPageLanguage = function() {
+    this.getPageLanguage = function () {
       return this.options.pageLanguage
     }
 
@@ -136,7 +135,7 @@
      *
      * @return {ca.nrc.cadc.search.SearchForm|SearchForm}
      */
-    this.getCAOMSearchForm = function() {
+    this.getCAOMSearchForm = function () {
       return this.caomSearchForm
     }
 
@@ -144,7 +143,7 @@
      *
      * @return {ca.nrc.cadc.search.SearchForm|SearchForm}
      */
-    this.getObsCoreSearchForm = function() {
+    this.getObsCoreSearchForm = function () {
       return this.obsCoreSearchForm
     }
 
@@ -154,7 +153,7 @@
      * @param {ca.nrc.cadc.search.SearchForm|SearchForm} form  New CAOM2 form instance.
      * @private
      */
-    this._setCAOMSearchForm = function(form) {
+    this._setCAOMSearchForm = function (form) {
       this.caomSearchForm = form
     }
 
@@ -164,7 +163,7 @@
      * @param {ca.nrc.cadc.search.SearchForm|SearchForm} form  New ObsCore form instance.
      * @private
      */
-    this._setObsCoreSearchForm = function(form) {
+    this._setObsCoreSearchForm = function (form) {
       this.obsCoreSearchForm = form
     }
 
@@ -177,7 +176,7 @@
      * @return  {String}    The ID of the active tab.
      * @private
      */
-    this._getActiveTabID = function() {
+    this._getActiveTabID = function () {
       var $tabList = $('ul#tabList')
       var activeTab = $tabList.find('li.active')
       var defaultTab = $tabList.find('li.default')
@@ -206,17 +205,17 @@
      * return {ca.nrc.cadc.search.SearchForm|SearchForm}    Form instance.
      * @private
      */
-    this._getActiveForm = function() {
-      return this.getCAOMSearchForm().isActive(this.activeFormID)
-        ? this.getCAOMSearchForm()
-        : this.getObsCoreSearchForm()
+    this._getActiveForm = function () {
+      return this.getCAOMSearchForm().isActive(this.activeFormID) ?
+        this.getCAOMSearchForm() :
+        this.getObsCoreSearchForm()
     }
 
     /**
      * Obtain the currently set maximum record return count.
      * @returns {Number}
      */
-    this.getMaxRecordCount = function() {
+    this.getMaxRecordCount = function () {
       return this._getActiveForm()
         .getForm()
         .find('input[name="MaxRecords"]')
@@ -230,15 +229,15 @@
      * @returns {String}
      * @private
      */
-    this._adqlPrint = function(adqlText) {
+    this._adqlPrint = function (adqlText) {
       return adqlText
-        .replace(/(FROM|WHERE|AND)/g, function(match) {
+        .replace(/(FROM|WHERE|AND)/g, function (match) {
           return '\n' + match
         })
-        .replace(/JOIN/g, function(match) {
+        .replace(/JOIN/g, function (match) {
           return '\n\t' + match
         })
-        .replace(/,/g, function(match) {
+        .replace(/,/g, function (match) {
           return match + '\n\t'
         })
     }
@@ -251,7 +250,7 @@
      * @param {function} failCallback      Call back to call on unsuccessful job load.
      * @private
      */
-    this._loadUWSJob = function(jobURL, successCallback, failCallback) {
+    this._loadUWSJob = function (jobURL, successCallback, failCallback) {
       if (jobURL) {
         var jobLoader = new ca.nrc.cadc.search.uws.UWSJobLoader(jobURL)
 
@@ -278,7 +277,7 @@
      * @returns {String} text of ADQL.
      * @private
      */
-    this._getADQL = function(_includeExtendedColumns) {
+    this._getADQL = function (_includeExtendedColumns) {
       var jobString = sessionStorage.getItem('uws_job')
       var adqlText
 
@@ -303,7 +302,7 @@
       return adqlText
     }
 
-    this._getTargetUpload = function() {
+    this._getTargetUpload = function () {
       var jobString = sessionStorage.getItem('uws_job')
       var upload
       if (jobString) {
@@ -320,7 +319,7 @@
      * @param {Function} callback   Callback on successful build.
      * @private
      */
-    this._initFormConfigurations = function(callback) {
+    this._initFormConfigurations = function (callback) {
       var tapQuery =
         'select * from TAP_SCHEMA.columns where ' +
         "((table_name='caom2.Observation' or " +
@@ -342,21 +341,19 @@
       // this.options.activateMAQ signals the toggle switch is set to 'on'.
 
       $.get(
-        this.options.tapSyncEndpoint,
-        {
+        this.options.tapSyncEndpoint, {
           REQUEST: 'doQuery',
           LANG: 'ADQL',
           USEMAQ: this.options.activateMAQ || false,
           QUERY: tapQuery,
           FORMAT: 'votable'
         },
-        function(data) {
+        function (data) {
           new cadc.vot.Builder(
-            1000,
-            {
+            1000, {
               xmlDOM: data
             },
-            function(voTableBuilder) {
+            function (voTableBuilder) {
               voTableBuilder.build(voTableBuilder.buildRowData)
 
               var voTable = voTableBuilder.getVOTable()
@@ -393,13 +390,13 @@
           )
         },
         'xml'
-      ).fail(function($xhr, textStatus) {
+      ).fail(function ($xhr, textStatus) {
         callback(
           'ERROR: TAP query failed: ' +
-            ($xhr.responseXML ? $xhr.responseXML : $xhr.responseText) +
-            '( ' +
-            textStatus +
-            ' )',
+          ($xhr.responseXML ? $xhr.responseXML : $xhr.responseText) +
+          '( ' +
+          textStatus +
+          ' )',
           null,
           null
         )
@@ -409,7 +406,7 @@
     /**
      * Initialize all things pertinent to the application.
      */
-    this.init = function() {
+    this.init = function () {
       // Internet Explorer compatibility.
       //
       // WebRT 48318
@@ -418,7 +415,7 @@
       wgxpath.install()
 
       this._initFormConfigurations(
-        function(error, caomConfiguration, obsCoreConfiguration) {
+        function (error, caomConfiguration, obsCoreConfiguration) {
           if (error) {
             var errorMessage = 'Metadata field failed to initialize: ' + error
             console.error(errorMessage)
@@ -452,7 +449,7 @@
        *
        */
       $('#tabList > li').click(
-        function(e) {
+        function (e) {
           var tabID = e.target.hash
           window.location.hash = tabID
 
@@ -472,9 +469,9 @@
      * @private
      */
 
-    this._initBackButtonHandling = function() {
+    this._initBackButtonHandling = function () {
       // Add a hash of previous to the URL when a new tab is shown
-      $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
+      $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
         // Avoid duplication of history elements
         $currentTarget = $(e.target)
         $relatedTarget = $(e.relatedTarget)
@@ -515,7 +512,7 @@
      *
      * @private
      */
-    this._cleanMetadata = function(_formConfig) {
+    this._cleanMetadata = function (_formConfig) {
       var tableMetaData = _formConfig.getTableMetadata()
       var metadataFields = tableMetaData.getFields()
       var cleanFields = []
@@ -538,7 +535,7 @@
      * @param {String}  formData    The String serialized form data.
      * @returns {{}}
      */
-    this.deserializeFormData = function(formData) {
+    this.deserializeFormData = function (formData) {
       // RegEx for '+' character.
       var plus = /\+/g
       var map = {}
@@ -572,7 +569,7 @@
      * @param {{}}  formDataMap   The map (hash) object containing form information.
      * @private
      */
-    this._repopulateForm = function(formDataMap) {
+    this._repopulateForm = function (formDataMap) {
       var mCollections = $('#Observation\\.collection').val()
       for (var k in formDataMap) {
         if (formDataMap.hasOwnProperty(k)) {
@@ -631,7 +628,7 @@
      *
      * @private
      */
-    this._updateResults = function() {
+    this._updateResults = function () {
       if (!$('div.slick-viewport').length) {
         var formData = sessionStorage.getItem('form_data')
         if (formData) {
@@ -650,7 +647,7 @@
      *
      * @private
      */
-    this._updateCurrentTabContent = function(tabID) {
+    this._updateCurrentTabContent = function (tabID) {
       if (tabID === 'resultTableTab') {
         this._updateResults()
       } else if (tabID === 'queryTab') {
@@ -664,7 +661,7 @@
      * @param {String} tabID   The TabID from the hash to select (move to).
      * @private
      */
-    this._selectTab = function(tabID) {
+    this._selectTab = function (tabID) {
       // If it's been initialized.
       if ($tabContainer.easytabs) {
         $tabContainer.easytabs('select', '#' + tabID)
@@ -698,11 +695,11 @@
      *
      * @returns {string}
      */
-    this._getFormQueryString = function() {
+    this._getFormQueryString = function () {
       var parameters = []
       var $activeFormObject = this._getActiveForm().getForm()
       var fields = $activeFormObject.serializeArray()
-      $.each(fields, function(index, field) {
+      $.each(fields, function (index, field) {
         if (
           field.value &&
           ca.nrc.cadc.search.field_ignore.indexOf(field.name) < 0
@@ -712,8 +709,8 @@
           } else {
             parameters.push(
               $activeFormObject.find("[name='" + field.name + "']").attr('id') +
-                '=' +
-                encodeURIComponent(field.value.replace(/\%/g, '*'))
+              '=' +
+              encodeURIComponent(field.value.replace(/\%/g, '*'))
             )
           }
         }
@@ -728,7 +725,7 @@
      * @param {ca.nrc.cadc.search.ObsCore.FormConfiguration}  obsCoreConfiguration  ObsCore form configuration.
      * @private
      */
-    this._initializeForms = function(caomConfiguration, obsCoreConfiguration) {
+    this._initializeForms = function (caomConfiguration, obsCoreConfiguration) {
       var caomSearchForm = new ca.nrc.cadc.search.SearchForm(
         'queryForm',
         false,
@@ -743,7 +740,7 @@
       this._setCAOMSearchForm(caomSearchForm)
       this._setObsCoreSearchForm(obsCoreSearchForm)
 
-      jQuery.fn.exists = function() {
+      jQuery.fn.exists = function () {
         return this.length > 0
       }
 
@@ -756,7 +753,7 @@
 
       var tooltipURL = 'json/tooltips_' + this.getPageLanguage() + '.json'
 
-      $.getJSON(tooltipURL, function(jsonData) {
+      $.getJSON(tooltipURL, function (jsonData) {
         caomSearchForm.loadTooltips(jsonData)
         obsCoreSearchForm.loadTooltips(jsonData)
       })
@@ -766,7 +763,7 @@
       // Story 959 - Task 2920.
       // jenkinsd 2012.05.24
       //
-      $('html').keydown(function(event) {
+      $('html').keydown(function (event) {
         if (event.keyCode === 8) {
           var currentFocus = $('*:focus')
 
@@ -776,7 +773,7 @@
         }
       })
 
-      var onFormCancel = function() {
+      var onFormCancel = function () {
         console.warn('Cancelling search.')
         queryOverlay.modal('hide')
       }
@@ -787,9 +784,9 @@
         onFormCancel
       )
 
-      var onFormSubmitComplete = function(eventData, args) {
+      var onFormSubmitComplete = function (eventData, args) {
         if (args.success) {
-          this._processResults(args.data, args.startDate, function() {
+          this._processResults(args.data, args.startDate, function () {
             queryOverlay.modal('hide')
             $('#resultTableTabLink').tab('show')
           })
@@ -811,7 +808,7 @@
       /**
        * Form validation succeeded.
        */
-      var onFormValid = function(eventData, args) {
+      var onFormValid = function (eventData, args) {
         if (resultsVOTV) {
           resultsVOTV.destroy()
         }
@@ -824,7 +821,7 @@
           this.activeFormID = cadcForm.getID()
         }
 
-        var formatCheckbox = function($rowItem) {
+        var formatCheckbox = function ($rowItem) {
           if (
             !stringUtil.hasText(
               $rowItem[this._getActiveForm().getDownloadAccessKey()]
@@ -842,20 +839,20 @@
 
         // To be used when the grid.onRenderedRows event is
         // fired.
-        var onRowRendered = function($rowItem, rowIndex) {
+        var onRowRendered = function ($rowItem, rowIndex) {
           if ($rowItem) {
             formatCheckbox($rowItem, rowIndex)
           }
         }
 
-        var isRowDisabled = function(row) {
+        var isRowDisabled = function (row) {
           var downloadableColumnName = this._getActiveForm().getDownloadAccessKey()
           var downloadableColumnValue = row.getCellValue(downloadableColumnName)
 
           return downloadableColumnValue === null
         }.bind(this)
 
-        var rowCountMessage = function(totalRows, rowCount) {
+        var rowCountMessage = function (totalRows, rowCount) {
           return stringUtil.format(
             ca.nrc.cadc.search.i18n[this.getPageLanguage()][
               'ROW_COUNT_MESSAGE'
@@ -864,7 +861,7 @@
           )
         }.bind(this)
 
-        var oneClickDownloadTitle = function() {
+        var oneClickDownloadTitle = function () {
           return ca.nrc.cadc.search.i18n[this.getPageLanguage()][
             'ONE_CLICK_DOWNLOAD_TIP'
           ]
@@ -944,7 +941,10 @@
                 targetSelector: $('#column_manager_container')
                   .find('.column_manager_columns')
                   .first(),
-                position: { my: 'right', at: 'right bottom' },
+                position: {
+                  my: 'right',
+                  at: 'right bottom'
+                },
                 closeDialogSelector: '.dialog-close',
                 refreshPositions: true
               }
@@ -985,7 +985,7 @@
         $(document).on(
           'click',
           ca.nrc.cadc.search.QUICKSEARCH_SELECTOR,
-          function(event) {
+          function (event) {
             var hrefURI = new cadc.web.util.URI(event.target.href)
             var href = hrefURI.toString()
 
@@ -1016,12 +1016,12 @@
 
         resultsVOTV.subscribe(
           cadc.vot.events.onUnitChanged,
-          function(event, args) {
+          function (event, args) {
             var viewer = args.application
             var columnID = args.column.id
             var filterValue = viewer.getColumnFilters()[columnID]
 
-            this.processFilterValue(filterValue, args, function(
+            this.processFilterValue(filterValue, args, function (
               breakdownPureFilterValue,
               breakdownDisplayFilterValue
             ) {
@@ -1033,7 +1033,7 @@
           }.bind(this)
         )
 
-        downloadFormSubmit.off().click(function(event) {
+        downloadFormSubmit.off().click(function (event) {
           event.preventDefault()
 
           downloadForm.find("input[name='uri']").remove()
@@ -1044,9 +1044,7 @@
           } else {
             var selectedRows = resultsVOTV.getSelectedRows()
             for (
-              var arrIndex = 0, srl = selectedRows.length;
-              arrIndex < srl;
-              arrIndex++
+              var arrIndex = 0, srl = selectedRows.length; arrIndex < srl; arrIndex++
             ) {
               var $nextRow = resultsVOTV.getRow(selectedRows[arrIndex])
               var $nextPlaneURI =
@@ -1065,13 +1063,13 @@
             // checkboxes are checked, do not send any
             var allChecked =
               downloadForm
-                .find('input.product_type_option_flag')
-                .not(':checked').length === 0
+              .find('input.product_type_option_flag')
+              .not(':checked').length === 0
             if (allChecked) {
               // disable all 'Product Types' checkboxes
               $.each(
                 downloadForm.find('input.product_type_option_flag:checked'),
-                function() {
+                function () {
                   $(this).prop('disabled', true)
                 }
               )
@@ -1087,7 +1085,7 @@
               // checkboxes
               $.each(
                 downloadForm.find('input.product_type_option_flag:checked'),
-                function() {
+                function () {
                   $(this).prop('disabled', false)
                 }
               )
@@ -1096,7 +1094,7 @@
         })
 
         $('#results_bookmark').click(
-          function(event) {
+          function (event) {
             event.preventDefault()
             this._setBookmarkURL(new cadc.web.util.URI(event.target.href))
             $('#bookmark_link').modal('show')
@@ -1118,11 +1116,11 @@
         onFormValid
       )
 
-      var onFormInvalid = function(event, args) {
+      var onFormInvalid = function (event, args) {
         alert(
           'Please enter at least one value to search on. (' +
-            args.cadcForm.getName() +
-            ')'
+          args.cadcForm.getName() +
+          ')'
         )
       }
 
@@ -1136,13 +1134,13 @@
       )
 
       $(':reset').click(
-        function() {
+        function () {
           this._getActiveForm().resetFields()
         }.bind(this)
       )
 
       $('#cancel_search').click(
-        function() {
+        function () {
           this._getActiveForm().cancel()
         }.bind(this)
       )
@@ -1152,7 +1150,7 @@
 
     // End initForms function.
 
-    this._setBookmarkURL = function(hrefURI) {
+    this._setBookmarkURL = function (hrefURI) {
       hrefURI.clearQuery()
       var href = hrefURI.toString()
 
@@ -1184,7 +1182,7 @@
       })
     }
 
-    this.getQueryFromURI = function() {
+    this.getQueryFromURI = function () {
       var currentURI = new cadc.web.util.currentURI()
       return currentURI.getQuery()
     }
@@ -1192,9 +1190,9 @@
     /**
      * Start this application.  This will check for a quick submission.
      */
-    this.start = function() {
+    this.start = function () {
       // After the series of columns (Data Train) has loaded, then proceed.
-      var postDataTrainLoad = function(_continue) {
+      var postDataTrainLoad = function (_continue) {
         var activeSearchForm = this._getActiveForm()
         // Enable the switch again (was disabled prior to data train load to
         // make sure only one call is out at a time from this page
@@ -1213,7 +1211,7 @@
 
           if (JSON.stringify(queryObject) !== JSON.stringify({})) {
             // Update text fields.
-            $.each(queryObject, function(qKey, qValue) {
+            $.each(queryObject, function (qKey, qValue) {
               if (qValue && qValue.length > 0) {
                 if (
                   qKey === ca.nrc.cadc.search.CAOM2_RESOLVER_VALUE_KEY ||
@@ -1237,7 +1235,7 @@
               }
             })
 
-            $submitForm.find('input').each(function(item, index) {
+            $submitForm.find('input').each(function (item, index) {
               // Explicitly skip the enableMAQ input toggle
               if (this.className !== maqKey) {
                 $(this).change()
@@ -1280,6 +1278,10 @@
               }
 
               if (dtSelectUtypeValues && dtSelectUtypeValues.length > 0) {
+                dtSelectUtypeValues = dtSelectUtypeValues.map(function (val) {
+                  return decodeURIComponent(val)
+                })
+
                 var dtSelect = $submitForm.find(
                   "select[id='" + dtSelectUtype + "']"
                 )
@@ -1295,9 +1297,9 @@
                 } else {
                   alert(
                     'Incompatible query parameter: ' +
-                      dtSelectUtype +
-                      ' > ' +
-                      dtSelectUtypeValues
+                    dtSelectUtype +
+                    ' > ' +
+                    dtSelectUtypeValues
                   )
                   activeSearchForm.cancel()
                   doSubmit = false
@@ -1344,7 +1346,7 @@
       var obsCoreSearchForm = this.getObsCoreSearchForm()
 
       // Default form.
-      caomSearchForm.subscribe(ca.nrc.cadc.search.events.onInit, function(
+      caomSearchForm.subscribe(ca.nrc.cadc.search.events.onInit, function (
         event,
         args
       ) {
@@ -1358,31 +1360,31 @@
 
       caomSearchForm.getDataTrain().subscribe(
         ca.nrc.cadc.search.datatrain.events.onDataTrainLoaded,
-        function() {
+        function () {
           postDataTrainLoad(true)
 
           this.subscribe(
             ca.nrc.cadc.search.events.onAdvancedSearchInit,
-            function() {
+            function () {
               /*
-                                                   * Story 1644
-                                                   * The start method should set this, then tabs after that should set the
-                                                   * hash as they go.
-                                                   *
-                                                   * This should be automatic from the easy tabs library, but I have a
-                                                   * feeling the WET 3.1 library is getting in the way.
-                                                   *
-                                                   * TODO - Re-evaluate when WET 4.0 is implemented!
-                                                   *
-                                                   * jenkinsd 11.10.2014
-                                                   */
+               * Story 1644
+               * The start method should set this, then tabs after that should set the
+               * hash as they go.
+               *
+               * This should be automatic from the easy tabs library, but I have a
+               * feeling the WET 3.1 library is getting in the way.
+               *
+               * TODO - Re-evaluate when WET 4.0 is implemented!
+               *
+               * jenkinsd 11.10.2014
+               */
               $.address.change(
-                function(event) {
+                function (event) {
                   var slashIndex = event.value.indexOf('/')
                   var eventHash =
-                    slashIndex >= 0
-                      ? event.value.substring(slashIndex + 1)
-                      : event.value
+                    slashIndex >= 0 ?
+                    event.value.substring(slashIndex + 1) :
+                    event.value
                   var tabID = eventHash || this._getActiveTabID().split('#')[1]
 
                   if (eventHash) {
@@ -1401,26 +1403,26 @@
         .getDataTrain()
         .subscribe(
           ca.nrc.cadc.search.datatrain.events.onDataTrainLoadFail,
-          function() {
+          function () {
             postDataTrainLoad(false)
           }
         )
 
-      obsCoreSearchForm.subscribe(ca.nrc.cadc.search.events.onInit, function() {
+      obsCoreSearchForm.subscribe(ca.nrc.cadc.search.events.onInit, function () {
         obsCoreSearchForm.enable()
         obsCoreSearchForm.resetFields()
       })
 
       obsCoreSearchForm.getDataTrain().subscribe(
         ca.nrc.cadc.search.datatrain.events.onDataTrainLoaded,
-        function() {
+        function () {
           obsCoreSearchForm.enableMaqToggle()
         }.bind(this)
       )
 
       obsCoreSearchForm.getDataTrain().subscribe(
         ca.nrc.cadc.search.datatrain.events.onDataTrainLoadFail,
-        function() {
+        function () {
           obsCoreSearchForm.enableMaqToggle()
         }.bind(this)
       )
@@ -1439,7 +1441,7 @@
      * @return {{}} Sanitized object.
      * @private
      */
-    this._sanitizeColumnOptions = function(_columnOptions) {
+    this._sanitizeColumnOptions = function (_columnOptions) {
       var sanitizedObject = {}
 
       sanitizedObject.sortColumn = columnManager.getIDFromLabel(
@@ -1449,14 +1451,14 @@
 
       if (_columnOptions.columnOptions) {
         sanitizedObject.columnOptions = {}
-        $.each(_columnOptions.columnOptions, function(key, obj) {
+        $.each(_columnOptions.columnOptions, function (key, obj) {
           sanitizedObject.columnOptions[columnManager.getIDFromLabel(key)] = obj
         })
       }
 
       if (_columnOptions.columnFilters) {
         sanitizedObject.columnFilters = {}
-        $.each(_columnOptions.columnFilters, function(key, obj) {
+        $.each(_columnOptions.columnFilters, function (key, obj) {
           sanitizedObject.columnFilters[columnManager.getIDFromLabel(key)] = obj
         })
       }
@@ -1481,7 +1483,7 @@
      * @param {cadc.vot.Viewer|Viewer} _viewer    The VOTV viewer instance.
      * @private
      */
-    this._setDefaultColumns = function(_viewer) {
+    this._setDefaultColumns = function (_viewer) {
       // Check if defaultColumnIDs has already been set in the
       // viewer options (i.e. from a bookmark url) and if so use them.
 
@@ -1516,7 +1518,7 @@
      * @param {cadc.vot.Viewer|Viewer} _viewer     The VOTV viewer instance.
      * @private
      */
-    this._setDefaultUnitTypes = function(_viewer) {
+    this._setDefaultUnitTypes = function (_viewer) {
       var unitTypes = this._getActiveForm()
         .getConfiguration()
         .getDefaultUnitTypes()
@@ -1566,7 +1568,7 @@
      * @param {function}  [callback]    Optional on completion function.
      * @private
      */
-    this._setJobParameters = function(jobParams, callback) {
+    this._setJobParameters = function (jobParams, callback) {
       var queryParam = 'QUERY=' + encodeURIComponent(this._getADQL(true))
       var votableURL =
         this.options.tapSyncEndpoint +
@@ -1581,9 +1583,7 @@
       }
 
       for (
-        var dti = 0, dtl = ca.nrc.cadc.search.downloadTypes.length;
-        dti < dtl;
-        dti++
+        var dti = 0, dtl = ca.nrc.cadc.search.downloadTypes.length; dti < dtl; dti++
       ) {
         var nextDownloadType = ca.nrc.cadc.search.downloadTypes[dti]
 
@@ -1607,7 +1607,7 @@
      * @param {{}}  jobParams   JSON containing post job creation Upload URL information.
      * @private
      */
-    this._postQuerySubmission = function(jobParams) {
+    this._postQuerySubmission = function (jobParams) {
       queryOverlay.modal('hide')
 
       var selectAllCheckbox = $("input[name='selectAllCheckbox']")
@@ -1636,7 +1636,7 @@
      * @param {String}  error_url   UWS Job error URL.
      * @private
      */
-    this._processErrorResults = function(error_url) {
+    this._processErrorResults = function (error_url) {
       var $errorTooltipColumnPickerHolder = $('#errorTooltipColumnPickerHolder')
       var pageLanguage = this.getPageLanguage()
 
@@ -1672,10 +1672,8 @@
             style: 'tooltip',
             panel: $('div#error-grid-header'),
             options: {
-              buttonText:
-                pageLanguage === 'fr'
-                  ? "Gérer l'affichage des colonnes"
-                  : 'Change Columns'
+              buttonText: pageLanguage === 'fr' ?
+                "Gérer l'affichage des colonnes" : 'Change Columns'
             },
             tooltipOptions: {
               targetSelector: $errorTooltipColumnPickerHolder
@@ -1725,11 +1723,10 @@
       var errorVOTV = new cadc.vot.Viewer('#errorTable', errorVOTVOptions)
 
       try {
-        errorVOTV.build(
-          {
+        errorVOTV.build({
             url: error_url
           },
-          function() {
+          function () {
             errorVOTV.render()
 
             $('#errorTable')
@@ -1741,7 +1738,7 @@
 
             queryOverlay.modal('hide')
           },
-          function(jqXHR, status, message) {
+          function (jqXHR, status, message) {
             console.error('Error status: ' + status)
             console.error('Error message: ' + message)
             console.error('Error from response: ' + jqXHR.responseText)
@@ -1765,7 +1762,7 @@
      * @param callback
      * @private
      */
-    this.processFilterValue = function(filterValue, args, callback) {
+    this.processFilterValue = function (filterValue, args, callback) {
       var columnID = args.column.id
       var unit = args.unitValue
       var $col = $(args.column)
@@ -1824,7 +1821,7 @@
      * @param {Function} searchCompleteCallback    Callback on completion.
      * @private
      */
-    this._processResults = function(json, startDate, searchCompleteCallback) {
+    this._processResults = function (json, startDate, searchCompleteCallback) {
       netEnd = new Date().getTime()
 
       // Next story should handle this better.
@@ -1843,7 +1840,7 @@
          * @param {Number} loadTimeEnd        End of load into grid in milliseconds.
          * @return {string}
          */
-        var buildPanelMessage = function(
+        var buildPanelMessage = function (
           queryTimeStart,
           queryTimeEnd,
           loadTimeStart,
@@ -1866,14 +1863,14 @@
 
         this._loadUWSJob(
           json.job_url,
-          function(event, args) {
+          function (event, args) {
             sessionStorage.setItem('uws_job', JSON.stringify(args.job))
 
             loadStart = new Date().getTime()
 
             $queryCode.text(this._adqlPrint(this._getADQL(false)))
           }.bind(this),
-          function(event, args) {
+          function (event, args) {
             console.error(
               'Status error when loading job: ' + args.errorStatusCode
             )
@@ -1913,7 +1910,7 @@
 
         resultsVOTV.build(
           buildInput,
-          function() {
+          function () {
             if (searchCompleteCallback) {
               searchCompleteCallback()
             }
@@ -1922,12 +1919,14 @@
 
             resultsVOTV.render()
 
-            this._postQuerySubmission({ upload_url: json.upload_url })
+            this._postQuerySubmission({
+              upload_url: json.upload_url
+            })
 
             // Necessary at the end!
             resultsVOTV.refreshGrid()
           }.bind(this),
-          function(jqXHR, status, message) {
+          function (jqXHR, status, message) {
             console.error('Error status: ' + status)
             console.error('Error message: ' + message)
             console.error('Error from response: ' + jqXHR.responseText)
@@ -1945,7 +1944,7 @@
      * @param {String} message   Message to display.
      * @private
      */
-    this._searchError = function(message) {
+    this._searchError = function (message) {
       this._getActiveForm().cancel()
       alert(message)
     }
@@ -1958,7 +1957,7 @@
      * @returns {*}       The event notification result.
      * @private
      */
-    this._trigger = function(_event, _args) {
+    this._trigger = function (_event, _args) {
       var args = _args || {}
       args.application = this
 
@@ -1971,7 +1970,7 @@
      * @param {jQuery.Event} _event       The Event to fire.
      * @param {function}  __handler   Handler function.
      */
-    this.subscribe = function(_event, __handler) {
+    this.subscribe = function (_event, __handler) {
       $(this).on(_event.type, __handler)
     }
 

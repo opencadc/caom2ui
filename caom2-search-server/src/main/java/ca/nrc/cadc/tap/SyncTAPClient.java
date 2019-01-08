@@ -31,6 +31,7 @@
  ****  C A N A D I A N   A S T R O N O M Y   D A T A   C E N T R E  *****
  ************************************************************************
  */
+
 package ca.nrc.cadc.tap;
 
 
@@ -39,14 +40,18 @@ import ca.nrc.cadc.uws.Job;
 import java.io.OutputStream;
 import java.net.URI;
 
-public interface SyncTAPClient
-{
+public interface SyncTAPClient {
+
+    String UPLOAD_JOB_PARAMETER_NAME = "target-list-upload";
+    String TAP_JOB_PARAMETER_NAME = "UPLOAD";
+
+
     /**
      * Execute the given Job.
      *
-     * @param serviceURI            The TAP Service URI.
-     * @param job                   The Job to execute.
-     * @param outputStream          The OutputStream to write out results.
+     * @param serviceURI   The TAP Service URI.
+     * @param job          The Job to execute.
+     * @param outputStream The OutputStream to write out results.
      */
     void execute(final URI serviceURI, final Job job, final OutputStream outputStream);
 }

@@ -64,14 +64,12 @@ public class TAPSearcherTest extends AbstractUnitTest<TAPSearcher>
 
 
     @Test
-    public void constructor() throws Exception
+    public void constructor()
     {
         final Job mockJob = createMock(Job.class);
         replay(mockJob, mockSyncResponseWriter, mockSyncTAPClient);
 
-        setTestSubject(new TAPSearcher(mockSyncResponseWriter, null,
-                                       mockSyncTAPClient,
-                                       mockQueryGenerator));
+        setTestSubject(new TAPSearcher(mockSyncResponseWriter, mockSyncTAPClient, mockQueryGenerator));
         verify(mockJob, mockSyncResponseWriter, mockSyncTAPClient);
     }
 
@@ -101,9 +99,7 @@ public class TAPSearcherTest extends AbstractUnitTest<TAPSearcher>
 
         stringBuilder.append("SELECT * FROM TABLE WHERE UTYPE1 = VAL1");
 
-        setTestSubject(new TAPSearcher(mockSyncResponseWriter, null,
-                                       mockSyncTAPClient,
-                                       mockQueryGenerator)
+        setTestSubject(new TAPSearcher(mockSyncResponseWriter, mockSyncTAPClient, mockQueryGenerator)
         {
             /**
              * Issue a TAP query.
@@ -146,7 +142,8 @@ public class TAPSearcherTest extends AbstractUnitTest<TAPSearcher>
         replay(mockFormData, mockQueryGenerator, mockSyncTAPClient);
 
         jsonWriter.object();
-        getTestSubject().runSearch(URI.create("ivo://mysite.com/service"), jsonWriter, dummyJob, mockFormData);
+        getTestSubject().runSearch(URI.create("ivo://mysite.com/service"), jsonWriter, dummyJob, null,
+                                   mockFormData);
         jsonWriter.endObject();
 
         verify(mockFormData, mockQueryGenerator, mockSyncTAPClient);

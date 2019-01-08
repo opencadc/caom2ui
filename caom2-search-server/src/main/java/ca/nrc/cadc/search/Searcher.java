@@ -35,6 +35,7 @@ package ca.nrc.cadc.search;
 
 import ca.nrc.cadc.uws.Job;
 import ca.nrc.cadc.uws.SyncResponseWriter;
+import ca.nrc.cadc.uws.server.JobUpdater;
 
 import java.net.URI;
 
@@ -49,9 +50,10 @@ public interface Searcher
      *
      * @param job         The Job to execute.
      * @param serviceURI  The Service URI to use.
+     * @param jobUpdater    The JobUpdater to use.
      * @param syncResponseWriter        The writer to write to.
      * @throws Exception    Any unforeseen errors.
      */
-    void search(final Job job, final URI serviceURI,
+    void search(final Job job, final URI serviceURI, final JobUpdater jobUpdater,
                 final SyncResponseWriter syncResponseWriter) throws Exception;
 }
