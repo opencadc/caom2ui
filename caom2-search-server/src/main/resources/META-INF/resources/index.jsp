@@ -274,7 +274,6 @@
           <script type="text/javascript"
                   src="js/hierarchy.js?version=@version@"></script>
 
-
           <script type="text/javascript">
             $(document).ready(function ()
                               {
@@ -303,8 +302,5 @@
 
   <!-- Close off the wb-body -->
 </div>
-
-<c:import url="_page_footer_js.html"/>
-
 </body>
 </html>

@@ -70,9 +70,14 @@
     <!-- AdvancedSearch Servlet -->
     <servlet>
         <servlet-name>SearchJobServlet</servlet-name>
+        <servlet-class>ca.nrc.cadc.uws.server.JobServlet</servlet-class>
         <init-param>
             <param-name>post</param-name>
             <param-value>ca.nrc.cadc.uws.web.SyncPostAction</param-value>
+        </init-param>
+        <init-param>
+            <param-name>get</param-name>
+            <param-value>ca.nrc.cadc.uws.web.SyncGetAction</param-value>
         </init-param>
         <init-param>
             <param-name>ca.nrc.cadc.uws.server.JobManager</param-name>
