@@ -35,6 +35,7 @@ package ca.nrc.cadc.caom2;
 
 import ca.nrc.cadc.search.QueryGenerator;
 import ca.nrc.cadc.search.upload.UploadResults;
+import ca.nrc.cadc.tap.SyncTAPClient;
 import ca.nrc.cadc.uws.Job;
 import ca.nrc.cadc.uws.ParameterUtil;
 
@@ -59,7 +60,7 @@ public abstract class AbstractQueryGenerator implements QueryGenerator
 
     protected String getUpload()
     {
-        return getParameterValue("UPLOAD");
+        return getParameterValue(SyncTAPClient.UPLOAD_JOB_PARAMETER_NAME);
     }
 
     String getUploadResolver()

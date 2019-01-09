@@ -19,4 +19,9 @@
             validationQuery="select 123"
   />
 
+  <!-- development server -->
+  <!--<ResourceLink name="jdbc/uws"-->
+                <!--global="jdbc/postgresql-uws-9"-->
+                <!--type="javax.sql.DataSource"/>-->
+
 </Context>

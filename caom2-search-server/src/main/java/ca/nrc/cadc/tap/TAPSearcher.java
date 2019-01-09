@@ -31,6 +31,7 @@
  ****  C A N A D I A N   A S T R O N O M Y   D A T A   C E N T R E  *****
  ************************************************************************
  */
+
 package ca.nrc.cadc.tap;
 
 
@@ -78,8 +79,7 @@ import java.util.Map;
 /**
  * Searcher implementation for TAP queries.
  */
-public class TAPSearcher implements Searcher
-{
+public class TAPSearcher implements Searcher {
     private static final Logger LOGGER = Logger.getLogger(TAPSearcher.class);
 
     private static final String CAOM2_RESOLVER_VALUE_KEY = "Plane.position.bounds@Shape1Resolver.value";
@@ -87,7 +87,6 @@ public class TAPSearcher implements Searcher
     private static final String CAOM2_RESOLVER_VALUE_NONE = "NONE";
 
     private final SyncResponseWriter syncResponseWriter;
-    private final JobUpdater jobUpdater;
     private final QueryGenerator queryGenerator;
     private final SyncTAPClient tapClient;
 
@@ -96,14 +95,11 @@ public class TAPSearcher implements Searcher
      * Full constructor.
      *
      * @param writer         The Sync writer to write out results to.
-     * @param jobUpdater     The UWS Job Updater.
      * @param queryGenerator The generator to use to handle queries
      */
-    public TAPSearcher(final SyncResponseWriter writer, final JobUpdater jobUpdater, final SyncTAPClient tapClient,
-                       final QueryGenerator queryGenerator)
-    {
+    public TAPSearcher(final SyncResponseWriter writer, final SyncTAPClient tapClient,
+                       final QueryGenerator queryGenerator) {
         this.syncResponseWriter = writer;
-        this.jobUpdater = jobUpdater;
         this.tapClient = tapClient;
         this.queryGenerator = queryGenerator;
     }
@@ -115,8 +111,7 @@ public class TAPSearcher implements Searcher
      *                     parameters.
      * @return True if set, false otherwise.
      */
-    private boolean hasSetValidResolver(final String resolverName)
-    {
+    private boolean hasSetValidResolver(final String resolverName) {
         return StringUtil.hasText(resolverName) && !resolverName.equals(CAOM2_RESOLVER_VALUE_NONE);
     }
 
@@ -130,44 +125,33 @@ public class TAPSearcher implements Searcher
      * @param syncResponseWriter The writer to write to.
      */
     @Override
-    public void search(final Job job, final URI serviceURI, final SyncResponseWriter syncResponseWriter)
-    {
+    public void search(final Job job, final URI serviceURI, final JobUpdater jobUpdater,
+                       final SyncResponseWriter syncResponseWriter) {
         // Validate search form.
         final FormData formData = new FormData(job);
         final FormErrors formError = new FormErrors();
         final JSONWriter jsonWriter = new JSONWriter(syncResponseWriter.getWriter());
 
-        try
-        {
+        try {
             syncResponseWriter.setResponseHeader("Content-Type", "application/json");
 
             jsonWriter.object();
 
             // Errors in the form.
-            if (!formData.isValid(formError))
-            {
-                handleError(job, formError.toString(), ErrorType.FATAL);
+            if (!formData.isValid(formError)) {
+                handleError(job, formError.toString(), jobUpdater, ErrorType.FATAL);
                 jsonWriter.key("errorMessage").value(job.getErrorSummary().getSummaryMessage());
-            }
-            else
-            {
-                runSearch(serviceURI, jsonWriter, job, formData);
+            } else {
+                runSearch(serviceURI, jsonWriter, job, jobUpdater, formData);
             }
 
             jsonWriter.endObject();
-        }
-        catch (JSONException | IOException e)
-        {
+        } catch (JSONException | IOException e) {
             throw new IllegalStateException("Unable to write out response.", e);
-        }
-        finally
-        {
-            try
-            {
+        } finally {
+            try {
                 syncResponseWriter.getWriter().flush();
-            }
-            catch (IOException e)
-            {
+            } catch (IOException e) {
                 // Do nothing.
             }
         }
@@ -178,23 +162,22 @@ public class TAPSearcher implements Searcher
      *
      * @param serviceURI The TAP Service URI.
      * @param jsonWriter The Writer for the JSON results.
+     * @param job        The job.
+     * @param jobUpdater The Job Updater.
      * @param formData   The FormData object.
      * @throws IOException   Any I/O weirdness.
      * @throws JSONException Any weirdness writing out JSON.
      */
-    void runSearch(final URI serviceURI, final JSONWriter jsonWriter, final Job job, final FormData formData)
-            throws IOException, JSONException
-    {
+    void runSearch(final URI serviceURI, final JSONWriter jsonWriter, final Job job, final JobUpdater jobUpdater,
+                   final FormData formData)
+        throws IOException, JSONException {
         // Generate the ADQL query string.
         final Templates templates = new Templates(formData.getFormConstraints());
         final FormErrors formError = new FormErrors();
 
-        if (!templates.isValid(formError))
-        {
-            handleError(job, formError.toString(), ErrorType.FATAL);
-        }
-        else
-        {
+        if (!templates.isValid(formError)) {
+            handleError(job, formError.toString(), jobUpdater, ErrorType.FATAL);
+        } else {
             // Just a simple OutputStream to hold the results URL.
             final OutputStream outputStream = new ByteArrayOutputStream();
 
@@ -212,18 +195,16 @@ public class TAPSearcher implements Searcher
 
             jsonWriter.key("results_url").value(tapResultsURL.toExternalForm());
             jsonWriter.key("job_url").value(
-                    new URL(resultsURLValue.substring(0, resultsURLValue.indexOf("/run"))).toExternalForm());
+                new URL(resultsURLValue.substring(0, resultsURLValue.indexOf("/run"))).toExternalForm());
             jsonWriter.key("run_id").value(job.getID());
 
             writeFormValueUnits(jsonWriter, formData);
 
-            if (isCutoutSpecified(job))
-            {
+            if (isCutoutSpecified(job)) {
                 final Cutout cutout = getCutout(job, templates);
                 final String cutoutValue = cutout.format();
 
-                if (StringUtil.hasText(cutoutValue))
-                {
+                if (StringUtil.hasText(cutoutValue)) {
                     jsonWriter.key("cutout").value(cutoutValue);
                 }
             }
@@ -243,27 +224,23 @@ public class TAPSearcher implements Searcher
      * @param jsonWriter The JSONWriter to append to.
      * @throws JSONException Any JSON Writing errors.
      */
-    private void writeUploadInfoJSON(final Job job, final JSONWriter jsonWriter) throws JSONException
-    {
+    private void writeUploadInfoJSON(final Job job, final JSONWriter jsonWriter) throws JSONException {
         final List<Parameter> searchParameters = job.getParameterList();
 
         final String rowCount = ParameterUtil.findParameterValue(UploadResults.UPLOAD_ROW_COUNT, searchParameters);
         final String errorCount = ParameterUtil.findParameterValue(UploadResults.UPLOAD_ERROR_COUNT, searchParameters);
 
-        final String uploadURLValue = ParameterUtil.findParameterValue("UPLOAD", searchParameters);
+        final String uploadURLValue = ParameterUtil.findParameterValue("target", searchParameters);
 
-        if (StringUtil.hasText(rowCount))
-        {
+        if (StringUtil.hasText(rowCount)) {
             jsonWriter.key(UploadResults.UPLOAD_ROW_COUNT).value(rowCount);
         }
 
-        if (StringUtil.hasText(errorCount))
-        {
+        if (StringUtil.hasText(errorCount)) {
             jsonWriter.key(UploadResults.UPLOAD_ERROR_COUNT).value(errorCount);
         }
 
-        if (StringUtil.hasText(uploadURLValue))
-        {
+        if (StringUtil.hasText(uploadURLValue)) {
             jsonWriter.key("upload_url").value(uploadURLValue);
         }
     }
@@ -276,14 +253,12 @@ public class TAPSearcher implements Searcher
      * @param formData   The Form data containing the units.
      * @throws JSONException Any JSON writing errors.
      */
-    private void writeFormValueUnits(final JSONWriter jsonWriter, final FormData formData) throws JSONException
-    {
+    private void writeFormValueUnits(final JSONWriter jsonWriter, final FormData formData) throws JSONException {
         final Map<String, String> formValueUnits = formData.getFormValueUnits();
 
         jsonWriter.key("display_units").object();
 
-        for (final Map.Entry<String, String> entry : formValueUnits.entrySet())
-        {
+        for (final Map.Entry<String, String> entry : formValueUnits.entrySet()) {
             jsonWriter.key(entry.getKey()).value(entry.getValue());
         }
 
@@ -297,10 +272,8 @@ public class TAPSearcher implements Searcher
      * @param jsonWriter The JSONWriter to write to.
      * @throws JSONException If anything goes wrong with writing JSON.
      */
-    private void writeResolverJSON(final Job job, final JSONWriter jsonWriter) throws JSONException
-    {
-        try
-        {
+    private void writeResolverJSON(final Job job, final JSONWriter jsonWriter) throws JSONException {
+        try {
             /*
              * Story 959, Task 2915
              * Display resolved results to the user.
@@ -309,30 +282,28 @@ public class TAPSearcher implements Searcher
              */
             final List<Parameter> parameters = job.getParameterList();
             final String targetName =
-                    ParameterUtil.findParameterValue(CAOM2_TARGET_NAME_VALUE_KEY,
-                                                     parameters);
+                ParameterUtil.findParameterValue(CAOM2_TARGET_NAME_VALUE_KEY,
+                                                 parameters);
             final String resolverName =
-                    ParameterUtil.findParameterValue(CAOM2_RESOLVER_VALUE_KEY,
-                                                     parameters);
+                ParameterUtil.findParameterValue(CAOM2_RESOLVER_VALUE_KEY,
+                                                 parameters);
 
             if (StringUtil.hasText(targetName)
-                && hasSetValidResolver(resolverName))
-            {
+                && hasSetValidResolver(resolverName)) {
                 final String targetValue = targetName.trim();
-                final Resolver resolver =
-                        new ResolverImpl(new DefaultNameResolverClient());
+                final Resolver resolver = new ResolverImpl(new DefaultNameResolverClient());
                 final TargetParser targetParser = new TargetParser(resolver);
                 final TargetData targetData = targetParser.parse(targetValue,
                                                                  resolverName);
                 System.out.println(targetData);
 
                 final String raValue =
-                        (targetData.getRA() == null)
+                    (targetData.getRA() == null)
                         ? targetData.getRaRange().getRange()
                         : Double.toString(targetData.getRA());
 
                 final String decValue =
-                        (targetData.getDec() == null)
+                    (targetData.getDec() == null)
                         ? targetData.getDecRange().getRange()
                         : Double.toString(targetData.getDec());
 
@@ -344,46 +315,41 @@ public class TAPSearcher implements Searcher
 
                 jsonWriter.endObject();
             }
-        }
-        catch (TargetParserException e)
-        {
+        } catch (TargetParserException e) {
             LOGGER.info("Unable to write out resolver information.", e);
             jsonWriter.key("error").value(e.getMessage());
             jsonWriter.endObject();
         }
     }
 
-    private Job createTAPJob(final Job baseJob, final String query)
-    {
+    private Job createTAPJob(final Job baseJob, final String query) {
         final List<Parameter> searchJobParameters = baseJob.getParameterList();
         final Job tapJob = new Job();
         tapJob.setRunID(baseJob.getID());
         tapJob.ownerSubject = AuthenticationUtil.getCurrentSubject();
 
         final String requestedFormat =
-                ParameterUtil.findParameterValue("format", searchJobParameters);
+            ParameterUtil.findParameterValue("format", searchJobParameters);
         final String uploadParameterValue =
-                ParameterUtil.findParameterValue("UPLOAD", searchJobParameters);
+            ParameterUtil.findParameterValue(SyncTAPClient.UPLOAD_JOB_PARAMETER_NAME, searchJobParameters);
         final String maxRecords =
-                RegexParameterUtil.findParameterValue("MaxRecords",
-                                                      searchJobParameters);
+            RegexParameterUtil.findParameterValue("MaxRecords",
+                                                  searchJobParameters);
         LOGGER.debug("MaxRecords: " + maxRecords);
 
         final String format = StringUtil.hasText(requestedFormat)
-                              ? requestedFormat : "votable";
+            ? requestedFormat : "votable";
 
         final List<Parameter> tapJobParams = new ArrayList<>();
 
         tapJobParams.add(new Parameter("LANG", "ADQL"));
         tapJobParams.add(new Parameter("FORMAT", format));
         tapJobParams.add(new Parameter("QUERY", query));
-        tapJobParams.add(new Parameter("REQUEST", "doQuery"));
         tapJobParams.add(new Parameter("MAXREC", StringUtil.hasText(maxRecords)
-                                                 ? maxRecords : DEFAULT_MAXREC.toString()));
+            ? maxRecords : DEFAULT_MAXREC.toString()));
 
-        if (StringUtil.hasText(uploadParameterValue))
-        {
-            tapJobParams.add(new Parameter("UPLOAD", uploadParameterValue));
+        if (StringUtil.hasText(uploadParameterValue)) {
+            tapJobParams.add(new Parameter(SyncTAPClient.TAP_JOB_PARAMETER_NAME, uploadParameterValue));
         }
 
         tapJob.setParameterList(tapJobParams);
@@ -399,33 +365,24 @@ public class TAPSearcher implements Searcher
      * @param outputStream The stream to write out results to.
      * @throws IOException Any writing errors.
      */
-    void queryTAP(final URI serviceURI, final Job tapJob, final OutputStream outputStream) throws IOException
-    {
+    void queryTAP(final URI serviceURI, final Job tapJob, final OutputStream outputStream) throws IOException {
         final Subject ownerSubject = tapJob.ownerSubject;
 
-        try
-        {
+        try {
             // Run the TAP Job.
-            if (ownerSubject != null)
-            {
+            if (ownerSubject != null) {
                 // To pass on the SSO Cookie credential
-                Subject.doAs(ownerSubject, new PrivilegedAction<Void>()
-                {
+                Subject.doAs(ownerSubject, new PrivilegedAction<Void>() {
                     @Override
-                    public Void run()
-                    {
+                    public Void run() {
                         tapClient.execute(serviceURI, tapJob, outputStream);
                         return null;
                     }
                 });
-            }
-            else
-            {
+            } else {
                 tapClient.execute(serviceURI, tapJob, outputStream);
             }
-        }
-        finally
-        {
+        } finally {
             outputStream.flush();
         }
     }
@@ -436,20 +393,16 @@ public class TAPSearcher implements Searcher
      * @param message   The error message to set to the job.
      * @param errorType The error type to set to the job.
      */
-    private void handleError(final Job job, final String message,
-                             final ErrorType errorType)
-    {
+    private void handleError(final Job job, final String message, final JobUpdater jobUpdater,
+                             final ErrorType errorType) {
         final ErrorSummary errorSummary = new ErrorSummary(message, errorType);
 
-        try
-        {
+        try {
             job.setErrorSummary(errorSummary);
             job.setExecutionPhase(ExecutionPhase.ERROR);
 
             jobUpdater.setPhase(job.getID(), ExecutionPhase.EXECUTING, ExecutionPhase.ERROR, errorSummary, new Date());
-        }
-        catch (Throwable oops)
-        {
+        } catch (Throwable oops) {
             LOGGER.error("failed to set final error status after " + message,
                          oops);
             syncResponseWriter.setResponseCode(500);
@@ -461,17 +414,13 @@ public class TAPSearcher implements Searcher
      *
      * @return True if seeking out cutout, False otherwise.
      */
-    private boolean isCutoutSpecified(final Job job)
-    {
+    private boolean isCutoutSpecified(final Job job) {
         return isSpatialCutoutSpecified(job) || isSpectralCutoutSpecified(job);
     }
 
-    private boolean isSpatialCutoutSpecified(final Job job)
-    {
-        for (final Parameter parameter : job.getParameterList())
-        {
-            if (parameter.getName().equals("Plane.position.DOWNLOADCUTOUT"))
-            {
+    private boolean isSpatialCutoutSpecified(final Job job) {
+        for (final Parameter parameter : job.getParameterList()) {
+            if (parameter.getName().equals("Plane.position.DOWNLOADCUTOUT")) {
                 return true;
             }
         }
@@ -479,12 +428,9 @@ public class TAPSearcher implements Searcher
         return false;
     }
 
-    private boolean isSpectralCutoutSpecified(final Job job)
-    {
-        for (final Parameter parameter : job.getParameterList())
-        {
-            if (parameter.getName().equals("Plane.energy.DOWNLOADCUTOUT"))
-            {
+    private boolean isSpectralCutoutSpecified(final Job job) {
+        for (final Parameter parameter : job.getParameterList()) {
+            if (parameter.getName().equals("Plane.energy.DOWNLOADCUTOUT")) {
                 return true;
             }
         }
@@ -498,14 +444,13 @@ public class TAPSearcher implements Searcher
      * @param templates The Search templates to obtain values from.
      * @return Cutout instance.
      */
-    private Cutout getCutout(final Job job, final Templates templates)
-    {
+    private Cutout getCutout(final Job job, final Templates templates) {
         final List<SpatialSearch> spatialSearches = templates.getSearchTemplates(SpatialSearch.class);
         final List<IntervalSearch> spectralSearches = templates.getSearchTemplates(IntervalSearch.class);
 
         return new STCCutoutImpl((spatialSearches.isEmpty() || !isSpatialCutoutSpecified(job))
-                                 ? null : spatialSearches.get(0),
+                                     ? null : spatialSearches.get(0),
                                  (spectralSearches.isEmpty() || !isSpectralCutoutSpecified(job))
-                                 ? null : spectralSearches.get(0));
+                                     ? null : spectralSearches.get(0));
     }
 }

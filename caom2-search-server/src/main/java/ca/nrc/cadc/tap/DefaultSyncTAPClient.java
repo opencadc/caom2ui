@@ -127,9 +127,6 @@ public class DefaultSyncTAPClient implements SyncTAPClient {
             payload.put(JobAttribute.RUN_ID.getValue(), job.getRunID());
         }
 
-        payload.put(JobAttribute.EXECUTION_PHASE.getValue(), "RUN");
-        payload.put("REQUEST", "doQuery");
-
         final List<Parameter> parameters = job.getParameterList();
 
         for (final Parameter parameter : parameters) {

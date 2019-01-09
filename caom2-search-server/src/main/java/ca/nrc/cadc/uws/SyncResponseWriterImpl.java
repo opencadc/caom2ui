@@ -68,7 +68,8 @@
 
 package ca.nrc.cadc.uws;
 
-import ca.nrc.cadc.uws.server.SyncOutput;
+
+import ca.nrc.cadc.rest.SyncOutput;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -76,24 +77,20 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 
 
-public class SyncResponseWriterImpl implements SyncResponseWriter
-{
+public class SyncResponseWriterImpl implements SyncResponseWriter {
     private final Writer writer;
     private final SyncOutput syncOutput;
 
 
     public SyncResponseWriterImpl(final SyncOutput so)
-            throws IOException
-    {
+        throws IOException {
         this.syncOutput = so;
-        this.writer = new BufferedWriter(
-                new OutputStreamWriter(syncOutput.getOutputStream()));
+        this.writer = new BufferedWriter(new OutputStreamWriter(syncOutput.getOutputStream()));
     }
 
 
     @Override
-    public final Writer getWriter()
-    {
+    public final Writer getWriter() {
         return writer;
     }
 
@@ -105,9 +102,8 @@ public class SyncResponseWriterImpl implements SyncResponseWriter
      * @param code The desired Response code
      */
     @Override
-    public void setResponseCode(final int code)
-    {
-        syncOutput.setResponseCode(code);
+    public void setResponseCode(final int code) {
+        syncOutput.setCode(code);
     }
 
     /**
@@ -118,8 +114,7 @@ public class SyncResponseWriterImpl implements SyncResponseWriter
      * @param value header value.
      */
     @Override
-    public void setResponseHeader(final String key, final String value)
-    {
+    public void setResponseHeader(final String key, final String value) {
         syncOutput.setHeader(key, value);
     }
 }

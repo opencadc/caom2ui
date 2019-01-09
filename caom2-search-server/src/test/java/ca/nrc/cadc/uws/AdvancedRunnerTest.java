@@ -31,31 +31,30 @@
  ****  C A N A D I A N   A S T R O N O M Y   D A T A   C E N T R E  *****
  ************************************************************************
  */
+
 package ca.nrc.cadc.uws;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.net.URI;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.*;
 
 import ca.nrc.cadc.AbstractUnitTest;
 import ca.nrc.cadc.date.DateUtil;
 import ca.nrc.cadc.net.TransientException;
+import ca.nrc.cadc.rest.SyncOutput;
 import ca.nrc.cadc.search.Searcher;
 import ca.nrc.cadc.uws.server.JobUpdater;
-import ca.nrc.cadc.uws.server.SyncOutput;
 
 
 import org.junit.Test;
+
 import static org.easymock.EasyMock.*;
 
 
-public class AdvancedRunnerTest extends AbstractUnitTest<AdvancedRunner>
-{
-    private static final List<Parameter> EMPTY_PARAMETER_LIST =
-            Collections.emptyList();
-
+public class AdvancedRunnerTest extends AbstractUnitTest<AdvancedRunner> {
+    private static final List<Parameter> EMPTY_PARAMETER_LIST = Collections.emptyList();
     private final Job mockJob = createMock(Job.class);
     private final JobUpdater mockJobUpdater = createMock(JobUpdater.class);
     private final SyncOutput mockSyncOutput = createMock(SyncOutput.class);
@@ -63,34 +62,38 @@ public class AdvancedRunnerTest extends AbstractUnitTest<AdvancedRunner>
 
 
     @Test
-    public void runOK() throws Throwable
-    {
-        final SyncResponseWriter mockSyncResponseWriter =
-                createMock(SyncResponseWriter.class);
-        final URI lookupURI = URI.create("ivo://mydomain.com/tap/service");
+    public void runOK() throws Throwable {
+        final SyncResponseWriter mockSyncResponseWriter = createMock(SyncResponseWriter.class);
         final Calendar cal = Calendar.getInstance(DateUtil.UTC);
         cal.set(1977, Calendar.NOVEMBER, 25, 3, 21, 0);
         cal.set(Calendar.MILLISECOND, 0);
 
-        setTestSubject(new AdvancedRunner(getMockJob(), getMockJobUpdater(),
-                                          getMockSyncOutput(),
-                                          getMockSearcher(), lookupURI)
-        {
+        setTestSubject(new AdvancedRunner() {
             /**
              * Obtain the current date.  Implementors can override.
              *
              * @return Date instance.
              */
             @Override
-            protected Date currentDate()
-            {
+            protected Date currentDate() {
                 return cal.getTime();
             }
 
             @Override
-            protected SyncResponseWriter wrapSyncOutput() throws IOException
-            {
+            protected SyncResponseWriter wrapSyncOutput() {
                 return mockSyncResponseWriter;
+            }
+
+            /**
+             * Create a default searcher instance when none exists.  This relies on the
+             * setters to populate this class first (Or whatever the isInitialized()
+             * method returns).
+             *
+             * @return Searcher instance
+             */
+            @Override
+            Searcher createSearcher() {
+                return getMockSearcher();
             }
         });
 
@@ -98,124 +101,105 @@ public class AdvancedRunnerTest extends AbstractUnitTest<AdvancedRunner>
         expect(getMockJobUpdater().setPhase("88", ExecutionPhase.QUEUED,
                                             ExecutionPhase.EXECUTING,
                                             cal.getTime())).andReturn(
-                ExecutionPhase.EXECUTING).once();
-        expect(getMockJob().getParameterList()).andReturn(
-                EMPTY_PARAMETER_LIST).once();
+            ExecutionPhase.EXECUTING).once();
+        expect(getMockJob().getParameterList()).andReturn(EMPTY_PARAMETER_LIST).times(3);
 
-        getMockSearcher().search(getMockJob(), lookupURI,
+        getMockSearcher().search(getMockJob(), AdvancedRunner.DEFAULT_TAP_SERVICE_URI, getMockJobUpdater(),
                                  mockSyncResponseWriter);
         expectLastCall().once();
 
-        expect(getMockJobUpdater().setPhase("88", ExecutionPhase.EXECUTING,
-                                            ExecutionPhase.COMPLETED,
-                                            cal.getTime())).andReturn(
-                ExecutionPhase.COMPLETED).once();
+        expect(getMockJobUpdater().setPhase("88", ExecutionPhase.EXECUTING, ExecutionPhase.COMPLETED,
+                                            cal.getTime())).andReturn(ExecutionPhase.COMPLETED).once();
 
-        expect(getMockSyncOutput().getOutputStream()).andReturn(
-                new ByteArrayOutputStream()).once();
+        expect(getMockSyncOutput().getOutputStream()).andReturn(new ByteArrayOutputStream()).once();
 
-        replay(getMockJob(), getMockJobUpdater(), getMockSyncOutput(),
-               getMockSearcher());
+        replay(getMockJob(), getMockJobUpdater(), getMockSyncOutput(), getMockSearcher(), mockSyncResponseWriter);
+
+        getTestSubject().setJob(getMockJob());
+        getTestSubject().setJobUpdater(getMockJobUpdater());
+        getTestSubject().setSyncOutput(getMockSyncOutput());
 
         getTestSubject().run();
 
-        verify(getMockJob(), getMockJobUpdater(), getMockSyncOutput(),
-               getMockSearcher());
+        verify(getMockJob(), getMockJobUpdater(), getMockSyncOutput(), getMockSearcher(), mockSyncResponseWriter);
     }
 
     @Test
-    public void runInternalServerError() throws Throwable
-    {
+    public void runInternalServerError() throws Throwable {
         final Calendar cal = Calendar.getInstance(DateUtil.UTC);
         cal.set(1977, Calendar.NOVEMBER, 25, 3, 21, 0);
         cal.set(Calendar.MILLISECOND, 0);
 
-        setTestSubject(new AdvancedRunner(getMockJob(), getMockJobUpdater(),
-                                          getMockSyncOutput(),
-                                          getMockSearcher(), null)
-        {
+        setTestSubject(new AdvancedRunner() {
             /**
              * Obtain the current date.  Implementors can override.
              *
              * @return Date instance.
              */
             @Override
-            protected Date currentDate()
-            {
+            protected Date currentDate() {
                 return cal.getTime();
             }
         });
 
         expect(getMockJob().getID()).andReturn("88").times(2);
+        expect(getMockJob().getParameterList()).andReturn(EMPTY_PARAMETER_LIST).once();
         expect(getMockJobUpdater().setPhase("88", ExecutionPhase.QUEUED,
                                             ExecutionPhase.EXECUTING,
                                             cal.getTime())).andThrow(
-                new TransientException("1")).once();
+            new TransientException("1")).once();
 
-        getMockSyncOutput().setResponseCode(
-                HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+        getMockSyncOutput().setCode(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
         expectLastCall().once();
 
         // Need to compensate for lack of equals in ErrorSummary.
         final ErrorSummary errorSummary =
-                new ErrorSummary("1", ErrorType.TRANSIENT)
-                {
-                    @Override
-                    public boolean equals(Object obj)
-                    {
-                        if (obj == this)
-                        {
-                            return true;
-                        }
-                        else
-                        {
-                            final ErrorSummary es = (ErrorSummary) obj;
+            new ErrorSummary("1", ErrorType.TRANSIENT) {
+                @Override
+                public boolean equals(Object obj) {
+                    if (obj == this) {
+                        return true;
+                    } else {
+                        final ErrorSummary es = (ErrorSummary) obj;
 
-                            return (es.getErrorType() == getErrorType())
-                                   && es.getSummaryMessage().equals(
-                                    getSummaryMessage());
-                        }
+                        return (es.getErrorType() == getErrorType())
+                            && es.getSummaryMessage().equals(
+                            getSummaryMessage());
                     }
-                };
+                }
+            };
 
         expect(getMockJobUpdater().setPhase("88", ExecutionPhase.EXECUTING,
                                             ExecutionPhase.ERROR, errorSummary,
                                             cal.getTime())).andThrow(
-                new TransientException("2")).once();
+            new TransientException("2")).once();
 
-        getMockSyncOutput().setResponseCode(
-                HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        getMockSyncOutput().setCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         expectLastCall().once();
 
-        expect(getMockSyncOutput().getOutputStream()).andReturn(
-                new ByteArrayOutputStream()).once();
-        replay(getMockJob(), getMockJobUpdater(), getMockSyncOutput(),
-               getMockSearcher());
-
+        expect(getMockSyncOutput().getOutputStream()).andReturn(new ByteArrayOutputStream()).once();
+        replay(getMockJob(), getMockJobUpdater(), getMockSyncOutput(), getMockSearcher());
+        getTestSubject().setJob(getMockJob());
+        getTestSubject().setJobUpdater(getMockJobUpdater());
+        getTestSubject().setSyncOutput(getMockSyncOutput());
         getTestSubject().run();
-
-        verify(getMockJob(), getMockJobUpdater(), getMockSyncOutput(),
-               getMockSearcher());
+        verify(getMockJob(), getMockJobUpdater(), getMockSyncOutput(), getMockSearcher());
     }
 
 
-    private Job getMockJob()
-    {
+    private Job getMockJob() {
         return mockJob;
     }
 
-    private JobUpdater getMockJobUpdater()
-    {
+    private JobUpdater getMockJobUpdater() {
         return mockJobUpdater;
     }
 
-    private SyncOutput getMockSyncOutput()
-    {
+    private SyncOutput getMockSyncOutput() {
         return mockSyncOutput;
     }
 
-    private Searcher getMockSearcher()
-    {
+    private Searcher getMockSearcher() {
         return mockSearcher;
     }
 }

@@ -1,4 +1,5 @@
-;(function($) {
+;
+(function ($) {
   $.extend(true, window, {
     ca: {
       nrc: {
@@ -8,8 +9,7 @@
             activateMAQSelector: '.activateMAQ',
             ignore_fields: ['collection', 'noexec'],
             CAOM2_TARGET_NAME_FIELD_ID: 'Plane.position.bounds',
-            OBSCORE_TARGET_NAME_FIELD_ID:
-              'Char.SpatialAxis.Coverage.Support.Area',
+            OBSCORE_TARGET_NAME_FIELD_ID: 'Char.SpatialAxis.Coverage.Support.Area',
             FORM_LABEL_INPUT_LENGTH: 12,
             TARGET_FORM_LABEL_INPUT_LENGTH: 24,
             CHECKBOX_CHECKED_REGEX: /^true|on$/g,
@@ -17,8 +17,7 @@
               payload: {
                 LANG: 'ADQL',
                 FORMAT: 'CSV',
-                QUERY:
-                  "select {1} from caom2.distinct_{1} where lower({1}) like '%{2}%' order by {1}"
+                QUERY: "select {1} from caom2.distinct_{1} where lower({1}) like '%{2}%' order by {1}"
               },
               fields: {
                 'Observation.proposal.pi': {
@@ -49,19 +48,13 @@
               FormConfiguration: ObsCoreFormConfiguration,
               config: {
                 id: 'ObsCore',
-                download_access_key:
-                  'obscore:Curation.PublisherDID.downloadable',
-                default_sort_column:
-                  'obscore:Char.TimeAxis.Coverage.Bounds.Limits.StartTime',
+                download_access_key: 'obscore:Curation.PublisherDID.downloadable',
+                default_sort_column: 'obscore:Char.TimeAxis.Coverage.Bounds.Limits.StartTime',
                 collection_select_id: 'DataID.Collection',
-                footprint_column_id:
-                  'obscore:Char.SpatialAxis.Coverage.Support.Area',
-                ra_column_id:
-                  'obscore:Char.SpatialAxis.Coverage.Location.Coord.Position2D.Value2.C1',
-                dec_column_id:
-                  'obscore:Char.SpatialAxis.Coverage.Location.Coord.Position2D.Value2.C2',
-                fov_column_id:
-                  'obscore:Char.SpatialAxis.Coverage.Bounds.Extent.diameter'
+                footprint_column_id: 'obscore:Char.SpatialAxis.Coverage.Support.Area',
+                ra_column_id: 'obscore:Char.SpatialAxis.Coverage.Location.Coord.Position2D.Value2.C1',
+                dec_column_id: 'obscore:Char.SpatialAxis.Coverage.Location.Coord.Position2D.Value2.C2',
+                fov_column_id: 'obscore:Char.SpatialAxis.Coverage.Bounds.Extent.diameter'
               }
             },
             types: {
@@ -77,19 +70,13 @@
               },
               ObsCore: {
                 id: 'ObsCore',
-                download_access_key:
-                  'obscore:Curation.PublisherDID.downloadable',
-                default_sort_column:
-                  'obscore:Char.TimeAxis.Coverage.Bounds.Limits.StartTime',
+                download_access_key: 'obscore:Curation.PublisherDID.downloadable',
+                default_sort_column: 'obscore:Char.TimeAxis.Coverage.Bounds.Limits.StartTime',
                 collection_select_id: 'DataID.Collection',
-                footprint_column_id:
-                  'obscore:Char.SpatialAxis.Coverage.Support.Area',
-                ra_column_id:
-                  'obscore:Char.SpatialAxis.Coverage.Location.Coord.Position2D.Value2.C1',
-                dec_column_id:
-                  'obscore:Char.SpatialAxis.Coverage.Location.Coord.Position2D.Value2.C2',
-                fov_column_id:
-                  'obscore:Char.SpatialAxis.Coverage.Bounds.Extent.diameter'
+                footprint_column_id: 'obscore:Char.SpatialAxis.Coverage.Support.Area',
+                ra_column_id: 'obscore:Char.SpatialAxis.Coverage.Location.Coord.Position2D.Value2.C1',
+                dec_column_id: 'obscore:Char.SpatialAxis.Coverage.Location.Coord.Position2D.Value2.C2',
+                fov_column_id: 'obscore:Char.SpatialAxis.Coverage.Bounds.Extent.diameter'
               }
             },
             SearchForm: SearchForm,
@@ -152,7 +139,7 @@
     this.columnManager = new ca.nrc.cadc.search.columns.ColumnManager()
     this.columnOptions = this.columnManager.getColumnOptions()
 
-    this.getDownloadAccessKey = function() {
+    this.getDownloadAccessKey = function () {
       return this.config.getConfig().download_access_key
     }
 
@@ -161,7 +148,7 @@
      *
      * @return {Metadata|cadc.vot.Metadata}
      */
-    this.getTableMetadata = function() {
+    this.getTableMetadata = function () {
       return this.tableMetadata
     }
 
@@ -171,7 +158,7 @@
      *
      * @return {Metadata|cadc.vot.Metadata}
      */
-    this.getResultsTableMetadata = function() {
+    this.getResultsTableMetadata = function () {
       // Current order of column IDs.
       var columnIDs = this.config.getAllColumnIDs()
       var currentMetadata = new cadc.vot.Metadata(
@@ -199,7 +186,7 @@
      * Obtain the column options for this configuration.
      * @return {{}}   Hash of all columns and their options.
      */
-    this.getColumnOptions = function() {
+    this.getColumnOptions = function () {
       return this.columnOptions
     }
 
@@ -214,7 +201,7 @@
      * @return {{}}   Plain object of items for metadata.
      * @private
      */
-    this._rowData = function(_row) {
+    this._rowData = function (_row) {
       var cells = _row.getCells()
 
       var rowData = {}
@@ -252,7 +239,7 @@
      * @param {cadc.vot.Row|Row} _row   Row object for a row in the VOTV grid.
      * @return {{}}   Plain hash of items.
      */
-    this.addField = function(_row) {
+    this.addField = function (_row) {
       var rowData = this._rowData(_row)
       var uType = rowData.utype
       var ucd = rowData.ucd
@@ -363,7 +350,7 @@
      * @param {Number} _order
      * @private
      */
-    this._addFieldsForUType = function(
+    this._addFieldsForUType = function (
       _uType,
       _ucd,
       _unit,
@@ -405,7 +392,7 @@
      * @param {boolean} _includeExtendedColumns   Flag to indicate whether extended (hidden) columns are to be included.
      * @returns {string}    ADQL Select clause, or empty string.  Never null.
      */
-    this.getSelectListString = function(_includeExtendedColumns) {
+    this.getSelectListString = function (_includeExtendedColumns) {
       var selectColumnIDs = this.config.getAllColumnIDs()
       var thisColumnOptions = this.getColumnOptions()
       var lowercaseName = this.getName().toLowerCase()
@@ -438,9 +425,9 @@
         }
       }
 
-      return stringUtil.hasText(selectListString)
-        ? selectListString.substring(0, selectListString.length - 2)
-        : ''
+      return stringUtil.hasText(selectListString) ?
+        selectListString.substring(0, selectListString.length - 2) :
+        ''
     }
 
     /**
@@ -451,17 +438,17 @@
      * @param {String} _field.tap_column_name    TAP Column name.
      * @private
      */
-    this._getSelect = function(_uType, _field) {
-      return _field.tap_column_name
-        ? _field.tap_column_name
-        : _uType.slice(_uType.indexOf(':') + 1)
+    this._getSelect = function (_uType, _field) {
+      return _field.tap_column_name ?
+        _field.tap_column_name :
+        _uType.slice(_uType.indexOf(':') + 1)
     }
 
     /**
      * Obtain the column ID of the column containing footprint vales.
      * @return {string}
      */
-    this.getFootprintColumnID = function() {
+    this.getFootprintColumnID = function () {
       return this.config.getConfig().footprint_column_id
     }
 
@@ -469,7 +456,7 @@
      * Obtain the column ID of the column containing RA vales.
      * @return {string}
      */
-    this.getRAColumnID = function() {
+    this.getRAColumnID = function () {
       return this.config.getConfig().ra_column_id
     }
 
@@ -477,7 +464,7 @@
      * Obtain the column ID of the column containing Dec vales.
      * @return {string}
      */
-    this.getDecColumnID = function() {
+    this.getDecColumnID = function () {
       return this.config.getConfig().dec_column_id
     }
 
@@ -485,7 +472,7 @@
      * Obtain the column ID of the column containing FOV (Field of View) vales.
      * @return {string}
      */
-    this.getFOVColumnID = function() {
+    this.getFOVColumnID = function () {
       return this.config.getConfig().fov_column_id
     }
 
@@ -493,7 +480,7 @@
      * Obtain the column ID of the column to sort by default.
      * @return {string}
      */
-    this.getDefaultSortColumnID = function() {
+    this.getDefaultSortColumnID = function () {
       return this.config.getConfig().default_sort_column
     }
 
@@ -501,7 +488,7 @@
      * Obtain the name of this form.
      * @return {string}
      */
-    this.getName = function() {
+    this.getName = function () {
       return this.config.getConfig().id
     }
 
@@ -510,7 +497,7 @@
      * @return {[]}
      * @deprecated    Use FormConfiguration.getDefaultColumnIDs().
      */
-    this.getDefaultColumnIDs = function() {
+    this.getDefaultColumnIDs = function () {
       return this.config.getDefaultColumnIDs()
     }
 
@@ -519,7 +506,7 @@
      * @return {{}}
      * @deprecated    Use FormConfiguration.getDefaultUnitTypes().
      */
-    this.getDefaultUnitTypes = function() {
+    this.getDefaultUnitTypes = function () {
       return this.config.getDefaultUnitTypes()
     }
 
@@ -529,7 +516,7 @@
      * @return {[]}
      * @deprecated    use FormConfiguration.getAllColumnIDs().
      */
-    this.getAllColumnIDs = function() {
+    this.getAllColumnIDs = function () {
       return this.config.getAllColumnIDs()
     }
   }
@@ -548,7 +535,7 @@
      * @return {String}
      * @private
      */
-    this._getSelectedCollections = function() {
+    this._getSelectedCollections = function () {
       return $("select[id='" + this.config.collection_select_id + "']").val()
     }
 
@@ -557,7 +544,7 @@
      *
      * @return {[]} column ids, or empty array.
      */
-    this.getDefaultColumnIDs = function() {
+    this.getDefaultColumnIDs = function () {
       var selectedCollections = this._getSelectedCollections()
       return this.columnBundleManager.getDefaultColumnIDs(selectedCollections)
     }
@@ -568,7 +555,7 @@
      *
      * @return {[]} Column IDs.
      */
-    this.getAllColumnIDs = function() {
+    this.getAllColumnIDs = function () {
       var selectedCollections = this._getSelectedCollections()
       return this.columnBundleManager.getAllColumnIDs(selectedCollections)
     }
@@ -578,7 +565,7 @@
      *
      * @return {Object}  Of Column ID to unit type mappings.
      */
-    this.getDefaultUnitTypes = function() {
+    this.getDefaultUnitTypes = function () {
       var selectedCollections = this._getSelectedCollections()
       return this.columnBundleManager.getDefaultUnitTypes(selectedCollections)
     }
@@ -589,7 +576,7 @@
      * @return {true.ca.nrc.cadc.search.CAOM2.config|{id, download_access_key, default_sort_column,
      *     collection_select_id, footprint_column_id, ra_column_id, dec_column_id, fov_column_id}|*}
      */
-    this.getConfig = function() {
+    this.getConfig = function () {
       return this.config
     }
   }
@@ -608,7 +595,7 @@
      *
      * @return {[]} column ids, or empty array.
      */
-    this.getDefaultColumnIDs = function() {
+    this.getDefaultColumnIDs = function () {
       return this.columnBundleManager.getDefaultColumnIDs([this.config.id])
     }
 
@@ -617,7 +604,7 @@
      *
      * @return {[]} Column IDs.
      */
-    this.getAllColumnIDs = function() {
+    this.getAllColumnIDs = function () {
       return this.columnBundleManager.getAllColumnIDs([this.config.id])
     }
 
@@ -626,7 +613,7 @@
      *
      * @return {{}}  Of Column ID to unit type mappings.
      */
-    this.getDefaultUnitTypes = function() {
+    this.getDefaultUnitTypes = function () {
       return this.columnBundleManager.getDefaultUnitTypes([this.config.id])
     }
 
@@ -636,7 +623,7 @@
      * @return {true.ca.nrc.cadc.search.ObsCore.config|{id, download_access_key, default_sort_column,
      *     collection_select_id, footprint_column_id, ra_column_id, dec_column_id, fov_column_id}|*}
      */
-    this.getConfig = function() {
+    this.getConfig = function () {
       return this.config
     }
   }
@@ -672,8 +659,7 @@
      */
     this.dataTrain = new ca.nrc.cadc.search.datatrain.DataTrain(
       this.configuration.getName().toLowerCase(),
-      this.configuration.columnManager,
-      {
+      this.configuration.columnManager, {
         tapSyncEndpoint: this.configuration.options.tapSyncEndpoint
       }
     )
@@ -690,7 +676,7 @@
     /**
      * Initialize this form.
      */
-    this.init = function() {
+    this.init = function () {
       var $currForm = this.$form
       this.targetNameFieldID = $currForm
         .find("input[name$='@Shape1.value']")
@@ -698,7 +684,7 @@
 
       $currForm.find('.search_criteria_input').on(
         'change input',
-        function(event) {
+        function (event) {
           this._searchCriteriaChanged($(event.target))
         }.bind(this)
       )
@@ -706,7 +692,7 @@
       $currForm
         .find("input:file[id$='_targetList']")
         .change(
-          function(event) {
+          function (event) {
             if ($(event.target).val() !== '') {
               $('.targetList_clear').show()
               this.toggleDisabled(
@@ -734,7 +720,7 @@
       $('*[data-assoc-field]')
         .on(
           'change keyup',
-          function(event) {
+          function (event) {
             var $thisElement = $(event.target)
             var thisValue = $thisElement.val()
 
@@ -747,7 +733,7 @@
         .change()
 
       $('input.ui-autocomplete-input').each(
-        function(key, input) {
+        function (key, input) {
           var id = $(input).attr('id')
           var config = this.configuration
 
@@ -760,7 +746,7 @@
             minLength: 2,
 
             // Define callback to format results
-            source: function(req, callback) {
+            source: function (req, callback) {
               // Reset each time as they type.
               suggestionKeys.length = 0
 
@@ -775,7 +761,7 @@
                 ])
               })
               // Does anything need to be done differently here for MAQ support?
-              $.get(config.options.tapSyncEndpoint, payload).done(function(
+              $.get(config.options.tapSyncEndpoint, payload).done(function (
                 csvData
               ) {
                 var csvArray = csvData.split('\n')
@@ -785,7 +771,7 @@
                 }
               })
             },
-            select: function(event, ui) {
+            select: function (event, ui) {
               var val = ui.item.value
               var index = $.inArray(val, suggestionKeys)
               ui.item.value = suggestionKeys[index]
@@ -798,7 +784,7 @@
       $(document).on(
         'click',
         'a.advanced_search_tooltip_example',
-        function(event) {
+        function (event) {
           var $thisLink = $(event.target)
           var uTypeID = $thisLink.prop('name')
 
@@ -819,7 +805,7 @@
 
       // All of those checkboxes that will disable something when checked.
       $currForm.find('[data-disable-to]').change(
-        function(event) {
+        function (event) {
           var $checkbox = $(event.target)
           var dataItem = $checkbox.data('disable-to')
 
@@ -830,7 +816,7 @@
       )
 
       $currForm.find('select.resolver-select').change(
-        function(event) {
+        function (event) {
           var $resolverSelectName = $(event.target).prop('name')
           var $fieldID = $resolverSelectName.substring(
             0,
@@ -841,13 +827,13 @@
       )
 
       $currForm.find('.targetList_clear').click(
-        function() {
+        function () {
           this._clearTargetList()
         }.bind(this)
       )
 
       $currForm.find('.activateMAQ').change(
-        function(event) {
+        function (event) {
           var maqSelectedFlag =
             event.currentTarget.checked === 'true' ||
             event.currentTarget.checked === true
@@ -864,7 +850,7 @@
       )
 
       // Prevent closing details when a value is present.
-      $currForm.find("details[id$='_details'] summary").click(function(event) {
+      $currForm.find("details[id$='_details'] summary").click(function (event) {
         var $detailsElement = $(this).parent('details')
         var $inputElements = $detailsElement.find('input.search_criteria_input')
         var isOpen = $detailsElement.prop('open')
@@ -872,7 +858,7 @@
         if (isOpen) {
           var canProceed = true
 
-          $.each($inputElements, function(inputElementKey, inputElement) {
+          $.each($inputElements, function (inputElementKey, inputElement) {
             var $inputElement = $(inputElement)
 
             if (
@@ -904,13 +890,13 @@
 
       // Bind form input validation function.
       $currForm.find('input.ui-form-input-validate').each(
-        function(key, value) {
+        function (key, value) {
           var $input = $(value)
           var thisSearchForm = this
-          var callbackFunction = function(jsonError) {
+          var callbackFunction = function (jsonError) {
             thisSearchForm._decorate($input, jsonError)
           }
-          $input.bind('keydown', function() {
+          $input.bind('keydown', function () {
             thisSearchForm
               .getValidator()
               .inputKeyPressed($input, callbackFunction)
@@ -924,8 +910,7 @@
       this._getTargetNameResolutionStatusObject().popover({
         html: true,
         placement: 'auto left',
-        template:
-          '<div class="popover resolver-popover" role="tooltip"><h3 class="popover-title"></h3><div class="popover-content"></div></div>'
+        template: '<div class="popover resolver-popover" role="tooltip"><h3 class="popover-title"></h3><div class="popover-content"></div></div>'
       })
 
       this.subscribe(
@@ -935,7 +920,7 @@
 
       this.subscribe(
         ca.nrc.cadc.search.events.onTargetNameUnresolved,
-        function() {
+        function () {
           var $targetNameResolutionStatus = this._getTargetNameResolutionStatusObject()
           var resolverPopover = $targetNameResolutionStatus.data('bs.popover')
 
@@ -949,7 +934,9 @@
           }
 
           $targetNameResolutionStatus.addClass('target_not_found')
-          this._decorate($targetNameResolutionStatus, { status: 'NOT_FOUND' })
+          this._decorate($targetNameResolutionStatus, {
+            status: 'NOT_FOUND'
+          })
 
           $targetNameResolutionStatus.removeClass('busy')
         }
@@ -964,29 +951,29 @@
       }
     }
 
-    this.setMaqToggle = function(setOn) {
+    this.setMaqToggle = function (setOn) {
       this.$form
         .find(ca.nrc.cadc.search.activateMAQSelector)
         .bootstrapToggle(setOn === true ? 'on' : 'off')
       this.disableMaqToggle()
     }
 
-    this.disableMaqToggle = function() {
+    this.disableMaqToggle = function () {
       this._toggleMAQToggle(false)
     }
 
-    this.enableMaqToggle = function() {
+    this.enableMaqToggle = function () {
       this._toggleMAQToggle(true)
     }
 
-    this._toggleMAQToggle = function(enabledFlag) {
+    this._toggleMAQToggle = function (enabledFlag) {
       this.maqToggleEnabled = enabledFlag
       this.$form
         .find(ca.nrc.cadc.search.activateMAQSelector)
         .bootstrapToggle(enabledFlag ? 'enable' : 'disable')
     }
 
-    this.setResultsMaqMode = function(setOn) {
+    this.setResultsMaqMode = function (setOn) {
       if (setOn === true || setOn === 'true') {
         $('#resultsMaqEnabled').removeClass('cadc-display-none')
       } else {
@@ -1003,7 +990,7 @@
      * @param {boolean} [args.resolved=true]   Whether the resolver resolved a name.  This affects the tooltip being
      * shown.
      */
-    this.targetAccepted = function(event, args) {
+    this.targetAccepted = function (event, args) {
       var $targetNameResolutionStatus = this._getTargetNameResolutionStatusObject()
       $targetNameResolutionStatus.addClass('target_ok')
       var tooltipCreator = new ca.nrc.cadc.search.TooltipCreator()
@@ -1041,7 +1028,7 @@
      * @param {String} inputID
      * @param {String} tooltipHeaderText
      */
-    this.handleTooltipLoad = function(
+    this.handleTooltipLoad = function (
       tipJSON,
       tooltipCreator,
       $liItem,
@@ -1096,10 +1083,10 @@
      * Given the JSON data, load the tooltips for those fields.
      * @param {{}}  jsonData    JSON data from external tooltips.
      */
-    this.loadTooltips = function(jsonData) {
+    this.loadTooltips = function (jsonData) {
       var tooltipCreator = new ca.nrc.cadc.search.TooltipCreator()
       this.$form.find('[data-toggle="popover"]').each(
-        function(key, element) {
+        function (key, element) {
           var $liItem = $(element)
           this.handleTooltipLoad(
             jsonData[element.dataset.utype],
@@ -1113,14 +1100,14 @@
 
       // Manage closing popovers, and maintaining that only one is
       // open at a time.
-      $(document).on('click', function(e) {
+      $(document).on('click', function (e) {
         if ($(e.target).hasClass('glyphicon-remove-circle')) {
-          $('[data-toggle="popover"],[data-original-title]').each(function() {
-            ;(
+          $('[data-toggle="popover"],[data-original-title]').each(function () {;
+            (
               (
                 $(this)
-                  .popover('hide')
-                  .data('bs.popover') || {}
+                .popover('hide')
+                .data('bs.popover') || {}
               ).inState || {}
             ).click = false // fix for BS
             // 3.3.6
@@ -1128,17 +1115,17 @@
         }
 
         if ($(e.target).hasClass('glyphicon-question-sign')) {
-          $('[data-toggle="popover"]').each(function() {
+          $('[data-toggle="popover"]').each(function () {
             if (
               !$(this).is(e.target) &&
               $(this).has(e.target).length === 0 &&
               $('.popover').has(e.target).length === 0
-            ) {
-              ;(
+            ) {;
+              (
                 (
                   $(this)
-                    .popover('hide')
-                    .data('bs.popover') || {}
+                  .popover('hide')
+                  .data('bs.popover') || {}
                 ).inState || {}
               ).click = false // fix for BS 3.3.6
             }
@@ -1156,7 +1143,7 @@
      * Action to perform when the given criteria (form element) has changed.
      * @param {jQuery} $node
      */
-    this._searchCriteriaChanged = function($node) {
+    this._searchCriteriaChanged = function ($node) {
       var id = $node.attr('id')
       var value = $node.val()
       var autocompleteURL =
@@ -1180,28 +1167,27 @@
 
           // Give the user a little more time to type stuff in.
           this.currentTimeoutID = window.setTimeout(
-            function() {
+            function () {
               this._clearTargetNameResolutionStatusOnly()
 
               var $targetNameResolutionStatus = this._getTargetNameResolutionStatusObject()
               $targetNameResolutionStatus.addClass('busy')
 
               $.ajax({
-                url:
-                  this.configuration.options.targetResolverEndpoint + '/' + id,
-                data: {
-                  term: encodeURIComponent(value),
-                  resolver: resolver.toLowerCase()
-                },
-                method: 'GET',
-                dataType: 'json'
-              })
+                  url: this.configuration.options.targetResolverEndpoint + '/' + id,
+                  data: {
+                    term: encodeURIComponent(value),
+                    resolver: resolver.toLowerCase()
+                  },
+                  method: 'GET',
+                  dataType: 'json'
+                })
                 .done(
                   /**
                    * @param {{}} data   Response JSON
                    * @param {String}  data.resolveStatus  Status text.
                    */
-                  function(data) {
+                  function (data) {
                     // Was input text cleared before the event arrived?
                     if ($.trim($("input[id='" + id + "']").val()).length > 0) {
                       var arg = {
@@ -1225,11 +1211,13 @@
                   }.bind(this)
                 )
                 .fail(
-                  function(jqXHR) {
+                  function (jqXHR) {
                     if (jqXHR.status === 425) {
                       this._trigger(
-                        ca.nrc.cadc.search.events.onTargetNameUnresolved,
-                        { id: id, target: value }
+                        ca.nrc.cadc.search.events.onTargetNameUnresolved, {
+                          id: id,
+                          target: value
+                        }
                       )
                     }
                   }.bind(this)
@@ -1243,9 +1231,10 @@
       } else if ($node.hasClass('ui_unitconversion_input')) {
         // Pass request to server
         $.getJSON(
-          autocompleteURL,
-          { term: value },
-          function(data) {
+          autocompleteURL, {
+            term: value
+          },
+          function (data) {
             var elementID
 
             if (id.indexOf('_targetList') > 0) {
@@ -1263,16 +1252,16 @@
             if ($label) {
               $label.empty()
               var searchCriteriaLabel =
-                value !== '' && JSON.stringify(data).indexOf('NaN') < 0
-                  ? data
-                  : ''
+                value !== '' && JSON.stringify(data).indexOf('NaN') < 0 ?
+                data :
+                ''
 
               $label.text(searchCriteriaLabel)
             } else {
               console.warn('Unable to reset text for ' + elementID)
             }
           }.bind(this)
-        ).error(function(jqXHR, status, message) {
+        ).error(function (jqXHR, status, message) {
           console.log('Error: ' + message)
         })
       } else if (id.match('^Observation.')) {
@@ -1306,7 +1295,7 @@
      * @param {String} elementValue The value to set.
      * @private
      */
-    this._indicateInputPresence = function(hasValue, elementID, elementValue) {
+    this._indicateInputPresence = function (hasValue, elementID, elementValue) {
       var $label = this.$form.find(
         "label[for='" + elementID + "'] .search_criteria_label_contents"
       )
@@ -1316,7 +1305,7 @@
 
         if (hasValue) {
           var mText = elementValue
-          $label.text(function() {
+          $label.text(function () {
             var maxLength
 
             if (
@@ -1342,7 +1331,7 @@
      * Obtain the jQuery Form object.
      * @return {jQuery}
      */
-    this.getForm = function() {
+    this.getForm = function () {
       return this.$form
     }
 
@@ -1350,7 +1339,7 @@
      * Obtain this Form's ID.
      * @return {String}
      */
-    this.getID = function() {
+    this.getID = function () {
       return this.id
     }
 
@@ -1358,7 +1347,7 @@
      * Obtain the Data Train instance.
      * @return {ca.nrc.cadc.search.datatrain.DataTrain|DataTrain}
      */
-    this.getDataTrain = function() {
+    this.getDataTrain = function () {
       return this.dataTrain
     }
 
@@ -1366,7 +1355,7 @@
      * This form's name.
      * @return {String}
      */
-    this.getName = function() {
+    this.getName = function () {
       return this.configuration.getName()
     }
 
@@ -1374,11 +1363,11 @@
      * This form's download access key column.
      * @return {String}
      */
-    this.getDownloadAccessKey = function() {
+    this.getDownloadAccessKey = function () {
       return this.configuration.getDownloadAccessKey()
     }
 
-    this.getConfiguration = function() {
+    this.getConfiguration = function () {
       return this.configuration
     }
 
@@ -1387,7 +1376,7 @@
      *
      * @returns {cadc.vot.Metadata|*}
      */
-    this.getResultsTableMetadata = function() {
+    this.getResultsTableMetadata = function () {
       return this.configuration.getResultsTableMetadata()
     }
 
@@ -1395,11 +1384,11 @@
      * @param {String}  _formID   Assess whether this form is active.
      * @return {boolean}
      */
-    this.isActive = function(_formID) {
+    this.isActive = function (_formID) {
       return _formID === this.id
     }
 
-    this.getValidator = function() {
+    this.getValidator = function () {
       return this.validator
     }
 
@@ -1410,7 +1399,7 @@
      * @param {{}} [jsonError]   The JSON object of error messages.
      * @private
      */
-    this._decorate = function($input, jsonError) {
+    this._decorate = function ($input, jsonError) {
       var $inputParent = $input.parent()
 
       if (!jsonError || $.isEmptyObject(jsonError)) {
@@ -1424,9 +1413,9 @@
      * Clear any errors.
      * @private
      */
-    this.clearErrors = function() {
+    this.clearErrors = function () {
       this.$form.find('.has-error').each(
-        function(key, value) {
+        function (key, value) {
           this._decorate($(value).find('input.search_criteria_input'), null)
         }.bind(this)
       )
@@ -1438,18 +1427,18 @@
      * @returns {boolean}   True if valid, False otherwise.
      * @private
      */
-    this._validate = function() {
+    this._validate = function () {
       var valid = false
       var $thisForm = this.$form
 
-      $thisForm.find('input:text').each(function() {
+      $thisForm.find('input:text').each(function () {
         if ($(this).val() !== '') {
           valid = true
         }
       })
 
       if (!valid) {
-        $thisForm.find('input.form-extra').each(function() {
+        $thisForm.find('input.form-extra').each(function () {
           if ($(this).val() !== '') {
             valid = true
           }
@@ -1457,11 +1446,11 @@
       }
 
       if (!valid) {
-        $thisForm.find('select.hierarchy_select :selected').each(function() {
+        $thisForm.find('select.hierarchy_select :selected').each(function () {
           if (
             !$(this)
-              .text()
-              .match(/^All/)
+            .text()
+            .match(/^All/)
           ) {
             valid = true
           }
@@ -1469,7 +1458,7 @@
       }
 
       if (!valid) {
-        $thisForm.find('input:hidden#target').each(function() {
+        $thisForm.find('input:hidden#target').each(function () {
           if ($(this).val() !== '') {
             valid = true
           }
@@ -1477,7 +1466,7 @@
       }
 
       if (!valid) {
-        $thisForm.find('input:hidden#collection').each(function() {
+        $thisForm.find('input:hidden#collection').each(function () {
           if ($(this).val() !== '') {
             valid = true
           }
@@ -1485,14 +1474,14 @@
       }
 
       if (!valid) {
-        $thisForm.find('select.preset-date').each(function() {
+        $thisForm.find('select.preset-date').each(function () {
           if ($(this).val() !== '') {
             valid = true
           }
         })
       }
 
-      $thisForm.find('input:file').each(function() {
+      $thisForm.find('input:file').each(function () {
         if ($(this).val() !== '') {
           valid = true
         }
@@ -1513,7 +1502,7 @@
      * @param {jQuery} node      The node to set.
      * @param {boolean} disable   The disabled flag to set.
      */
-    this.toggleDisabled = function(node, disable) {
+    this.toggleDisabled = function (node, disable) {
       node.prop('disabled', disable)
 
       if (disable === false) {
@@ -1524,7 +1513,7 @@
     /**
      * Disable searches from this form.
      */
-    this.disable = function() {
+    this.disable = function () {
       this.$form
         .prop('disabled', true)
         .find('input:submit')
@@ -1534,7 +1523,7 @@
     /**
      * Enable searches from this form.
      */
-    this.enable = function() {
+    this.enable = function () {
       this.$form
         .prop('disabled', false)
         .find('input:submit')
@@ -1545,7 +1534,7 @@
      * @return {jQuery}   Target list object.
      * @private
      */
-    this._clearTargetList = function() {
+    this._clearTargetList = function () {
       var $targetList = this.$form.find("input:file[id$='_targetList']")
       $targetList.val('')
 
@@ -1565,7 +1554,7 @@
      * @return {jQuery}
      * @private
      */
-    this._getTargetNameResolutionStatusObject = function() {
+    this._getTargetNameResolutionStatusObject = function () {
       return this.$form.find('span.target_name_resolution_status')
     }
 
@@ -1573,7 +1562,7 @@
      * Return those checkboxes that disable other fields to unchecked.
      * @private
      */
-    this._clearDisablingCheckboxes = function() {
+    this._clearDisablingCheckboxes = function () {
       // Force issue a change().
       this.$form
         .find('[data-disable-to]:checked')
@@ -1585,7 +1574,7 @@
      * Clear the target name resolution image.
      * @private
      */
-    this._clearTargetNameResolutionStatusOnly = function() {
+    this._clearTargetNameResolutionStatusOnly = function () {
       var targetNameResolutionStatus = this._getTargetNameResolutionStatusObject()
 
       targetNameResolutionStatus.removeClass('busy')
@@ -1600,7 +1589,7 @@
      * Clear the target name resolution image.
      * @private
      */
-    this._clearTargetNameResolutionStatus = function() {
+    this._clearTargetNameResolutionStatus = function () {
       this._closeResolverPopover()
       this._clearTargetNameResolutionStatusOnly()
     }
@@ -1609,7 +1598,7 @@
      * Attempt at cross-browser HTTPRequest creation.
      * @returns {*} Request
      */
-    this._createRequest = function() {
+    this._createRequest = function () {
       var _thisRequest
 
       try {
@@ -1633,14 +1622,14 @@
     /**
      * Submit the form.
      */
-    this.submit = function() {
+    this.submit = function () {
       this.$form.submit()
     }
 
     /**
      * Cancel the current form submission.
      */
-    this.cancel = function() {
+    this.cancel = function () {
       this.$form.stop(true, true)
 
       if (this.currentRequest) {
@@ -1654,7 +1643,7 @@
      * Hide all of the tooltips.  This is used when the form is submitted.
      * @private
      */
-    this._closeAllTooltips = function() {
+    this._closeAllTooltips = function () {
       this.$form.find('.' + tooltipIconCSS).popover('hide')
 
       // This popover is associated with a stateful DOM element,
@@ -1662,7 +1651,7 @@
       this._clearTargetNameResolutionStatus()
     }
 
-    this._closeResolverPopover = function() {
+    this._closeResolverPopover = function () {
       var resolverPopover = this.$form.find('.target_name_resolution_status')
       resolverPopover.popover('hide')
     }
@@ -1671,8 +1660,8 @@
      * Action to perform before form serialization begins.
      * @private
      */
-    this._beforeSerialize = function() {
-      $('#UPLOAD').remove()
+    this._beforeSerialize = function () {
+      // $('#UPLOAD').remove()
 
       var inputFile = this.$form.find('input:file.target-list')
 
@@ -1681,21 +1670,21 @@
         !inputFile.prop('disabled') &&
         inputFile.val() !== ''
       ) {
-        var upload = $('<input>')
-        upload.prop('type', 'hidden')
-        upload.prop('name', 'UPLOAD')
-        upload.prop('id', 'UPLOAD')
-        upload.prop('value', 'search_upload,param:targetList')
+      //   var upload = $('<input>')
+      //   upload.prop('type', 'hidden')
+      //   upload.prop('name', 'UPLOAD')
+      //   upload.prop('id', 'UPLOAD')
+      //   upload.prop('value', 'search_upload,param:targetList')
 
-        this.$form.append(upload)
+      //   this.$form.append(upload)
 
-        // Update the file input name with the value from the target list select.
+      //   // Update the file input name with the value from the target list select.
         var resolverSelect = this.$form.find('select.resolver-select')
 
         // Renaming the field is a terrible idea, but cloning it doesn't work in some browsers.
         // jenkinsd 2017.07.10
         //
-        inputFile.prop('name', 'targetList.' + resolverSelect.val())
+        inputFile.prop('name', 'targetList:' + resolverSelect.val())
       }
 
       // Save the form to sessionStorage.
@@ -1703,7 +1692,7 @@
       sessionStorage.setItem('isReload', false)
     }
 
-    $(window).ready(function() {
+    $(window).ready(function () {
       // if time between unload and ready is short (1 second or
       // less), page is reloaded
       if ($.now() - sessionStorage.getItem('unloadTime') < 1000) {
@@ -1711,7 +1700,7 @@
       }
     })
 
-    $(window).unload(function() {
+    $(window).unload(function () {
       // when page is unloaded, save the selected tab
       sessionStorage.setItem('unloadTime', $.now())
       sessionStorage.setItem('isReload', false)
@@ -1723,7 +1712,7 @@
      * @param {jQuery.Event|Event} event
      * @private
      */
-    this._formSubmit = function(event) {
+    this._formSubmit = function (event) {
       event.preventDefault()
 
       this._closeAllTooltips()
@@ -1759,7 +1748,7 @@
           target: '#file_upload_response',
           dataType: 'json',
           beforeSubmit: this._beforeSerialize.bind(this),
-          success: function(json) {
+          success: function (json) {
             myself.$form.find('input:hidden#target').remove()
             myself.$form.find('input:hidden#collection').remove()
 
@@ -1774,7 +1763,7 @@
 
             myself._trigger(ca.nrc.cadc.search.events.onSubmitComplete, args)
           },
-          error: function(request) {
+          error: function (request) {
             console.error('Error: ' + request.responseText)
 
             myself._trigger(ca.nrc.cadc.search.events.onSubmitComplete, {
@@ -1784,14 +1773,14 @@
               cadcForm: myself
             })
           },
-          complete: function(request, textStatus) {
+          complete: function (request, textStatus) {
             // Remove non-form inputs to prevent confusion with further queries.
             myself.$form.find('input.form-extra').remove()
 
             if (textStatus === 'timeout') {
               alert(
                 'The search took too long to return.\n' +
-                  'Please refine your search or try again later.'
+                'Please refine your search or try again later.'
               )
 
               myself._trigger(ca.nrc.cadc.search.events.onSubmitComplete, {
@@ -1814,10 +1803,10 @@
     /**
      * Reset all of the form fields.
      */
-    this.resetFields = function() {
+    this.resetFields = function () {
       // function that resets all fields to default values
       this.$form.find('input:text').val('')
-      this.$form.find(ca.nrc.cadc.search.activateMAQSelector).val(function() {
+      this.$form.find(ca.nrc.cadc.search.activateMAQSelector).val(function () {
         var $self = $(this)
         var defaultVal = $self.prop('defaultValue')
         $self
@@ -1833,7 +1822,7 @@
       this._clearTargetList()
 
       this.$form.find('select.search_criteria_input').each(
-        function(key, value) {
+        function (key, value) {
           var $selectCriteria = $(value)
           $selectCriteria.val('')
           this.toggleDisabled($selectCriteria, false)
@@ -1844,20 +1833,20 @@
       this._clearTargetNameResolutionStatus()
       this._clearDisablingCheckboxes()
 
-      $('.hierarchy select').each(function() {
+      $('.hierarchy select').each(function () {
         $(this).val('')
       })
 
       $("input[name$='.DOWNLOADCUTOUT']").prop('checked', false)
 
       this.$form.find('input.search_criteria_input').each(
-        function(key, value) {
+        function (key, value) {
           var $formItem = $(value)
           this.$form
             .find(
               "label[for='" +
-                $formItem.attr('id') +
-                "'] .search_criteria_label_contents"
+              $formItem.attr('id') +
+              "'] .search_criteria_label_contents"
             )
             .text('')
           this.toggleDisabled($formItem, false)
@@ -1886,7 +1875,7 @@
      * @param {String}  _selectID The ID of the <select> element.
      * @param {String} _optionValue    The value of the <option> to set.
      */
-    this.setSelectValue = function(_uTypeID, _selectID, _optionValue) {
+    this.setSelectValue = function (_uTypeID, _selectID, _optionValue) {
       var $detailsItem = this.$form.find(
         "details[id='" + _uTypeID + "_details']"
       )
@@ -1911,7 +1900,7 @@
      * @param {String} _inputID      The ID of the <input> field.
      * @param {String} _inputValue   The value to set.
      */
-    this.setInputValue = function(_inputID, _inputValue) {
+    this.setInputValue = function (_inputID, _inputValue) {
       var $inputItem = this.$form.find("input[id='" + _inputID + "']")
       var $formItem = this.$form.find("[id='" + _inputID + "']")
 
@@ -1968,7 +1957,7 @@
       }
     }
 
-    this.toggleMaqMode = function() {
+    this.toggleMaqMode = function () {
       // check if toggle is enabled for application first
       this.$form.find('.activateMAQ').click()
     }
@@ -1980,10 +1969,10 @@
      * @param {[]} _selectValues    The selected value array.
      * @returns {Boolean}
      */
-    this.setDataTrainValue = function(_$select, _selectValues) {
+    this.setDataTrainValue = function (_$select, _selectValues) {
       var $options = _$select
         .find('option')
-        .filter(function() {
+        .filter(function () {
           return _selectValues.indexOf($(this).val()) >= 0
         })
         .prop('selected', true)
@@ -2021,7 +2010,7 @@
      *
      * @param {jQuery} $detailsItem    The <details> item to open.
      */
-    this.openDetailsItem = function($detailsItem) {
+    this.openDetailsItem = function ($detailsItem) {
       $detailsItem.prop('open', true)
     }
 
@@ -2031,14 +2020,14 @@
      *
      * @param {jQuery} $detailsItem    The <details> item to open.
      */
-    this.closeDetailsItem = function($detailsItem) {
+    this.closeDetailsItem = function ($detailsItem) {
       $detailsItem.prop('open', false)
     }
 
     /**
      * Clear any existing timeouts.
      */
-    this.clearTimeout = function() {
+    this.clearTimeout = function () {
       if (this.currentTimeoutID) {
         window.clearTimeout(this.currentTimeoutID)
       }
@@ -2052,7 +2041,7 @@
      * @returns {*}       The event notification result.
      * @private
      */
-    this._trigger = function(_event, _args) {
+    this._trigger = function (_event, _args) {
       var args = _args || {}
       args.cadcForm = this
 
@@ -2065,7 +2054,7 @@
      * @param {jQuery.Event}  _event      Event object.
      * @param {function}  __handler   Handler function.
      */
-    this.subscribe = function(_event, __handler) {
+    this.subscribe = function (_event, __handler) {
       $(this).on(_event.type, __handler)
     }
 
