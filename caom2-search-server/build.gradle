@@ -18,7 +18,7 @@ dependencies {
     compile 'org.opencadc:cadc-registry:[1.3.5, )'
     compile 'org.opencadc:caom2-search-lib:[2.4.0, )'
     compile 'org.opencadc:cadc-access-control:1.+'
-    compile 'org.opencadc:cadc-uws:1.+'
+    compile 'org.opencadc:cadc-uws:[1.0.3, )'
     compile 'org.opencadc:cadc-uws-server:[1.2.1, )'
     compile 'org.opencadc:cadc-web-util:[1.1, )'
     compile 'org.opencadc:cadc-adql:1.+'
@@ -41,4 +41,4 @@ dependencies {
 
 sourceCompatibility = 1.7
 group = 'org.opencadc'
-version = '2.8.0'
+version = '2.8.1'
