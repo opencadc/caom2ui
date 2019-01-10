@@ -1,7 +1,7 @@
 
 package ca.nrc.cadc.uws;
 
-import ca.nrc.cadc.auth.HTTPIdentityManager;
+import ca.nrc.cadc.auth.ACIdentityManager;
 import ca.nrc.cadc.auth.IdentityManager;
 import ca.nrc.cadc.uws.server.DatabaseJobPersistence;
 import ca.nrc.cadc.uws.server.JobExecutor;
@@ -23,7 +23,7 @@ public class SearchJobManager extends SimpleJobManager {
     public SearchJobManager() {
         super();
 
-        final DatabaseJobPersistence jobPersistence = createJobPersistence(createIdentityManager());
+        final DatabaseJobPersistence jobPersistence = createJobPersistence();
         final JobExecutor jobExecutor = new SyncJobExecutor(jobPersistence, AdvancedRunner.class);
 
         super.setMaxExecDuration(MAX_EXEC_DURATION);
@@ -34,16 +34,15 @@ public class SearchJobManager extends SimpleJobManager {
     }
 
     IdentityManager createIdentityManager() {
-        return new HTTPIdentityManager();
+        return new ACIdentityManager();
     }
 
     /**
      * Override as needed.
      *
-     * @param identityManager The Identity Manager to pass to the persistence.
      * @return DatabasePersistence instance.
      */
-    DatabaseJobPersistence createJobPersistence(final IdentityManager identityManager) {
-        return new PostgresJobPersistence(identityManager);
+    DatabaseJobPersistence createJobPersistence() {
+        return new PostgresJobPersistence(createIdentityManager());
     }
 }
