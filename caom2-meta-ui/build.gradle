@@ -13,10 +13,10 @@ repositories {
 
 sourceCompatibility = '1.7'
 group = 'ca.nrc.cadc'
-version = '1013'
+version = '1014'
 
 dependencies {
-    compile 'org.opencadc:caom2-ui-server:1.2.0'
+    compile 'org.opencadc:caom2-ui-server:1.2.1'
 
     providedCompile 'javax.servlet:javax.servlet-api:3.1.+'
     providedCompile 'javax.servlet:javax.servlet-api:3.0.+'
