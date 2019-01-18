@@ -20,8 +20,7 @@ import ca.nrc.cadc.net.NetUtil;
  * @author pdowler
  */
 public class SS {
-    private static final DateFormat FORMAT_UTC =
-        DateUtil.getDateFormat(DateUtil.ISO_DATE_FORMAT, DateUtil.UTC);
+    private static final DateFormat FORMAT_UTC = DateUtil.getDateFormat(DateUtil.ISO_DATE_FORMAT, DateUtil.UTC);
 
     public static String toString(Number s) {
         return (s == null) ? "" : s.toString();
@@ -44,12 +43,9 @@ public class SS {
             if (comp != null) {
                 sb.append("bounds: ").append(comp.bounds);
                 sb.append("<br>").append("dimension: ").append(comp.dimension);
-                sb.append("<br>").append("sampleSize: ").append(
-                    comp.sampleSize);
-                sb.append("<br>").append("resolution: ").append(
-                    comp.resolution);
-                sb.append("<br>").append("time dependent: ").append(
-                    comp.timeDependent);
+                sb.append("<br>").append("sampleSize: ").append(comp.sampleSize);
+                sb.append("<br>").append("resolution: ").append(comp.resolution);
+                sb.append("<br>").append("time dependent: ").append(comp.timeDependent);
             }
         } catch (Exception ex) {
             sb.append("<span class=\"error\">ERROR: failed to compute: </span>");
@@ -235,18 +231,25 @@ public class SS {
             m.sourceNumberDensity;
     }
 
-    public static String toMemberString(final String contextPath, final Observation o, final String publisherID) {
+    public static String toMemberString(final String contextPath, final Observation o, final String parentID) {
         final StringBuilder sb = new StringBuilder();
 
-        if ((o != null) && (o instanceof CompositeObservation)) {
+        if ((o instanceof CompositeObservation)) {
             final CompositeObservation co = (CompositeObservation) o;
+            final URI parentURI = URI.create(parentID);
 
             for (final ObservationURI u : co.getMembers()) {
-                sb.append("<a href=\"").append(contextPath).append("/view/");
-                sb.append(u.getCollection()).append("/")
-                  .append(u.getObservationID()).append("?ID=").append(NetUtil.encode(publisherID));
+                final URI observationURI = u.getURI();
+                final String schemeSpecificPart = observationURI.getSchemeSpecificPart();
+                final String[] collectionObsID = schemeSpecificPart.split("/");
+                final String linkID =
+                    parentURI.getScheme() + "://" + parentURI.getAuthority() + "/" + collectionObsID[0] + "?" + collectionObsID[1];
+                sb.append("<a href=\"").append(contextPath).append("/view");
+//                sb.append("?ID=").append(parentURI.getScheme()).append("://").append(parentURI.getAuthority())
+//                .append("/").append(u.getURI().getPath());
+                sb.append("?ID=").append(NetUtil.encode(linkID));
                 sb.append("\">");
-                sb.append(u.getURI().toASCIIString());
+                sb.append(observationURI.toASCIIString());
                 sb.append("</a> ");
             }
         }
