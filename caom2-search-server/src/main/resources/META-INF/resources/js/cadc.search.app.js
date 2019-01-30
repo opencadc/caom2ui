@@ -912,6 +912,7 @@
             .getDownloadAccessKey(),
           oneClickInvisibleDefault: true,
           headerCheckboxLabel: 'Mark',
+          headerCheckboxWidth: 70,
           rowManager: {
             onRowRendered: onRowRendered,
             isRowDisabled: isRowDisabled

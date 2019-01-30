@@ -39,14 +39,14 @@ import org.junit.Test;
 
 
 public class MAQCAOMSearchBrowserTest extends AbstractAdvancedSearchIntegrationTest {
-    public MAQCAOMSearchBrowserTest() throws Exception {
+    public MAQCAOMSearchBrowserTest() {
         super();
     }
 
 
     @Test
     public void searchMAQ() throws Exception {
-        CAOMSearchFormPage searchFormPage = goTo(endpoint, null, CAOMSearchFormPage.class);
+        CAOMSearchFormPage searchFormPage = goToMain(CAOMSearchFormPage.class);
         if (searchFormPage.isMAQEnabled()) {
             searchMAQ(searchFormPage);
         }

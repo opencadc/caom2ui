@@ -995,7 +995,7 @@
       if (typeof CADC !== 'undefined' && CADC.CheckboxSelectColumn) {
         checkboxSelector = new CADC.CheckboxSelectColumn({
           cssClass: 'slick-cell-checkboxsel',
-          width: 55,
+          width: getOptions().headerCheckboxWidth,
           headerCssClass: 'slick-header-column-checkboxsel',
           headerCheckboxLabel: getOptions().headerCheckboxLabel,
           enableOneClickDownload: getOptions().enableOneClickDownload,

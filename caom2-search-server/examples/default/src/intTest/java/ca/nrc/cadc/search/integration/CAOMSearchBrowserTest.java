@@ -43,14 +43,14 @@ public class CAOMSearchBrowserTest extends AbstractAdvancedSearchIntegrationTest
     private static final By ONE_CLICK_DOWNLOAD_LINK_ROW_3_ID_BY = By.id("_one-click_vov_3");
 
 
-    public CAOMSearchBrowserTest() throws Exception {
+    public CAOMSearchBrowserTest() {
         super();
     }
 
 
     @Test
     public void searchCAOM() throws Exception {
-        CAOMSearchFormPage searchFormPage = goTo(endpoint, null, CAOMSearchFormPage.class);
+        CAOMSearchFormPage searchFormPage = goToMain(CAOMSearchFormPage.class);
 
         searchFormPage.enterObservationID("692512");
         searchFormPage.enterValidTarget("210.05  54.3");
@@ -110,8 +110,8 @@ public class CAOMSearchBrowserTest extends AbstractAdvancedSearchIntegrationTest
         searchResultsPage = searchFormPage.submitSuccess();
         verifyTrue(searchResultsPage.getCurrentResultsRowCount() > 0);
 
+        searchResultsPage.ensureMarkAllCheckboxVisible();
         searchResultsPage.filterOnRA("18:03..18:07");
-
         searchResultsPage.includeHiddenColumn("caom2:Observation.target.keywords");
 
         // Nav back to query tab for next test

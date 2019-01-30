@@ -43,7 +43,7 @@ import org.openqa.selenium.By;
  * Verify form inputs
  */
 public class FormInputBrowserTest extends AbstractAdvancedSearchIntegrationTest {
-    public FormInputBrowserTest() throws Exception {
+    public FormInputBrowserTest() {
         super();
     }
 
@@ -54,7 +54,7 @@ public class FormInputBrowserTest extends AbstractAdvancedSearchIntegrationTest 
      */
     @Test
     public void verifyFormInputs() throws Exception {
-        final CAOMSearchFormPage caomSearchFormPage = goTo(endpoint, "", CAOMSearchFormPage.class);
+        final CAOMSearchFormPage caomSearchFormPage = goToMain(CAOMSearchFormPage.class);
 
         caomSearchFormPage.reset();
 
