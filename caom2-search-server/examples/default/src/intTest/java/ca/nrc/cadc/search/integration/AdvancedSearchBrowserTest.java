@@ -36,88 +36,32 @@ package ca.nrc.cadc.search.integration;
 
 
 import org.junit.Test;
-import org.openqa.selenium.By;
 
 
-public class CAOMSearchBrowserTest extends AbstractAdvancedSearchIntegrationTest {
-    private static final By ONE_CLICK_DOWNLOAD_LINK_ROW_3_ID_BY = By.id("_one-click_vov_3");
+public class AdvancedSearchBrowserTest extends CAOMSearchBrowserTest {
 
-
-    public CAOMSearchBrowserTest() {
+    public AdvancedSearchBrowserTest() {
         super();
     }
 
 
     @Test
     public void searchCAOM() throws Exception {
-        CAOMSearchFormPage searchFormPage = goToMain(CAOMSearchFormPage.class);
+        super.searchCAOM();
 
-        searchFormPage.enterObservationID("692512");
-        searchFormPage.enterValidTarget("210.05  54.3");
-
-        searchFormPage.reset();
-        searchFormPage.uncheckMAQ();
-
-        final int index = searchFormPage.findDataTrainValueIndex(By.id("Observation.instrument.name"), "SPACER",
-                                                                 false);
-
-        verifyTrue(index > 0);
-
-        searchFormPage.enterObservationID("f008h000");
-
-        SearchResultsPage searchResultsPage = searchFormPage.submitSuccess();
-
-        searchResultsPage.waitForElementPresent(ONE_CLICK_DOWNLOAD_LINK_ROW_3_ID_BY);
-        searchResultsPage.confirmFootprintViewer();
-
-        final String currentWindow = getCurrentWindowHandle();
-
-        final CAOMObservationDetailsPage detailsPage = searchResultsPage.openObservationDetails(1);
-
-        detailsPage.waitForElementPresent(By.cssSelector("table.content"));
-        detailsPage.close();
-
-        selectWindow(currentWindow);
-
-        searchResultsPage.quickSearchTarget();
-
-        selectWindow(currentWindow);
-
-        searchFormPage = searchResultsPage.queryTab();
-        searchFormPage.reset();
-        searchFormPage.uncheckMAQ();
-
-        searchFormPage.enterTarget("M17");
-        searchFormPage.enterCollection("JCMT");
-
-        searchResultsPage = searchFormPage.submitSuccess();
-        verifyEquals(searchResultsPage.getSelectedRestFrameEnergyUnit(), "GHz");
-
-        searchFormPage = searchResultsPage.queryTab();
-        searchFormPage.reset();
-        searchFormPage.uncheckMAQ();
-
-        searchFormPage.enterCollection("CFHTMEGAPIPE");
-        searchResultsPage = searchFormPage.submitSuccess();
-
-        verifyEquals(searchResultsPage.getSelectIQUnit(), "Arcseconds");
-
-        searchFormPage = searchResultsPage.queryTab();
-        searchFormPage.reset();
-        searchFormPage.uncheckMAQ();
-
-        searchFormPage.enterCollection("IRIS");
-        searchResultsPage = searchFormPage.submitSuccess();
-        verifyTrue(searchResultsPage.getCurrentResultsRowCount() > 0);
-
-        searchResultsPage.ensureMarkAllCheckboxVisible();
-        searchResultsPage.filterOnRA("18:03..18:07");
-        searchResultsPage.includeHiddenColumn("caom2:Observation.target.keywords");
+        AdvancedSearchFormPage searchFormPage = goToMain(AdvancedSearchFormPage.class);
 
         // Nav back to query tab for next test
-        searchFormPage = searchResultsPage.queryTab();
         searchFormPage.reset();
         searchFormPage.uncheckMAQ();
+
+        // Test login and logout
+        System.out.println("Test login");
+        searchFormPage = loginTest(searchFormPage);
+
+        System.out.println("Test logout");
+        searchFormPage = searchFormPage.doLogout();
+        verifyFalse(searchFormPage.isLoggedIn());
 
         System.out.println("searchCAOM test complete.");
 
@@ -228,4 +172,15 @@ public class CAOMSearchBrowserTest extends AbstractAdvancedSearchIntegrationTest
         logout();
         */
     }
+
+
+    private AdvancedSearchFormPage loginTest(final AdvancedSearchFormPage userPage) throws Exception {
+        final AdvancedSearchFormPage authPage = userPage.doLogin(username, password);
+        verifyTrue(userPage.isLoggedIn());
+        System.out.println("logged in");
+
+        return authPage;
+    }
+
+
 }

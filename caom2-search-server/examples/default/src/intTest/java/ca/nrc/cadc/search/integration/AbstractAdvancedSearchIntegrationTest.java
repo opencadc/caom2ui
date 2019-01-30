@@ -31,28 +31,16 @@
  ****  C A N A D I A N   A S T R O N O M Y   D A T A   C E N T R E  *****
  ************************************************************************
  */
+
 package ca.nrc.cadc.search.integration;
 
-
-import ca.nrc.cadc.util.StringUtil;
 
 import ca.nrc.cadc.web.selenium.AbstractWebApplicationIntegrationTest;
 
 
-public abstract class AbstractAdvancedSearchIntegrationTest extends AbstractWebApplicationIntegrationTest
-{
-    private static final String DEFAULT_ENGLISH_ENDPOINT = "/archive-search/";
-
-    final String endpoint;
-
-
-    AbstractAdvancedSearchIntegrationTest() throws Exception
-    {
+public abstract class AbstractAdvancedSearchIntegrationTest extends AbstractWebApplicationIntegrationTest {
+    AbstractAdvancedSearchIntegrationTest() {
         super();
         setFailOnTimeout(true);
-
-        // Base Host of the web application to be tested.
-        final String configuredEndpoint = System.getProperty("web.app.endpoint");
-        endpoint = StringUtil.hasText(configuredEndpoint) ? configuredEndpoint : DEFAULT_ENGLISH_ENDPOINT;
     }
 }

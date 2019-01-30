@@ -109,7 +109,7 @@ public class BookmarkBrowserTest extends AbstractAdvancedSearchIntegrationTest
 
     private SearchResultsPage bookmarkSearch(final String requestQuery) throws Exception
     {
-        final SearchResultsPage searchResultsPage = goTo(endpoint, requestQuery, SearchResultsPage.class);
+        final SearchResultsPage searchResultsPage = goTo(webURL, "", requestQuery, SearchResultsPage.class);
 
         searchResultsPage.verifyGridHeaderLabelHasIntegerValue(true);
 

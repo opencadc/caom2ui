@@ -31,26 +31,25 @@
  ****  C A N A D I A N   A S T R O N O M Y   D A T A   C E N T R E  *****
  ************************************************************************
  */
+
 package ca.nrc.cadc.search.integration;
 
 import org.junit.Test;
 
 
-public class ResolverTooltipBrowserTest extends AbstractAdvancedSearchIntegrationTest
-{
-    public ResolverTooltipBrowserTest() throws Exception
-    {
+public class ResolverTooltipBrowserTest extends AbstractAdvancedSearchIntegrationTest {
+    public ResolverTooltipBrowserTest() {
         super();
     }
 
     /**
      * Tooltip for the Name resolver
-     * @throws Exception        Any issue at all.
+     *
+     * @throws Exception Any issue at all.
      */
     @Test
-    public void resolverToolTipTest() throws Exception
-    {
-        final CAOMSearchFormPage searchFormPage = goTo(endpoint, null, CAOMSearchFormPage.class);
+    public void resolverToolTipTest() throws Exception {
+        final CAOMSearchFormPage searchFormPage = goToMain(CAOMSearchFormPage.class);
 
         searchFormPage.enterValidTarget("m101");
         searchFormPage.resetForm();
