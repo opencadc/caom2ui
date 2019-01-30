@@ -42,8 +42,8 @@ dependencies {
 
 ext {
     // Change this value to test other locations, such as Production or RC.
-    intTest_default_web_app_url = 'http://rc.cadc-ccda.hia-iha.nrc-cnrc.gc.ca'
-    intTest_default_web_app_endpoint = '/search/'
+    intTest_default_web_app_url = 'http://sc2.canfar.net/search/'
+    intTest_default_web_app_endpoint = ''
     intTest_user_name = 'CADCtest'
     intTest_user_password = 'sywymUL4'
 
