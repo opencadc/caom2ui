@@ -1,4 +1,5 @@
-;(function($, window, undefined) {
+;
+(function ($, window, undefined) {
   'use strict'
   // register namespace
   $.extend(true, window, {
@@ -21,7 +22,7 @@
       oneClickDownloadURL: null,
       oneClickDownloadURLColumnID: null,
       oneClickInvisibleDefault: false,
-      width: 30
+      width: 55
     }
 
     this.options = $.extend(true, {}, _defaults, options)
@@ -61,9 +62,10 @@
 
       var disabledRowCount = 0
       for (var i = 0; i < _grid.getDataLength(); i++) {
-        _grid.getDataItem(i)[cadc.vot.ROW_SELECT_DISABLED_KEY]
-          ? disabledRowCount++
-          : null
+        _grid.getDataItem(i)[cadc.vot.ROW_SELECT_DISABLED_KEY] ?
+          disabledRowCount++
+          :
+          null
       }
 
       var rowChecked =
@@ -73,9 +75,9 @@
       _grid.updateColumnHeader(
         _self.options.columnId,
         getHeaderCheckboxLabel() +
-          "<input type='checkbox' class='slick-header-column-checkboxsel'" +
-          (rowChecked ? " checked='checked'" : '') +
-          ' >',
+        "<input type='checkbox' class='slick-header-column-checkboxsel'" +
+        (rowChecked ? " checked='checked'" : '') +
+        ' >',
         _self.options.toolTip
       )
     }
@@ -85,9 +87,9 @@
     }
 
     function getHeaderCheckboxLabel() {
-      return _self.options.headerCheckboxLabel
-        ? _self.options.headerCheckboxLabel
-        : ''
+      return _self.options.headerCheckboxLabel ?
+        _self.options.headerCheckboxLabel :
+        ''
     }
 
     function handleKeyDown(e, args) {
@@ -116,7 +118,7 @@
 
     function deselect(row) {
       _grid.setSelectedRows(
-        $.grep(_grid.getSelectedRows(), function(n) {
+        $.grep(_grid.getSelectedRows(), function (n) {
           return n != row
         })
       )
@@ -220,13 +222,13 @@
             ' data-default-url="' +
             linkURL +
             '"' +
-            (_self.options.oneClickDownloadTitle
-              ? ' title="' + _self.options.oneClickDownloadTitle + '"'
-              : '') +
+            (_self.options.oneClickDownloadTitle ?
+              ' title="' + _self.options.oneClickDownloadTitle + '"' :
+              '') +
             ' class="no-propagate-event"' +
-            (_self.options.oneClickInvisibleDefault === true
-              ? ' style="display: none;"'
-              : '') +
+            (_self.options.oneClickInvisibleDefault === true ?
+              ' style="display: none;"' :
+              '') +
             '><span aria-hidden="true" class="glyphicon glyphicon-download-alt one-click-download-link no-propagate-event"></span></a>'
         }
 
