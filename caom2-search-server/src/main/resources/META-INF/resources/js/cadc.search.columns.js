@@ -660,6 +660,7 @@
               },
               'caom2:Plane.position.bounds.cval1': {
                 label: 'RA (J2000.0)',
+                datatype: 'double',
                 tap_column_name: 'COORD1(CENTROID(Plane.position.bounds))',
                 // Fit max would be nice, but the original data is in a long
                 // decimal format, so set it manually.
@@ -692,6 +693,7 @@
               },
               'caom2:Plane.position.bounds.cval2': {
                 label: 'Dec. (J2000.0)',
+                datatype: 'double',
                 tap_column_name: 'COORD2(CENTROID(Plane.position.bounds))',
                 // Fit max would be nice, but the original data is in a long
                 // decimal format, so set it manually.

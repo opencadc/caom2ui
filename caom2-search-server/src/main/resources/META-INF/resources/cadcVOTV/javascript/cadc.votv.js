@@ -176,8 +176,6 @@
               _self.$emptyResultsMessage.show()
             }
 
-            // sort()
-
             trigger(cadc.vot.events.onDataLoaded, args)
           })
 
