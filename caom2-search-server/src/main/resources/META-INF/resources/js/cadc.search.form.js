@@ -376,7 +376,7 @@
             _ucd,
             _uType,
             utypeFields.unit ? utypeFields.unit : _unit,
-            _xtype,
+            utypeFields.datatype ? null : _xtype,  // Only use xtype if the datatype was not explicitly set.
             utypeFields.datatype ? utypeFields.datatype : _datatype,
             _arraySize,
             _description,
