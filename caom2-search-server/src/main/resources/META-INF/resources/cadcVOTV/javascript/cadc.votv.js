@@ -775,7 +775,7 @@
     }
 
     function isNumber(val) {
-      return !isNaN(parseFloat(val)) && isFinite(val)
+      return !isNaN(parseFloat(val)) && (isFinite(val) || isFinite(parseFloat(val)))
     }
 
     function areNumbers() {

@@ -1,4 +1,5 @@
-;(function($, window) {
+;
+(function ($, window) {
   'use strict'
   $.extend(true, window, {
     ca: {
@@ -7,10 +8,8 @@
           search: {
             URI_MATCH_REGEX: /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/,
             DETAILS_BASE_URL: '/caom2ui/view',
-            CAOM2_RESOLVER_VALUE_KEY:
-              'Plane.position.bounds@Shape1Resolver.value',
-            OBSCORE_RESOLVER_VALUE_KEY:
-              'Char.SpatialAxis.Coverage.Support.Area@Shape1Resolver.value',
+            CAOM2_RESOLVER_VALUE_KEY: 'Plane.position.bounds@Shape1Resolver.value',
+            OBSCORE_RESOLVER_VALUE_KEY: 'Char.SpatialAxis.Coverage.Support.Area@Shape1Resolver.value',
             CAOM2_TARGET_NAME_VALUE_KEY: 'Plane.position.bounds@Shape1.value',
             COLLECTION_VALUE_KEY: 'Observation.collection',
             DETAILS_CSS: 'details_tooltip_link',
@@ -37,7 +36,7 @@
               'caom2:Observation.observationID': {
                 label: 'Obs. ID',
                 fitMax: true,
-                formatter: function(row, cell, value, columnDef, dataContext) {
+                formatter: function (row, cell, value, columnDef, dataContext) {
                   var publisherID =
                     dataContext[ca.nrc.cadc.search.columns.PUBLISHER_ID_UTYPE]
                   return formatDetailsCell(
@@ -54,10 +53,10 @@
                 width: 70,
                 sortable: false,
                 filterable: false,
-                formatter: function() {
+                formatter: function () {
                   return '<span class="cellValue preview"></span>'
                 },
-                asyncFormatter: function(cellNode, row, dataContext) {
+                asyncFormatter: function (cellNode, row, dataContext) {
                   var $cell = $(cellNode)
                   var planePublisherIdValue =
                     dataContext[ca.nrc.cadc.search.columns.PUBLISHER_ID_UTYPE]
@@ -116,9 +115,9 @@
                     // Create the preview link
                     var $link = createLink(
                       $cell,
-                      thumbnailUrls !== null && thumbnailUrls.length > 0
-                        ? thumbnailUrls[0]
-                        : null
+                      thumbnailUrls !== null && thumbnailUrls.length > 0 ?
+                      thumbnailUrls[0] :
+                      null
                     )
 
                     if (previewUrls.length > 0) {
@@ -129,7 +128,7 @@
                       var productID = pubIDQuery[1]
 
                       // Display the preview window
-                      $link.click(function() {
+                      $link.click(function () {
                         var $content = $('<div id="scoped-content"></div>')
 
                         // Preview window content
@@ -176,7 +175,7 @@
                         return false
                       })
                     } else {
-                      $link.click(function() {
+                      $link.click(function () {
                         return false
                       })
                     }
@@ -203,8 +202,7 @@
 
                     // Get the thumbnails and previews from datalink
                     $.ajax({
-                      url:
-                        ' ' +
+                      url: ' ' +
                         ca.nrc.cadc.search.services.applicationEndpoint +
                         ca.nrc.cadc.search.DATALINK_URL_SUFFIX,
                       dataType: 'xml',
@@ -217,7 +215,7 @@
                         withCredentials: true
                       },
                       statusCode: {
-                        200: function(data) {
+                        200: function (data) {
                           var evaluator = new cadc.vot.xml.VOTableXPathEvaluator(
                             data,
                             'votable'
@@ -238,37 +236,40 @@
                               "/VOTABLE/RESOURCE[@type='results']/TABLE/FIELD"
                             )
                             for (
-                              var fieldIndex = 0, fl = fields.length;
-                              fieldIndex < fl;
-                              fieldIndex++
+                              var fieldIndex = 0, fl = fields.length; fieldIndex < fl; fieldIndex++
                             ) {
                               var field = fields[fieldIndex]
                               var name = field.getAttribute('name')
                               switch (name) {
-                                case 'access_url': {
-                                  accessUrlIndex = fieldIndex
-                                  break
-                                }
+                                case 'access_url':
+                                  {
+                                    accessUrlIndex = fieldIndex
+                                    break
+                                  }
 
-                                case 'error_message': {
-                                  errorMessageIndex = fieldIndex
-                                  break
-                                }
+                                case 'error_message':
+                                  {
+                                    errorMessageIndex = fieldIndex
+                                    break
+                                  }
 
-                                case 'semantics': {
-                                  semanticsIndex = fieldIndex
-                                  break
-                                }
+                                case 'semantics':
+                                  {
+                                    semanticsIndex = fieldIndex
+                                    break
+                                  }
 
-                                case 'readable': {
-                                  readableIndex = fieldIndex
-                                  break
-                                }
+                                case 'readable':
+                                  {
+                                    readableIndex = fieldIndex
+                                    break
+                                  }
 
-                                case 'content_type': {
-                                  contentTypeIndex = fieldIndex
-                                  break
-                                }
+                                case 'content_type':
+                                  {
+                                    contentTypeIndex = fieldIndex
+                                    break
+                                  }
                               }
                             }
 
@@ -283,9 +284,7 @@
                             )
 
                             for (
-                              var trIndex = 0, trl = tableDataRows.length;
-                              trIndex < trl;
-                              trIndex++
+                              var trIndex = 0, trl = tableDataRows.length; trIndex < trl; trIndex++
                             ) {
                               var tableDataCells =
                                 tableDataRows[trIndex].children
@@ -294,7 +293,7 @@
                               var readable =
                                 readableIndex >= 0 &&
                                 tableDataCells[readableIndex].textContent ===
-                                  'true'
+                                'true'
 
                               if (errorMessage.length > 0) {
                                 console.error(
@@ -306,9 +305,9 @@
                                 var semantics =
                                   tableDataCells[semanticsIndex].textContent
                                 var accessURL =
-                                  tableDataCells.length >= accessUrlIndex
-                                    ? tableDataCells[accessUrlIndex].textContent
-                                    : ''
+                                  tableDataCells.length >= accessUrlIndex ?
+                                  tableDataCells[accessUrlIndex].textContent :
+                                  ''
                                 if (accessURL) {
                                   if (
                                     semantics ===
@@ -317,7 +316,7 @@
                                     thumbnailURLs.push(accessURL)
                                   } else if (
                                     semantics ===
-                                      ca.nrc.cadc.search.datalink.preview_uri &&
+                                    ca.nrc.cadc.search.datalink.preview_uri &&
                                     contentType.indexOf('image') >= 0
                                   ) {
                                     previewURLs.push(accessURL)
@@ -361,7 +360,7 @@
                                 undefined
                               )
 
-                              var addMainPreview = function(thumbnailURL) {
+                              var addMainPreview = function (thumbnailURL) {
                                 var preview = new ca.nrc.cadc.search.Preview(
                                   collection,
                                   observationID,
@@ -371,7 +370,7 @@
                                   undefined
                                 )
 
-                                preview.getPreview(function(previewURL) {
+                                preview.getPreview(function (previewURL) {
                                   if (previewURL) {
                                     var $link = createLink($cell, thumbnailURL)
                                     $link.attr('href', previewURL)
@@ -390,7 +389,7 @@
 
                               thumbnailPreview.getPreview(
                                 addMainPreview,
-                                function(status) {
+                                function (status) {
                                   if (status === 404) {
                                     addMainPreview(null)
                                   }
@@ -406,7 +405,7 @@
                           }
                         }
                       }
-                    }).fail(function(jqXHR, textStatus, errorThrown) {
+                    }).fail(function (jqXHR, textStatus, errorThrown) {
                       if (jqXHR.status !== 404) {
                         console.error(
                           'Error >> ' + errorThrown + ' (' + jqXHR.status + ')'
@@ -434,10 +433,10 @@
               },
               'caom2:Observation.sequenceNumber': {
                 label: 'Sequence Number',
-                valueFormatter: function(value) {
+                valueFormatter: function (value) {
                   return formatNumeric(value, null)
                 },
-                formatter: function(row, cell, value, columnDef) {
+                formatter: function (row, cell, value, columnDef) {
                   return formatOutputHTML(
                     formatNumeric(value, null),
                     columnDef.utype,
@@ -447,10 +446,10 @@
               },
               'caom2:Observation.environment.tau': {
                 label: 'Tau',
-                valueFormatter: function(value) {
+                valueFormatter: function (value) {
                   return formatNumeric(value, 2)
                 },
-                formatter: function(row, cell, value, columnDef) {
+                formatter: function (row, cell, value, columnDef) {
                   return formatOutputHTML(
                     formatNumeric(value, 2),
                     columnDef.utype,
@@ -460,7 +459,7 @@
               },
               'caom2:Observation.proposal.id': {
                 label: 'Proposal ID',
-                formatter: function(row, cell, value, columnDef, dataContext) {
+                formatter: function (row, cell, value, columnDef, dataContext) {
                   var utype = columnDef.utype
                   var uTypeName = utype.substr(utype.indexOf(':') + 1)
                   var valueObject = {}
@@ -480,7 +479,7 @@
               },
               'caom2:Observation.proposal.pi': {
                 label: 'P.I. Name',
-                formatter: function(row, cell, value, columnDef) {
+                formatter: function (row, cell, value, columnDef) {
                   var utype = columnDef.utype
                   var uTypeName = utype.substr(utype.indexOf(':') + 1)
                   var valueObject = {}
@@ -506,7 +505,7 @@
               },
               'caom2:Observation.target.name': {
                 label: 'Target Name',
-                formatter: function(row, cell, value, columnDef) {
+                formatter: function (row, cell, value, columnDef) {
                   var utype = columnDef.utype
                   var valueObject = {}
 
@@ -524,10 +523,10 @@
               },
               'caom2:Observation.target.moving': {
                 label: 'Moving Target',
-                valueFormatter: function(value) {
+                valueFormatter: function (value) {
                   return formatNumeric(value, 2)
                 },
-                formatter: function(row, cell, value, columnDef) {
+                formatter: function (row, cell, value, columnDef) {
                   return formatOutputHTML(
                     formatNumeric(value, 2),
                     columnDef.utype,
@@ -537,10 +536,10 @@
               },
               'caom2:Observation.target.standard': {
                 label: 'Target Standard',
-                valueFormatter: function(value) {
+                valueFormatter: function (value) {
                   return formatNumeric(value, 2)
                 },
-                formatter: function(row, cell, value, columnDef) {
+                formatter: function (row, cell, value, columnDef) {
                   return formatOutputHTML(
                     formatNumeric(value, 2),
                     columnDef.utype,
@@ -571,7 +570,7 @@
               'caom2:Plane.productID': {
                 label: 'Product ID',
                 fitMax: true,
-                formatter: function(row, cell, value, columnDef, dataContext) {
+                formatter: function (row, cell, value, columnDef, dataContext) {
                   var publisherID =
                     dataContext[ca.nrc.cadc.search.columns.PUBLISHER_ID_UTYPE]
                   return formatDetailsCell(
@@ -593,16 +592,16 @@
                 label: 'Data Type',
                 fitMax: false,
                 width: 65,
-                formatter: function(row, cell, value, columnDef) {
+                formatter: function (row, cell, value, columnDef) {
                   return formatDataType(value, columnDef.utype)
                 }
               },
               'caom2:Plane.calibrationLevel': {
                 label: 'Cal. Lev.',
-                valueFormatter: function(value) {
+                valueFormatter: function (value) {
                   return formatNumeric(value, null)
                 },
-                formatter: function(row, cell, value, columnDef) {
+                formatter: function (row, cell, value, columnDef) {
                   return formatOutputHTML(
                     formatNumeric(value, null),
                     columnDef.utype,
@@ -647,10 +646,10 @@
               'caom2:Plane.energy.resolvingPower': {
                 label: 'Resolving Power',
                 width: 117,
-                valueFormatter: function(value) {
+                valueFormatter: function (value) {
                   return formatNumeric(value, 2)
                 },
-                formatter: function(row, cell, value, columnDef) {
+                formatter: function (row, cell, value, columnDef) {
                   return formatOutputHTML(
                     formatNumeric(value, 2),
                     columnDef.utype,
@@ -667,10 +666,10 @@
                 fitMax: false,
                 width: 116,
                 converter: 'RAConverter',
-                valueFormatter: function(value, column) {
+                valueFormatter: function (value, column) {
                   return formatUnit(value, column, 'hms')
                 },
-                formatter: function(row, cell, value, columnDef) {
+                formatter: function (row, cell, value, columnDef) {
                   return formatOutputHTML(
                     formatUnit(value, columnDef, 'hms') || Number.NaN,
                     columnDef.utype,
@@ -678,8 +677,7 @@
                   )
                 },
                 header: {
-                  units: [
-                    {
+                  units: [{
                       label: 'H:M:S',
                       value: 'hms',
                       default: true
@@ -700,10 +698,10 @@
                 fitMax: false,
                 width: 125,
                 converter: 'DECConverter',
-                valueFormatter: function(value, column) {
+                valueFormatter: function (value, column) {
                   return formatUnit(value, column, 'dms')
                 },
-                formatter: function(row, cell, value, columnDef) {
+                formatter: function (row, cell, value, columnDef) {
                   return formatOutputHTML(
                     formatUnit(value, columnDef, 'dms') || Number.NaN,
                     columnDef.utype,
@@ -711,8 +709,7 @@
                   )
                 },
                 header: {
-                  units: [
-                    {
+                  units: [{
                       label: 'D:M:S',
                       value: 'dms',
                       default: true
@@ -734,7 +731,7 @@
                 fitMax: false,
                 width: 100,
                 converter: 'AreaConverter',
-                formatter: function(row, cell, value, columnDef) {
+                formatter: function (row, cell, value, columnDef) {
                   return format(
                     value,
                     columnDef.utype,
@@ -743,8 +740,7 @@
                   )
                 },
                 header: {
-                  units: [
-                    {
+                  units: [{
                       label: 'Sq. arcsec',
                       value: 'sec**2'
                     },
@@ -765,7 +761,7 @@
                 fitMax: true,
                 width: 105,
                 converter: 'AngleConverter',
-                formatter: function(row, cell, value, columnDef) {
+                formatter: function (row, cell, value, columnDef) {
                   return format(
                     value,
                     columnDef.utype,
@@ -774,8 +770,7 @@
                   )
                 },
                 header: {
-                  units: [
-                    {
+                  units: [{
                       label: 'Milliarcseconds',
                       value: 'milliarcsec'
                     },
@@ -798,7 +793,7 @@
                 fitMax: false,
                 width: 110,
                 converter: 'AngleConverter',
-                formatter: function(row, cell, value, columnDef) {
+                formatter: function (row, cell, value, columnDef) {
                   return format(
                     value,
                     columnDef.utype,
@@ -807,8 +802,7 @@
                   )
                 },
                 header: {
-                  units: [
-                    {
+                  units: [{
                       label: 'Milliarcseconds',
                       value: 'milliarcsec'
                     },
@@ -867,10 +861,10 @@
                 fitMax: false,
                 width: 145,
                 converter: 'DateConverter',
-                valueFormatter: function(value, column) {
+                valueFormatter: function (value, column) {
                   return formatUnit(value, column, 'IVOA')
                 },
-                formatter: function(row, cell, value, columnDef) {
+                formatter: function (row, cell, value, columnDef) {
                   var searchValue = {}
 
                   if (value) {
@@ -887,8 +881,7 @@
                   )
                 },
                 header: {
-                  units: [
-                    {
+                  units: [{
                       label: 'Calendar',
                       value: 'IVOA',
                       default: true
@@ -909,10 +902,10 @@
                 fitMax: false,
                 width: 145,
                 converter: 'DateConverter',
-                valueFormatter: function(value, column) {
+                valueFormatter: function (value, column) {
                   return formatUnit(value, column, 'IVOA')
                 },
-                formatter: function(row, cell, value, columnDef) {
+                formatter: function (row, cell, value, columnDef) {
                   return formatOutputHTML(
                     formatUnit(value, columnDef, 'IVOA') || Number.NaN,
                     columnDef.utype,
@@ -920,8 +913,7 @@
                   )
                 },
                 header: {
-                  units: [
-                    {
+                  units: [{
                       label: 'Calendar',
                       value: 'IVOA',
                       default: true
@@ -940,10 +932,10 @@
                 fitMax: false,
                 width: 95,
                 converter: 'TimeConverter',
-                valueFormatter: function(value, column) {
+                valueFormatter: function (value, column) {
                   return formatUnit(value, column, 'SECONDS')
                 },
-                formatter: function(row, cell, value, columnDef) {
+                formatter: function (row, cell, value, columnDef) {
                   return formatOutputHTML(
                     formatUnit(value, columnDef, 'SECONDS') || Number.NaN,
                     columnDef.utype,
@@ -951,8 +943,7 @@
                   )
                 },
                 header: {
-                  units: [
-                    {
+                  units: [{
                       label: 'Seconds',
                       value: 'SECONDS',
                       default: true
@@ -1155,10 +1146,10 @@
     // smaller than the Calendar dates, so set it up for Calendar
     // instead.
     fitMax: false,
-    valueFormatter: function(value) {
+    valueFormatter: function (value) {
       return formatIVOAToW3CDateValue(value)
     },
-    formatter: function(row, cell, value, columnDef) {
+    formatter: function (row, cell, value, columnDef) {
       return formatOutputHTML(
         formatIVOAToW3CDateValue(value),
         columnDef.utype,
@@ -1168,8 +1159,7 @@
   }
 
   var spectralUnits = {
-    units: [
-      {
+    units: [{
         label: 'm',
         value: 'm',
         default: true
@@ -1232,10 +1222,10 @@
   var spectralProperties = {
     fitMax: true,
     converter: 'WavelengthConverter',
-    valueFormatter: function(value, column) {
+    valueFormatter: function (value, column) {
       return formatUnit(value, column, 'm')
     },
-    formatter: function(row, cell, value, columnDef) {
+    formatter: function (row, cell, value, columnDef) {
       return formatOutputHTML(
         formatUnit(value, columnDef, 'm') || Number.NaN,
         columnDef.utype,
@@ -1256,7 +1246,9 @@
   })
 
   var IVOAToW3CDateOptionsWide = {}
-  $.extend(true, IVOAToW3CDateOptionsWide, IVOAToW3CDateOptions, { width: 132 })
+  $.extend(true, IVOAToW3CDateOptionsWide, IVOAToW3CDateOptions, {
+    width: 132
+  })
 
   $.extend(
     ca.nrc.cadc.search.columnOptions['caom2:Plane.metaRelease'],
@@ -1291,9 +1283,9 @@
    * @return  {String}
    */
   function formatNumeric(_value, _sigDigits) {
-    return isNaN(_value)
-      ? ''
-      : new cadc.web.util.NumberFormat(_value, _sigDigits).format()
+    return isNaN(_value) ?
+      '' :
+      new cadc.web.util.NumberFormat(_value, _sigDigits).format()
   }
 
   /**
@@ -1352,8 +1344,8 @@
     var publisherIDURI = new cadc.web.util.URI(publisherID)
     var detailsURI = new cadc.web.util.URI(
       ca.nrc.cadc.search.DETAILS_BASE_URL +
-        '?ID=' +
-        encodeURIComponent(publisherID.substring(0, publisherID.lastIndexOf('/')))
+      '?ID=' +
+      encodeURIComponent(publisherID.substring(0, publisherID.lastIndexOf('/')))
     )
 
     $link.text(value)
@@ -1375,9 +1367,9 @@
   }
 
   function formatDataType(value, utype) {
-    var outputVal = ca.nrc.cadc.search.URI_MATCH_REGEX.test(value)
-      ? new cadc.web.util.URI(value).getHash()
-      : value
+    var outputVal = ca.nrc.cadc.search.URI_MATCH_REGEX.test(value) ?
+      new cadc.web.util.URI(value).getHash() :
+      value
     return formatOutputHTML(outputVal, utype, value)
   }
 
@@ -1400,9 +1392,9 @@
    * @param {String} toUnit            The unit to convert to.
    */
   function formatQuickSearchLink(value, _searchItems, columnUType, toUnit) {
-    var $output = toUnit
-      ? $(format(value, columnUType, value, toUnit))
-      : $(formatOutputHTML(value, columnUType, value))
+    var $output = toUnit ?
+      $(format(value, columnUType, value, toUnit)) :
+      $(formatOutputHTML(value, columnUType, value))
 
     var maqKey = 'activateMAQ'
 
@@ -1413,7 +1405,7 @@
         currentURIStr.substr(0, currentURIStr.indexOf('?'))
       )
 
-      $.each(_searchItems, function(name, value) {
+      $.each(_searchItems, function (name, value) {
         if (name != maqKey) {
           baseURI.setQueryValue(name, encodeURIComponent(value))
         }
@@ -1494,7 +1486,7 @@
     /**
      * @return {{}}   Options object.
      */
-    this.getColumnOptions = function() {
+    this.getColumnOptions = function () {
       return ca.nrc.cadc.search.columnOptions
     }
 
@@ -1505,7 +1497,7 @@
      * @return {{}}
      * @private
      */
-    this._getColumnOption = function(_id) {
+    this._getColumnOption = function (_id) {
       return this.getColumnOptions()[_id]
     }
 
@@ -1517,11 +1509,11 @@
      *
      * @return  Converter object, or null if none found.
      */
-    this.getConverter = function(_id, _value, _unit) {
+    this.getConverter = function (_id, _value, _unit) {
       var converterType = this._getColumnOption(_id).converter
-      return converterType
-        ? new ca.nrc.cadc.search.unitconversion[converterType](_value, _unit)
-        : null
+      return converterType ?
+        new ca.nrc.cadc.search.unitconversion[converterType](_value, _unit) :
+        null
     }
 
     /**
@@ -1531,12 +1523,12 @@
      * @param {String} _label      The label to look up.
      * @returns {String}    ID value.
      */
-    this.getIDFromLabel = function(_label) {
+    this.getIDFromLabel = function (_label) {
       var result = null
 
       // If not label is provided, don't bother iterating.
       if (_label) {
-        $.each(this.getColumnOptions(), function(columnID, object) {
+        $.each(this.getColumnOptions(), function (columnID, object) {
           if (columnID === _label || object.label === _label) {
             result = columnID
             return false
@@ -1553,7 +1545,7 @@
      * @param {{}} _column   The column object.
      * @param {String} _value    The value to convert.
      */
-    this.format = function(_column, _value) {
+    this.format = function (_column, _value) {
       var columnOption = this._getColumnOption(_column.utype)
       var formattedValue
 
@@ -1584,13 +1576,13 @@
      * @param {String} _string   The string to get the pattern for.
      * @return {[]}  The pattern array.
      */
-    this.getFilterPattern = function(_string) {
+    this.getFilterPattern = function (_string) {
       var breakdown = []
       var match
       var pattern =
-        _string.indexOf('..') > 0
-          ? /\s*(.*)\s*(\.\.)\s*(.*)\s*/g
-          : /(<=|>=|<|>|!)?\s*(.*)/g
+        _string.indexOf('..') > 0 ?
+        /\s*(.*)\s*(\.\.)\s*(.*)\s*/g :
+        /(<=|>=|<|>|!)?\s*(.*)/g
 
       if ((match = pattern.exec(_string))) {
         var ml = match.length
@@ -1610,7 +1602,7 @@
      * @param {String} _string    String to check.
      * @return {boolean}
      */
-    this.isFilterSyntax = function(_string) {
+    this.isFilterSyntax = function (_string) {
       return _string && /^(<|>|<=|>=|!|\.\.)$/.test($.trim(_string))
     }
   }

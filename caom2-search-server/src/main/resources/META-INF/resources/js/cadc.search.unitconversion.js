@@ -26,218 +26,216 @@
  ************************************************************************
  */
 
-(function ($)
-{
+;(function($) {
+  'use strict'
   // register namespace
   $.extend(true, window, {
-    "ca": {
-      "nrc": {
-        "cadc": {
-          "search": {
-            "unitconversion": {
-              "PREVIEW_URL_PREFIX": "preview",
+    ca: {
+      nrc: {
+        cadc: {
+          search: {
+            unitconversion: {
+              PREVIEW_URL_PREFIX: 'preview',
 
               // Month lengths in days.
-              "mtab": [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31],
+              mtab: [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31],
 
               // Angle units.
-              "angle": {
-                "milliarcsec": {
-                  "factor": 1.0e3
+              angle: {
+                milliarcsec: {
+                  factor: 1.0e3
                 },
-                "arcsec": {
-                  "factor": 1.0
+                arcsec: {
+                  factor: 1.0
                 },
-                "arcmin": {
-                  "factor": (1.0 / 60.0)
+                arcmin: {
+                  factor: 1.0 / 60.0
                 },
-                "deg": {
-                  "factor": (1.0 / 3600.0)
+                deg: {
+                  factor: 1.0 / 3600.0
                 },
-                "milliarcsecond": {
-                  "factor": 1.0e3
+                milliarcsecond: {
+                  factor: 1.0e3
                 },
-                "arcsecond": {
-                  "factor": 1.0
+                arcsecond: {
+                  factor: 1.0
                 },
-                "arcminute":
-                {
-                  "factor": (1.0 / 60.0)
+                arcminute: {
+                  factor: 1.0 / 60.0
                 },
-                "degrees": {
-                  "factor": (1.0 / 3600.0)
+                degrees: {
+                  factor: 1.0 / 3600.0
                 }
               },
 
               // Area units.
-              "area": {
-                "millisec**2": {
-                  "factor": 1.0e6 * 3600 * 3600
+              area: {
+                'millisec**2': {
+                  factor: 1.0e6 * 3600 * 3600
                 },
-                "sec**2": {
-                  "factor": 3600 * 3600
+                'sec**2': {
+                  factor: 3600 * 3600
                 },
-                "min**2": {
-                  "factor": 3600.0
+                'min**2': {
+                  factor: 3600.0
                 },
-                "deg**2": {
-                  "factor": 1.0
+                'deg**2': {
+                  factor: 1.0
                 },
-                "millisecond**2": {
-                  "factor": 1.0e6 * 3600 * 3600
+                'millisecond**2': {
+                  factor: 1.0e6 * 3600 * 3600
                 },
-                "second**2": {
-                  "factor": 3600 * 3600
+                'second**2': {
+                  factor: 3600 * 3600
                 },
-                "minute**2":
-                {
-                  "factor": 3600.0
+                'minute**2': {
+                  factor: 3600.0
                 },
-                "degrees**2": {
-                  "factor": 1.0
+                'degrees**2': {
+                  factor: 1.0
                 }
               },
 
               // Temporal units.
-              "time": {
-                "s": {
-                  "factor": 1.0
+              time: {
+                s: {
+                  factor: 1.0
                 },
-                "sec": {
-                  "factor": 1.0
+                sec: {
+                  factor: 1.0
                 },
-                "second": {
-                  "factor": 1.0
+                second: {
+                  factor: 1.0
                 },
-                "seconds": {
-                  "factor": 1.0
+                seconds: {
+                  factor: 1.0
                 },
-                "m": {
-                  "factor": Number(1.0 / 60.0)
+                m: {
+                  factor: Number(1.0 / 60.0)
                 },
-                "min": {
-                  "factor": Number(1.0 / 60.0)
+                min: {
+                  factor: Number(1.0 / 60.0)
                 },
-                "minute": {
-                  "factor": Number(1.0 / 60.0)
+                minute: {
+                  factor: Number(1.0 / 60.0)
                 },
-                "minutes": {
-                  "factor": Number(1.0 / 60.0)
+                minutes: {
+                  factor: Number(1.0 / 60.0)
                 },
-                "h": {
-                  "factor": Number(1.0 / 3600.0)
+                h: {
+                  factor: Number(1.0 / 3600.0)
                 },
-                "hour": {
-                  "factor": Number(1.0 / 3600.0)
+                hour: {
+                  factor: Number(1.0 / 3600.0)
                 },
-                "hours": {
-                  "factor": Number(1.0 / 3600.0)
+                hours: {
+                  factor: Number(1.0 / 3600.0)
                 },
-                "d": {
-                  "factor": Number(1.0 / 3600.0 / 24.0)
+                d: {
+                  factor: Number(1.0 / 3600.0 / 24.0)
                 },
-                "day": {
-                  "factor": Number(1.0 / 3600.0 / 24.0)
+                day: {
+                  factor: Number(1.0 / 3600.0 / 24.0)
                 },
-                "days": {
-                  "factor": Number(1.0 / 3600.0 / 24.0)
+                days: {
+                  factor: Number(1.0 / 3600.0 / 24.0)
                 }
               },
 
               // Spectral units.
-              "energy": {
-                "c": Number(2.9979250e8),     // m/sec
-                "h": Number(6.62620e-27),     // erg/sec
-                "eV": Number(1.602192e-12),    // erg
+              energy: {
+                c: Number(2.997925e8), // m/sec
+                h: Number(6.6262e-27), // erg/sec
+                eV: Number(1.602192e-12), // erg
 
-                "energyUnits": {
-                  "ev": {
-                    "factor": Number(1.0)
+                energyUnits: {
+                  ev: {
+                    factor: Number(1.0)
                   },
-                  "kev": {
-                    "factor": Number(1.0e3)
+                  kev: {
+                    factor: Number(1.0e3)
                   },
-                  "mev": {
-                    "factor": Number(1.0e6)
+                  mev: {
+                    factor: Number(1.0e6)
                   },
-                  "gev": {
-                    "factor": Number(1.0e9)
+                  gev: {
+                    factor: Number(1.0e9)
                   }
                 },
-                "freqUnits": {
-                  "hz": {
-                    "factor": Number(1.0)
+                freqUnits: {
+                  hz: {
+                    factor: Number(1.0)
                   },
-                  "khz": {
-                    "factor": Number(1.0e3)
+                  khz: {
+                    factor: Number(1.0e3)
                   },
-                  "mhz": {
-                    "factor": Number(1.0e6)
+                  mhz: {
+                    factor: Number(1.0e6)
                   },
-                  "ghz": {
-                    "factor": Number(1.0e9)
+                  ghz: {
+                    factor: Number(1.0e9)
                   }
                 },
-                "waveUnits": {
-                  "a": {
-                    "factor": Number(1.0e-10)
+                waveUnits: {
+                  a: {
+                    factor: Number(1.0e-10)
                   },
-                  "nm": {
-                    "factor": Number(1.0e-9)
+                  nm: {
+                    factor: Number(1.0e-9)
                   },
-                  "um": {
-                    "factor": Number(1.0e-6)
+                  um: {
+                    factor: Number(1.0e-6)
                   },
-                  "mm": {
-                    "factor": Number(1.0e-3)
+                  mm: {
+                    factor: Number(1.0e-3)
                   },
-                  "cm": {
-                    "factor": Number(1.0e-2)
+                  cm: {
+                    factor: Number(1.0e-2)
                   },
-                  "m": {
-                    "factor": Number(1.0)
+                  m: {
+                    factor: Number(1.0)
                   }
                 }
               },
 
               // Spatial units.
-              "position": {
-                "degUnits": {
-                  "deg": {},
-                  "degree": {},
-                  "degrees": {}
+              position: {
+                degUnits: {
+                  deg: {},
+                  degree: {},
+                  degrees: {}
                 },
-                "sexiUnits": {
-                  "hms": {},  // For RA.
-                  "dms": {}   // For DEC.
+                sexiUnits: {
+                  hms: {}, // For RA.
+                  dms: {} // For DEC.
                 }
               },
 
               // Date units.
-              "date": {
-                "ivoaUnits": {
-                  "ivoa": {}
+              date: {
+                ivoaUnits: {
+                  ivoa: {}
                 },
-                "mjdUnits": {
-                  "mjd": {}
+                mjdUnits: {
+                  mjd: {}
                 }
               },
-              "AngleConverter": AngleConverter,
-              "AreaConverter": AreaConverter,
-              "RAConverter": RAConverter,
-              "DECConverter": DECConverter,
-              "WavelengthConverter": WavelengthConverter,
-              "EnergyConverter": EnergyConverter,
-              "FrequencyConverter": FrequencyConverter,
-              "TimeConverter": TimeConverter,
-              "DateConverter": DateConverter,
-              "MJDConverter": MJDConverter
+              AngleConverter: AngleConverter,
+              AreaConverter: AreaConverter,
+              RAConverter: RAConverter,
+              DECConverter: DECConverter,
+              WavelengthConverter: WavelengthConverter,
+              EnergyConverter: EnergyConverter,
+              FrequencyConverter: FrequencyConverter,
+              TimeConverter: TimeConverter,
+              DateConverter: DateConverter,
+              MJDConverter: MJDConverter
             }
           }
         }
       }
     }
-  });
+  })
 
   /**
    * Sanitize the input value.
@@ -245,10 +243,9 @@
    * @param _val    The value to sanitize.
    * @returns {*}   The sanitized value.
    */
-  function sanitizeInput(_val)
-  {
-    var stringUtil = new cadc.web.util.StringUtil(_val);
-    return stringUtil.sanitize();
+  function sanitizeInput(_val) {
+    var stringUtil = new cadc.web.util.StringUtil(_val)
+    return stringUtil.sanitize()
   }
 
   /**
@@ -258,16 +255,14 @@
    * @param fixation  The fixation value.
    * @returns {*}
    */
-  function formatNumericFixation(value, fixation)
-  {
-    var numberFormat = new cadc.web.util.NumberFormat(value, fixation);
-    return numberFormat.formatFixation();
+  function formatNumericFixation(value, fixation) {
+    var numberFormat = new cadc.web.util.NumberFormat(value, fixation)
+    return numberFormat.formatFixation()
   }
 
-  function formatNumericPrecision(value, precision)
-  {
-    var numberFormat = new cadc.web.util.NumberFormat(value, precision);
-    return numberFormat.formatPrecision();
+  function formatNumericPrecision(value, precision) {
+    var numberFormat = new cadc.web.util.NumberFormat(value, precision)
+    return numberFormat.formatPrecision()
   }
 
   /**
@@ -277,70 +272,65 @@
    * @param _toUnit   The target unit of the conversion.
    * @constructor
    */
-  function DECConverter(_value, _toUnit)
-  {
-    var _selfDECConverter = this;
+  function DECConverter(_value, _toUnit) {
+    var _selfDECConverter = this
 
-    this.value = sanitizeInput(_value);
-    this.toUnit = _toUnit.toLowerCase();
+    this.value = sanitizeInput(_value)
+    this.toUnit = _toUnit.toLowerCase()
 
-    function getValue()
-    {
-      return _selfDECConverter.value;
+    function getValue() {
+      return _selfDECConverter.value
     }
 
-    function getToUnit()
-    {
-      return _selfDECConverter.toUnit;
+    function getToUnit() {
+      return _selfDECConverter.toUnit
     }
 
     /**
      * Convert the DEC value from degrees to sexigesimal.
      */
-    function degreesToDEC()
-    {
-      var degrees = Number(getValue());
-      if (degrees < -90.0 || degrees > 90.0)
-      {
-        return Number.NaN;
+    function degreesToDEC() {
+      var degrees = Number(getValue())
+      if (degrees < -90.0 || degrees > 90.0) {
+        return Number.NaN
       }
 
-      var sign = "+";
-      if (degrees < 0.0)
-      {
-        sign = "-";
-        degrees *= -1.0;
+      var sign
+      if (degrees < 0.0) {
+        sign = '-'
+        degrees *= -1.0
+      } else {
+        sign = '+'
       }
 
-      var deg = Math.floor(degrees);
-      degrees -= deg;
+      var deg = Math.floor(degrees)
+      degrees -= deg
 
       // 60 min/deg
-      var m = Math.floor(degrees * 60.0);
-      degrees -= m / 60.0;
+      var m = Math.floor(degrees * 60.0)
+      degrees -= m / 60.0
 
       // 60 sec/min == 3600 sec/deg
-      degrees *= 3600.0;
+      degrees *= 3600.0
       //  var d = degrees.toString();
 
-      var dd = deg.toString();
-      if (deg < 10)
-      {
-        dd = "0" + dd;
+      var dd = deg.toString()
+      if (deg < 10) {
+        dd = '0' + dd
       }
 
-      var mm = Math.floor(m).toString();
-      if (m < 10)
-      {
-        mm = "0" + mm;
+      var mm = Math.floor(m).toString()
+      if (m < 10) {
+        mm = '0' + mm
       }
 
       // for seconds, show 3 chars, which is up to ##.#
-      var prependZeroToSecond = degrees < 10;
-      var s = sign + dd + ":" + mm + ":";
+      var prependZeroToSecond = degrees < 10
+      var s = sign + dd + ':' + mm + ':'
 
-      return s + (prependZeroToSecond ? "0" : "")
-             + formatNumericFixation(degrees, 1);
+      return (
+        s + (prependZeroToSecond ? '0' : '') + formatNumericFixation(degrees, 1)
+      )
     }
 
     /**
@@ -348,42 +338,33 @@
      *
      * @return          Dec value converted, or null if unable to convert.
      */
-    function convertDEC()
-    {
-      var convertedDec;
+    function convertDEC() {
+      var convertedDec
 
-      if (isSexigesimalToUnit())
-      {
-        convertedDec = degreesToDEC();
-      }
-      else
-      {
-        convertedDec = formatNumericFixation(getValue(), 6);
+      if (isSexigesimalToUnit()) {
+        convertedDec = degreesToDEC()
+      } else {
+        convertedDec = formatNumericFixation(getValue(), 6)
       }
 
-      return convertedDec;
+      return convertedDec
     }
 
     /**
      * Test if the unit is a Position DEC unit.
      *
      */
-    function isSexigesimalToUnit()
-    {
-      return (getToUnit()
-                  in ca.nrc.cadc.search.unitconversion.position.sexiUnits);
+    function isSexigesimalToUnit() {
+      return getToUnit() in ca.nrc.cadc.search.unitconversion.position.sexiUnits
     }
 
-    function convert()
-    {
-      return convertDEC();
+    function convert() {
+      return convertDEC()
     }
 
-
-    $.extend(this,
-             {
-               "convert": convert
-             });
+    $.extend(this, {
+      convert: convert
+    })
   }
 
   /**
@@ -393,80 +374,70 @@
    * @param _toUnit   The unit to convert to.
    * @constructor
    */
-  function RAConverter(_value, _toUnit)
-  {
-    var _selfRAConverter = this;
+  function RAConverter(_value, _toUnit) {
+    var _selfRAConverter = this
 
-    this.value = sanitizeInput(_value);
-    this.toUnit = _toUnit.toLowerCase();
+    this.value = sanitizeInput(_value)
+    this.toUnit = _toUnit.toLowerCase()
 
-
-    function getValue()
-    {
-      return _selfRAConverter.value;
+    function getValue() {
+      return _selfRAConverter.value
     }
 
-    function getToUnit()
-    {
-      return _selfRAConverter.toUnit;
+    function getToUnit() {
+      return _selfRAConverter.toUnit
     }
 
     /**
      * Test if the unit is a Position RA unit.
      *
      */
-    function isSexigesimalToUnit()
-    {
-      return (getToUnit()
-                  in ca.nrc.cadc.search.unitconversion.position.sexiUnits);
+    function isSexigesimalToUnit() {
+      return getToUnit() in ca.nrc.cadc.search.unitconversion.position.sexiUnits
     }
 
     /**
      * Convert the value from degrees to sexigesimal.
      */
-    function degreesToRA()
-    {
-      var degrees = Number(getValue());
-      var returnVal;
+    function degreesToRA() {
+      var degrees = Number(getValue())
+      var returnVal
 
-      if (degrees < 0.0 || degrees >= 360.0)
-      {
-        returnVal = Number.NaN;
-      }
-      else
-      {
+      if (degrees < 0.0 || degrees >= 360.0) {
+        returnVal = Number.NaN
+      } else {
         // 24 hours/360 degrees = 15 deg/hour
-        var h = Math.floor(degrees / 15.0);
-        degrees -= h * 15.0;
+        var h = Math.floor(degrees / 15.0)
+        degrees -= h * 15.0
 
         // 15 deg/hour == 0.25 deg/min == 4 min/deg
-        var m = Math.floor(degrees * 4.0);
-        degrees -= m / 4.0;
+        var m = Math.floor(degrees * 4.0)
+        degrees -= m / 4.0
 
         // 4 min/deg == 240 sec/deg
-        degrees *= 240.0;
+        degrees *= 240.0
 
-        var hh = h.toString();
-        var mm = m.toString();
-        if (h < 10)
-        {
-          hh = "0" + h;
+        var hh = h.toString()
+        var mm = m.toString()
+        if (h < 10) {
+          hh = '0' + h
         }
-        if (m < 10)
-        {
-          mm = "0" + m;
+        if (m < 10) {
+          mm = '0' + m
         }
 
-        var s = hh + ":" + mm + ":";
+        var s = hh + ':' + mm + ':'
 
         // for seconds, show 4 chars, which is up to ##.##
-        var prependZeroToSecond = degrees < 10;
+        var prependZeroToSecond = degrees < 10
 
-        returnVal = s + (prependZeroToSecond ? "0" : "")
-                    + formatNumericFixation(degrees, 2);
+        returnVal =
+          s +
+          (prependZeroToSecond ? '0' : '') +
+          formatNumericFixation(degrees, 2)
       }
 
-      return returnVal;
+      return returnVal
     }
 
     /**
@@ -474,40 +445,32 @@
      *
      * @return          RA value converted, empty string, or null if unable to convert.
      */
-    function convertRA()
-    {
-      var displayValue;
-      var convertedRA;
+    function convertRA() {
+      var displayValue
+      var convertedRA
 
-      if (isSexigesimalToUnit())
-      {
-        convertedRA = degreesToRA();
-      }
-      else
-      {
-        displayValue = Number(getValue());
+      if (isSexigesimalToUnit()) {
+        convertedRA = degreesToRA()
+      } else {
+        displayValue = Number(getValue())
 
-        if (displayValue !== Number.NaN)
-        {
-          displayValue = formatNumericFixation(getValue(), 6);
+        if (displayValue !== Number.NaN) {
+          displayValue = formatNumericFixation(getValue(), 6)
         }
 
-        convertedRA = displayValue;
+        convertedRA = displayValue
       }
 
-      return convertedRA;
+      return convertedRA
     }
 
-    function convert()
-    {
-      return convertRA();
+    function convert() {
+      return convertRA()
     }
 
-
-    $.extend(this,
-             {
-               "convert": convert
-             });
+    $.extend(this, {
+      convert: convert
+    })
   }
 
   /**
@@ -517,22 +480,18 @@
    * @param _toUnit   The unit to convert to.
    * @constructor
    */
-  function TimeConverter(_value, _toUnit)
-  {
-    var _selfTimeConverter = this;
+  function TimeConverter(_value, _toUnit) {
+    var _selfTimeConverter = this
 
-    this.value = sanitizeInput(_value);
-    this.toUnit = _toUnit.toLowerCase();
+    this.value = sanitizeInput(_value)
+    this.toUnit = _toUnit.toLowerCase()
 
-
-    function getValue()
-    {
-      return _selfTimeConverter.value;
+    function getValue() {
+      return _selfTimeConverter.value
     }
 
-    function getToUnit()
-    {
-      return _selfTimeConverter.toUnit;
+    function getToUnit() {
+      return _selfTimeConverter.toUnit
     }
 
     /**
@@ -541,21 +500,18 @@
      * @param _unit   The unit to get the factor for.
      * @returns {*}
      */
-    function getTimeFactor(_unit)
-    {
-      var unitEntry = ca.nrc.cadc.search.unitconversion.time[_unit.toLowerCase()];
-      var factor;
+    function getTimeFactor(_unit) {
+      var unitEntry =
+        ca.nrc.cadc.search.unitconversion.time[_unit.toLowerCase()]
+      var factor
 
-      if (unitEntry)
-      {
-        factor = unitEntry.factor;
-      }
-      else
-      {
-        factor = null;
+      if (unitEntry) {
+        factor = unitEntry.factor
+      } else {
+        factor = null
       }
 
-      return factor;
+      return factor
     }
 
     /**
@@ -563,27 +519,22 @@
      *
      * @return        Number to two decimals, or null if unable to convert.
      */
-    function convertTime()
-    {
-      var time = Number(getValue());
-      var toFactor = getTimeFactor(getToUnit());
-      var convertedTime;
+    function convertTime() {
+      var time = Number(getValue())
+      var toFactor = getTimeFactor(getToUnit())
+      var convertedTime
 
-      if (toFactor)
-      {
-        convertedTime = Number(toFactor * time);
-      }
-      else
-      {
-        convertedTime = null;
+      if (toFactor) {
+        convertedTime = Number(toFactor * time)
+      } else {
+        convertedTime = null
       }
 
-      return convertedTime;
+      return convertedTime
     }
 
-    function convert()
-    {
-      return formatNumericFixation(convertTime().valueOf(), 3);
+    function convert() {
+      return formatNumericFixation(convertTime().valueOf(), 3)
     }
 
     /**
@@ -595,28 +546,22 @@
      * @param _fromUnit   The unit that the given value is currently known as.
      * @returns {number}  Number in seconds.
      */
-    function rebase(_fromUnit)
-    {
-      var factor = getTimeFactor(_fromUnit);
-      var currTime = Number(getValue());
+    function rebase(_fromUnit) {
+      var factor = getTimeFactor(_fromUnit)
+      var currTime = Number(getValue())
 
-      if (factor)
-      {
-        return Number(currTime / factor);
-      }
-      else
-      {
-        throw new Error("No time factor available for " + _fromUnit);
+      if (factor) {
+        return Number(currTime / factor)
+      } else {
+        throw new Error('No time factor available for ' + _fromUnit)
       }
     }
 
-
-    $.extend(this,
-             {
-               "convert": convert,
-               "convertValue": convertTime,
-               "rebase": rebase
-             });
+    $.extend(this, {
+      convert: convert,
+      convertValue: convertTime,
+      rebase: rebase
+    })
   }
 
   /**
@@ -626,22 +571,18 @@
    * @param _toUnit   The unit to convert to.
    * @constructor
    */
-  function WavelengthConverter(_value, _toUnit)
-  {
-    var _selfWavelengthConverter = this;
+  function WavelengthConverter(_value, _toUnit) {
+    var _selfWavelengthConverter = this
 
-    this.value = sanitizeInput(_value);
-    this.toUnit = _toUnit.toLowerCase();
+    this.value = sanitizeInput(_value)
+    this.toUnit = _toUnit.toLowerCase()
 
-
-    function getValue()
-    {
-      return _selfWavelengthConverter.value;
+    function getValue() {
+      return _selfWavelengthConverter.value
     }
 
-    function getToUnit()
-    {
-      return _selfWavelengthConverter.toUnit;
+    function getToUnit() {
+      return _selfWavelengthConverter.toUnit
     }
 
     /**
@@ -649,9 +590,8 @@
      *
      * @param _unit   The unit to check.
      */
-    function isEnergyUnit(_unit)
-    {
-      return (_unit in ca.nrc.cadc.search.unitconversion.energy.energyUnits);
+    function isEnergyUnit(_unit) {
+      return _unit in ca.nrc.cadc.search.unitconversion.energy.energyUnits
     }
 
     /**
@@ -659,9 +599,8 @@
      *
      * @param _unit   The unit to check.
      */
-    function isFrequencyUnit(_unit)
-    {
-      return (_unit in ca.nrc.cadc.search.unitconversion.energy.freqUnits);
+    function isFrequencyUnit(_unit) {
+      return _unit in ca.nrc.cadc.search.unitconversion.energy.freqUnits
     }
 
     /**
@@ -669,56 +608,57 @@
      *
      * @param _unit   The unit to check.
      */
-    function isWavelengthUnit(_unit)
-    {
-      return (_unit in ca.nrc.cadc.search.unitconversion.energy.waveUnits);
+    function isWavelengthUnit(_unit) {
+      return _unit in ca.nrc.cadc.search.unitconversion.energy.waveUnits
     }
 
     /**
      * Convert an Energy value from the fromUnit to the toUnit.
      *
      */
-    function convertEnergy()
-    {
+    function convertEnergy() {
       // Always use the base value from the VOTable, which is in the val
       // attribute.
-      var energy = Number(getValue());
+      var energy = Number(getValue())
 
       // Wavelength to Wavelength.
-      if (isWavelengthUnit(getToUnit()))
-      {
-        energy = normalizeWavelength();
+      if (isWavelengthUnit(getToUnit())) {
+        energy = normalizeWavelength()
       }
 
       // Wavelength to Energy.
-      else if (isEnergyUnit(getToUnit()))
-      {
+      else if (isEnergyUnit(getToUnit())) {
         // Convert Wavelength to Energy in eV.
-        var evValue = Number((ca.nrc.cadc.search.unitconversion.energy.h
-            * ca.nrc.cadc.search.unitconversion.energy.c)
-                             /  (ca.nrc.cadc.search.unitconversion.energy.eV
-            * getValue()));
+        var evValue = Number(
+          (ca.nrc.cadc.search.unitconversion.energy.h *
+            ca.nrc.cadc.search.unitconversion.energy.c) /
+            (ca.nrc.cadc.search.unitconversion.energy.eV * getValue())
+        )
 
         // Normalize Energy to desired unit from eV.
-        var tmpFromEVToEnergyUnitConverter = new EnergyConverter(evValue,
-                                                                 getToUnit());
-        energy = tmpFromEVToEnergyUnitConverter.convert();
+        var tmpFromEVToEnergyUnitConverter = new EnergyConverter(
+          evValue,
+          getToUnit()
+        )
+        energy = tmpFromEVToEnergyUnitConverter.convert()
       }
 
       // Wavelength to Frequency.
-      else if (isFrequencyUnit(getToUnit()))
-      {
+      else if (isFrequencyUnit(getToUnit())) {
         // Convert Wavelength to Frequency.
-        var hzValue = Number(ca.nrc.cadc.search.unitconversion.energy.c
-                             / getValue());
+        var hzValue = Number(
+          ca.nrc.cadc.search.unitconversion.energy.c / getValue()
+        )
 
         // Normalize Frequency to desired unit from Hz.
-        var tmpFromHzToEnergyUnitConverter =
-            new FrequencyConverter(hzValue, getToUnit());
-        energy = tmpFromHzToEnergyUnitConverter.convert();
+        var tmpFromHzToEnergyUnitConverter = new FrequencyConverter(
+          hzValue,
+          getToUnit()
+        )
+        energy = tmpFromHzToEnergyUnitConverter.convert()
       }
 
-      return energy;
+      return energy
     }
 
     /**
@@ -728,10 +668,9 @@
      * @param unit    The unit.
      * @returns {*}
      */
-    function getWavelengthFactor(unit)
-    {
-      var unitEntry = ca.nrc.cadc.search.unitconversion.energy.waveUnits[unit];
-      return unitEntry ? unitEntry.factor : null;
+    function getWavelengthFactor(unit) {
+      var unitEntry = ca.nrc.cadc.search.unitconversion.energy.waveUnits[unit]
+      return unitEntry ? unitEntry.factor : null
     }
 
     /**
@@ -739,16 +678,14 @@
      *
      * @return  {Number}  Normalized wavelength value.
      */
-    function normalizeWavelength()
-    {
-      var toFactor = getWavelengthFactor(getToUnit());
-      return Number(getValue() * (1.0 / toFactor));
+    function normalizeWavelength() {
+      var toFactor = getWavelengthFactor(getToUnit())
+      return Number(getValue() * (1.0 / toFactor))
     }
 
-    function convert()
-    {
-      var energyValue = convertEnergy();
-      return formatNumericPrecision(energyValue, 12);
+    function convert() {
+      var energyValue = convertEnergy()
+      return formatNumericPrecision(energyValue, 12)
     }
 
     /**
@@ -756,57 +693,54 @@
      *
      * @param _fromUnit   The unit being rebased FROM.
      */
-    function rebase(_fromUnit)
-    {
-      var rebasedValue;
-      var fromUnit = _fromUnit.toLowerCase();
+    function rebase(_fromUnit) {
+      var rebasedValue
+      var fromUnit = _fromUnit.toLowerCase()
 
-      if (isEnergyUnit(fromUnit))
-      {
+      if (isEnergyUnit(fromUnit)) {
         // Rebase to the energy unit (eV).
-        var energyRebaseConverter =
-            new EnergyConverter(Number(getValue()), "eV");
+        var energyRebaseConverter = new EnergyConverter(
+          Number(getValue()),
+          'eV'
+        )
 
         // Should be value in eV.
-        var rebasedEnergy = energyRebaseConverter.rebase(fromUnit);
-        rebasedValue = Number((ca.nrc.cadc.search.unitconversion.energy.h
-                               * ca.nrc.cadc.search.unitconversion.energy.c)
-                              /  (ca.nrc.cadc.search.unitconversion.energy.eV
-                                  * rebasedEnergy));
-      }
-      else if (isFrequencyUnit(fromUnit))
-      {
+        var rebasedEnergy = energyRebaseConverter.rebase(fromUnit)
+        rebasedValue = Number(
+          (ca.nrc.cadc.search.unitconversion.energy.h *
+            ca.nrc.cadc.search.unitconversion.energy.c) /
+            (ca.nrc.cadc.search.unitconversion.energy.eV * rebasedEnergy)
+        )
+      } else if (isFrequencyUnit(fromUnit)) {
         // Rebase to the frequency unit (Hz).
-        var frequencyRebaseConverter =
-            new FrequencyConverter(Number(getValue()), "Hz");
+        var frequencyRebaseConverter = new FrequencyConverter(
+          Number(getValue()),
+          'Hz'
+        )
 
-        var rebasedFrequency = frequencyRebaseConverter.rebase(fromUnit);
+        var rebasedFrequency = frequencyRebaseConverter.rebase(fromUnit)
 
         // Convert back to metres.
-        rebasedValue = Number(ca.nrc.cadc.search.unitconversion.energy.c /
-                              rebasedFrequency);
-      }
-      else if (isWavelengthUnit(fromUnit))
-      {
-        var factor = getWavelengthFactor(fromUnit);
-        rebasedValue = Number(getValue() * factor);
-      }
-      else
-      {
-        throw new Error("No wavelength, energy, or frequency entry for unit "
-                        + _fromUnit);
+        rebasedValue = Number(
+          ca.nrc.cadc.search.unitconversion.energy.c / rebasedFrequency
+        )
+      } else if (isWavelengthUnit(fromUnit)) {
+        var factor = getWavelengthFactor(fromUnit)
+        rebasedValue = Number(getValue() * factor)
+      } else {
+        throw new Error(
+          'No wavelength, energy, or frequency entry for unit ' + _fromUnit
+        )
       }
 
-      return rebasedValue;
+      return rebasedValue
     }
 
-
-    $.extend(this,
-             {
-               "convert": convert,
-               "convertValue": convertEnergy,
-               "rebase": rebase
-             });
+    $.extend(this, {
+      convert: convert,
+      convertValue: convertEnergy,
+      rebase: rebase
+    })
   }
 
   /**
@@ -816,21 +750,18 @@
    * @param _toUnit   The target unit of the conversion.
    * @constructor
    */
-  function EnergyConverter(_value, _toUnit)
-  {
-    var _selfEnergyConverter = this;
+  function EnergyConverter(_value, _toUnit) {
+    var _selfEnergyConverter = this
 
-    this.value = sanitizeInput(_value);
-    this.toUnit = _toUnit.toLowerCase();
+    this.value = sanitizeInput(_value)
+    this.toUnit = _toUnit.toLowerCase()
 
-    function getValue()
-    {
-      return _selfEnergyConverter.value;
+    function getValue() {
+      return _selfEnergyConverter.value
     }
 
-    function getToUnit()
-    {
-      return _selfEnergyConverter.toUnit;
+    function getToUnit() {
+      return _selfEnergyConverter.toUnit
     }
 
     /**
@@ -839,12 +770,10 @@
      * @param unit
      * @returns {*}
      */
-    function getEnergyFactor(unit)
-    {
-      var unitEntry =
-          ca.nrc.cadc.search.unitconversion.energy.energyUnits[unit];
+    function getEnergyFactor(unit) {
+      var unitEntry = ca.nrc.cadc.search.unitconversion.energy.energyUnits[unit]
 
-      return unitEntry ? unitEntry.factor : null;
+      return unitEntry ? unitEntry.factor : null
     }
 
     /**
@@ -852,38 +781,30 @@
      *
      * @return  {Number}  Normalized energy value.
      */
-    function normalizeEnergy()
-    {
-      return (getValue() * (1.0 / getEnergyFactor(getToUnit())));
+    function normalizeEnergy() {
+      return getValue() * (1.0 / getEnergyFactor(getToUnit()))
     }
 
-    function convert()
-    {
-      return normalizeEnergy();
+    function convert() {
+      return normalizeEnergy()
     }
 
-    function rebase(_fromUnit)
-    {
-      var factor = getEnergyFactor(_fromUnit.toLowerCase());
-      var energy = Number(getValue());
+    function rebase(_fromUnit) {
+      var factor = getEnergyFactor(_fromUnit.toLowerCase())
+      var energy = Number(getValue())
 
-      if (factor)
-      {
-        return Number(energy / (1.0 / factor));
-      }
-      else
-      {
-        throw new Error("No energy factor available for " + _fromUnit);
+      if (factor) {
+        return Number(energy / (1.0 / factor))
+      } else {
+        throw new Error('No energy factor available for ' + _fromUnit)
       }
     }
 
-
-    $.extend(this,
-             {
-               "convert": convert,
-               "convertValue": normalizeEnergy,
-               "rebase": rebase
-             });
+    $.extend(this, {
+      convert: convert,
+      convertValue: normalizeEnergy,
+      rebase: rebase
+    })
   }
 
   /**
@@ -893,22 +814,18 @@
    * @param _toUnit     The unit to convert to.
    * @constructor
    */
-  function FrequencyConverter(_value, _toUnit)
-  {
-    var _selfFrequencyConverter = this;
+  function FrequencyConverter(_value, _toUnit) {
+    var _selfFrequencyConverter = this
 
-    this.value = sanitizeInput(_value);
-    this.toUnit = _toUnit.toLowerCase();
+    this.value = sanitizeInput(_value)
+    this.toUnit = _toUnit.toLowerCase()
 
-
-    function getValue()
-    {
-      return _selfFrequencyConverter.value;
+    function getValue() {
+      return _selfFrequencyConverter.value
     }
 
-    function getToUnit()
-    {
-      return _selfFrequencyConverter.toUnit;
+    function getToUnit() {
+      return _selfFrequencyConverter.toUnit
     }
 
     /**
@@ -918,10 +835,9 @@
      * @param unit    The unit.
      * @returns {*}
      */
-    function getFrequencyFactor(unit)
-    {
-      var unitEntry = ca.nrc.cadc.search.unitconversion.energy.freqUnits[unit];
-      return unitEntry ? unitEntry.factor : null;
+    function getFrequencyFactor(unit) {
+      var unitEntry = ca.nrc.cadc.search.unitconversion.energy.freqUnits[unit]
+      return unitEntry ? unitEntry.factor : null
     }
 
     /**
@@ -929,39 +845,31 @@
      *
      * @return  {Number}  Normalized frequency value.
      */
-    function normalizeFrequency()
-    {
-      var toFactor = getFrequencyFactor(getToUnit());
-      return Number(getValue() * (1.0 / toFactor));
+    function normalizeFrequency() {
+      var toFactor = getFrequencyFactor(getToUnit())
+      return Number(getValue() * (1.0 / toFactor))
     }
 
-    function convert()
-    {
-      return normalizeFrequency();
+    function convert() {
+      return normalizeFrequency()
     }
 
-    function rebase(_fromUnit)
-    {
-      var factor = getFrequencyFactor(_fromUnit.toLowerCase());
-      var frequency = Number(getValue());
+    function rebase(_fromUnit) {
+      var factor = getFrequencyFactor(_fromUnit.toLowerCase())
+      var frequency = Number(getValue())
 
-      if (factor)
-      {
-        return Number(frequency * factor);
-      }
-      else
-      {
-        throw new Error("No frequency factor available for " + _fromUnit);
+      if (factor) {
+        return Number(frequency * factor)
+      } else {
+        throw new Error('No frequency factor available for ' + _fromUnit)
       }
     }
 
-
-    $.extend(this,
-             {
-               "convert": convert,
-               "convertValue": normalizeFrequency,
-               "rebase": rebase
-             });
+    $.extend(this, {
+      convert: convert,
+      convertValue: normalizeFrequency,
+      rebase: rebase
+    })
   }
 
   /**
@@ -969,29 +877,28 @@
    * @param _date   Date input.
    * @constructor
    */
-  function MJDConverter(_date)
-  {
-    var _selfMJDConverter = this;
-    this.value = _date;
+  function MJDConverter(_date) {
+    var _selfMJDConverter = this
+    this.value = _date
 
     /**
      * Convert from Date to MJD double.
      *
      * @returns {number}
      */
-    function convert()
-    {
-      var givenDate = _selfMJDConverter.value;
-      return (((givenDate / 86400000)
-               - (givenDate.getTimezoneOffset() / 1440) + 2440587.5)
-              - 2400000.5);
-
+    function convert() {
+      var givenDate = _selfMJDConverter.value
+      return (
+        givenDate / 86400000 -
+        givenDate.getTimezoneOffset() / 1440 +
+        2440587.5 -
+        2400000.5
+      )
     }
 
-    $.extend(this,
-      {
-        "convert": convert
-      })
+    $.extend(this, {
+      convert: convert
+    })
   }
 
   /**
@@ -1001,32 +908,27 @@
    * @param _toUnit   The target unit of the conversion.
    * @constructor
    */
-  function DateConverter(_value, _toUnit)
-  {
-    var _selfDateConverter = this;
+  function DateConverter(_value, _toUnit) {
+    var _selfDateConverter = this
 
-    this.value = sanitizeInput(_value);
-    this.toUnit = _toUnit.toLowerCase();
-    this.includeTime = true;
+    this.value = sanitizeInput(_value)
+    this.toUnit = _toUnit.toLowerCase()
+    this.includeTime = true
 
-    function getValue()
-    {
-      return _selfDateConverter.value;
+    function getValue() {
+      return _selfDateConverter.value
     }
 
-    function getToUnit()
-    {
-      return _selfDateConverter.toUnit;
+    function getToUnit() {
+      return _selfDateConverter.toUnit
     }
 
-    function includeTime()
-    {
-      return _selfDateConverter.includeTime;
+    function includeTime() {
+      return _selfDateConverter.includeTime
     }
 
-    function excludeTime()
-    {
-      _selfDateConverter.includeTime = false;
+    function excludeTime() {
+      _selfDateConverter.includeTime = false
     }
 
     /**
@@ -1034,80 +936,81 @@
      *
      * @return {String}  Converted value, or null if unable.
      */
-    function formatMJD()
-    {
-      var MJD = Number(getValue());
+    function formatMJD() {
+      var MJD = Number(getValue())
 
       // Julian day
-      var jd = Math.floor(MJD) + 2400000.5;
+      var jd = Math.floor(MJD) + 2400000.5
 
       // Integer Julian day
-      var jdi = Math.floor(jd);
+      var jdi = Math.floor(jd)
 
       // Fractional part of day
-      var jdf = Number(jd - jdi + 0.5);
+      var jdf = Number(jd - jdi + 0.5)
 
       // Really the next calendar day?
-      if (jdf >= 1.0)
-      {
+      if (jdf >= 1.0) {
         //    jdf = jdf - 1.0;
-        jdi = jdi + 1;
+        jdi = jdi + 1
       }
 
-      var fraction = Number(MJD - Math.floor(MJD));
-      var hours = Math.floor(Number(fraction * 24.0));
-      fraction = (fraction * 24.0) - hours;
+      var fraction = Number(MJD - Math.floor(MJD))
+      var hours = Math.floor(Number(fraction * 24.0))
+      fraction = fraction * 24.0 - hours
 
-      var minutes = Math.floor(Number(fraction * 60.0));
-      fraction = (fraction * 60.0) - minutes;
+      var minutes = Math.floor(Number(fraction * 60.0))
+      fraction = fraction * 60.0 - minutes
 
-      var seconds = Math.floor(Number(fraction * 60.0));
-      fraction = (fraction * 60.0) - seconds;
+      var seconds = Math.floor(Number(fraction * 60.0))
+      fraction = fraction * 60.0 - seconds
 
-      var milliseconds = Number(fraction * 1000.0).toFixed(0);
-        
-      var l = jdi + 68569;
-      var n = Math.floor(4 * l / 146097);
+      var milliseconds = Number(fraction * 1000.0).toFixed(0)
 
-      l = Math.floor(l) - Math.floor((146097 * n + 3) / 4);
-      var year = Math.floor(4000 * (l + 1) / 1461001);
+      var l = jdi + 68569
+      var n = Math.floor((4 * l) / 146097)
 
-      l = l - (Math.floor(1461 * year / 4)) + 31;
-      var month = Math.floor(80 * l / 2447);
+      l = Math.floor(l) - Math.floor((146097 * n + 3) / 4)
+      var year = Math.floor((4000 * (l + 1)) / 1461001)
 
-      var day = l - Math.floor(2447 * month / 80);
+      l = l - Math.floor((1461 * year) / 4) + 31
+      var month = Math.floor((80 * l) / 2447)
 
-      l = Math.floor(month / 11);
+      var day = l - Math.floor((2447 * month) / 80)
 
-      month = Math.floor(month + 2 - 12 * l);
-      year = Math.floor(100 * (n - 49) + year + l);
+      l = Math.floor(month / 11)
+
+      month = Math.floor(month + 2 - 12 * l)
+      year = Math.floor(100 * (n - 49) + year + l)
 
       // Verification step.  Month needs to be zero-based.
-      var date = new Date(year, month - 1, day, hours, minutes, seconds,
-                          milliseconds);
+      var date = new Date(
+        year,
+        month - 1,
+        day,
+        hours,
+        minutes,
+        seconds,
+        milliseconds
+      )
 
-      var dateFormat;
+      var dateFormat
 
-      if (includeTime())
-      {
-        dateFormat = ca.nrc.cadc.search.formats.date.ISO;
+      if (includeTime()) {
+        dateFormat = ca.nrc.cadc.search.formats.date.ISO
+      } else {
+        dateFormat = ca.nrc.cadc.search.formats.date.W3C
       }
-      else
-      {
-        dateFormat = ca.nrc.cadc.search.formats.date.W3C;
-      }
 
-      var dateFormatter = new ca.nrc.cadc.search.DateFormat(date, dateFormat);
+      var dateFormatter = new ca.nrc.cadc.search.DateFormat(date, dateFormat)
 
-      return dateFormatter.format();
+      return dateFormatter.format()
     }
 
     /**
      * Test if the to unit is an IVOA date unit.
      */
-    function isIVOAToUnit()
-    {
-      return (getToUnit() in ca.nrc.cadc.search.unitconversion.date.ivoaUnits);
+    function isIVOAToUnit() {
+      return getToUnit() in ca.nrc.cadc.search.unitconversion.date.ivoaUnits
     }
 
     /**
@@ -1115,50 +1018,40 @@
      *
      * @return          String value.
      */
-    function convertDate()
-    {
-      var formattedValue;
+    function convertDate() {
+      var formattedValue
 
-      if (isIVOAToUnit())
-      {
-        formattedValue = formatMJD();
-      }
-      else
-      {
-        formattedValue = formatNumericFixation(getValue(), 5);
+      if (isIVOAToUnit()) {
+        formattedValue = formatMJD()
+      } else {
+        formattedValue = formatNumericFixation(getValue(), 5)
       }
 
-      return formattedValue;
+      return formattedValue
     }
 
-    function convert()
-    {
-      return convertDate();
+    function convert() {
+      return convertDate()
     }
 
-    $.extend(this,
-             {
-               "convert": convert,
-               "excludeTime": excludeTime
-             });
+    $.extend(this, {
+      convert: convert,
+      excludeTime: excludeTime
+    })
   }
 
-  function AngleConverter(_value, _toUnit)
-  {
-    var _selfAngleConverter = this;
+  function AngleConverter(_value, _toUnit) {
+    var _selfAngleConverter = this
 
-    this.value = _value;
-    this.toUnit = _toUnit;
+    this.value = _value
+    this.toUnit = _toUnit
 
-
-    function getValue()
-    {
-      return _selfAngleConverter.value;
+    function getValue() {
+      return _selfAngleConverter.value
     }
 
-    function getToUnit()
-    {
-      return _selfAngleConverter.toUnit;
+    function getToUnit() {
+      return _selfAngleConverter.toUnit
     }
 
     /**
@@ -1167,29 +1060,24 @@
      * @param _angleUnit    The Angular unit obtain the factor for.
      * @return {Number}     Numeric factor.
      */
-    function getAngleFactor(_angleUnit)
-    {
-      var unitEntry = ca.nrc.cadc.search.unitconversion.angle[_angleUnit];
-      var factor;
+    function getAngleFactor(_angleUnit) {
+      var unitEntry = ca.nrc.cadc.search.unitconversion.angle[_angleUnit]
+      var factor
 
-      if (unitEntry)
-      {
-        factor = unitEntry.factor;
-      }
-      else
-      {
-        factor = null;
+      if (unitEntry) {
+        factor = unitEntry.factor
+      } else {
+        factor = null
       }
 
-      return factor;
+      return factor
     }
 
     /**
      * Test if the unit is an Angle unit.
      */
-    function isToAngleUnit()
-    {
-      return (getToUnit() in ca.nrc.cadc.search.unitconversion.angle);
+    function isToAngleUnit() {
+      return getToUnit() in ca.nrc.cadc.search.unitconversion.angle
     }
 
     /**
@@ -1197,23 +1085,19 @@
      *
      * @return  Number value, or null if unable to convert.
      */
-    function convertAngle()
-    {
-      var angle = Number(getValue());
-      var convertedAngle;
-      var toFactor = getAngleFactor(getToUnit());
+    function convertAngle() {
+      var angle = Number(getValue())
+      var convertedAngle
+      var toFactor = getAngleFactor(getToUnit())
 
-      if (toFactor)
-      {
-        var returned = Number(toFactor * angle);
-        convertedAngle = returned.valueOf();
-      }
-      else
-      {
-        convertedAngle = null;
+      if (toFactor) {
+        var returned = Number(toFactor * angle)
+        convertedAngle = returned.valueOf()
+      } else {
+        convertedAngle = null
       }
 
-      return convertedAngle;
+      return convertedAngle
     }
 
     /**
@@ -1225,18 +1109,14 @@
      * @param _fromUnit   The unit that the given value is currently known as.
      * @returns {number}  Number in arc seconds.
      */
-    function rebase(_fromUnit)
-    {
-      var factor = getAngleFactor(_fromUnit);
-      var area = Number(getValue());
+    function rebase(_fromUnit) {
+      var factor = getAngleFactor(_fromUnit)
+      var area = Number(getValue())
 
-      if (factor)
-      {
-        return Number(area / factor);
-      }
-      else
-      {
-        throw new Error("No angular factor available for " + _fromUnit);
+      if (factor) {
+        return Number(area / factor)
+      } else {
+        throw new Error('No angular factor available for ' + _fromUnit)
       }
     }
 
@@ -1245,19 +1125,17 @@
      *
      * @returns {*}   Converted value.
      */
-    function convert()
-    {
-      var res = isToAngleUnit() ? convertAngle() : null;
+    function convert() {
+      var res = isToAngleUnit() ? convertAngle() : null
 
-      return formatNumericFixation(res, 4);
+      return formatNumericFixation(res, 4)
     }
 
-    $.extend(this,
-             {
-               "convert": convert,
-               "convertValue": convertAngle,
-               "rebase": rebase
-             });
+    $.extend(this, {
+      convert: convert,
+      convertValue: convertAngle,
+      rebase: rebase
+    })
   }
 
   /**
@@ -1266,22 +1144,18 @@
    * @param _toUnit   The unit to convert to.
    * @constructor
    */
-  function AreaConverter(_value, _toUnit)
-  {
-    var _selfAreaConverter = this;
+  function AreaConverter(_value, _toUnit) {
+    var _selfAreaConverter = this
 
-    this.value = _value;
-    this.toUnit = _toUnit;
+    this.value = _value
+    this.toUnit = _toUnit
 
-
-    function getValue()
-    {
-      return _selfAreaConverter.value;
+    function getValue() {
+      return _selfAreaConverter.value
     }
 
-    function getToUnit()
-    {
-      return _selfAreaConverter.toUnit;
+    function getToUnit() {
+      return _selfAreaConverter.toUnit
     }
 
     /**
@@ -1290,29 +1164,24 @@
      * @param _areaUnit   The unit to use.
      * @return {*}
      */
-    function getAreaFactor(_areaUnit)
-    {
-      var unitEntry = ca.nrc.cadc.search.unitconversion.area[_areaUnit];
-      var factor;
+    function getAreaFactor(_areaUnit) {
+      var unitEntry = ca.nrc.cadc.search.unitconversion.area[_areaUnit]
+      var factor
 
-      if (unitEntry)
-      {
-        factor = unitEntry.factor;
-      }
-      else
-      {
-        factor = null;
+      if (unitEntry) {
+        factor = unitEntry.factor
+      } else {
+        factor = null
       }
 
-      return factor;
+      return factor
     }
 
     /**
      * Test if the unit is an Area unit.
      */
-    function isToAreaUnit()
-    {
-      return (getToUnit() in ca.nrc.cadc.search.unitconversion.area);
+    function isToAreaUnit() {
+      return getToUnit() in ca.nrc.cadc.search.unitconversion.area
     }
 
     /**
@@ -1320,23 +1189,19 @@
      *
      * @return  Number value, or null if unable to convert.
      */
-    function convertArea()
-    {
-      var area = Number(getValue());
-      var convertedArea;
-      var factor = getAreaFactor(getToUnit());
+    function convertArea() {
+      var area = Number(getValue())
+      var convertedArea
+      var factor = getAreaFactor(getToUnit())
 
-      if (factor)
-      {
-        var returned = Number(factor * area);
-        convertedArea = returned.valueOf();
-      }
-      else
-      {
-        convertedArea = null;
+      if (factor) {
+        var returned = Number(factor * area)
+        convertedArea = returned.valueOf()
+      } else {
+        convertedArea = null
       }
 
-      return convertedArea;
+      return convertedArea
     }
 
     /**
@@ -1348,18 +1213,14 @@
      * @param _fromUnit   The unit that the given value is currently known as.
      * @returns {number}  Number in arc degrees.
      */
-    function rebase(_fromUnit)
-    {
-      var factor = getAreaFactor(_fromUnit);
-      var area = Number(getValue());
+    function rebase(_fromUnit) {
+      var factor = getAreaFactor(_fromUnit)
+      var area = Number(getValue())
 
-      if (factor)
-      {
-        return Number(area / factor);
-      }
-      else
-      {
-        throw new Error("No area factor available for " + _fromUnit);
+      if (factor) {
+        return Number(area / factor)
+      } else {
+        throw new Error('No area factor available for ' + _fromUnit)
       }
     }
 
@@ -1368,18 +1229,15 @@
      *
      * @returns {*}   Converted value.
      */
-    function convert()
-    {
-      var res = isToAreaUnit() ? convertArea() : null;
-      return formatNumericFixation(res, 4);
+    function convert() {
+      var res = isToAreaUnit() ? convertArea() : null
+      return formatNumericFixation(res, 4)
     }
 
-    $.extend(this,
-             {
-               "convert": convert,
-               "convertValue": convertArea,
-               "rebase": rebase
-             });
+    $.extend(this, {
+      convert: convert,
+      convertValue: convertArea,
+      rebase: rebase
+    })
   }
-
-})(jQuery);
+})(jQuery)
