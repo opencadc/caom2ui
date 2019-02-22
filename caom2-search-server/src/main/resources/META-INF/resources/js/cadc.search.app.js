@@ -1570,7 +1570,11 @@
      * @private
      */
     this._setJobParameters = function (jobParams, callback) {
-      var queryParam = 'QUERY=' + encodeURIComponent(this._getADQL(true))
+      // Exclamation points are not encoded by default mechanisms, so explicitly replace them here.
+      // WebRT 75687
+      // jenkinsd 2019.02.22
+      var queryParam = 'QUERY=' + encodeURIComponent(this._getADQL(true)).replace('!', '%21')
+
       var votableURL =
         this.options.tapSyncEndpoint +
         '?LANG=ADQL&REQUEST=doQuery&USEMAQ=' +
