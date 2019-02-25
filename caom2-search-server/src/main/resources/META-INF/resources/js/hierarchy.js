@@ -393,13 +393,12 @@
     this._buildTable = function(_group) {
       // Keep track of the first non-hidden select.
       var firstSelect
+      var groupUTypesLength = _group.uTypes.length
+      var rightPosIdx = groupUTypesLength / 2
 
       // Loop through each attribute.
       for (
-        var i = 0, groupUTypesLength = _group.uTypes.length;
-        i < groupUTypesLength;
-        i++
-      ) {
+        var i = 0; i < groupUTypesLength; i++) {
         // Get the JSON text from hidden input and
         // eval into an enumerated object.
         var row = _group.values[i]
@@ -409,6 +408,14 @@
         var containerElement = document.createElement('div')
         containerElement.className = 'text-left col-md-1 hierarchy'
 
+        // Position for popovers so they don't flop off the side of the screen
+        var position
+        if (i < rightPosIdx) {
+          position = 'right'
+        } else {
+          position = 'left'
+        }
+
         if (i === 0) {
           containerElement.className += ' row-start'
         } else if (i === groupUTypesLength - 1) {
@@ -416,7 +423,7 @@
           containerElement.className += ' row-end'
         }
 
-        select = this._buildSelect(_group.uTypes[i], containerElement)
+        select = this._buildSelect(_group.uTypes[i], containerElement, position)
 
         if (firstSelect === undefined) {
           firstSelect = select.childNodes[1]
@@ -448,7 +455,7 @@
      * @returns {*}
      * @private
      */
-    this._buildSelect = function(uType, containerElement) {
+    this._buildSelect = function(uType, containerElement, position) {
       var label = document.createElement('label')
 
       var hidden = document.createElement('input')
@@ -465,7 +472,10 @@
       )
 
       labelSpanFieldName.className = 'indent-small field-name'
-      labelSpanFieldName.innerHTML = select.title
+      labelSpanFieldName.innerHTML = select.title + '<div data-toggle="popover" data-utype="' + uType
+          + '" data-placement="' + position + '" data-title="' + select.title
+          + '" class="advancedsearch-tooltip glyphicon glyphicon-question-sign popover-blue popover-left" data-original-title="" title="">\n' +
+          '  </div>'
 
       label.appendChild(labelSpanFieldName)
       label.setAttribute('for', select.id)

@@ -1038,8 +1038,6 @@
       if (tipJSON && tipJSON.tipHTML) {
         var tipMarkup = tipJSON.tipHTML
 
-        var offsetY = tipJSON.verticalOffset ? tipJSON.verticalOffset : 0
-
         var $tooltipDiv = tooltipCreator.getContent(
           tipMarkup,
           tooltipHeaderText,
@@ -1059,23 +1057,6 @@
           placement: $liItem[0].dataset.placement
         })
 
-        // todo: can popovers be draggable?
-        // $ttIconImg.on("click", function (e)
-        // {
-        //   e.preventDefault();
-        //   $ttIconImg.tooltipster("show");
-        //
-        //   // Make them
-        //   // draggable.
-        //   $(".tooltipster-advanced-search").draggable(
-        //       {
-        //         handle: ".tooltip_header",
-        //         snap: true,
-        //         revert: false
-        //       });
-        //
-        //   return false;
-        // });
       }
     }
 
@@ -1109,8 +1090,7 @@
                 .popover('hide')
                 .data('bs.popover') || {}
               ).inState || {}
-            ).click = false // fix for BS
-            // 3.3.6
+            ).click = false // fix for BS 3.3.6
           })
         }
 
