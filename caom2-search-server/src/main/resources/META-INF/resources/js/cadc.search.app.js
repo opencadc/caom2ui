@@ -751,13 +751,6 @@
       caomSearchForm.disable()
       obsCoreSearchForm.disable()
 
-      var tooltipURL = 'json/tooltips_' + this.getPageLanguage() + '.json'
-
-      $.getJSON(tooltipURL, function (jsonData) {
-        caomSearchForm.loadTooltips(jsonData)
-        obsCoreSearchForm.loadTooltips(jsonData)
-      })
-
       // Trap the backspace key to prevent it going 'Back' when not using it to
       // delete characters.                                      tabContainer
       // Story 959 - Task 2920.
@@ -1200,6 +1193,15 @@
         activeSearchForm.enableMaqToggle()
 
         if (_continue && isFirstLoad) {
+
+          // set tooltips
+          var tooltipURL = 'json/tooltips_' + this.getPageLanguage() + '.json'
+
+          $.getJSON(tooltipURL, function (jsonData) {
+            caomSearchForm.loadTooltips(jsonData)
+            obsCoreSearchForm.loadTooltips(jsonData)
+          })
+
           // Don't process the queryfrom the URL if this is not the first page load.
           isFirstLoad = false
 
