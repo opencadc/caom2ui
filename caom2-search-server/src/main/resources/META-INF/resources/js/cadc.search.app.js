@@ -96,6 +96,8 @@
     var columnManager = new ca.nrc.cadc.search.columns.ColumnManager()
     var resultsVOTV
 
+    var tooltipJsonData = {}
+
     var services = {
       autocompleteEndpoint: _options.autocompleteEndpoint,
       targetResolverEndpoint: _options.targetResolverEndpoint,
@@ -1200,8 +1202,11 @@
 
           // set main search form tooltips
           $.getJSON(tooltipURL, function (jsonData) {
+            tooltipJsonData = jsonData
             caomSearchForm.loadTooltips(jsonData, 'popover')
             obsCoreSearchForm.loadTooltips(jsonData, 'popover')
+            caomSearchForm.loadTooltips(jsonData, 'dt-popover')
+            obsCoreSearchForm.loadTooltips(jsonData, 'dt-popover')
           })
 
           // Don't process the queryfrom the URL if this is not the first page load.
@@ -1345,13 +1350,11 @@
             this._selectTab(destinationTabID)
           }
         }
-
-        // Initialize the data train tooltips
-        $.getJSON(tooltipURL, function (jsonData) {
-          caomSearchForm.loadTooltips(jsonData, 'dt-popover')
-          obsCoreSearchForm.loadTooltips(jsonData, 'dt-popover')
-        })
-
+        else {
+          // Initialize the data train tooltips
+          caomSearchForm.loadTooltips(tooltipJsonData, 'dt-popover')
+          obsCoreSearchForm.loadTooltips(tooltipJsonData, 'dt-popover')
+        }
       }.bind(this)
 
       var caomSearchForm = this.getCAOMSearchForm()
