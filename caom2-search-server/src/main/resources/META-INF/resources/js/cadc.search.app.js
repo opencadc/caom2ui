@@ -86,7 +86,6 @@
     var queryOverlay = $('#queryOverlay')
     var queryTab = $('#queryTab')
     var $tabContainer = $('#tabContainer')
-    var tooltipJsonData
 
     // For controlling MAQ Switch triggering data train load
     var isFirstLoad = true
