@@ -472,7 +472,7 @@
       )
 
       labelSpanFieldName.className = 'indent-small field-name'
-      labelSpanFieldName.innerHTML = select.title + '<div data-toggle="popover" data-utype="' + uType
+      labelSpanFieldName.innerHTML = select.title + '<div data-toggle="dt-popover" data-utype="' + uType
           + '" data-placement="' + position + '" data-title="' + select.title
           + '" class="advancedsearch-tooltip glyphicon glyphicon-question-sign popover-blue popover-left" data-original-title="" title="">\n' +
           '  </div>'

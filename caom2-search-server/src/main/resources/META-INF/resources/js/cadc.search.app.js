@@ -86,6 +86,7 @@
     var queryOverlay = $('#queryOverlay')
     var queryTab = $('#queryTab')
     var $tabContainer = $('#tabContainer')
+    var tooltipJsonData
 
     // For controlling MAQ Switch triggering data train load
     var isFirstLoad = true
@@ -1188,18 +1189,20 @@
       // After the series of columns (Data Train) has loaded, then proceed.
       var postDataTrainLoad = function (_continue) {
         var activeSearchForm = this._getActiveForm()
+
         // Enable the switch again (was disabled prior to data train load to
         // make sure only one call is out at a time from this page
         activeSearchForm.enableMaqToggle()
 
+        // set tooltips url
+        var tooltipURL = 'json/tooltips_' + this.getPageLanguage() + '.json'
+
         if (_continue && isFirstLoad) {
 
-          // set tooltips
-          var tooltipURL = 'json/tooltips_' + this.getPageLanguage() + '.json'
-
+          // set main search form tooltips
           $.getJSON(tooltipURL, function (jsonData) {
-            caomSearchForm.loadTooltips(jsonData)
-            obsCoreSearchForm.loadTooltips(jsonData)
+            caomSearchForm.loadTooltips(jsonData, 'popover')
+            obsCoreSearchForm.loadTooltips(jsonData, 'popover')
           })
 
           // Don't process the queryfrom the URL if this is not the first page load.
@@ -1343,6 +1346,13 @@
             this._selectTab(destinationTabID)
           }
         }
+
+        // Initialize the data train tooltips
+        $.getJSON(tooltipURL, function (jsonData) {
+          caomSearchForm.loadTooltips(jsonData, 'dt-popover')
+          obsCoreSearchForm.loadTooltips(jsonData, 'dt-popover')
+        })
+
       }.bind(this)
 
       var caomSearchForm = this.getCAOMSearchForm()

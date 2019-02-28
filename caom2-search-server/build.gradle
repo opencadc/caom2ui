@@ -42,4 +42,4 @@ dependencies {
 
 sourceCompatibility = 1.7
 group = 'org.opencadc'
-version = '2.8.8'
+version = '2.8.9'

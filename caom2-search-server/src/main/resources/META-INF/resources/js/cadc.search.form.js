@@ -1064,9 +1064,9 @@
      * Given the JSON data, load the tooltips for those fields.
      * @param {{}}  jsonData    JSON data from external tooltips.
      */
-    this.loadTooltips = function (jsonData) {
+    this.loadTooltips = function (jsonData, divClass) {
       var tooltipCreator = new ca.nrc.cadc.search.TooltipCreator()
-      this.$form.find('[data-toggle="popover"]').each(
+      this.$form.find('[data-toggle="' + divClass + '"]').each(
         function (key, element) {
           var $liItem = $(element)
           this.handleTooltipLoad(
@@ -1083,7 +1083,7 @@
       // open at a time.
       $(document).on('click', function (e) {
         if ($(e.target).hasClass('glyphicon-remove-circle')) {
-          $('[data-toggle="popover"],[data-original-title]').each(function () {;
+          $('[data-toggle="' + divClass + '"],[data-original-title]').each(function () {;
             (
               (
                 $(this)
@@ -1095,7 +1095,7 @@
         }
 
         if ($(e.target).hasClass('glyphicon-question-sign')) {
-          $('[data-toggle="popover"]').each(function () {
+          $('[data-toggle="' + divClass + '"]').each(function () {
             if (
               !$(this).is(e.target) &&
               $(this).has(e.target).length === 0 &&
