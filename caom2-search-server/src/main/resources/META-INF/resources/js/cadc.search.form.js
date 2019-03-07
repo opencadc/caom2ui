@@ -1038,8 +1038,6 @@
       if (tipJSON && tipJSON.tipHTML) {
         var tipMarkup = tipJSON.tipHTML
 
-        var offsetY = tipJSON.verticalOffset ? tipJSON.verticalOffset : 0
-
         var $tooltipDiv = tooltipCreator.getContent(
           tipMarkup,
           tooltipHeaderText,
@@ -1059,23 +1057,6 @@
           placement: $liItem[0].dataset.placement
         })
 
-        // todo: can popovers be draggable?
-        // $ttIconImg.on("click", function (e)
-        // {
-        //   e.preventDefault();
-        //   $ttIconImg.tooltipster("show");
-        //
-        //   // Make them
-        //   // draggable.
-        //   $(".tooltipster-advanced-search").draggable(
-        //       {
-        //         handle: ".tooltip_header",
-        //         snap: true,
-        //         revert: false
-        //       });
-        //
-        //   return false;
-        // });
       }
     }
 
@@ -1083,9 +1064,9 @@
      * Given the JSON data, load the tooltips for those fields.
      * @param {{}}  jsonData    JSON data from external tooltips.
      */
-    this.loadTooltips = function (jsonData) {
+    this.loadTooltips = function (jsonData, divClass) {
       var tooltipCreator = new ca.nrc.cadc.search.TooltipCreator()
-      this.$form.find('[data-toggle="popover"]').each(
+      this.$form.find('[data-toggle="' + divClass + '"]').each(
         function (key, element) {
           var $liItem = $(element)
           this.handleTooltipLoad(
@@ -1102,20 +1083,19 @@
       // open at a time.
       $(document).on('click', function (e) {
         if ($(e.target).hasClass('glyphicon-remove-circle')) {
-          $('[data-toggle="popover"],[data-original-title]').each(function () {;
+          $('[data-toggle="' + divClass + '"],[data-original-title]').each(function () {;
             (
               (
                 $(this)
                 .popover('hide')
                 .data('bs.popover') || {}
               ).inState || {}
-            ).click = false // fix for BS
-            // 3.3.6
+            ).click = false // fix for BS 3.3.6
           })
         }
 
         if ($(e.target).hasClass('glyphicon-question-sign')) {
-          $('[data-toggle="popover"]').each(function () {
+          $('[data-toggle="' + divClass + '"]').each(function () {
             if (
               !$(this).is(e.target) &&
               $(this).has(e.target).length === 0 &&
