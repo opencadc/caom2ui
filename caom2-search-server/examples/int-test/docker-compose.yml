@@ -27,8 +27,6 @@ services:
     depends_on:
       - uwspg.cadc-ccda.hia-iha.nrc-cnrc.gc.ca
       - caom2-meta-ui.cadc-ccda.hia-iha.nrc-cnrc.gc.ca
-    environment:
-      CATALINA_OPTS: -Dca.nrc.cadc.reg.client.RegistryClient.host=proxy.cadc-ccda.hia-iha.nrc-cnrc.gc.ca
   uwspg.cadc-ccda.hia-iha.nrc-cnrc.gc.ca:
     image: opencadc/uws-postgres:alpine
     networks:
@@ -37,11 +35,9 @@ services:
       POSTGRES_USER: uws
       POSTGRES_PASSWORD: astr0query
   caom2-meta-ui.cadc-ccda.hia-iha.nrc-cnrc.gc.ca:
-    image: opencadc/caom2-meta-ui:SNAPSHOT
+    image: opencadc/caom2-meta-ui:alpine
     networks:
       - 'selenium'
-    environment:
-      CATALINA_OPTS: -Dca.nrc.cadc.reg.client.RegistryClient.host=proxy.cadc-ccda.hia-iha.nrc-cnrc.gc.ca
 
 
 # Create the network 'selenium' for which this system will run within.

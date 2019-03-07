@@ -35,7 +35,7 @@ dependencies {
 
     testCompile 'junit:junit:4.+'
     testCompile 'org.skyscreamer:jsonassert:1.+'
-    testCompile 'org.opencadc:cadc-web-test:[2.1.0, )'
+    testCompile 'org.opencadc:cadc-web-test:[2.1.2, )'
     testCompile 'org.easymock:easymock:3.+'
 }
 

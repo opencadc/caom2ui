@@ -66,6 +66,32 @@
         <url-pattern>*.html</url-pattern>
     </filter-mapping>
 
+    <!--
+      To make sure the logging level gets set before any
+      logging gets done, set load-on-startup to a smaller
+      whole number than is used for any other servlet
+      in this webapp.  This assumes Tomcat 5.5 or later.
+    -->
+    <servlet>
+        <servlet-name>logControl</servlet-name>
+        <servlet-class>ca.nrc.cadc.log.LogControlServlet</servlet-class>
+        <init-param>
+            <param-name>logLevel</param-name>
+            <param-value>info</param-value>
+        </init-param>
+        <init-param>
+            <param-name>logLevelPackages</param-name>
+            <param-value>
+                ca.nrc.cadc.uws
+                ca.nrc.cadc.tap
+                ca.nrc.cadc.vosi
+                ca.nrc.cadc.search
+                ca.nrc.cadc.caom2
+                ca.nrc.cadc.web
+            </param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
 
     <!-- AdvancedSearch Servlet -->
     <servlet>
@@ -136,6 +162,11 @@
         <servlet-class>ca.nrc.cadc.search.FormValidationServlet</servlet-class>
         <load-on-startup>4</load-on-startup>
     </servlet>
+
+    <servlet-mapping>
+        <servlet-name>logControl</servlet-name>
+        <url-pattern>/logControl</url-pattern>
+    </servlet-mapping>
 
     <!-- map symbolic names to JSP pages explicitly -->
     <servlet>
