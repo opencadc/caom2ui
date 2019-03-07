@@ -1641,8 +1641,6 @@
      * @private
      */
     this._beforeSerialize = function () {
-      // $('#UPLOAD').remove()
-
       var inputFile = this.$form.find('input:file.target-list')
 
       if (
@@ -1650,15 +1648,8 @@
         !inputFile.prop('disabled') &&
         inputFile.val() !== ''
       ) {
-      //   var upload = $('<input>')
-      //   upload.prop('type', 'hidden')
-      //   upload.prop('name', 'UPLOAD')
-      //   upload.prop('id', 'UPLOAD')
-      //   upload.prop('value', 'search_upload,param:targetList')
 
-      //   this.$form.append(upload)
-
-      //   // Update the file input name with the value from the target list select.
+        // Update the file input name with the value from the target list select.
         var resolverSelect = this.$form.find('select.resolver-select')
 
         // Renaming the field is a terrible idea, but cloning it doesn't work in some browsers.
