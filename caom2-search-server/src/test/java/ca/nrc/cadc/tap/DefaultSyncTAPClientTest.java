@@ -69,7 +69,6 @@
 package ca.nrc.cadc.tap;
 
 import ca.nrc.cadc.AbstractUnitTest;
-import ca.nrc.cadc.config.ApplicationConfiguration;
 
 import static org.easymock.EasyMock.*;
 
@@ -78,12 +77,14 @@ import ca.nrc.cadc.net.HttpPost;
 import ca.nrc.cadc.reg.Standards;
 import ca.nrc.cadc.reg.client.RegistryClient;
 import ca.nrc.cadc.uws.Job;
-import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
+
+import org.junit.Test;
+import org.junit.Assert;
 
 
 public class DefaultSyncTAPClientTest extends AbstractUnitTest<DefaultSyncTAPClient> {
@@ -95,6 +96,8 @@ public class DefaultSyncTAPClientTest extends AbstractUnitTest<DefaultSyncTAPCli
         testSubject = new DefaultSyncTAPClient(false, mockRegistryClient) {
             @Override
             HttpPost getPoster(URL url, Job job, OutputStream outputStream) {
+                Assert.assertEquals("Wrong URL looked up.", "http://www.site.com/example/tap/sync",
+                                    url.toString());
                 return mockPost;
             }
         };
@@ -109,13 +112,14 @@ public class DefaultSyncTAPClientTest extends AbstractUnitTest<DefaultSyncTAPCli
         mockPost.run();
         expectLastCall().once();
 
-        expect(mockPost.getRedirectURL()).andReturn(new URL("http://www.site.com/tap/sync/endpoint")).once();
+        expect(mockPost.getRedirectURL()).andReturn(
+            new URL("http://www.site.com/tap/sync/endpoint/redirect")).once();
 
         expect(mockRegistryClient.getServiceURL(
             testServiceURI,
             Standards.TAP_10,
             AuthMethod.ANON,
-            Standards.INTERFACE_UWS_SYNC))
+            Standards.INTERFACE_PARAM_HTTP))
             .andReturn(new URL("http://www.site.com/example/tap"));
 
         replay(mockRegistryClient, mockPost);

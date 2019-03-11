@@ -209,9 +209,9 @@ public class TAPServlet extends ConfigurableServlet {
         final Subject currentSubject = AuthenticationUtil.getCurrentSubject();
         final AuthMethod currentAuthMethod = AuthenticationUtil.getAuthMethod(currentSubject);
         final URL serviceURL = registryClient.getServiceURL(lookupServiceURI(request), Standards.TAP_10,
-            (currentAuthMethod == null) ? AuthMethod.ANON : currentAuthMethod, Standards.INTERFACE_UWS_SYNC);
+            (currentAuthMethod == null) ? AuthMethod.ANON : currentAuthMethod, Standards.INTERFACE_PARAM_HTTP);
 
-        response.sendRedirect(serviceURL.toExternalForm() + "?" + request.getQueryString());
+        response.sendRedirect(serviceURL.toExternalForm() + "/sync?" + request.getQueryString());
     }
 
     /**
