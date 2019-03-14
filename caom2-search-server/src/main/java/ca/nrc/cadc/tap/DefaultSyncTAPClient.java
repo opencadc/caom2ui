@@ -77,8 +77,9 @@ public class DefaultSyncTAPClient implements SyncTAPClient {
             serviceURI,
             Standards.TAP_10,
             AuthMethod.ANON,
-            Standards.INTERFACE_UWS_SYNC);
+            Standards.INTERFACE_PARAM_HTTP);
         final URIBuilder builder = new URIBuilder(serviceURL.toURI());
+        builder.setPath(serviceURL.getPath() + "/sync");
         final URL tapServiceURL = builder.build().toURL();
 
         LOGGER.info("Configured TAP Service URL: " + tapServiceURL);

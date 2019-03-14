@@ -35,7 +35,7 @@ services:
       POSTGRES_USER: uws
       POSTGRES_PASSWORD: astr0query
   caom2-meta-ui.cadc-ccda.hia-iha.nrc-cnrc.gc.ca:
-    image: opencadc/caom2-meta-ui:alpine
+    image: opencadc/caom2-meta-ui:SNAPSHOT
     networks:
       - 'selenium'
 
