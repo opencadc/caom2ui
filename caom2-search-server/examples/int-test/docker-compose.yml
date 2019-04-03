@@ -5,23 +5,23 @@ services:
     image: nginx:alpine
     ports:
       - '80:80'
-#      - '443:443'
+    #      - '443:443'
     networks:
       - 'caom2search'
     volumes:
-#      - 'server_certs:/usr/share/nginx/certs'
+      #      - 'server_certs:/usr/share/nginx/certs'
       - './default.conf:/etc/nginx/conf.d/default.conf'
     depends_on:
       - search.cadc.dao.nrc.ca
       - caom2-meta-ui.cadc.dao.nrc.ca
-   selenium-firefox:
-     image: selenium/standalone-firefox:3
-     ports:
-       - '4444:4444'
-     networks:
-       - 'caom2search'
-     depends_on:
-       - proxy.cadc.dao.nrc.ca
+  selenium-firefox:
+    image: selenium/standalone-firefox:3
+    ports:
+      - '4444:4444'
+    networks:
+      - 'caom2search'
+    depends_on:
+      - proxy.cadc.dao.nrc.ca
   search.cadc.dao.nrc.ca:
     image: opencadc/caom2-search:SNAPSHOT
     networks:
@@ -29,8 +29,8 @@ services:
     depends_on:
       - uwspg.cadc.dao.nrc.ca
       - caom2-meta-ui.cadc.dao.nrc.ca
-#    volumes:
-#      - './search##2047.war:/usr/local/tomcat/webapps/search##2047.war'
+  #    volumes:
+  #      - './search##2047.war:/usr/local/tomcat/webapps/search##2047.war'
   uwspg.cadc.dao.nrc.ca:
     image: opencadc/uws-postgres:alpine
     networks:
