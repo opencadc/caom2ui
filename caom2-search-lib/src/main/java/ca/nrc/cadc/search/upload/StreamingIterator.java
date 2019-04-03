@@ -43,7 +43,6 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import ca.nrc.cadc.search.parser.resolver.ResolverImpl;
-import ca.nrc.cadc.search.parser.resolver.TargetNameResolverClient;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
 
@@ -55,15 +54,13 @@ import ca.nrc.cadc.search.parser.TargetParser;
 public class StreamingIterator implements Iterator<Element>
 {
     // Iterator
-    private Iterator<String> innerIterator;
+    private final Iterator<String> innerIterator;
 
     // Namespace of the element.
-    private Namespace namespace;
+    private final Namespace namespace;
 
     // Counts of table rows and processing errors.
-    private UploadResults uploadResults;
-
-    private final TargetNameResolverClient targetNameResolverClient;
+    private final UploadResults uploadResults;
 
 
     /**
@@ -75,13 +72,11 @@ public class StreamingIterator implements Iterator<Element>
      */
     public StreamingIterator(final Iterator<String> innerIterator,
                              final Namespace namespace,
-                             final TargetNameResolverClient targetNameResolverClient,
                              final UploadResults uploadResults)
     {
         this.innerIterator = innerIterator;
         this.namespace = namespace;
         this.uploadResults = uploadResults;
-        this.targetNameResolverClient = targetNameResolverClient;
     }
 
     /**
@@ -110,10 +105,10 @@ public class StreamingIterator implements Iterator<Element>
         final Element tableRow = new Element("TR", namespace);
 
         // Add the row count.
-        tableRow.addContent(getTableData(uploadResults.getRowCount()));
+        tableRow.addContent(createTableData(uploadResults.getRowCount()));
 
         // The position.
-        tableRow.addContent(getTableData(line));
+        tableRow.addContent(createTableData(line));
 
         Double ra = null;
         Double dec = null;
@@ -122,11 +117,9 @@ public class StreamingIterator implements Iterator<Element>
         try
         {
             // Attempt to parse the element into a position.
-            final Resolver resolver =
-                    new ResolverImpl(targetNameResolverClient);
+            final Resolver resolver = new ResolverImpl();
             final TargetParser parser = new TargetParser(resolver);
-            final TargetData result = parser.parse(line,
-                                                   uploadResults.getResolver());
+            final TargetData result = parser.parse(line, uploadResults.getResolver());
 
             ra = result.getRA();
             dec = result.getDec();
@@ -138,10 +131,10 @@ public class StreamingIterator implements Iterator<Element>
             error = t.getMessage();
         }
 
-        tableRow.addContent(getTableData(ra));
-        tableRow.addContent(getTableData(dec));
-        tableRow.addContent(getTableData(radius));
-        tableRow.addContent(getTableData(error));
+        tableRow.addContent(createTableData(ra));
+        tableRow.addContent(createTableData(dec));
+        tableRow.addContent(createTableData(radius));
+        tableRow.addContent(createTableData(error));
 
         return tableRow;
     }
@@ -154,21 +147,21 @@ public class StreamingIterator implements Iterator<Element>
         throw new UnsupportedOperationException();
     }
 
-    private Element getTableData(int i)
+    private Element createTableData(int i)
     {
         Element element = new Element("TD", namespace);
         element.setText(String.valueOf(i));
         return element;
     }
 
-    private Element getTableData(Double d)
+    private Element createTableData(Double d)
     {
         final Element element = new Element("TD", namespace);
         element.setText((d == null) ? "" : d.toString());
         return element;
     }
 
-    private Element getTableData(String s)
+    private Element createTableData(String s)
     {
         final Element element = new Element("TD", namespace);
         element.setText((s == null) ? "" : s);

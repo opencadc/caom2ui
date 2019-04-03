@@ -1,45 +1,52 @@
 version: '3.2'
 services:
-  proxy.cadc-ccda.hia-iha.nrc-cnrc.gc.ca:
-    hostname: proxy.cadc-ccda.hia-iha.nrc-cnrc.gc.ca
+  proxy.cadc.dao.nrc.ca:
+    hostname: proxy.cadc.dao.nrc.ca
     image: nginx:alpine
     ports:
       - '80:80'
+      - '443:443'
     networks:
-      - 'selenium'
+      - 'caom2search'
     volumes:
+      - 'server_certs:/usr/share/nginx/certs'
       - './default.conf:/etc/nginx/conf.d/default.conf'
     depends_on:
-      - search.cadc-ccda.hia-iha.nrc-cnrc.gc.ca
-      - caom2-meta-ui.cadc-ccda.hia-iha.nrc-cnrc.gc.ca
-  selenium-firefox:
-    image: selenium/standalone-firefox:3
-    ports:
-      - '4444:4444'
-    networks:
-      - 'selenium'
-    depends_on:
-      - proxy.cadc-ccda.hia-iha.nrc-cnrc.gc.ca
-  search.cadc-ccda.hia-iha.nrc-cnrc.gc.ca:
+      - search.cadc.dao.nrc.ca
+      - caom2-meta-ui.cadc.dao.nrc.ca
+  # selenium-firefox:
+  #   image: selenium/standalone-firefox:3
+  #   ports:
+  #     - '4444:4444'
+  #   networks:
+  #     - 'caom2search'
+  #   depends_on:
+  #     - proxy.cadc.dao.nrc.ca
+  search.cadc.dao.nrc.ca:
     image: opencadc/caom2-search:SNAPSHOT
     networks:
-      - 'selenium'
+      - 'caom2search'
     depends_on:
-      - uwspg.cadc-ccda.hia-iha.nrc-cnrc.gc.ca
-      - caom2-meta-ui.cadc-ccda.hia-iha.nrc-cnrc.gc.ca
-  uwspg.cadc-ccda.hia-iha.nrc-cnrc.gc.ca:
+      - uwspg.cadc.dao.nrc.ca
+      - caom2-meta-ui.cadc.dao.nrc.ca
+    volumes:
+      - './search##2047.war:/usr/local/tomcat/webapps/search##2047.war'
+  uwspg.cadc.dao.nrc.ca:
     image: opencadc/uws-postgres:alpine
     networks:
-      - 'selenium'
+      - 'caom2search'
     environment:
       POSTGRES_USER: uws
       POSTGRES_PASSWORD: astr0query
-  caom2-meta-ui.cadc-ccda.hia-iha.nrc-cnrc.gc.ca:
+  caom2-meta-ui.cadc.dao.nrc.ca:
     image: opencadc/caom2-meta-ui:SNAPSHOT
     networks:
-      - 'selenium'
+      - 'caom2search'
 
-
-# Create the network 'selenium' for which this system will run within.
+# Create the network 'caom2search' for which this system will run within.
 networks:
-  selenium:
+  caom2search:
+
+volumes:
+  server_certs:
+    external: true

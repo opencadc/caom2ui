@@ -8,97 +8,73 @@ package ca.nrc.cadc.search.parser;
 
 
 import ca.nrc.cadc.AbstractUnitTest;
+import ca.nrc.cadc.search.nameresolver.NameResolver;
+import ca.nrc.cadc.search.nameresolver.NameResolverData;
+import ca.nrc.cadc.search.nameresolver.exception.TargetNotFoundException;
 import ca.nrc.cadc.search.parser.resolver.ResolverImpl;
-import ca.nrc.cadc.search.parser.resolver.TargetNameResolverClient;
 
 import org.junit.Test;
+
 import static org.junit.Assert.*;
-import static org.easymock.EasyMock.*;
+import static org.mockito.Mockito.*;
 
 
 /**
  * @author jburke
  */
-public class ResolverImplTest extends AbstractUnitTest<Resolver>
-{
-    private final TargetNameResolverClient mockNameResolverClient =
-            createMock(TargetNameResolverClient.class);
+public class ResolverImplTest extends AbstractUnitTest<ResolverImpl> {
+
+    private final NameResolver mockNameResolverClient = mock(NameResolver.class);
 
     @Test
-    public final void resolveTargetWithRadius() throws Exception
-    {
-        final TargetData targetData =
-                new TargetData("M4", 88.0d, null, -88.0d, null, null,
-                               "COORDSYS1", "SERVICE1", -1, "ONAME",
-                               "OTYPE", "MTYPE");
+    public final void resolveTargetWithRadius() throws Exception {
+        final NameResolverData nameResolverData = new NameResolverData(88.0d, -88.0d, "M4", "COORDSYS1", "SERVICE1",
+                                                                       "ONAME", "OTYPE", "MTYPE", -1);
+        when(mockNameResolverClient.resolve("M4 0.5", "SIMBAD", false, true)).thenThrow(new TargetNotFoundException());
+        when(mockNameResolverClient.resolve("M4", "SIMBAD", false, true)).thenReturn(nameResolverData);
 
-        expect(getMockNameResolverClient().resolve("M4 0.5", "SIMBAD")).
-                andReturn(null).once();
-        expect(getMockNameResolverClient().resolve("M4", "SIMBAD")).
-                andReturn(targetData).once();
+        testSubject = new ResolverImpl(mockNameResolverClient);
 
-        replay(getMockNameResolverClient());
-
-        setTestSubject(new ResolverImpl(getMockNameResolverClient()));
-
-        final TargetData targetData1 =
-                getTestSubject().resolveTarget("M4 0.5", "SIMBAD");
+        final TargetData targetData1 = testSubject.resolveTarget("M4 0.5", "SIMBAD");
 
         assertEquals("Radius is wrong.", 0.5d, targetData1.getRadius(), 0.0d);
         assertEquals("RA is wrong.", 88.0d, targetData1.getRA(), 0.0d);
 
-        verify(getMockNameResolverClient());
+        verify(mockNameResolverClient, times(1)).resolve("M4 0.5", "SIMBAD", false, true);
+        verify(mockNameResolverClient, times(1)).resolve("M4", "SIMBAD", false, true);
     }
 
     @Test
-    public final void resolveTargetWithSpaces() throws Exception
-    {
-        final TargetData targetData =
-                new TargetData("zeta Aurora", 88.0d, null, -88.0d, null, null,
-                               "COORDSYS1", "SERVICE1", -1, "", "", "");
+    public final void resolveTargetWithSpaces() throws Exception {
+        final NameResolverData nameResolverData = new NameResolverData(88.0d, -88.0d, "M4", "COORDSYS1", "SERVICE1",
+                                                                       "ONAME", "OTYPE", "MTYPE", -1);
 
-        expect(getMockNameResolverClient().resolve("zeta Aurora", "SIMBAD")).
-                andReturn(targetData).once();
+        when(mockNameResolverClient.resolve("zeta Aurora", "SIMBAD", false, true)).thenReturn(nameResolverData);
 
-        replay(getMockNameResolverClient());
+        testSubject = new ResolverImpl(mockNameResolverClient);
 
-        setTestSubject(new ResolverImpl(getMockNameResolverClient()));
-
-        final TargetData targetData1 =
-                getTestSubject().resolveTarget("zeta Aurora", "SIMBAD");
+        final TargetData targetData1 = testSubject.resolveTarget("zeta Aurora", "SIMBAD");
 
         assertEquals("Radius is wrong.", AbstractPositionParser.DEFAULT_RADIUS, targetData1.getRadius(), 0.0d);
         assertEquals("RA is wrong.", 88.0d, targetData1.getRA(), 0.0d);
 
-        verify(getMockNameResolverClient());
+        verify(mockNameResolverClient, times(1)).resolve("zeta Aurora", "SIMBAD", false, true);
     }
 
     @Test
-    public final void resolveTargetWithSpacesAndNumber() throws Exception
-    {
-        final TargetData targetData =
-                new TargetData("HD 19785", 88.0d, null, -88.0d, null, null,
-                               "COORDSYS1", "SERVICE1", -1, "", "", "");
+    public final void resolveTargetWithSpacesAndNumber() throws Exception {
+        final NameResolverData nameResolverData = new NameResolverData(88.0d, -88.0d, "M4", "COORDSYS1", "SERVICE1",
+                                                                       "ONAME", "OTYPE", "MTYPE", -1);
 
-        expect(getMockNameResolverClient().resolve("HD 19785", "SIMBAD"))
-                .andReturn(targetData).once();
+        when(mockNameResolverClient.resolve("HD 19785", "SIMBAD", false, true)).thenReturn(nameResolverData);
 
-        replay(getMockNameResolverClient());
+        testSubject = new ResolverImpl(mockNameResolverClient);
 
-        setTestSubject(new ResolverImpl(getMockNameResolverClient()));
-
-        final TargetData targetData1 =
-                getTestSubject().resolveTarget("HD 19785", "SIMBAD");
+        final TargetData targetData1 = testSubject.resolveTarget("HD 19785", "SIMBAD");
 
         assertEquals("Radius is wrong.", AbstractPositionParser.DEFAULT_RADIUS, targetData1.getRadius(), 0.0d);
         assertEquals("RA is wrong.", 88.0d, targetData1.getRA(), 0.0d);
 
-        verify(getMockNameResolverClient());
-    }
-
-
-    public TargetNameResolverClient getMockNameResolverClient()
-    {
-        return mockNameResolverClient;
+        verify(mockNameResolverClient, times(1)).resolve("HD 19785", "SIMBAD", false, true);
     }
 }

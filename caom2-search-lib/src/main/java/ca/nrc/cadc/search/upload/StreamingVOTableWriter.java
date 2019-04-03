@@ -48,7 +48,6 @@ import java.io.OutputStream;
 import java.util.Iterator;
 
 import ca.nrc.cadc.dali.tables.votable.VOTableWriter;
-import ca.nrc.cadc.search.parser.resolver.TargetNameResolverClient;
 import org.apache.commons.io.LineIterator;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -60,13 +59,10 @@ import org.jdom2.output.XMLOutputter;
 public class StreamingVOTableWriter extends VOTableWriter {
     // Counts of table rows and processing errors.
     private UploadResults uploadResults;
-    private final TargetNameResolverClient targetNameResolverClient;
 
-    public StreamingVOTableWriter(final UploadResults uploadResults,
-                                  final TargetNameResolverClient targetNameResolverClient) {
+    public StreamingVOTableWriter(final UploadResults uploadResults) {
         super();
         this.uploadResults = uploadResults;
-        this.targetNameResolverClient = targetNameResolverClient;
     }
 
 
@@ -111,7 +107,7 @@ public class StreamingVOTableWriter extends VOTableWriter {
         table.addContent(data);
 
         // Create the TABLEDATA element and add the to DATA element.
-        Element tableData = new TableDataElement(iterator, namespace, targetNameResolverClient, uploadResults);
+        Element tableData = new TableDataElement(iterator, namespace, uploadResults);
         data.addContent(tableData);
 
         write(document, out);

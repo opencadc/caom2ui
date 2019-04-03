@@ -44,13 +44,6 @@ idea {
             systemProperty 'web.app.url', project.intTest_default_web_app_url
         }
 
-        if (project.hasProperty('intTest_web_app_endpoint')) {
-            systemProperty 'web.app.endpoint', project.intTest_web_app_endpoint
-        }
-        else {
-            systemProperty 'web.app.endpoint', project.intTest_default_web_app_endpoint
-        }
-
         if (project.hasProperty('intTest_user_name'))
         {
           systemProperty 'user.name', project.intTest_user_name

@@ -69,6 +69,10 @@
 package ca.nrc.cadc.search.parser.resolver;
 
 
+import ca.nrc.cadc.search.nameresolver.NameResolver;
+import ca.nrc.cadc.search.nameresolver.NameResolverData;
+import ca.nrc.cadc.search.nameresolver.NameResolverException;
+import ca.nrc.cadc.search.nameresolver.exception.TargetNotFoundException;
 import ca.nrc.cadc.search.parser.RadiusParser;
 import ca.nrc.cadc.search.parser.Resolver;
 import ca.nrc.cadc.search.parser.TargetData;
@@ -79,38 +83,36 @@ import java.io.IOException;
 import java.util.Arrays;
 
 
-public class ResolverImpl implements Resolver
-{
-    private final TargetNameResolverClient nameResolverClient;
+public class ResolverImpl implements Resolver {
+
+    private final NameResolver nameResolverClient;
 
 
     /**
      * Complete constructor.
      *
-     * @param nameResolverClient      NameResolver instance.
+     * @param nameResolverClient NameResolver instance.
      */
-    public ResolverImpl(final TargetNameResolverClient nameResolverClient)
-    {
+    public ResolverImpl(final NameResolver nameResolverClient) {
         this.nameResolverClient = nameResolverClient;
     }
 
+    public ResolverImpl() {
+        this(new NameResolver());
+    }
 
     /**
      * Attempts to parse a radius and verify it is within allowed limits.
      *
      * @param rad radius to be parsed.
      */
-    private Double parseRadius(final String rad)
-    {
+    private Double parseRadius(final String rad) {
         Double val;
 
-        try
-        {
+        try {
             final RadiusParser parser = new RadiusParser(rad);
             val = parser.getValue().doubleValue();
-        }
-        catch (final NumericParserException e)
-        {
+        } catch (final NumericParserException e) {
             val = null;
         }
 
@@ -121,49 +123,39 @@ public class ResolverImpl implements Resolver
      * Attempts to parse the last target parameter as a radius,
      * and resolve the remaining leading parameters.
      *
-     * @param target            The target name.
-     * @param resolverName      The name of the resolver to use.
-     *
+     * @param target       The target name.
+     * @param resolverName The name of the resolver to use.
      * @return boolean true if the target was parsed and resolved,
-     *         false otherwise.
-     * @throws IOException      For resolver issues.
+     * false otherwise.
+     *
+     * @throws IOException For resolver issues.
      */
     @Override
-    public TargetData resolveTarget(final String target,
-                                    final String resolverName)
-            throws IOException
-    {
+    public TargetData resolveTarget(final String target, final String resolverName) throws IOException {
         TargetData result;
 
-        if (StringUtil.hasLength(target) && StringUtil.hasLength(resolverName))
-        {
+        if (StringUtil.hasLength(target) && StringUtil.hasLength(resolverName)) {
             // Try entire name first.
-            result = nameResolverClient.resolve(target, resolverName);
+            result = resolve(target, resolverName);
 
             // Can't resolve as provided.
-            if (result == null)
-            {
+            if (result == null) {
                 // Check for a radius at the end.
                 final String[] parts = target.split("[, ]+");
 
-                if (parts.length > 1)
-                {
+                if (parts.length > 1) {
                     final String rad = parts[parts.length - 1]; // last part
                     final Double radius = parseRadius(rad);
 
-                    if (radius == null)
-                    {
+                    if (radius == null) {
                         result = null;
-                    }
-                    else
-                    {
+                    } else {
                         final StringBuilder targetValueBuilder =
-                                new StringBuilder();
+                            new StringBuilder();
 
                         for (final String targetVal
-                                : Arrays.copyOfRange(parts, 0,
-                                                     (parts.length - 1)))
-                        {
+                            : Arrays.copyOfRange(parts, 0,
+                                                 (parts.length - 1))) {
                             targetValueBuilder.append(targetVal).append(" ");
                         }
 
@@ -171,32 +163,47 @@ public class ResolverImpl implements Resolver
 
                         char c = name.charAt(name.length() - 1);
 
-                        while (c == ',' || c == ' ')
-                        {
+                        while (c == ',' || c == ' ') {
                             name = name.substring(0, name.length() - 1);
                             c = name.charAt(name.length() - 1);
                         }
 
                         result = resolveTarget(name, resolverName);
 
-                        if (result != null)
-                        {
+                        if (result != null) {
                             result.setRadius(radius);
                         }
                     }
-                }
-                else
-                {
+                } else {
                     result = null;
                 }
             }
-        }
-        else
-        {
+        } else {
             throw new IllegalArgumentException(
-                    "Target and Resolver name are required.");
+                "Target and Resolver name are required.");
         }
 
         return result;
+    }
+
+    private TargetData resolve(final String target, final String resolverName) throws IOException {
+        try {
+            final NameResolverData data = nameResolverClient.resolve(target, resolverName,
+                                                                     false, // cached
+                                                                     true); // maxDetail
+
+            return new TargetData(data.getTarget(), //target
+                                  data.getRa(), null, // raRange
+                                  data.getDec(), null, // decRange
+                                  null, // radius
+                                  data.getCoordsys(), data.getService(),
+                                  data.getTime(),
+                                  data.getObjectName(), data.getObjectType(),
+                                  data.getMorphologyType());
+        } catch (TargetNotFoundException tnfe) {
+            return null;
+        } catch (NameResolverException e) {
+            throw new IOException(e.getMessage());
+        }
     }
 }
