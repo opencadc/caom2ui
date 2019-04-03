@@ -5,11 +5,11 @@ services:
     image: nginx:alpine
     ports:
       - '80:80'
-      - '443:443'
+#      - '443:443'
     networks:
       - 'caom2search'
     volumes:
-      - 'server_certs:/usr/share/nginx/certs'
+#      - 'server_certs:/usr/share/nginx/certs'
       - './default.conf:/etc/nginx/conf.d/default.conf'
     depends_on:
       - search.cadc.dao.nrc.ca
@@ -47,6 +47,6 @@ services:
 networks:
   caom2search:
 
-volumes:
-  server_certs:
-    external: true
+#volumes:
+#  server_certs:
+#    external: true
