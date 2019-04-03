@@ -35,14 +35,14 @@ script:
 - docker-compose up -d
 - docker ps -a
 - cd ../default
-- gradle -i -PintTest_selenium_server_url=http://localhost:4444 -PintTest_web_app_url=http://proxy.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/search/ intTestFirefox
+- gradle -i -PintTest_selenium_server_url=http://localhost:4444 -PintTest_web_app_url=http://proxy.cadc.dao.nrc.ca/search/ intTestFirefox
 after_success:
 - cd $TRAVIS_BUILD_DIR
 - if [ "$(. ./can-deploy.sh)" = "DEPLOY" ]; then echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin; docker push opencadc/caom2-search:$CAOM2_SEARCH_SERVER_VERSION; docker push opencadc/caom2-search:alpine; docker push opencadc/caom2-meta-ui:$CAOM2_META_UI_VERSION; docker push opencadc/caom2-meta-ui:alpine fi
 - if [ "$(. ./can-deploy.sh)" != "DEPLOY" ]; then echo "Not deploying."; fi
 addons:
   hosts:
-    - proxy.cadc-ccda.hia-iha.nrc-cnrc.gc.ca
+    - proxy.cadc.dao.nrc.ca
 notifications:
   slack:
     secure: WwH5T9fWOsWT5/sqS0t5vifKTGQbzHdSGo0DWt1YnfjFLC2NRWMiQ43TD3G+eGtoNaQ/4qcesiGG8ooJMjUjugf5GqQCKohuSfGWl3Tq44UOJD3MDFBe34YINPSe2fNAz3gO9jDKdJHTCilnyWg6bNO7LHSynt7kjDSDi/i04q3OSrV989niHu5yvDSLz2K/ydDRUFzjnQLlAcRNC3M1WGXoOiAIyGqxSbIBF9GXmOi3XB5HvH3Bvi4+wTkoxknRtSlnUZOBtC6iYTUZ7nubLItoA59o/LQ9bmHxcxWlfylRbhieKc4rCFflNKx/YaKrLLYFKlGlshr9Nf+R4OeI4SAPS4rvZbx4afXnJZrM7qleksU6yCON7RHz/546saYC4HGV6HZ/maNczJ7QsaK/5M6CUx4NsVVAKNmIhRZl12/sZEafrm5POQM3jg+560YorTk9H0NfAXraC7J8Lb0/oBkVb7qMj+0awc4n8xO5uU390OjgAl4G7oSR/PBeoC19OZA7pWH4u6I5eoUcv6CUyFQ6OnNqSJsKNQr7Nd3IOblhUmTV6oFBvTIFuOSChp1UdMPLK9numcje7dnGD3xw4BkKTdiUgD3/3G8oJY8W5GrV9MYe4WBnlJoReq82JfwJN63DHQ8HKlwzMgE+UrKNEbznPVENUslMuHK16YtbZ9w=
