@@ -29,8 +29,8 @@ services:
     depends_on:
       - uwspg.cadc.dao.nrc.ca
       - caom2-meta-ui.cadc.dao.nrc.ca
-    volumes:
-      - './search##2047.war:/usr/local/tomcat/webapps/search##2047.war'
+#    volumes:
+#      - './search##2047.war:/usr/local/tomcat/webapps/search##2047.war'
   uwspg.cadc.dao.nrc.ca:
     image: opencadc/uws-postgres:alpine
     networks:
