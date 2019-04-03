@@ -312,6 +312,7 @@ public class TAPSearcher implements Searcher {
                 jsonWriter.key("dec").value(decValue);
                 jsonWriter.key("coordsys").value(targetData.getCoordsys());
                 jsonWriter.key("service").value(targetData.getService());
+                jsonWriter.endObject();
             }
         } catch (TargetParserException e) {
             LOGGER.info("Unable to write out resolver information.", e);
