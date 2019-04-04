@@ -85,7 +85,7 @@ public class TargetData {
         this.dec = dec;
         this.decRange = decRange;
         this.radius = (radius == null) ? AbstractPositionParser.DEFAULT_RADIUS
-            : radius;
+                          : radius;
         this.coordsys = coordsys;
         this.service = service;
         this.time = time;
@@ -109,30 +109,30 @@ public class TargetData {
     @Override
     public String toString() {
         return "TargetResult[target=" +
-            target +
-            ",ra=" +
-            (ra == null ? "" : ra) +
-            ",raRange=" +
-            (raRange == null ? "" : raRange.getRange()) +
-            ",dec=" +
-            (dec == null ? "" : dec) +
-            ",decRange=" +
-            (decRange == null ? "" : decRange.getRange()) +
-            ",radius=" +
-            radius +
-            ",coordsys=" +
-            coordsys +
-            ",service=" +
-            service +
-            ",time=" +
-            time +
-            ",objectName=" +
-            objectName +
-            ",objectType=" +
-            objectType +
-            ",morphologyType=" +
-            morphologyType +
-            "]";
+                   target +
+                   ",ra=" +
+                   (ra == null ? "" : ra) +
+                   ",raRange=" +
+                   (raRange == null ? "" : raRange.getRange()) +
+                   ",dec=" +
+                   (dec == null ? "" : dec) +
+                   ",decRange=" +
+                   (decRange == null ? "" : decRange.getRange()) +
+                   ",radius=" +
+                   radius +
+                   ",coordsys=" +
+                   coordsys +
+                   ",service=" +
+                   service +
+                   ",time=" +
+                   time +
+                   ",objectName=" +
+                   objectName +
+                   ",objectType=" +
+                   objectType +
+                   ",morphologyType=" +
+                   morphologyType +
+                   "]";
     }
 
     public String getTarget() {

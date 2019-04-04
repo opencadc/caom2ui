@@ -22,7 +22,7 @@ configurations.all {
 dependencies {
     compile 'log4j:log4j:1.2.+'
 
-    compile 'org.opencadc:caom2-search-server:[2.8.11, )'
+    compile 'org.opencadc:caom2-search-server:[2.9.0, )'
     compile 'org.opencadc:cadc-uws-server:[1.2.1, )'
     compile 'org.opencadc:cadc-registry:[1.5.0, )'
 
@@ -42,7 +42,6 @@ dependencies {
 ext {
     // Change this value to test other locations, such as Production or RC.
     intTest_default_web_app_url = 'http://sc2.canfar.net/search/'
-    intTest_default_web_app_endpoint = ''
     intTest_user_name = 'CADCtest'
     intTest_user_password = 'sywymUL4'
 
@@ -52,7 +51,7 @@ ext {
 
 sourceCompatibility = 1.7
 group = 'org.opencadc'
-version = '2046'
+version = '2047'
 apply from: '../../../_shared.gradle'
 
 war {

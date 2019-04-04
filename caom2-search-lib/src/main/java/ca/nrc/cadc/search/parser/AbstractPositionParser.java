@@ -72,7 +72,7 @@ import ca.nrc.cadc.util.StringUtil;
  */
 public abstract class AbstractPositionParser {
     private static final Logger log = Logger
-        .getLogger(AbstractPositionParser.class);
+                                          .getLogger(AbstractPositionParser.class);
 
     // In degrees
     public static final double DEFAULT_RADIUS = 0.0166667D;
@@ -88,6 +88,7 @@ public abstract class AbstractPositionParser {
      *
      * @param target The spatial target.
      * @return Parsed target data.
+     *
      * @throws PositionParserException If the target is null or cannot be parsed.
      */
     public TargetData parse(final String target) throws PositionParserException {
@@ -174,11 +175,14 @@ public abstract class AbstractPositionParser {
                 StringBuilder DEC = new StringBuilder();
                 try {
                     for (int i = 0; i < 6; i++) {
-                        double d = Double.valueOf(parts[i]);
-                        if (i < 3) {
-                            RA.append(d).append(":");
-                        } else {
-                            DEC.append(d).append(":");
+                        final String nextPart = parts[i];
+                        if (StringUtil.hasText(nextPart)) {
+                            double d = Double.valueOf(nextPart);
+                            if (i < 3) {
+                                RA.append(d).append(":");
+                            } else {
+                                DEC.append(d).append(":");
+                            }
                         }
                     }
                     targetData.setRA(raToDegrees(RA.toString()));
@@ -206,7 +210,7 @@ public abstract class AbstractPositionParser {
             }
         } catch (NumberFormatException nfe) {
             final String message = "Unable to parse '" + target + "' because " +
-                nfe.getMessage();
+                                       nfe.getMessage();
             throw new PositionParserException(message);
         }
     }
@@ -242,9 +246,9 @@ public abstract class AbstractPositionParser {
         final boolean success;
 
         if ((comparator.compare(value, CoordSys.ICRS.getValue()) == 0) ||
-            (comparator.compare(value, CoordSys.FK5.getValue()) == 0) ||
-            (comparator.compare(value, CoordSys.J2000.getValue()) == 0) ||
-            (comparator.compare(value, CoordSys.J2000_0.getValue()) == 0)) {
+                (comparator.compare(value, CoordSys.FK5.getValue()) == 0) ||
+                (comparator.compare(value, CoordSys.J2000.getValue()) == 0) ||
+                (comparator.compare(value, CoordSys.J2000_0.getValue()) == 0)) {
             targetData.setCoordsys(value);
             success = true;
         } else if (comparator.compare(value, CoordSys.GAL.getValue()) == 0) {
@@ -258,8 +262,8 @@ public abstract class AbstractPositionParser {
             targetData.setCoordsys(value);
             success = true;
         } else if ((comparator.compare(value, CoordSys.B1950.getValue()) == 0) ||
-            (comparator.compare(value, CoordSys.B1950_0.getValue()) == 0) ||
-            (comparator.compare(value, CoordSys.FK4.getValue()) == 0)) {
+                       (comparator.compare(value, CoordSys.B1950_0.getValue()) == 0) ||
+                       (comparator.compare(value, CoordSys.FK4.getValue()) == 0)) {
             if (targetData.getRA() != null && targetData.getDec() != null) {
                 Point2D.Double point = new Point2D.Double(targetData.getRA(),
                                                           targetData.getDec());

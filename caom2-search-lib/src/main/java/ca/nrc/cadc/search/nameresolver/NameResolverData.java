@@ -28,59 +28,118 @@
 
 package ca.nrc.cadc.search.nameresolver;
 
+
+import ca.nrc.cadc.astro.CoordUtil;
+import ca.nrc.cadc.search.nameresolver.exception.ClientException;
+import ca.nrc.cadc.stc.CoordPair;
+
+import java.util.Properties;
+
 /**
  * Simple class to hold the results from a Name Resolver query.
- *
  */
-public class NameResolverData
-{
+public class NameResolverData {
+
     private static final String LF = "\n";
-    
-    public double ra;
-    public double dec;
-    public String target;
-    public String coordsys;
-    public String service;
-    public String objectName;
-    public String objectType;
-    public String morphologyType;
-    public int time;
-    
-    /**
-     * Default constructor.
-     *
-     */
-    public NameResolverData()
-    {
-        this.ra = 0.0;
-        this.dec = 0.0;
-        this.target = null;
-        this.coordsys = null;
-        this.service = null;
-        this.objectName = null;
-        this.objectType = null;
-        this.morphologyType = null;
-        this.time = 0;
+
+    private double ra;
+    private double dec;
+    private String target;
+    private String coordsys;
+    private String service;
+    private String objectName;
+    private String objectType;
+    private String morphologyType;
+    private int time;
+
+
+    public NameResolverData(final Properties properties) throws ClientException {
+        this.ra = CoordUtil.raToDegrees(getProperty(properties, NameResolverDataKey.RA));
+        this.dec = CoordUtil.decToDegrees(getProperty(properties, NameResolverDataKey.DEC));
+        this.service = getProperty(properties, NameResolverDataKey.SERVICE);
+        this.coordsys = getProperty(properties, NameResolverDataKey.COORDSYS);
+        this.time = Integer.parseInt(getProperty(properties, NameResolverDataKey.TIME));
+        this.target = getProperty(properties, NameResolverDataKey.TARGET);
+
+        this.objectName = getProperty(properties, NameResolverDataKey.ONAME);
+        this.objectType = getProperty(properties, NameResolverDataKey.OTYPE);
+        this.morphologyType = getProperty(properties, NameResolverDataKey.MTYPE);
     }
-    
+
+    private String getProperty(final Properties properties, final NameResolverDataKey nameResolverDataKey)
+            throws ClientException {
+        if (properties.containsKey(nameResolverDataKey.getKeyLabel())) {
+            return properties.getProperty(nameResolverDataKey.getKeyLabel());
+        } else if (nameResolverDataKey.isRequired()) {
+            throw new ClientException(nameResolverDataKey.getKeyLabel() + " not found in query results.");
+        } else {
+            return null;
+        }
+    }
+
+
+    public NameResolverData(double ra, double dec, String target, String coordsys, String service,
+                            String objectName, String objectType, String morphologyType, int time) {
+        this.ra = ra;
+        this.dec = dec;
+        this.target = target;
+        this.coordsys = coordsys;
+        this.service = service;
+        this.objectName = objectName;
+        this.objectType = objectType;
+        this.morphologyType = morphologyType;
+        this.time = time;
+    }
+
+    public double getRa() {
+        return ra;
+    }
+
+    public double getDec() {
+        return dec;
+    }
+
+    public String getTarget() {
+        return target;
+    }
+
+    public String getCoordsys() {
+        return coordsys;
+    }
+
+    public String getService() {
+        return service;
+    }
+
+    public String getObjectName() {
+        return objectName;
+    }
+
+    public String getObjectType() {
+        return objectType;
+    }
+
+    public String getMorphologyType() {
+        return morphologyType;
+    }
+
+    public int getTime() {
+        return time;
+    }
+
     /**
-     * 
      * @return String representation of the object.
      */
     @Override
-    public String toString()
-    {
-        StringBuilder sb = new StringBuilder();
-        sb.append("target=").append(target).append(LF);
-        sb.append("service=").append(service).append(LF);
-        sb.append("coordsys=").append(coordsys).append(LF);
-        sb.append("ra=").append(ra).append(LF);
-        sb.append("dec=").append(dec).append(LF);
-        sb.append("oname=").append(objectName == null ? "" : objectName).append(LF);
-        sb.append("otype=").append(objectType == null ? "" : objectType).append(LF);
-        sb.append("mtype=").append(morphologyType == null ? "" : morphologyType).append(LF);
-        sb.append("time=").append(time).append(LF);
-        return sb.toString();
+    public String toString() {
+        return "target=" + target + LF +
+                "service=" + service + LF +
+                "coordsys=" + coordsys + LF +
+                "ra=" + ra + LF +
+                "dec=" + dec + LF +
+                "oname=" + (objectName == null ? "" : objectName) + LF +
+                "otype=" + (objectType == null ? "" : objectType) + LF +
+                "mtype=" + (morphologyType == null ? "" : morphologyType) + LF +
+                "time=" + time + LF;
     }
-    
 }
