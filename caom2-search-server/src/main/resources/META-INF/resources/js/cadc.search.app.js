@@ -804,7 +804,16 @@
        * Form validation succeeded.
        */
       var onFormValid = function (eventData, args) {
+        var prevDisplayedColumns = []
+        var prevColumnSelects = {}
+        var prevSortOptions = {}
         if (resultsVOTV) {
+          // Save viewer state from previous search
+          prevDisplayedColumns = resultsVOTV.getDisplayedColumns()
+          prevColumnSelects = resultsVOTV.getUpdatedColumnSelects()
+          prevSortOptions['sortcol'] = resultsVOTV.sortcol
+          prevSortOptions['sortAsc'] = resultsVOTV.sortAsc
+
           resultsVOTV.destroy()
         }
 
@@ -818,16 +827,16 @@
 
         var formatCheckbox = function ($rowItem) {
           if (
-            !stringUtil.hasText(
-              $rowItem[this._getActiveForm().getDownloadAccessKey()]
-            )
+              !stringUtil.hasText(
+                  $rowItem[this._getActiveForm().getDownloadAccessKey()]
+              )
           ) {
             var $checkboxSelect = $('input:checkbox._select_' + $rowItem.id)
             var $parentContainer = $checkboxSelect.parent('div')
 
             $parentContainer.empty()
             $('<span class="_select_' + $rowItem.id + '">N/A</span>').appendTo(
-              $parentContainer
+                $parentContainer
             )
           }
         }.bind(this)
@@ -849,17 +858,17 @@
 
         var rowCountMessage = function (totalRows, rowCount) {
           return stringUtil.format(
-            ca.nrc.cadc.search.i18n[this.getPageLanguage()][
-              'ROW_COUNT_MESSAGE'
-            ],
-            [totalRows, rowCount]
+              ca.nrc.cadc.search.i18n[this.getPageLanguage()][
+                  'ROW_COUNT_MESSAGE'
+                  ],
+              [totalRows, rowCount]
           )
         }.bind(this)
 
         var oneClickDownloadTitle = function () {
           return ca.nrc.cadc.search.i18n[this.getPageLanguage()][
-            'ONE_CLICK_DOWNLOAD_TIP'
-          ]
+              'ONE_CLICK_DOWNLOAD_TIP'
+              ]
         }.bind(this)
 
         var activeForm = this._getActiveForm()
@@ -903,8 +912,8 @@
           oneClickDownloadTitle: oneClickDownloadTitle(),
           oneClickDownloadURL: this.options.packageEndpoint,
           oneClickDownloadURLColumnID: activeForm
-            .getConfiguration()
-            .getDownloadAccessKey(),
+              .getConfiguration()
+              .getDownloadAccessKey(),
           oneClickInvisibleDefault: true,
           headerCheckboxLabel: 'Mark',
           headerCheckboxWidth: 70,
@@ -925,18 +934,18 @@
               style: 'dialog',
               options: {
                 showAllButtonText: $(
-                  '#COLUMN_MANAGER_SHOW_ALL_BUTTON_TEXT'
+                    '#COLUMN_MANAGER_SHOW_ALL_BUTTON_TEXT'
                 ).text(),
                 resetButtonText: $(
-                  '#COLUMN_MANAGER_DEFAULT_COLUMNS_BUTTON_TEXT'
+                    '#COLUMN_MANAGER_DEFAULT_COLUMNS_BUTTON_TEXT'
                 ).text(),
                 orderAlphaButtonText: $(
-                  '#COLUMN_MANAGER_ORDER_ALPHABETICALLY_BUTTON_TEXT'
+                    '#COLUMN_MANAGER_ORDER_ALPHABETICALLY_BUTTON_TEXT'
                 ).text(),
                 dialogTriggerID: 'change_column_button',
                 targetSelector: $('#column_manager_container')
-                  .find('.column_manager_columns')
-                  .first(),
+                    .find('.column_manager_columns')
+                    .first(),
                 position: {
                   my: 'right',
                   at: 'right bottom'
@@ -959,8 +968,8 @@
               renderedRowsOnly: false,
               toggleSwitchSelector: '#slick-visualize',
               footprintFieldID: activeForm
-                .getConfiguration()
-                .getFootprintColumnID(),
+                  .getConfiguration()
+                  .getFootprintColumnID(),
               fovFieldID: activeForm.getConfiguration().getFOVColumnID(),
               raFieldID: activeForm.getConfiguration().getRAColumnID(),
               decFieldID: activeForm.getConfiguration().getDecColumnID()
@@ -970,8 +979,8 @@
         }
 
         resultsVOTV = new cadc.vot.Viewer(
-          ca.nrc.cadc.search.GRID_SELECTOR,
-          cadcVOTVOptions
+            ca.nrc.cadc.search.GRID_SELECTOR,
+            cadcVOTVOptions
         )
 
         // Unfortunately this has to be selected at the Document level since the items in question (located by
@@ -979,54 +988,54 @@
         // jenkinsd 2015.05.08
         //
         $(document).on(
-          'click',
-          ca.nrc.cadc.search.QUICKSEARCH_SELECTOR,
-          function (event) {
-            var hrefURI = new cadc.web.util.URI(event.target.href)
-            var href = hrefURI.toString()
+            'click',
+            ca.nrc.cadc.search.QUICKSEARCH_SELECTOR,
+            function (event) {
+              var hrefURI = new cadc.web.util.URI(event.target.href)
+              var href = hrefURI.toString()
 
-            // Strip off the fragment part of the
-            // href url if necessary.
-            var index = href.indexOf('#')
-            if (index !== -1) {
-              href = href.substring(0, index)
+              // Strip off the fragment part of the
+              // href url if necessary.
+              var index = href.indexOf('#')
+              if (index !== -1) {
+                href = href.substring(0, index)
+              }
+
+              var serializer = new cadc.vot.ResultStateSerializer(
+                  href,
+                  resultsVOTV.sortcol,
+                  resultsVOTV.sortDir ? 'asc' : 'dsc',
+                  resultsVOTV.getDisplayedColumns(),
+                  resultsVOTV.getResizedColumns(),
+                  resultsVOTV.getColumnFilters(),
+                  resultsVOTV.getUpdatedColumnSelects()
+              )
+
+              var windowName = '_' + $(event.target).text()
+
+              window.open(serializer.getResultStateUrl(), windowName, '')
+
+              return false
             }
-
-            var serializer = new cadc.vot.ResultStateSerializer(
-              href,
-              resultsVOTV.sortcol,
-              resultsVOTV.sortDir ? 'asc' : 'dsc',
-              resultsVOTV.getDisplayedColumns(),
-              resultsVOTV.getResizedColumns(),
-              resultsVOTV.getColumnFilters(),
-              resultsVOTV.getUpdatedColumnSelects()
-            )
-
-            var windowName = '_' + $(event.target).text()
-
-            window.open(serializer.getResultStateUrl(), windowName, '')
-
-            return false
-          }
         )
 
         resultsVOTV.subscribe(
-          cadc.vot.events.onUnitChanged,
-          function (event, args) {
-            var viewer = args.application
-            var columnID = args.column.id
-            var filterValue = viewer.getColumnFilters()[columnID]
+            cadc.vot.events.onUnitChanged,
+            function (event, args) {
+              var viewer = args.application
+              var columnID = args.column.id
+              var filterValue = viewer.getColumnFilters()[columnID]
 
-            this.processFilterValue(filterValue, args, function (
-              breakdownPureFilterValue,
-              breakdownDisplayFilterValue
-            ) {
-              $(args.column).data('pureFilterValue', breakdownPureFilterValue)
+              this.processFilterValue(filterValue, args, function (
+                  breakdownPureFilterValue,
+                  breakdownDisplayFilterValue
+              ) {
+                $(args.column).data('pureFilterValue', breakdownPureFilterValue)
 
-              viewer.setColumnFilter(columnID, breakdownDisplayFilterValue)
-              viewer.getColumnFilters()[columnID] = breakdownDisplayFilterValue
-            })
-          }.bind(this)
+                viewer.setColumnFilter(columnID, breakdownDisplayFilterValue)
+                viewer.getColumnFilters()[columnID] = breakdownDisplayFilterValue
+              })
+            }.bind(this)
         )
 
         downloadFormSubmit.off().click(function (event) {
@@ -1040,11 +1049,11 @@
           } else {
             var selectedRows = resultsVOTV.getSelectedRows()
             for (
-              var arrIndex = 0, srl = selectedRows.length; arrIndex < srl; arrIndex++
+                var arrIndex = 0, srl = selectedRows.length; arrIndex < srl; arrIndex++
             ) {
               var $nextRow = resultsVOTV.getRow(selectedRows[arrIndex])
               var $nextPlaneURI =
-                $nextRow['caom2:Plane.publisherID.downloadable']
+                  $nextRow['caom2:Plane.publisherID.downloadable']
 
               var $input = $('<input>')
               $input.prop('type', 'hidden')
@@ -1058,16 +1067,16 @@
             // Story 1566, when all 'Product Types'
             // checkboxes are checked, do not send any
             var allChecked =
-              downloadForm
-              .find('input.product_type_option_flag')
-              .not(':checked').length === 0
+                downloadForm
+                    .find('input.product_type_option_flag')
+                    .not(':checked').length === 0
             if (allChecked) {
               // disable all 'Product Types' checkboxes
               $.each(
-                downloadForm.find('input.product_type_option_flag:checked'),
-                function () {
-                  $(this).prop('disabled', true)
-                }
+                  downloadForm.find('input.product_type_option_flag:checked'),
+                  function () {
+                    $(this).prop('disabled', true)
+                  }
               )
             }
 
@@ -1080,28 +1089,37 @@
               // re-enable all 'Product Types'
               // checkboxes
               $.each(
-                downloadForm.find('input.product_type_option_flag:checked'),
-                function () {
-                  $(this).prop('disabled', false)
-                }
+                  downloadForm.find('input.product_type_option_flag:checked'),
+                  function () {
+                    $(this).prop('disabled', false)
+                  }
               )
             }
           }
         })
 
         $('#results_bookmark').click(
-          function (event) {
-            event.preventDefault()
-            this._setBookmarkURL(new cadc.web.util.URI(event.target.href))
-            $('#bookmark_link').modal('show')
-          }.bind(this)
+            function (event) {
+              event.preventDefault()
+              this._setBookmarkURL(new cadc.web.util.URI(event.target.href))
+              $('#bookmark_link').modal('show')
+            }.bind(this)
         )
 
-        resultsVOTV.setDisplayColumns([])
+        resultsVOTV.setDisplayColumns(prevDisplayedColumns)
+        resultsVOTV.setUpdatedColumnSelects(prevColumnSelects)
 
-        // Set the default columns.
+        // Set the default columns and units.
         this._setDefaultColumns(resultsVOTV)
         this._setDefaultUnitTypes(resultsVOTV)
+
+        // Set default sort column and direction.
+        if (prevSortOptions['sortcol']) {
+          resultsVOTV['sortcol'] = prevSortOptions['sortcol']
+        }
+        if (prevSortOptions['sortAsc']) {
+          resultsVOTV['sortAsc'] = prevSortOptions['sortAsc']
+        }
 
         queryOverlay.modal('show')
       }.bind(this)
@@ -1534,37 +1552,71 @@
      * @private
      */
     this._setDefaultUnitTypes = function (_viewer) {
-      var unitTypes = this._getActiveForm()
-        .getConfiguration()
-        .getDefaultUnitTypes()
 
-      for (var columnName in unitTypes) {
+      //
+      var allColumnOptions = this._getActiveForm().getConfiguration().getColumnOptions()
+      var allUnitTypes = {}
+      for (var columnOption in allColumnOptions) {
+        var column = allColumnOptions[columnOption]
+        if (column.header)
+        {
+          for (var j = 0; j < column.header.units.length; j++) {
+            var headerUnit = column.header.units[j]
+            if (headerUnit['default']) {
+              allUnitTypes[columnOption] = headerUnit.value
+              break
+            }
+          }
+        }
+      }
+
+      var unitTypes = this._getActiveForm().getConfiguration().getDefaultUnitTypes()
+      Object.assign( allUnitTypes, unitTypes )
+
+      var updatedColumnSelects = _viewer.getUpdatedColumnSelects()
+
+      for (var columnName in allUnitTypes) {
         var newDefaultAdded = false
         var oldDefaultRemoved = false
 
-        if (unitTypes.hasOwnProperty(columnName)) {
-          var defaultUnitType = unitTypes[columnName]
+        if (allUnitTypes.hasOwnProperty(columnName)) {
+          var defaultUnitType = allUnitTypes[columnName]
           var columnOptions = _viewer.getOptionsForColumn(columnName)
+          var selectedUnit = updatedColumnSelects[columnName]
           var units = columnOptions['header']['units']
           for (var i = 0; i < units.length; i++) {
             var unit = units[i]
-            if (defaultUnitType === unit['value']) {
-              if (unit['default']) {
-                // no need to remove default unit type
-                oldDefaultRemoved = true
+            if (selectedUnit) {
+              if (selectedUnit === unit['value']) {
+                if (unit['default']) {
+                  oldDefaultRemoved = true
+                }
+                unit['default'] = true
+                newDefaultAdded = true
+              } else {
+                if (unit['default']) {
+                  unit['default'] = false
+                  oldDefaultRemoved = true
+                }
               }
-
-              unit['default'] = true
-              newDefaultAdded = true
             } else {
-              // look for default being set in other unit types
-              if (unit['default']) {
-                // remove it
-                delete unit['default']
-                oldDefaultRemoved = true
+              if (defaultUnitType === unit['value']) {
+                if (unit['default']) {
+                  // no need to remove default unit type
+                  oldDefaultRemoved = true
+                }
+
+                unit['default'] = true
+                newDefaultAdded = true
+              } else {
+                // look for default being set in other unit types
+                if (unit['default']) {
+                  // remove it
+                  delete unit['default']
+                  oldDefaultRemoved = true
+                }
               }
             }
-
             if (newDefaultAdded && oldDefaultRemoved) {
               break
             }
@@ -1574,6 +1626,24 @@
         }
       }
     }
+
+    /**
+     * Set the default sort column and direction.
+     *
+     * @param {cadc.vot.Viewer|Viewer} _viewer     The VOTV viewer instance.
+     * @private
+     */
+    // this._setDefaultSortColumn = function (_viewer) {
+    //   _viewer.
+    //   if (_viewer.sortColumn) {
+    //     var columns = _viewer.getColumns
+    //     for (var column in columns) {
+    //       var foo = column
+    //     }
+    //
+    //     // var columnOptions = _viewer.getOptionsForColumn(_viewer.sortColumn)
+    //   }
+    // }
 
     /**
      * Called when the results are in and the UWS Job is complete.
