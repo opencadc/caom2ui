@@ -1117,10 +1117,10 @@
         this._setDefaultUnitTypes(resultsVOTV)
 
         // Set default sort column and direction.
-        if (prevSortOptions['sortcol']) {
+        if (prevSortOptions.hasOwnProperty('sortcol')) {
           resultsVOTV['sortcol'] = prevSortOptions['sortcol']
         }
-        if (prevSortOptions['sortAsc']) {
+        if (prevSortOptions.hasOwnProperty('sortAsc')) {
           resultsVOTV['sortAsc'] = prevSortOptions['sortAsc']
         }
 
@@ -1561,8 +1561,7 @@
       var allUnitTypes = {}
       for (var columnOption in allColumnOptions) {
         var column = allColumnOptions[columnOption]
-        if (column.header)
-        {
+        if (column.header) {
           for (var j = 0; j < column.header.units.length; j++) {
             var headerUnit = column.header.units[j]
             if (headerUnit['default']) {
@@ -1629,24 +1628,6 @@
         }
       }
     }
-
-    /**
-     * Set the default sort column and direction.
-     *
-     * @param {cadc.vot.Viewer|Viewer} _viewer     The VOTV viewer instance.
-     * @private
-     */
-    // this._setDefaultSortColumn = function (_viewer) {
-    //   _viewer.
-    //   if (_viewer.sortColumn) {
-    //     var columns = _viewer.getColumns
-    //     for (var column in columns) {
-    //       var foo = column
-    //     }
-    //
-    //     // var columnOptions = _viewer.getOptionsForColumn(_viewer.sortColumn)
-    //   }
-    // }
 
     /**
      * Called when the results are in and the UWS Job is complete.
