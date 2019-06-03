@@ -804,11 +804,13 @@
        * Form validation succeeded.
        */
       var onFormValid = function (eventData, args) {
+        var prevColumns = []
         var prevDisplayedColumns = []
         var prevColumnSelects = {}
         var prevSortOptions = {}
         if (resultsVOTV) {
           // Save viewer state from previous search
+          prevColumns = resultsVOTV.getColumns()
           prevDisplayedColumns = resultsVOTV.getDisplayedColumns()
           prevColumnSelects = resultsVOTV.getUpdatedColumnSelects()
           prevSortOptions['sortcol'] = resultsVOTV.sortcol
@@ -1106,6 +1108,7 @@
             }.bind(this)
         )
 
+        resultsVOTV.setColumns(prevColumns)
         resultsVOTV.setDisplayColumns(prevDisplayedColumns)
         resultsVOTV.setUpdatedColumnSelects(prevColumnSelects)
 
