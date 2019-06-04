@@ -95,6 +95,7 @@
     var $queryCode = $('#query')
     var columnManager = new ca.nrc.cadc.search.columns.ColumnManager()
     var resultsVOTV
+    var previousCollections = []
 
     var tooltipJsonData = {}
 
@@ -804,20 +805,27 @@
        * Form validation succeeded.
        */
       var onFormValid = function (eventData, args) {
+        var preserveColumnState = false
         var prevColumns = []
         var prevDisplayedColumns = []
         var prevColumnSelects = {}
         var prevSortOptions = {}
+        var currentCollections = $('#Observation\\.collection').val()
         if (resultsVOTV) {
-          // Save viewer state from previous search
-          prevColumns = resultsVOTV.getColumns()
-          prevDisplayedColumns = resultsVOTV.getDisplayedColumns()
-          prevColumnSelects = resultsVOTV.getUpdatedColumnSelects()
-          prevSortOptions['sortcol'] = resultsVOTV.sortcol
-          prevSortOptions['sortAsc'] = resultsVOTV.sortAsc
+          if (currentCollections.sort().join('') ===
+              previousCollections.sort().join('')) {
+            // Save viewer state from previous search
+            preserveColumnState = true
+            prevColumns = resultsVOTV.getColumns()
+            prevDisplayedColumns = resultsVOTV.getDisplayedColumns()
+            prevColumnSelects = resultsVOTV.getUpdatedColumnSelects()
+            prevSortOptions['sortcol'] = resultsVOTV.sortcol
+            prevSortOptions['sortAsc'] = resultsVOTV.sortAsc
+          }
 
           resultsVOTV.destroy()
         }
+        previousCollections = currentCollections
 
         var cadcForm = args.cadcForm
 
@@ -1108,21 +1116,25 @@
             }.bind(this)
         )
 
-        resultsVOTV.setColumns(prevColumns)
-        resultsVOTV.setDisplayColumns(prevDisplayedColumns)
-        resultsVOTV.setUpdatedColumnSelects(prevColumnSelects)
+        if (preserveColumnState) {
+          resultsVOTV.setColumns(prevColumns)
+          resultsVOTV.setDisplayColumns(prevDisplayedColumns)
+          resultsVOTV.setUpdatedColumnSelects(prevColumnSelects)
+
+          // Set default sort column and direction.
+          if (prevSortOptions.hasOwnProperty('sortcol')) {
+            resultsVOTV['sortcol'] = prevSortOptions['sortcol']
+          }
+          if (prevSortOptions.hasOwnProperty('sortAsc')) {
+            resultsVOTV['sortAsc'] = prevSortOptions['sortAsc']
+          }
+        } else {
+          resultsVOTV.setDisplayColumns([])
+        }
 
         // Set the default columns and units.
         this._setDefaultColumns(resultsVOTV)
         this._setDefaultUnitTypes(resultsVOTV)
-
-        // Set default sort column and direction.
-        if (prevSortOptions.hasOwnProperty('sortcol')) {
-          resultsVOTV['sortcol'] = prevSortOptions['sortcol']
-        }
-        if (prevSortOptions.hasOwnProperty('sortAsc')) {
-          resultsVOTV['sortAsc'] = prevSortOptions['sortAsc']
-        }
 
         queryOverlay.modal('show')
       }.bind(this)
@@ -1555,8 +1567,7 @@
      * @private
      */
     this._setDefaultUnitTypes = function (_viewer) {
-
-      //
+      // Get all default units for columns with a select
       var allColumnOptions = this._getActiveForm().getConfiguration().getColumnOptions()
       var allUnitTypes = {}
       for (var columnOption in allColumnOptions) {
@@ -1572,7 +1583,10 @@
         }
       }
 
+      // Default unit types for the current form.
       var unitTypes = this._getActiveForm().getConfiguration().getDefaultUnitTypes()
+
+      // Update allUnitTypes with default units from unitTypes.
       Object.assign( allUnitTypes, unitTypes )
 
       var updatedColumnSelects = _viewer.getUpdatedColumnSelects()
