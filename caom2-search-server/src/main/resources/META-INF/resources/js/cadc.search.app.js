@@ -810,7 +810,9 @@
         var prevDisplayedColumns = []
         var prevColumnSelects = {}
         var prevSortOptions = {}
-        var currentCollections = $('#Observation\\.collection').val()
+        var selectedCollections = this._getActiveForm().getCollectionSelectID()
+        var currentCollections = $(
+            '#' + selectedCollections.replace('.', '\\.')).val()
         if (resultsVOTV) {
           if (currentCollections.sort().join('') ===
               previousCollections.sort().join('')) {
