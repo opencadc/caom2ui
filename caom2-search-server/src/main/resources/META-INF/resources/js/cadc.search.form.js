@@ -143,6 +143,10 @@
       return this.config.getConfig().download_access_key
     }
 
+    this.getCollectionSelectID = function () {
+      return this.config.getConfig().collection_select_id
+    }
+
     /**
      * Obtain the full default metadata.
      *
@@ -1345,6 +1349,14 @@
      */
     this.getDownloadAccessKey = function () {
       return this.configuration.getDownloadAccessKey()
+    }
+
+    /**
+     * This form's Observation Collection select id.
+     * @returns {String}
+     */
+    this.getCollectionSelectID = function() {
+      return this.configuration.getCollectionSelectID()
     }
 
     this.getConfiguration = function () {
