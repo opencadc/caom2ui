@@ -20,23 +20,24 @@ configurations.all {
 }
 
 dependencies {
-    compile 'log4j:log4j:1.2.+'
+//    compile 'log4j:log4j:1.2.+'
 
-    compile 'org.opencadc:caom2-search-server:[2.9.0, )'
-    compile 'org.opencadc:cadc-uws-server:[1.2.1, )'
-    compile 'org.opencadc:cadc-registry:[1.5.0, )'
+    compile 'org.opencadc:caom2-search-server:[2.10.0,)'
+    compile 'org.opencadc:cadc-uws-server:[1.2.1,)'
+    compile 'org.opencadc:cadc-registry:[1.5.0,)'
 
-    providedCompile 'javax.servlet:javax.servlet-api:3.1.+'
-    providedCompile 'javax.servlet:javax.servlet-api:3.0.+'
+//    providedCompile 'javax.servlet:javax.servlet-api:3.1.+'
+//    providedCompile 'javax.servlet:javax.servlet-api:3.0.+'
 
-    runtime 'commons-logging:commons-logging:1.+'
-    runtime 'org.postgresql:postgresql:42.2.5.jre7'
-    runtime 'jstl:jstl:1.+'
+//    runtime 'commons-logging:commons-logging:1.+'
+//    runtime 'org.postgresql:postgresql:42.2.5.jre7'
+//    runtime 'javax.servlet.jsp.jstl:jstl-api:1.2'
+//    runtime 'org.apache.taglibs:taglibs-standard-impl:1.2.5'
 
-    testCompile 'junit:junit:4.+'
-    testCompile 'org.skyscreamer:jsonassert:1.+'
     testCompile 'org.opencadc:cadc-web-test:[2.1.2, )'
-    testCompile 'org.easymock:easymock:3.+'
+    testCompile 'junit:junit:[4.12,)'
+    testCompile 'org.skyscreamer:jsonassert:[1.5.0,)'
+    testCompile 'org.easymock:easymock:[4.0.2,)'
 }
 
 ext {
@@ -51,7 +52,7 @@ ext {
 
 sourceCompatibility = 1.7
 group = 'org.opencadc'
-version = '2047'
+version = '2048'
 apply from: '../../../_shared.gradle'
 
 war {

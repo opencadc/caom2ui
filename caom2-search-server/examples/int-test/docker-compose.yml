@@ -4,13 +4,13 @@ services:
     hostname: proxy.cadc.dao.nrc.ca
     image: nginx:alpine
     ports:
-      - '80:80'
-    #      - '443:443'
+#      - '80:80'
+      - '443:443'
     networks:
       - 'caom2search'
     volumes:
-      #      - 'server_certs:/usr/share/nginx/certs'
-      - './default.conf:/etc/nginx/conf.d/default.conf'
+      - 'server_certs:/usr/share/nginx/certs'
+      - './default-ssl.conf:/etc/nginx/conf.d/default.conf'
     depends_on:
       - search.cadc.dao.nrc.ca
       - caom2-meta-ui.cadc.dao.nrc.ca
@@ -29,8 +29,8 @@ services:
     depends_on:
       - uwspg.cadc.dao.nrc.ca
       - caom2-meta-ui.cadc.dao.nrc.ca
-  #    volumes:
-  #      - './search##2047.war:/usr/local/tomcat/webapps/search##2047.war'
+    volumes:
+      - './search##2048.war:/usr/local/tomcat/webapps/search##2048.war'
   uwspg.cadc.dao.nrc.ca:
     image: opencadc/uws-postgres:alpine
     networks:
@@ -39,7 +39,7 @@ services:
       POSTGRES_USER: uws
       POSTGRES_PASSWORD: astr0query
   caom2-meta-ui.cadc.dao.nrc.ca:
-    image: opencadc/caom2-meta-ui:SNAPSHOT
+    image: opencadc/caom2-meta-ui:alpine
     networks:
       - 'caom2search'
 
@@ -47,6 +47,6 @@ services:
 networks:
   caom2search:
 
-#volumes:
-#  server_certs:
-#    external: true
+volumes:
+  server_certs:
+    external: true

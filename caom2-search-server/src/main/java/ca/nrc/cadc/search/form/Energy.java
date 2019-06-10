@@ -2,7 +2,7 @@
  ************************************************************************
  ****  C A N A D I A N   A S T R O N O M Y   D A T A   C E N T R E  *****
  *
- * (c) 2008.                            (c) 2008.
+ * (c) 2019.                            (c) 2019.
  * National Research Council            Conseil national de recherches
  * Ottawa, Canada, K1A 0R6              Ottawa, Canada, K1A 0R6
  * All rights reserved                  Tous droits reserves
@@ -33,7 +33,8 @@ import ca.nrc.cadc.caom2.SearchTemplate;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import ca.nrc.cadc.search.parser.EnergyParser;
 import ca.nrc.cadc.search.validate.EnergyValidator;
@@ -46,10 +47,9 @@ import ca.nrc.cadc.uws.Parameter;
  *
  * @author jburke
  */
-public class Energy extends AbstractNumericFormConstraint
-        implements SearchableFormConstraint
-{
-    private static Logger log = Logger.getLogger(Energy.class);
+public class Energy extends AbstractNumericFormConstraint implements SearchableFormConstraint {
+
+    private static Logger log = LogManager.getLogger(Energy.class);
 
     // Energy values are normalized to meters.
     public static String NORMALIZED_UNITS = "m";
@@ -65,13 +65,10 @@ public class Energy extends AbstractNumericFormConstraint
      * @param job   The servlet request.
      * @param utype The utype of the form.
      */
-    public Energy(final Job job, final String utype)
-    {
+    public Energy(final Job job, final String utype) {
         super(utype);
-        for (final Parameter parameter : job.getParameterList())
-        {
-            if (parameter.getName().equals(utype + VALUE))
-            {
+        for (final Parameter parameter : job.getParameterList()) {
+            if (parameter.getName().equals(utype + VALUE)) {
                 setFormValue(parameter.getValue());
             }
         }
@@ -79,35 +76,30 @@ public class Energy extends AbstractNumericFormConstraint
     }
 
     // Create and add a IntervalSearch to SearchTemplates.
-    public SearchTemplate buildSearch(List<FormError> errorList)
-    {
+    public SearchTemplate buildSearch(List<FormError> errorList) {
         SearchTemplate template = null;
 
-        try
-        {
+        try {
             template = new IntervalSearch(this.getUType(),
                                           ((this.getLowerNumber() == null)
-                                           ? null
-                                           :
-                                           this.getLowerNumber().doubleValue()),
+                                                  ? null
+                                                  :
+                                                  this.getLowerNumber().doubleValue()),
                                           ((this.getUpperNumber() == null)
-                                           ? null
-                                           :
-                                           this.getUpperNumber().doubleValue()),
+                                                  ? null
+                                                  :
+                                                  this.getUpperNumber().doubleValue()),
                                           this.getUnit());
-        }
-        catch (IllegalArgumentException e)
-        {
+        } catch (IllegalArgumentException e) {
             errorList.add(new FormError(Energy.NAME, e.getMessage()));
             log.debug("Invalid Energy parameters: " + e.getMessage() + " " +
-                      this.toString());
+                              this.toString());
         }
 
         return template;
     }
 
-    public Energy(final String value, final String utype)
-    {
+    public Energy(final String value, final String utype) {
         super(utype);
         setFormValue(value);
         init();
@@ -116,19 +108,17 @@ public class Energy extends AbstractNumericFormConstraint
     /**
      * Initialize what needs to be initialized.
      */
-    protected void init()
-    {
+    protected void init() {
         unit = null;
     }
 
     /**
      * Determines whether meter should be used as the unit based on the utype.
      *
-     * @param utype     The UType to check.
+     * @param utype The UType to check.
      * @return true if we should use metric, false otherwise.
      */
-    public static boolean useMeter(final String utype)
-    {
+    public static boolean useMeter(final String utype) {
         // Story 888 - For frequency matches, convert the value
         // to the Hz value for all energy but the Spectral
         // Coverage.  Otherwise, back to metres.
@@ -138,8 +128,8 @@ public class Energy extends AbstractNumericFormConstraint
         // Story 1502
         // Adding Rest Frequency follows the same logic.
         return utype.equals("Plane.energy.bounds.samples") ||
-               utype.equals("Plane.energy.restwav") ||
-               utype.equals("Char.SpectralAxis.Coverage.Bounds.Limits");
+                utype.equals("Plane.energy.restwav") ||
+                utype.equals("Char.SpectralAxis.Coverage.Bounds.Limits");
     }
 
     /**
@@ -147,15 +137,13 @@ public class Energy extends AbstractNumericFormConstraint
      *
      * @return boolean true if form value is valid, false otherwise.
      */
-    public boolean isValid(final FormErrors formErrors)
-    {
+    public boolean isValid(final FormErrors formErrors) {
         return new RangeValidation(this, new EnergyParser(),
                                    new EnergyValidator(), NORMALIZED_UNITS,
                                    VALUE).isValid(formErrors);
     }
 
-    public String getUnit()
-    {
+    public String getUnit() {
         return unit;
     }
 
@@ -165,25 +153,20 @@ public class Energy extends AbstractNumericFormConstraint
      * @return boolean true if form contains a processable value, false otherwise.
      */
     @Override
-    public boolean hasData()
-    {
+    public boolean hasData() {
         return (getLowerNumber() != null) || (getUpperNumber() != null);
     }
 
     @Override
-    public String resolveUnit(final String forUnit)
-    {
+    public String resolveUnit(final String forUnit) {
         final String resolvedUnit;
 
-        if (useMeter(getUType()))
-        {
+        if (useMeter(getUType())) {
             resolvedUnit = Energy.NORMALIZED_UNITS;
-        }
-        else
-        {
+        } else {
             resolvedUnit = forUnit.matches("^.*([Hh]+[Zz]+)")
-                           ? Energy.NORMALIZED_FREQ_UNITS
-                           : Energy.NORMALIZED_UNITS;
+                    ? Energy.NORMALIZED_FREQ_UNITS
+                    : Energy.NORMALIZED_UNITS;
         }
 
         return resolvedUnit;
@@ -193,9 +176,8 @@ public class Energy extends AbstractNumericFormConstraint
      * @return String representation of the Time form.
      */
     @Override
-    public String toString()
-    {
+    public String toString() {
         return "Energy[" + getUType() + ", " + getLowerNumber() + ", "
-               + getUpperNumber() + ", " + getUnit() + "]";
+                + getUpperNumber() + ", " + getUnit() + "]";
     }
 }

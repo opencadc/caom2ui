@@ -2,7 +2,7 @@
  ************************************************************************
  ****  C A N A D I A N   A S T R O N O M Y   D A T A   C E N T R E  *****
  *
- * (c) 2011.                         (c) 2011.
+ * (c) 2019.                            (c) 2019.
  * National Research Council            Conseil national de recherches
  * Ottawa, Canada, K1A 0R6              Ottawa, Canada, K1A 0R6
  * All rights reserved                  Tous droits reserves
@@ -31,12 +31,15 @@
  ****  C A N A D I A N   A S T R O N O M Y   D A T A   C E N T R E  *****
  ************************************************************************
  */
+
 package ca.nrc.cadc.search.form;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 
 import ca.nrc.cadc.caom2.InList;
 import ca.nrc.cadc.caom2.IsNull;
@@ -47,9 +50,10 @@ import ca.nrc.cadc.util.ArrayUtil;
 import ca.nrc.cadc.util.StringUtil;
 import ca.nrc.cadc.uws.Job;
 
-abstract class AbstractScalarFormConstraint extends AbstractFormConstraint implements SearchableFormConstraint
-{
-    private static Logger log = Logger.getLogger(AbstractScalarFormConstraint.class);
+
+abstract class AbstractScalarFormConstraint extends AbstractFormConstraint implements SearchableFormConstraint {
+
+    private static Logger log = LogManager.getLogger(AbstractScalarFormConstraint.class);
 
     // TODO: change this attribute to private
     // Array of selected values from the drop down list.
@@ -64,69 +68,53 @@ abstract class AbstractScalarFormConstraint extends AbstractFormConstraint imple
 
     abstract String getName();
 
-    AbstractScalarFormConstraint(final Job job, final String utype, final String[] selectedValues, final boolean hidden)
-    {
+    AbstractScalarFormConstraint(final Job job, final String utype, final String[] selectedValues,
+                                 final boolean hidden) {
         super(utype);
         this.hidden = hidden;
 
-        if ((selectedValues == null) && (job != null))
-        {
+        if ((selectedValues == null) && (job != null)) {
             final List<String> list = new ParameterUtil().getValues(utype + this.getName(),
                                                                     job.getParameterList());
             this.selectedValues = list.toArray(new String[list.size()]);
-        }
-        else
-        {
+        } else {
             this.selectedValues = selectedValues;
         }
     }
 
     // Create a TextSearch or InList to SearchTemplates.
     private SearchTemplate buildScalarSearch(final List<String> list, final String tableColumn,
-                                             final List<FormError> errorList)
-    {
-        if (list.size() == 1)
-        {
-            try
-            {
+                                             final List<FormError> errorList) {
+        if (list.size() == 1) {
+            try {
                 final String value = list.get(0);
 
-                if (value.equals("null"))
-                {
+                if (value.equals("null")) {
                     return new IsNull(tableColumn);
-                }
-                else
-                {
+                } else {
                     return new TextSearch(tableColumn, value, value);
                 }
-            }
-            catch (IllegalArgumentException e)
-            {
+            } catch (IllegalArgumentException e) {
                 errorList.add(new FormError(this.getUType(), e.getMessage()));
                 log.debug("Invalid parameters: " + e.getMessage()
-                          + " " + this.toString());
+                                  + " " + this.toString());
 
                 return null;
             }
-        }
-        else
-        {
+        } else {
             return new InList(tableColumn, list);
         }
     }
 
     // Create a ScalarSearch to SearchTemplates.
-    public SearchTemplate buildSearch(List<FormError> errorList)
-    {
+    public SearchTemplate buildSearch(List<FormError> errorList) {
         final List<String> selected = this.getSelected();
-        SearchTemplate scalarSearch = null;
 
-        if ((selected != null) && !selected.isEmpty())
-        {
-            scalarSearch = buildScalarSearch(selected, this.getUType(), errorList);
+        if ((selected != null) && !selected.isEmpty()) {
+            return buildScalarSearch(selected, this.getUType(), errorList);
+        } else {
+            return null;
         }
-
-        return scalarSearch;
     }
 
     /**
@@ -135,28 +123,23 @@ abstract class AbstractScalarFormConstraint extends AbstractFormConstraint imple
      *
      * @return boolean true if form contains processable values, false otherwise.
      */
-    public boolean hasData()
-    {
+    public boolean hasData() {
         return getSelected() != null;
     }
 
-    public List<String> getSelected()
-    {
+    public List<String> getSelected() {
         return selected;
     }
 
-    protected void setSelected(final List<String> selected)
-    {
+    protected void setSelected(final List<String> selected) {
         this.selected = selected;
     }
 
-    void resetSelectedValues()
-    {
+    void resetSelectedValues() {
         this.selectedValues = new String[0];
     }
 
-    public boolean isHidden()
-    {
+    public boolean isHidden() {
         return hidden;
     }
 
@@ -166,19 +149,14 @@ abstract class AbstractScalarFormConstraint extends AbstractFormConstraint imple
      *
      * @return boolean true if all form values are valid, false otherwise.
      */
-    public boolean isValid(FormErrors formErrors)
-    {
-        if (ArrayUtil.isEmpty(selectedValues))
-        {
+    public boolean isValid(FormErrors formErrors) {
+        if (ArrayUtil.isEmpty(selectedValues)) {
             return false;
         }
 
-        for (final String selectedValue : selectedValues)
-        {
-            if (StringUtil.hasLength(selectedValue))
-            {
-                if (this.getSelected() == null)
-                {
+        for (final String selectedValue : selectedValues) {
+            if (StringUtil.hasLength(selectedValue)) {
+                if (this.getSelected() == null) {
                     final List<String> list = new ArrayList<>();
                     this.setSelected(list);
                 }
@@ -195,19 +173,15 @@ abstract class AbstractScalarFormConstraint extends AbstractFormConstraint imple
     /*
      * @return String representation of the form.
      */
-    protected String toString(final String name)
-    {
+    protected String toString(final String name) {
         StringBuilder sb = new StringBuilder();
         sb.append(name).append("[ ");
         sb.append(getUType());
         sb.append(", ");
 
-        if (selectedValues != null)
-        {
-            for (final String select : selectedValues)
-            {
-                if (StringUtil.hasText(select))
-                {
+        if (selectedValues != null) {
+            for (final String select : selectedValues) {
+                if (StringUtil.hasText(select)) {
                     sb.append(select);
                     sb.append(" ");
                 }
@@ -217,8 +191,7 @@ abstract class AbstractScalarFormConstraint extends AbstractFormConstraint imple
         return sb.toString();
     }
 
-    String[] getSelectedValues()
-    {
+    String[] getSelectedValues() {
         return selectedValues;
     }
 }

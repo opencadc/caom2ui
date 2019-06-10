@@ -30,7 +30,8 @@ package ca.nrc.cadc.search.form;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import ca.nrc.cadc.caom2.SearchTemplate;
 import ca.nrc.cadc.caom2.TextSearch;
@@ -40,16 +41,14 @@ import ca.nrc.cadc.uws.Job;
 import ca.nrc.cadc.uws.Parameter;
 
 
-
 /**
- * Class to represent an Interva1 form component. 
- * 
- * @author jburke
+ * Class to represent an Interva1 form component.
  *
+ * @author jburke
  */
-public class Text extends AbstractFormConstraint implements SearchableFormConstraint
-{
-    private static Logger log = Logger.getLogger(Text.class);
+public class Text extends AbstractFormConstraint implements SearchableFormConstraint {
+
+    private static Logger log = LogManager.getLogger(Text.class);
 
     // Constants used to construct name for form elements.
     public static final String NAME = "@Text";
@@ -62,13 +61,11 @@ public class Text extends AbstractFormConstraint implements SearchableFormConstr
      * Constructor to populate necessary fields.  Useful for testing and just
      * to re-use this Text form constraint.
      *
-     * @param utype         The UType unique name.
-     * @param value         The value.
-     * @param ignoreCase    Whether to ignore case or not.
+     * @param utype      The UType unique name.
+     * @param value      The value.
+     * @param ignoreCase Whether to ignore case or not.
      */
-    public Text(final String utype, final String value,
-                final boolean ignoreCase)
-    {
+    public Text(final String utype, final String value, final boolean ignoreCase) {
         super(utype);
         setFormValue(value);
         setIgnoreCase(ignoreCase);
@@ -76,18 +73,15 @@ public class Text extends AbstractFormConstraint implements SearchableFormConstr
 
     /**
      * Text constructor instantiates a new instance with the given parameters.
-     * 
-     * @param job       The UWS Job.
-     * @param utype     The utype of the form.
+     *
+     * @param job   The UWS Job.
+     * @param utype The utype of the form.
      */
-    public Text(final Job job, final String utype)
-    {
+    public Text(final Job job, final String utype) {
         super(utype);
 
-        for (final Parameter parameter : job.getParameterList())
-        {
-            if (parameter.getName().equals(utype + VALUE))
-            {
+        for (final Parameter parameter : job.getParameterList()) {
+            if (parameter.getName().equals(utype + VALUE)) {
                 setFormValue(parameter.getValue());
             }
         }
@@ -103,37 +97,31 @@ public class Text extends AbstractFormConstraint implements SearchableFormConstr
     }
 
     // Create a TextSearch to SearchTemplates.
-    public SearchTemplate buildSearch(List<FormError> errorList)
-    {
+    public SearchTemplate buildSearch(List<FormError> errorList) {
         SearchTemplate template = null;
 
-        try
-        {
+        try {
             template = new TextSearch(this.getUType(), this.getFormValue(),
-                               ObsModel.isWildcardUtype(this.getUType()),
-                               this.isIgnoreCase());
-        }
-        catch (IllegalArgumentException e)
-        {
+                                      ObsModel.isWildcardUtype(this.getUType()),
+                                      this.isIgnoreCase());
+        } catch (IllegalArgumentException e) {
             errorList.add(new FormError(Text.NAME, e.getMessage()));
             log.debug("Invalid Text parameters: " + e.getMessage() + " "
-                      + this.toString());
+                              + this.toString());
         }
-        
+
         return template;
     }
-    
+
     /**
      * Text is valid if the Text value has been successfully validated.
-     * 
+     *
      * @return boolean true if form value is valid, false otherwise.
      */
-    public boolean isValid(final FormErrors formErrors)
-    {
+    public boolean isValid(final FormErrors formErrors) {
         final String utype = getUType();
 
-        if (!ObsModel.isTextUtype(utype))
-        {
+        if (!ObsModel.isTextUtype(utype)) {
             addError(new FormError(utype + VALUE, "Invalid utype " + utype));
         }
 
@@ -141,23 +129,20 @@ public class Text extends AbstractFormConstraint implements SearchableFormConstr
         return getErrorList().isEmpty();
     }
 
-    public boolean isIgnoreCase()
-    {
+    public boolean isIgnoreCase() {
         return ignoreCase;
     }
 
-    protected void setIgnoreCase(final boolean igCase)
-    {
+    protected void setIgnoreCase(final boolean igCase) {
         this.ignoreCase = igCase;
     }
 
     /**
      * Text has processable data if the Text value is not null or empty.
-     * 
+     *
      * @return boolean true if form contains a processable value, false otherwise.
      */
-    public boolean hasData()
-    {
+    public boolean hasData() {
         return StringUtil.hasText(getFormValue());
     }
 
@@ -166,16 +151,7 @@ public class Text extends AbstractFormConstraint implements SearchableFormConstr
      * @return String representation of the Interval1 form.
      */
     @Override
-    public String toString()
-    {
-        final StringBuilder sb = new StringBuilder();
-
-        sb.append("Text[");
-        sb.append(getUType());
-        sb.append(", ");
-        sb.append(getFormValue());
-        sb.append("]");
-
-        return sb.toString();
+    public String toString() {
+        return "Text[" + getUType() + ", " + getFormValue() + "]";
     }
 }

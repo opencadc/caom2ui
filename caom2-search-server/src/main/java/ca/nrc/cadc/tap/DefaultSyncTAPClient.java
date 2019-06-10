@@ -45,7 +45,8 @@ import ca.nrc.cadc.uws.JobAttribute;
 import ca.nrc.cadc.uws.Parameter;
 
 import org.apache.http.client.utils.URIBuilder;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.net.URI;
@@ -60,7 +61,8 @@ import java.util.Map;
  * Extension of the TapClient to handle Synchronous access and job creation.
  */
 public class DefaultSyncTAPClient implements SyncTAPClient {
-    private static final Logger LOGGER = Logger.getLogger(DefaultSyncTAPClient.class);
+
+    private static final Logger LOGGER = LogManager.getLogger(DefaultSyncTAPClient.class);
 
 
     private final boolean followToResults;
@@ -74,10 +76,10 @@ public class DefaultSyncTAPClient implements SyncTAPClient {
 
     private URL lookupServiceURL(final URI serviceURI) throws IOException, URISyntaxException {
         final URL serviceURL = registryClient.getServiceURL(
-            serviceURI,
-            Standards.TAP_10,
-            AuthMethod.ANON,
-            Standards.INTERFACE_PARAM_HTTP);
+                serviceURI,
+                Standards.TAP_10,
+                AuthMethod.ANON,
+                Standards.INTERFACE_PARAM_HTTP);
         final URIBuilder builder = new URIBuilder(serviceURL.toURI());
         builder.setPath(serviceURL.getPath() + "/sync");
         final URL tapServiceURL = builder.build().toURL();
@@ -121,7 +123,7 @@ public class DefaultSyncTAPClient implements SyncTAPClient {
      * @param job The Job to get the payload for.
      * @return Map of Parameter name:value.
      */
-    protected Map<String, Object> getQueryPayload(final Job job) {
+    Map<String, Object> getQueryPayload(final Job job) {
         final Map<String, Object> payload = new HashMap<>();
 
         if (StringUtil.hasText(job.getRunID())) {
@@ -165,14 +167,7 @@ public class DefaultSyncTAPClient implements SyncTAPClient {
     }
 
     HttpPost getPoster(final URL url, final Job job, final OutputStream outputStream) {
-        final HttpPost poster;
-
-        if (followToResults) {
-            poster = new HttpPost(url, getQueryPayload(job), outputStream);
-        } else {
-            poster = new HttpPost(url, getQueryPayload(job), false);
-        }
-
-        return poster;
+        return followToResults ? new HttpPost(url, getQueryPayload(job), outputStream)
+                : new HttpPost(url, getQueryPayload(job), false);
     }
 }

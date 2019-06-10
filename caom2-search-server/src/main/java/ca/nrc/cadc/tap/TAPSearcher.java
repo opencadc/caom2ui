@@ -2,7 +2,7 @@
  ************************************************************************
  ****  C A N A D I A N   A S T R O N O M Y   D A T A   C E N T R E  *****
  *
- * (c) 2013.                         (c) 2013.
+ * (c) 2019.                         (c) 2019.
  * National Research Council            Conseil national de recherches
  * Ottawa, Canada, K1A 0R6              Ottawa, Canada, K1A 0R6
  * All rights reserved                  Tous droits reserves
@@ -59,7 +59,8 @@ import ca.nrc.cadc.uws.ParameterUtil;
 import ca.nrc.cadc.uws.RegexParameterUtil;
 import ca.nrc.cadc.uws.SyncResponseWriter;
 import ca.nrc.cadc.uws.server.JobUpdater;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONWriter;
 
@@ -81,7 +82,7 @@ import java.util.Map;
  */
 public class TAPSearcher implements Searcher {
 
-    private static final Logger LOGGER = Logger.getLogger(TAPSearcher.class);
+    private static final Logger LOGGER = LogManager.getLogger(TAPSearcher.class);
 
     private static final String CAOM2_RESOLVER_VALUE_KEY = "Plane.position.bounds@Shape1Resolver.value";
     private static final String CAOM2_TARGET_NAME_VALUE_KEY = "Plane.position.bounds@Shape1.value";

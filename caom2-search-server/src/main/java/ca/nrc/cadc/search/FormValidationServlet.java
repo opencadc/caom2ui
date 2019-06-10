@@ -25,6 +25,7 @@
  ****  C A N A D I A N   A S T R O N O M Y   D A T A   C E N T R E  *****
  ************************************************************************
  */
+
 package ca.nrc.cadc.search;
 
 import javax.servlet.ServletConfig;
@@ -36,7 +37,9 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.*;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.json.JSONException;
 import org.json.JSONWriter;
 
@@ -50,16 +53,14 @@ import ca.nrc.cadc.util.StringUtil;
  *
  * @author jburke
  */
-public class FormValidationServlet extends HttpServlet
-{
+public class FormValidationServlet extends HttpServlet {
+
     private static final long serialVersionUID = 201310020918L;
 
-    private static Logger LOGGER =
-            Logger.getLogger(FormValidationServlet.class);
+    private static Logger LOGGER = LogManager.getLogger(FormValidationServlet.class);
 
     @Override
-    public void init(ServletConfig config) throws ServletException
-    {
+    public void init(ServletConfig config) throws ServletException {
         super.init(config);
     }
 
@@ -72,10 +73,8 @@ public class FormValidationServlet extends HttpServlet
      * @throws IOException      If IO exception.
      */
     @Override
-    protected void doPost(final HttpServletRequest request,
-                          final HttpServletResponse response)
-            throws ServletException, IOException
-    {
+    protected void doPost(final HttpServletRequest request, final HttpServletResponse response)
+            throws ServletException, IOException {
         doGet(request, response);
     }
 
@@ -90,10 +89,8 @@ public class FormValidationServlet extends HttpServlet
      */
     @Override
     protected void doGet(final HttpServletRequest request, final HttpServletResponse response)
-            throws ServletException, IOException
-    {
+            throws ServletException, IOException {
         // Validate the parameters.
-        @SuppressWarnings("unchecked")
         final FormErrors formErrors = getFormErrors(request.getParameterMap());
 
         // Write out any errors as JSON.
@@ -108,51 +105,43 @@ public class FormValidationServlet extends HttpServlet
      *
      * @param parameters Map of parameter names and values.
      * @return FormError containing any validation errors.
-     * @throws ServletException     Any Servlet errors to be bubbled up.
+     *
+     * @throws ServletException Any Servlet errors to be bubbled up.
      */
-    protected FormErrors getFormErrors(final Map<String, String[]> parameters) throws ServletException
-    {
+    protected FormErrors getFormErrors(final Map<String, String[]> parameters) throws ServletException {
         // Fields to validate.
         final String[] fields = parameters.get("field");
 
-        if (fields == null)
-        {
+        if (fields == null) {
             throw new IllegalArgumentException("Required field parameter not found");
         }
 
         // Holds any validation errors.
         final FormErrors formErrors = new FormErrors();
 
-        for (final String field : fields)
-        {
+        for (final String field : fields) {
             // Form parameters are assumed to be single valued, else unable to
             // determine which input is incorrect.
             final String[] values = parameters.get(field);
 
-            if ((values != null) && (values.length == 1))
-            {
+            if ((values != null) && (values.length == 1)) {
                 final String value = values[0];
 
                 // Try and create a FormConstraint.
                 final FormConstraint form = getFormConstraint(field, value);
 
-                if (form == null)
-                {
+                if (form == null) {
                     final String message = "BUG: unknown form utype " + field;
                     throw new ServletException(message);
-                }
-                else
-                {
+                } else {
                     // Validate the input.
                     final boolean isValid = form.isValid(formErrors);
                     LOGGER.debug(field + "[" + value + "] valid: " + isValid);
                 }
-            }
-            else if (values != null && values.length > 1)
-            {
+            } else if (values != null && values.length > 1) {
                 final String message =
                         "BUG: form utype " + field
-                        + " should be distinct but found multiple form values";
+                                + " should be distinct but found multiple form values";
                 throw new ServletException(message);
             }
         }
@@ -166,52 +155,41 @@ public class FormValidationServlet extends HttpServlet
      * @param value Form input value.
      * @return A FormConstraint
      */
-    FormConstraint getFormConstraint(final String field, final String value)
-    {
+    FormConstraint getFormConstraint(final String field, final String value) {
         final FormConstraint formConstraint;
 
-        if (StringUtil.hasText(field))
-        {
+        if (StringUtil.hasText(field)) {
             // Field might have a @[form name].value appended, strip out.
             int index = field.indexOf("@");
             final String utype = (index == -1) ? field : field.substring(0, index);
 
             // Text
-            if (ObsModel.isTextUtype(utype))
-            {
+            if (ObsModel.isTextUtype(utype)) {
                 formConstraint = new Text(utype, value, false);
             }
 
             // Number
-            else if (ObsModel.isNumberUtype(utype))
-            {
+            else if (ObsModel.isNumberUtype(utype)) {
                 formConstraint = new ca.nrc.cadc.search.form.Number(value, utype);
             }
 
             // Timestamp
-            else if (ObsModel.isUTCDateUtype(utype))
-            {
+            else if (ObsModel.isUTCDateUtype(utype)) {
                 formConstraint = new TimestampFormConstraint(value, utype);
             }
 
             // Date
-            else if (ObsModel.isMJDUtype(utype) || ObsModel.isLocalDateUtype(utype) || ObsModel.isTimeUtype(utype))
-            {
+            else if (ObsModel.isMJDUtype(utype) || ObsModel.isLocalDateUtype(utype) || ObsModel.isTimeUtype(utype)) {
                 formConstraint = new ca.nrc.cadc.search.form.Date(value, utype, null);
             }
 
             // Energy
-            else if (ObsModel.isEnergyUtype(utype))
-            {
+            else if (ObsModel.isEnergyUtype(utype)) {
                 formConstraint = new Energy(value, utype);
-            }
-            else
-            {
+            } else {
                 formConstraint = null;
             }
-        }
-        else
-        {
+        } else {
             formConstraint = null;
         }
 
@@ -225,36 +203,27 @@ public class FormValidationServlet extends HttpServlet
      * @param writer     Response Writer.
      * @throws IOException if unable to write JSON.
      */
-    void writeFormErrors(final FormErrors formErrors, final Writer writer) throws IOException
-    {
+    void writeFormErrors(final FormErrors formErrors, final Writer writer) throws IOException {
         final JSONWriter jsonWriter = new JSONWriter(writer);
-        try
-        {
+        try {
             // Each FormConstraint class can create multiple errors, but JSON
             // keys must be unique, so don't add duplicate keys.
             final Set<String> keys = new HashSet<>();
             jsonWriter.object();
 
-            for (final FormError formError : formErrors.get())
-            {
-                if (keys.add(formError.name))
-                {
+            for (final FormError formError : formErrors.get()) {
+                if (keys.add(formError.name)) {
                     jsonWriter.key(formError.name).value(formError.value);
                 }
             }
 
             jsonWriter.endObject();
-        }
-        catch (JSONException e)
-        {
+        } catch (JSONException e) {
             LOGGER.error("Unable to create JSON.", e);
             throw new IOException("Unable to create JSON.", e);
-        }
-        finally
-        {
+        } finally {
             writer.flush();
             writer.close();
         }
     }
-
 }

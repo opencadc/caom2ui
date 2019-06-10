@@ -31,9 +31,11 @@
  ****  C A N A D I A N   A S T R O N O M Y   D A T A   C E N T R E  *****
  ************************************************************************
  */
+
 package ca.nrc.cadc.search;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -43,39 +45,31 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 
-public class QuickSearchServlet extends HttpServlet
-{
-    private final static Logger LOGGER =
-            Logger.getLogger(QuickSearchServlet.class);
+public class QuickSearchServlet extends HttpServlet {
+
+    private final static Logger LOGGER = LogManager.getLogger(QuickSearchServlet.class);
 
 
     @Override
-    protected void doPost(final HttpServletRequest req,
-                          final HttpServletResponse resp)
-            throws ServletException, IOException
-    {
+    protected void doPost(final HttpServletRequest req, final HttpServletResponse resp)
+            throws ServletException, IOException {
         handleRequest(req, resp);
     }
 
     @Override
-    protected void doGet(final HttpServletRequest req,
-                         final HttpServletResponse resp)
-            throws ServletException, IOException
-    {
+    protected void doGet(final HttpServletRequest req, final HttpServletResponse resp)
+            throws ServletException, IOException {
         handleRequest(req, resp);
     }
 
 
-    protected void handleRequest(final HttpServletRequest request,
-                                 final HttpServletResponse response)
-            throws ServletException, IOException
-    {
+    void handleRequest(final HttpServletRequest request, final HttpServletResponse response)
+            throws ServletException, IOException {
         final String jspName = "/META-INF/resources/login.jsp";
 
         // Forward to the index jsp.
         LOGGER.debug("redirecting to " + jspName);
-        final RequestDispatcher dispatcher =
-                request.getRequestDispatcher(jspName);
+        final RequestDispatcher dispatcher = request.getRequestDispatcher(jspName);
 
         dispatcher.forward(request, response);
     }

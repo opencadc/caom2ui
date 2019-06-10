@@ -30,7 +30,8 @@ package ca.nrc.cadc.search.form;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import ca.nrc.cadc.caom2.NumericSearch;
 import ca.nrc.cadc.caom2.SearchTemplate;
@@ -54,9 +55,9 @@ import ca.nrc.cadc.uws.Parameter;
  * @author jburke
  */
 public class Number extends AbstractNumericFormConstraint
-        implements SearchableFormConstraint
-{
-    private static Logger log = Logger.getLogger(Number.class);
+        implements SearchableFormConstraint {
+
+    private static Logger log = LogManager.getLogger(Number.class);
 
     // Constants used to construct name for form elements.
     public static final String NAME = "@Number";
@@ -71,8 +72,7 @@ public class Number extends AbstractNumericFormConstraint
      *
      * @param utype The utype.
      */
-    Number(final String utype)
-    {
+    Number(final String utype) {
         super(utype);
     }
 
@@ -82,8 +82,7 @@ public class Number extends AbstractNumericFormConstraint
      * @param value The value to set.
      * @param utype This constraint's utype.
      */
-    public Number(final String value, final String utype)
-    {
+    public Number(final String value, final String utype) {
         super(utype);
         setFormValue(value);
     }
@@ -94,53 +93,43 @@ public class Number extends AbstractNumericFormConstraint
      * @param job   The UWS Job.
      * @param utype The utype of the form.
      */
-    public Number(final Job job, final String utype)
-    {
+    public Number(final Job job, final String utype) {
         super(utype);
-        for (final Parameter parameter : job.getParameterList())
-        {
-            if (parameter.getName().equals(getUType()))
-            {
+        for (final Parameter parameter : job.getParameterList()) {
+            if (parameter.getName().equals(getUType())) {
                 setFormValue(parameter.getValue());
             }
         }
     }
 
     // Create a NumericSearch to SearchTemplates.
-    public SearchTemplate buildSearch(List<FormError> errorList)
-    {
+    public SearchTemplate buildSearch(List<FormError> errorList) {
         SearchTemplate template = null;
 
-        try
-        {
+        try {
             final Operand operand = this.getOperand();
 
             if ((this.getLowerNumber() == null)
-                && (this.getUpperNumber() == null))
-            {
+                    && (this.getUpperNumber() == null)) {
                 template = new NumericSearch(this.getUType(),
                                              Double.parseDouble(
                                                      this.getFormValue()));
-            }
-            else
-            {
+            } else {
                 template = new NumericSearch(this.getUType(),
                                              this.getLowerNumber(),
                                              this.getUpperNumber(),
                                              operand.equals(
                                                      Operand.LESS_THAN_EQUALS)
-                                             || operand.equals(Operand.RANGE),
+                                                     || operand.equals(Operand.RANGE),
                                              operand.equals(
                                                      Operand.GREATER_THAN_EQUALS)
-                                             || operand.equals(Operand.RANGE)
+                                                     || operand.equals(Operand.RANGE)
                 );
             }
-        }
-        catch (IllegalArgumentException e)
-        {
+        } catch (IllegalArgumentException e) {
             errorList.add(new FormError(Number.NAME, e.getMessage()));
             log.debug("Invalid Number parameters: " + e.getMessage() + " "
-                      + this.toString());
+                              + this.toString());
         }
 
         return template;
@@ -152,29 +141,19 @@ public class Number extends AbstractNumericFormConstraint
      *
      * @return boolean true if form values are valid, false otherwise.
      */
-    public boolean isValid(final FormErrors formErrors)
-    {
+    public boolean isValid(final FormErrors formErrors) {
         final String utype = getUType();
 
-        if (super.hasData())
-        {
-            try
-            {
-                if (ObsModel.isTimeUtype(utype) || ObsModel.isAngleUtype(utype))
-                {
+        if (super.hasData()) {
+            try {
+                if (ObsModel.isTimeUtype(utype) || ObsModel.isAngleUtype(utype)) {
                     validateTime(utype, formErrors);
-                }
-                else if (ObsModel.isEnergyUtype(utype))
-                {
+                } else if (ObsModel.isEnergyUtype(utype)) {
                     validateEnergy(utype, formErrors);
-                }
-                else
-                {
+                } else {
                     validateProperty(utype);
                 }
-            }
-            catch (NumberFormatException | ValidationException e)
-            {
+            } catch (NumberFormatException | ValidationException e) {
                 formErrors.set(utype + VALUE,
                                new FormError(utype + VALUE, e.getMessage()));
             }
@@ -192,18 +171,15 @@ public class Number extends AbstractNumericFormConstraint
      * false  otherwise.
      */
     @Override
-    public boolean hasData()
-    {
-        return super.hasData()
-               || (getLowerNumber() != null || getUpperNumber() != null);
+    public boolean hasData() {
+        return super.hasData() || (getLowerNumber() != null || getUpperNumber() != null);
     }
 
     /**
      * @return String representation of the Number form.
      */
     @Override
-    public String toString()
-    {
+    public String toString() {
         final StringBuilder sb = new StringBuilder();
 
         sb.append("Number[");
@@ -214,8 +190,7 @@ public class Number extends AbstractNumericFormConstraint
         sb.append(getUpperNumber());
         sb.append(", ");
 
-        if (getUnit() != null)
-        {
+        if (getUnit() != null) {
             sb.append(getUnit());
         }
 
@@ -224,9 +199,7 @@ public class Number extends AbstractNumericFormConstraint
         return sb.toString();
     }
 
-    private void validateTime(final String utype, final FormErrors formErrors)
-            throws ValidationException
-    {
+    private void validateTime(final String utype, final FormErrors formErrors) {
         Time time = new Time(getFormValue(), utype);
         TimeParser timeParser = new TimeParser();
         TimeValidator timeValidator = new TimeValidator();
@@ -243,9 +216,7 @@ public class Number extends AbstractNumericFormConstraint
         this.setUpperNumber(time.getUpperNumber());
     }
 
-    private void validateEnergy(final String utype, final FormErrors formErrors)
-            throws ValidationException
-    {
+    private void validateEnergy(final String utype, final FormErrors formErrors) {
         Energy energy = new Energy(getFormValue(), utype);
         EnergyParser energyParser = new EnergyParser();
         EnergyValidator energyValidator = new EnergyValidator();
@@ -257,8 +228,7 @@ public class Number extends AbstractNumericFormConstraint
         this.setFormValue(energy.getFormValue());
         this.setFormValueUnit(energy.getFormValueUnit());
 
-        if (isNotARange(energy.getRange()))
-        {
+        if (isNotARange(energy.getRange())) {
             Double formValue = Double.parseDouble(energy.getFormValue());
             Double delta = formValue / 200;
             Double valueLower = formValue - delta;
@@ -275,18 +245,16 @@ public class Number extends AbstractNumericFormConstraint
     /**
      *
      */
-    private boolean isNotARange(final Range<String> range)
-    {
+    private boolean isNotARange(final Range<String> range) {
         return Operand.EQUALS.equals(range.getOperand())
-               && StringUtil.hasLength(this.getFormValue());
+                && StringUtil.hasLength(this.getFormValue());
     }
 
     /**
      *
      */
     private Range<String> constructRange(final Double valueLower,
-                                         final Double valueUpper)
-    {
+                                         final Double valueUpper) {
         final String lowerString = String.valueOf(valueLower);
         final String upperString = String.valueOf(valueUpper);
 
@@ -295,22 +263,19 @@ public class Number extends AbstractNumericFormConstraint
     }
 
     @Override
-    public String resolveUnit(final String forUnit)
-    {
+    public String resolveUnit(final String forUnit) {
         return forUnit;
     }
 
 
     private void validateProperty(final String utype)
-            throws ValidationException
-    {
+            throws ValidationException {
         final PropertyValidator validator = new PropertyValidator(utype);
         setLowerNumber(validator.validate(getLowerValue()));
         setUpperNumber(validator.validate(getUpperValue()));
 
         if ((getLowerNumber() == null && getUpperNumber() == null)
-            && super.hasData())
-        {
+                && super.hasData()) {
             setLowerNumber(validator.validate(getFormValue()));
         }
     }

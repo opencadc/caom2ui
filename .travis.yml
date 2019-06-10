@@ -1,7 +1,3 @@
-env:
-  DOCKER_COMPOSE_VERSION: 1.23.2
-  CAOM2_SEARCH_SERVER_VERSION: 2.8.10
-  CAOM2_META_UI_VERSION: 1013
 language: java
 group: edge
 jdk:
@@ -22,15 +18,14 @@ before_install:
 - docker-compose -v
 - gradle -v
 script:
-- cd caom2-ui-server && gradle clean build javadoc install && cd ..
-- cd caom2-meta-ui && gradle clean build
+- cd caom2-ui-server && gradle clean build javadoc install
+- cd ../caom2-meta-ui && gradle clean build
 - docker build -t opencadc/caom2-meta-ui:SNAPSHOT -t opencadc/caom2-meta-ui:alpine -t opencadc/caom2-meta-ui:${CAOM2_META_UI_VERSION} .
 - cd ../caom2-search-lib && gradle clean build javadoc install
 - cd ../caom2-search-server && gradle clean build install
 - cd examples/default
 - gradle -i clean build
-- mkdir docker && cp Dockerfile docker/ && cp build/libs/*.war docker/ && cp *.properties docker/
-- docker build -t opencadc/caom2-search:SNAPSHOT -t opencadc/caom2-search:alpine -t opencadc/caom2-search:${CAOM2_SEARCH_SERVER_VERSION} -f docker/Dockerfile docker/
+- docker build -t opencadc/caom2-search:SNAPSHOT -t opencadc/caom2-search:alpine -t opencadc/caom2-search:${CAOM2_SEARCH_SERVER_VERSION} .
 - cd ../int-test
 - docker-compose up -d
 - docker ps -a

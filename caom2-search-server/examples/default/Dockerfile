@@ -1,5 +1,5 @@
 # Base Tomcat 8 JRE 8 image from CANFAR running on Alpine.
-FROM opencadc/tomcat:alpine
+FROM opencadc/tomcat:8.5-alpine
 
 # Clear out the webapps directory.
 RUN rm -rf webapps \
@@ -11,7 +11,7 @@ RUN rm -rf webapps \
 #
 # For development purposes, pass the -v ${PATH_TO_LOCAL_BUILD_WAR_DIR}:/usr/local/tomcat/webapps to the run command
 #
-COPY *.war webapps/
+COPY build/libs/*.war webapps/
 
 VOLUME /root/config
 

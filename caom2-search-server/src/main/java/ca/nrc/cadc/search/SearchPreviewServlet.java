@@ -50,11 +50,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.client.utils.URIBuilder;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 public class SearchPreviewServlet extends ConfigurableServlet {
-    private static Logger log = Logger.getLogger(SearchPreviewServlet.class);
+
+    private static Logger log = LogManager.getLogger(SearchPreviewServlet.class);
 
     private PreviewRequestHandler previewRequestHandler;
 
@@ -71,7 +73,8 @@ public class SearchPreviewServlet extends ConfigurableServlet {
      * Constructor to use the Registry Client to obtain the Data Web Service
      * location.
      */
-    public SearchPreviewServlet() { }
+    public SearchPreviewServlet() {
+    }
 
     @Override
     protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
@@ -85,7 +88,7 @@ public class SearchPreviewServlet extends ConfigurableServlet {
             final PublisherID publisherID = new PublisherID(URI.create(uriStr));
 
             final URL serviceURL = registryClient.getServiceURL(
-                publisherID.getResourceID(), Standards.DATALINK_LINKS_10, AuthMethod.COOKIE);
+                    publisherID.getResourceID(), Standards.DATALINK_LINKS_10, AuthMethod.COOKIE);
             log.info("serviceURL to use: " + serviceURL);
 
             previewRequestHandler = new PreviewRequestHandler(serviceURL, new JobURLCreator() {
