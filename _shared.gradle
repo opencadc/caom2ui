@@ -23,9 +23,9 @@ idea {
             html.destination = reporting.file("$name/html")
         }
         dependencies {
-            intTestCompile 'junit:junit:4.+'
-            intTestCompile 'org.opencadc:cadc-web-test:[2.1.2, )'
-            intTestCompile 'org.seleniumhq.selenium:selenium-java:3.+'
+            intTestCompile 'junit:junit:[4.12,)'
+            intTestCompile 'org.opencadc:cadc-web-test:[2.1.2,)'
+            intTestCompile 'org.seleniumhq.selenium:selenium-java:[3.18,)'
         }
 
         systemProperty "driver", "${driver}"
