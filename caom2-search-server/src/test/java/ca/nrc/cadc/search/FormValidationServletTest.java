@@ -25,6 +25,7 @@
  ****  C A N A D I A N   A S T R O N O M Y   D A T A   C E N T R E  *****
  ************************************************************************
  */
+
 package ca.nrc.cadc.search;
 
 import javax.servlet.ServletException;
@@ -36,13 +37,13 @@ import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Level;
+import org.apache.logging.log4j.Level;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ca.nrc.cadc.AbstractUnitTest;
 import ca.nrc.cadc.search.form.*;
-import ca.nrc.cadc.util.Log4jInit;
+import org.apache.logging.log4j.core.config.Configurator;
 
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
@@ -52,184 +53,166 @@ import static org.junit.Assert.*;
  * @author jburke
  */
 public class FormValidationServletTest
-        extends AbstractUnitTest<FormValidationServlet>
-{
+        extends AbstractUnitTest<FormValidationServlet> {
+
     private static final String CAOM2_TIME_FIELD = "Plane.time.bounds.samples";
     private static final String CAOM2_ENERGY_FIELD = "Plane.energy.bounds.samples";
 
-    private HttpServletRequest mockRequest =
-            createMock(HttpServletRequest.class);
-    private HttpServletResponse mockResponse =
-            createMock(HttpServletResponse.class);
+    private HttpServletRequest mockRequest = createMock(HttpServletRequest.class);
+    private HttpServletResponse mockResponse = createMock(HttpServletResponse.class);
 
     @BeforeClass
-    public static void setUpClass()
-    {
-        Log4jInit.setLevel("ca.nrc.cadc", Level.INFO);
+    public static void setUpClass() {
+        Configurator.setLevel("ca.nrc.cadc", Level.INFO);
     }
 
     @Test
-    public void testDoGet() throws Exception
-    {
-        setTestSubject(new FormValidationServlet()
-        {
-            protected FormErrors getFormErrors(
-                    final Map<String, String[]> parameters)
-                    throws ServletException
-            {
+    public void testDoGet() throws Exception {
+        testSubject = new FormValidationServlet() {
+            protected FormErrors getFormErrors(final Map<String, String[]> parameters) {
                 return new FormErrors();
             }
-        });
-        getTestSubject().init();
+        };
+        testSubject.init();
 
         final Writer sw = new StringWriter();
         final PrintWriter pw = new PrintWriter(sw);
 
-        expect(getMockRequest().getParameterMap()).andReturn(
-                new HashMap<String, String[]>()).once();
+        expect(mockRequest.getParameterMap()).andReturn(new HashMap<String, String[]>()).once();
 
-        getMockResponse().setStatus(200);
+        mockResponse.setStatus(200);
         expectLastCall().once();
 
-        getMockResponse().setContentType("application/json");
+        mockResponse.setContentType("application/json");
         expectLastCall().once();
 
-        getMockResponse().setHeader("Cache-Control", "no-cache");
+        mockResponse.setHeader("Cache-Control", "no-cache");
         expectLastCall().once();
 
-        expect(getMockResponse().getWriter()).andReturn(pw).once();
+        expect(mockResponse.getWriter()).andReturn(pw).once();
 
-        replay(getMockRequest(), getMockResponse());
+        replay(mockRequest, mockResponse);
 
-        getTestSubject().doGet(getMockRequest(), getMockResponse());
+        testSubject.doGet(mockRequest, mockResponse);
 
-        assertEquals("Response JSON should be an empty object", "{}",
-                     sw.toString());
+        assertEquals("Response JSON should be an empty object", "{}", sw.toString());
 
-        verify(getMockRequest(), getMockResponse());
+        verify(mockRequest, mockResponse);
     }
 
     @Test
-    public void testGetFormErrors() throws Exception
-    {
-        setTestSubject(new FormValidationServlet());
-        getTestSubject().init();
+    public void testGetFormErrors() throws Exception {
+        testSubject = new FormValidationServlet();
+        testSubject.init();
 
         Map<String, String[]> parameters = new HashMap<>();
 
         FormErrors formErrors;
-        try
-        {
-            getTestSubject().getFormErrors(parameters);
+        try {
+            testSubject.getFormErrors(parameters);
             fail("Missing field parameter should throw IllegalArgumentException");
-        }
-        catch (IllegalArgumentException ignore)
-        {
+        } catch (IllegalArgumentException ignore) {
+            // Good.
         }
 
-        parameters.put("field", new String[]{"foo"});
-        parameters.put("foo", new String[]{"bar", "baz"});
-        try
-        {
-            getTestSubject().getFormErrors(parameters);
+        parameters.put("field", new String[] {"foo"});
+        parameters.put("foo", new String[] {"bar", "baz"});
+        try {
+            testSubject.getFormErrors(parameters);
             fail("Multiple utype values should throw ServletException");
-        }
-        catch (ServletException ignore)
-        {
+        } catch (ServletException ignore) {
         }
 
         parameters.clear();
 
-        parameters.put("field", new String[]{"Observation.observationID"});
-        parameters.put("Observation.observationID", new String[]{"bar"});
-        formErrors = getTestSubject().getFormErrors(parameters);
+        parameters.put("field", new String[] {"Observation.observationID"});
+        parameters.put("Observation.observationID", new String[] {"bar"});
+        formErrors = testSubject.getFormErrors(parameters);
         assertNotNull(formErrors);
         assertTrue("FormErrors should be empty", formErrors.get().isEmpty());
 
-        parameters.put("field", new String[]{"Plane.position.sampleSize"});
-        parameters.put("Plane.position.sampleSize", new String[]{"1"});
-        formErrors = getTestSubject().getFormErrors(parameters);
+        parameters.put("field", new String[] {"Plane.position.sampleSize"});
+        parameters.put("Plane.position.sampleSize", new String[] {"1"});
+        formErrors = testSubject.getFormErrors(parameters);
         assertNotNull(formErrors);
         assertTrue("FormErrors should be empty", formErrors.get().isEmpty());
 
-        parameters.put("field", new String[]{CAOM2_TIME_FIELD});
-        parameters.put(CAOM2_TIME_FIELD, new String[]{"2013-10-02"});
-        formErrors = getTestSubject().getFormErrors(parameters);
+        parameters.put("field", new String[] {CAOM2_TIME_FIELD});
+        parameters.put(CAOM2_TIME_FIELD, new String[] {"2013-10-02"});
+        formErrors = testSubject.getFormErrors(parameters);
         assertNotNull(formErrors);
         assertTrue("FormErrors should be empty", formErrors.get().isEmpty());
 
-        parameters.put("field", new String[]{CAOM2_ENERGY_FIELD});
-        parameters.put(CAOM2_ENERGY_FIELD, new String[]{"1.0"});
-        formErrors = getTestSubject().getFormErrors(parameters);
+        parameters.put("field", new String[] {CAOM2_ENERGY_FIELD});
+        parameters.put(CAOM2_ENERGY_FIELD, new String[] {"1.0"});
+        formErrors = testSubject.getFormErrors(parameters);
         assertNotNull(formErrors);
         assertTrue("FormErrors should be empty", formErrors.get().isEmpty());
 
         parameters.clear();
 
-        parameters.put("field", new String[]{"Plane.position.sampleSize"});
-        parameters.put("Plane.position.sampleSize", new String[]{"qwerty"});
-        formErrors = getTestSubject().getFormErrors(parameters);
+        parameters.put("field", new String[] {"Plane.position.sampleSize"});
+        parameters.put("Plane.position.sampleSize", new String[] {"qwerty"});
+        formErrors = testSubject.getFormErrors(parameters);
         assertNotNull(formErrors);
         assertTrue("FormErrors should not be empty",
                    formErrors.get().size() > 0);
 
-        parameters.put("field", new String[]{CAOM2_TIME_FIELD});
-        parameters.put(CAOM2_TIME_FIELD, new String[]{"qwerty"});
-        formErrors = getTestSubject().getFormErrors(parameters);
+        parameters.put("field", new String[] {CAOM2_TIME_FIELD});
+        parameters.put(CAOM2_TIME_FIELD, new String[] {"qwerty"});
+        formErrors = testSubject.getFormErrors(parameters);
         assertNotNull(formErrors);
         assertTrue("FormErrors should not be empty",
                    formErrors.get().size() > 0);
 
-        parameters.put("field", new String[]{CAOM2_ENERGY_FIELD});
-        parameters.put(CAOM2_ENERGY_FIELD, new String[]{"qwerty"});
-        formErrors = getTestSubject().getFormErrors(parameters);
+        parameters.put("field", new String[] {CAOM2_ENERGY_FIELD});
+        parameters.put(CAOM2_ENERGY_FIELD, new String[] {"qwerty"});
+        formErrors = testSubject.getFormErrors(parameters);
         assertNotNull(formErrors);
         assertTrue("FormErrors should not be empty",
                    formErrors.get().size() > 0);
     }
 
     @Test
-    public void testGetFormConstraint() throws Exception
-    {
-        setTestSubject(new FormValidationServlet());
-        getTestSubject().init();
+    public void testGetFormConstraint() throws Exception {
+        testSubject = new FormValidationServlet();
+        testSubject.init();
 
-        FormConstraint form = getTestSubject().getFormConstraint(null, null);
+        FormConstraint form = testSubject.getFormConstraint(null, null);
         assertNull(form);
 
-        form = getTestSubject().getFormConstraint("foo", null);
+        form = testSubject.getFormConstraint("foo", null);
         assertNull(form);
 
-        form = getTestSubject().getFormConstraint(null, "bar");
+        form = testSubject.getFormConstraint(null, "bar");
         assertNull(form);
 
-        form = getTestSubject().getFormConstraint("foo", "bar");
+        form = testSubject.getFormConstraint("foo", "bar");
         assertNull(form);
 
-        form = getTestSubject()
+        form = testSubject
                 .getFormConstraint("Observation.observationID", null);
         assertNotNull(form);
         assertTrue("", (form instanceof Text));
 
-        form = getTestSubject()
+        form = testSubject
                 .getFormConstraint("Plane.position.sampleSize", null);
         assertNotNull(form);
         assertTrue("", (form instanceof ca.nrc.cadc.search.form.Number));
 
-        form = getTestSubject().getFormConstraint(CAOM2_TIME_FIELD, null);
+        form = testSubject.getFormConstraint(CAOM2_TIME_FIELD, null);
         assertNotNull(form);
         assertTrue("", (form instanceof ca.nrc.cadc.search.form.Date));
 
-        form = getTestSubject().getFormConstraint(CAOM2_ENERGY_FIELD, null);
+        form = testSubject.getFormConstraint(CAOM2_ENERGY_FIELD, null);
         assertNotNull(form);
         assertTrue("", (form instanceof Energy));
     }
 
     @Test
-    public void testWriteFormErrors() throws Exception
-    {
-        setTestSubject(new FormValidationServlet());
-        getTestSubject().init();
+    public void testWriteFormErrors() throws Exception {
+        testSubject = new FormValidationServlet();
+        testSubject.init();
 
         String expected = "{\"utype1\":\"error1\",\"utype2\":\"error2\"}";
 
@@ -240,21 +223,10 @@ public class FormValidationServletTest
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
 
-        getTestSubject().writeFormErrors(formErrors, pw);
+        testSubject.writeFormErrors(formErrors, pw);
         String actual = sw.toString();
 
         assertNotNull(actual);
         assertEquals(expected, actual);
     }
-
-    public HttpServletRequest getMockRequest()
-    {
-        return mockRequest;
-    }
-
-    public HttpServletResponse getMockResponse()
-    {
-        return mockResponse;
-    }
-
 }

@@ -32,7 +32,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import ca.nrc.cadc.caom2.SearchTemplate;
 import ca.nrc.cadc.caom2.Top;
@@ -48,11 +49,12 @@ import ca.nrc.cadc.search.form.SearchableFormConstraint;
  * @author jburke
  */
 public class Templates {
-    private static Logger log = Logger.getLogger(Templates.class);
+
+    private static Logger log = LogManager.getLogger(Templates.class);
     private static final int QUERY_LIMIT = 20000;
 
-    public List<FormError> errorList;
-    private List<SearchTemplate> searchTemplates;
+    public final List<FormError> errorList = new ArrayList<>();
+    private final List<SearchTemplate> searchTemplates = new ArrayList<>();
 
 
     /**
@@ -71,12 +73,9 @@ public class Templates {
      * @param formConstraints List of forms.
      */
     public Templates(final List<SearchableFormConstraint> formConstraints) {
-        errorList = new ArrayList<>();
-        searchTemplates = new ArrayList<>();
-
         for (final SearchableFormConstraint formConstraint : formConstraints) {
             final SearchTemplate template =
-                formConstraint.buildSearch(errorList);
+                    formConstraint.buildSearch(errorList);
             if (template != null) {
                 searchTemplates.add(template);
                 log.debug(template);
@@ -124,7 +123,7 @@ public class Templates {
      */
     @SuppressWarnings("unchecked")
     public <T extends SearchTemplate> List<T> getSearchTemplates(
-        final Class<T> searchTemplateClass) {
+            final Class<T> searchTemplateClass) {
         final List<T> searchTemplateClasses = new ArrayList<>();
 
         for (final SearchTemplate searchTemplate : getSearchTemplates()) {
@@ -152,9 +151,6 @@ public class Templates {
 
     @Override
     public int hashCode() {
-        int result = errorList != null ? errorList.hashCode() : 0;
-        result = 31 * result + (searchTemplates != null ?
-            searchTemplates.hashCode() : 0);
-        return result;
+        return 31 * errorList.hashCode() + searchTemplates.hashCode();
     }
 }

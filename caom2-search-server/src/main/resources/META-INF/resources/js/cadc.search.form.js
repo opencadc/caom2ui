@@ -380,7 +380,7 @@
             _ucd,
             _uType,
             utypeFields.unit ? utypeFields.unit : _unit,
-            utypeFields.datatype ? null : _xtype,  // Only use xtype if the datatype was not explicitly set.
+            utypeFields.datatype ? null : _xtype, // Only use xtype if the datatype was not explicitly set.
             utypeFields.datatype ? utypeFields.datatype : _datatype,
             _arraySize,
             _description,
@@ -853,32 +853,22 @@
         }.bind(this)
       )
 
-      // Prevent closing details when a value is present.
-      $currForm.find("details[id$='_details'] summary").click(function (event) {
-        var $detailsElement = $(this).parent('details')
-        var $inputElements = $detailsElement.find('input.search_criteria_input')
-        var isOpen = $detailsElement.prop('open')
+      const detailsSummaryHandler = function (event, $detailsElement) {
+        const $inputElements = $detailsElement.find('input.search_criteria_input')
+        const detailsObj = $detailsElement[0]
 
-        if (isOpen) {
-          var canProceed = true
+        if (detailsObj.open) {
+          let canProceed = true
 
-          $.each($inputElements, function (inputElementKey, inputElement) {
-            var $inputElement = $(inputElement)
+          $.each($inputElements, function (_inputElementKey, inputElement) {
+            const inputElementValue = inputElement.value
 
-            if (
-              $inputElement &&
-              $inputElement.val() &&
-              $inputElement.val() !== ''
-            ) {
-              // Disallow
-              // closure when
-              // value
-              // present.
+            if (inputElementValue && inputElementValue !== '') {
+              // Disallow closure when value present.
               event.preventDefault()
               canProceed = false
 
-              // Break out of
-              // the loop.
+              // Break out of the loop.
               return false
             } else {
               // Keep going.
@@ -890,11 +880,28 @@
         } else {
           return true
         }
+      }
+
+      // Prevent closing details when a value is present.
+      $currForm.find('details[id$="_details"] summary').off().on('click', function (event) {
+        const targetObj = event.target
+        const $target = $(targetObj)
+        const $targetDetails = ($target.is('details') === false) ? $target.parents('details[id$="_details"]') : $target
+        const proceed = detailsSummaryHandler(event, $targetDetails)
+
+        event.preventDefault()
+
+        if (proceed === true) {
+          const targetDetailsObj = $targetDetails[0]
+          targetDetailsObj.open = !targetDetailsObj.open
+        }
+
+        return false
       })
 
       // Bind form input validation function.
       $currForm.find('input.ui-form-input-validate').each(
-        function (key, value) {
+        function (_key, value) {
           var $input = $(value)
           var thisSearchForm = this
           var callbackFunction = function (jsonError) {
@@ -1055,7 +1062,7 @@
         )
 
         $liItem.popover({
-          title: $tooltipHeaderDiv,
+          title: $tooltipHeaderDiv[0].innerHTML,
           content: $tooltipDiv[0].innerHTML,
           html: true,
           placement: $liItem[0].dataset.placement
@@ -1071,7 +1078,7 @@
     this.loadTooltips = function (jsonData, divClass) {
       var tooltipCreator = new ca.nrc.cadc.search.TooltipCreator()
       this.$form.find('[data-toggle="' + divClass + '"]').each(
-        function (key, element) {
+        function (_key, element) {
           var $liItem = $(element)
           this.handleTooltipLoad(
             jsonData[element.dataset.utype],
@@ -1087,7 +1094,8 @@
       // open at a time.
       $(document).on('click', function (e) {
         if ($(e.target).hasClass('glyphicon-remove-circle')) {
-          $('[data-toggle="' + divClass + '"],[data-original-title]').each(function () {;
+          $('[data-toggle="' + divClass + '"],[data-original-title]').each(function () {
+            ;
             (
               (
                 $(this)
@@ -1104,7 +1112,8 @@
               !$(this).is(e.target) &&
               $(this).has(e.target).length === 0 &&
               $('.popover').has(e.target).length === 0
-            ) {;
+            ) {
+              ;
               (
                 (
                   $(this)
@@ -1355,7 +1364,7 @@
      * This form's Observation Collection select id.
      * @returns {String}
      */
-    this.getCollectionSelectID = function() {
+    this.getCollectionSelectID = function () {
       return this.configuration.getCollectionSelectID()
     }
 
@@ -1994,7 +2003,7 @@
      * @param {jQuery} $detailsItem    The <details> item to open.
      */
     this.openDetailsItem = function ($detailsItem) {
-      $detailsItem.prop('open', true)
+      $detailsItem[0].open = true
     }
 
     /**
@@ -2004,7 +2013,7 @@
      * @param {jQuery} $detailsItem    The <details> item to open.
      */
     this.closeDetailsItem = function ($detailsItem) {
-      $detailsItem.prop('open', false)
+      $detailsItem[0].open = false
     }
 
     /**

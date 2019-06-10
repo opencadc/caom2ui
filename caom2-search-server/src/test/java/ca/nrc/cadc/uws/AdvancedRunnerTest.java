@@ -36,8 +36,6 @@ package ca.nrc.cadc.uws;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.util.*;
 
 import ca.nrc.cadc.AbstractUnitTest;

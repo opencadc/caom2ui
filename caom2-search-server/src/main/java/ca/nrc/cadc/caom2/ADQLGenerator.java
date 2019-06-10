@@ -3,7 +3,8 @@ package ca.nrc.cadc.caom2;
 import ca.nrc.cadc.caom2.types.*;
 import ca.nrc.cadc.util.StringUtil;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -15,15 +16,15 @@ import java.util.TreeMap;
  *
  * @author pdowler
  */
-public class ADQLGenerator extends AbstractPersistenceService
-{
+public class ADQLGenerator extends AbstractPersistenceService {
+
     private static final String CAOM2_ENERGY_UTYPE = "Plane.energy.bounds.samples";
     private static final String CAOM2_TIME_UTYPE = "Plane.time.bounds.samples";
     private static final String OBSCORE_ENERGY_UTYPE = "Char.SpectralAxis.Coverage.Bounds.Limits";
     private static final String OBSCORE_TIME_UTYPE = "Char.TemporalAxis.Coverage.Bounds.Limits";
 
 
-    private static Logger LOGGER = Logger.getLogger(ADQLGenerator.class);
+    private static Logger LOGGER = LogManager.getLogger(ADQLGenerator.class);
 
     private final String upload;
     private final String uploadResolver;
@@ -32,8 +33,7 @@ public class ADQLGenerator extends AbstractPersistenceService
 
 
     ADQLGenerator(final String schema, final String _upload, final String _uploadResolver,
-                  final String _targetNameField, final String _targetCoordField)
-    {
+                  final String _targetNameField, final String _targetCoordField) {
         super(null, schema, null);
 
         this.upload = _upload;
@@ -47,35 +47,29 @@ public class ADQLGenerator extends AbstractPersistenceService
 
     @Override
     public String toSQL(final SpatialSearch s, final String col,
-                        final boolean carefulWithNULL)
-    {
+                        final boolean carefulWithNULL) {
         final String CAOM2_POSITION_UTYPE = "Plane.position.bounds";
         final String OBSCORE_POSITION_UTYPE =
                 "Char.SpatialAxis.Coverage.Support.Area";
 
         if (s.getName() == null ||
-            (!CAOM2_POSITION_UTYPE.equals(s.getName()) &&
-             !OBSCORE_POSITION_UTYPE.equals(s.getName())))
-        {
+                (!CAOM2_POSITION_UTYPE.equals(s.getName()) &&
+                        !OBSCORE_POSITION_UTYPE.equals(s.getName()))) {
             throw new IllegalArgumentException(
                     "cannot use SpatialSearch with utype=" + s.getName());
-        }
-        else if (s.getPosition() == null)
-        {
+        } else if (s.getPosition() == null) {
             throw new IllegalArgumentException(
                     "cannot use SpatialSearch with position=" + s
                             .getPosition());
         }
 
         String position = CAOM2_POSITION_UTYPE;
-        if (s.getName().equals(OBSCORE_POSITION_UTYPE))
-        {
+        if (s.getName().equals(OBSCORE_POSITION_UTYPE)) {
             position = OBSCORE_POSITION_UTYPE;
         }
 
         final StringBuilder sb = new StringBuilder();
-        if (s.getPosition() instanceof Location)
-        {
+        if (s.getPosition() instanceof Location) {
             final Location loc = (Location) s.getPosition();
             sb.append("CONTAINS( POINT('ICRS',");
             sb.append(loc.getCenter().cval1);
@@ -84,9 +78,7 @@ public class ADQLGenerator extends AbstractPersistenceService
             sb.append("), ");
             sb.append(getColumnName(position));
             sb.append(" ) = 1");
-        }
-        else if (s.getPosition() instanceof Circle)
-        {
+        } else if (s.getPosition() instanceof Circle) {
             final Circle circ = (Circle) s.getPosition();
             sb.append("INTERSECTS( CIRCLE('ICRS',");
             sb.append(circ.getCenter().cval1);
@@ -97,19 +89,15 @@ public class ADQLGenerator extends AbstractPersistenceService
             sb.append("), ");
             sb.append(getColumnName(position));
             sb.append(" ) = 1");
-        }
-        else if (s.getPosition() instanceof Polygon)
-        {
+        } else if (s.getPosition() instanceof Polygon) {
             // TODO: This will fail if the polygon is not a simple poly, but
             // TODO: should be OK for query... use REGION(<stc>) for general
             // TODO: case.
             final Polygon poly = (Polygon) s.getPosition();
             sb.append("INTERSECTS( POLYGON('ICRS'");
 
-            for (final Vertex v : poly.getSamples().getVertices())
-            {
-                if (v.getType() != SegmentType.CLOSE)
-                {
+            for (final Vertex v : poly.getSamples().getVertices()) {
+                if (v.getType() != SegmentType.CLOSE) {
                     sb.append(", ");
                     sb.append(v.cval1);
                     sb.append(", ");
@@ -120,9 +108,7 @@ public class ADQLGenerator extends AbstractPersistenceService
             sb.append("),");
             sb.append(getColumnName(position));
             sb.append(" ) = 1");
-        }
-        else
-        {
+        } else {
             throw new IllegalArgumentException(
                     "cannot use SpatialSearch with position=" + s
                             .getPosition());
@@ -138,12 +124,11 @@ public class ADQLGenerator extends AbstractPersistenceService
      * @param col The column to search on.
      * @return String SQL fragment.
      */
-    private String toIntersectSQL(final IntervalSearch s, final String col)
-    {
+    private String toIntersectSQL(final IntervalSearch s, final String col) {
         final StringBuilder sb = new StringBuilder();
         final double lowerValue = (s.getLower() == null) ? 0.0 : s.getLower();
         final double upperValue = (s.getUpper() == null) ? Double.MAX_VALUE
-                                                         : s.getUpper();
+                : s.getUpper();
 
         sb.append("INTERSECTS( INTERVAL( ");
         sb.append(lowerValue);
@@ -165,12 +150,10 @@ public class ADQLGenerator extends AbstractPersistenceService
      * @return String SQL fragment.
      */
     private String toIntervalSQL(final IntervalSearch s, final String col1,
-                                 final String col2)
-    {
+                                 final String col2) {
         final StringBuilder sb = new StringBuilder();
 
-        if ((s.getLower() != null) && (s.getUpper() != null))
-        {
+        if ((s.getLower() != null) && (s.getUpper() != null)) {
             // contains
             sb.append(col1);
             sb.append(" <= ");
@@ -179,16 +162,12 @@ public class ADQLGenerator extends AbstractPersistenceService
             sb.append(s.getLower());
             sb.append(" <= ");
             sb.append(col2);
-        }
-        else if (s.getUpper() != null)
-        {
+        } else if (s.getUpper() != null) {
             // below
             sb.append(col1);
             sb.append(" <= ");
             sb.append(s.getUpper());
-        }
-        else if (s.getLower() != null)
-        {
+        } else if (s.getLower() != null) {
             // above
             sb.append(s.getLower());
             sb.append(" <= ");
@@ -208,42 +187,28 @@ public class ADQLGenerator extends AbstractPersistenceService
      */
     @Override
     public String toSQL(final IntervalSearch s, final String col,
-                        final boolean carefulWithNULL)
-    {
+                        final boolean carefulWithNULL) {
         final String sql;
 
-        if (s.getShift() != null)
-        {
+        if (s.getShift() != null) {
             // fuzzy matching
             throw new UnsupportedOperationException("IntervalSearch shifting");
-        }
-        else if (s.getEpsilon() != null)
-        {
+        } else if (s.getEpsilon() != null) {
             // fuzzy matching
             throw new UnsupportedOperationException(
                     "IntervalSearch to SQL (fuzzy match)");
-        }
-        else if (CAOM2_ENERGY_UTYPE.equals(s.getName()))
-        {
+        } else if (CAOM2_ENERGY_UTYPE.equals(s.getName())) {
             sql = toIntersectSQL(s, getColumnName(CAOM2_ENERGY_UTYPE));
-        }
-        else if (CAOM2_TIME_UTYPE.equals(s.getName()))
-        {
+        } else if (CAOM2_TIME_UTYPE.equals(s.getName())) {
             sql = toIntersectSQL(s, getColumnName(CAOM2_TIME_UTYPE));
-        }
-        else if (OBSCORE_ENERGY_UTYPE.equals(s.getName()))
-        {
+        } else if (OBSCORE_ENERGY_UTYPE.equals(s.getName())) {
             sql = toIntervalSQL(s,
                                 getColumnName(OBSCORE_ENERGY_UTYPE + ".LoLimit"),
                                 getColumnName(OBSCORE_ENERGY_UTYPE + ".HiLimit"));
-        }
-        else if (OBSCORE_TIME_UTYPE.equals(s.getName()))
-        {
+        } else if (OBSCORE_TIME_UTYPE.equals(s.getName())) {
             sql = toIntervalSQL(s, getColumnName(OBSCORE_TIME_UTYPE + ".StopTime"),
                                 getColumnName(OBSCORE_TIME_UTYPE + ".StartTime"));
-        }
-        else
-        {
+        } else {
             throw new IllegalArgumentException("cannot use IntervalSearch with utype=" + s.getName());
         }
 
@@ -252,44 +217,38 @@ public class ADQLGenerator extends AbstractPersistenceService
 
     @Override
     public String toSQL(final RangeSearch s, final String col,
-                        final boolean carefulWithNULL)
-    {
+                        final boolean carefulWithNULL) {
         final String CAOM2_POSITION_UTYPE = "Plane.position.bounds";
         final String OBSCORE_POSITION_UTYPE = "Char.SpatialAxis.Coverage.Support.Area";
 
         if (s.getName() == null ||
-            (!CAOM2_POSITION_UTYPE.equals(s.getName()) &&
-             !OBSCORE_POSITION_UTYPE.equals(s.getName())))
-        {
+                (!CAOM2_POSITION_UTYPE.equals(s.getName()) &&
+                        !OBSCORE_POSITION_UTYPE.equals(s.getName()))) {
             throw new IllegalArgumentException(
                     "cannot use RangeSearch with utype=" + s.getName());
-        }
-        else if (s.getLowerRange() == null || s.getUpperRange() == null)
-        {
+        } else if (s.getLowerRange() == null || s.getUpperRange() == null) {
             throw new IllegalArgumentException("cannot use RangeSearch with null RA or Dec range");
         }
 
         String position = CAOM2_POSITION_UTYPE;
-        if (s.getName().equals(OBSCORE_POSITION_UTYPE))
-        {
+        if (s.getName().equals(OBSCORE_POSITION_UTYPE)) {
             position = OBSCORE_POSITION_UTYPE;
         }
 
         return "INTERSECTS( RANGE_S2D(" +
-               s.getLowerRange().getLowerValue() +
-               ", " +
-               s.getLowerRange().getUpperValue() +
-               ", " +
-               s.getUpperRange().getLowerValue() +
-               ", " +
-               s.getUpperRange().getUpperValue() +
-               "), " +
-               getColumnName(position) +
-               " ) = 1";
+                s.getLowerRange().getLowerValue() +
+                ", " +
+                s.getLowerRange().getUpperValue() +
+                ", " +
+                s.getUpperRange().getLowerValue() +
+                ", " +
+                s.getUpperRange().getUpperValue() +
+                "), " +
+                getColumnName(position) +
+                " ) = 1";
     }
 
-    private void init()
-    {
+    private void init() {
         // class -> table name
         this.tableMap = new TreeMap<>(new ClassComp());
 
@@ -302,14 +261,10 @@ public class ADQLGenerator extends AbstractPersistenceService
         // class -> alias, String -> String
         aliasMap = new TreeMap<>(new ClassComp());
 
-        for (final Class c : tableMap.keySet())
-        {
-            if (Observation.class.isAssignableFrom(c))
-            {
+        for (final Class c : tableMap.keySet()) {
+            if (Observation.class.isAssignableFrom(c)) {
                 aliasMap.put(c, "Observation");
-            }
-            else
-            {
+            } else {
                 aliasMap.put(c, c.getSimpleName());
             }
         }
@@ -318,25 +273,20 @@ public class ADQLGenerator extends AbstractPersistenceService
     }
 
     @Override
-    public String getFrom(final Class c, int depth)
-    {
+    public String getFrom(final Class c, int depth) {
         final String fromClause;
 
         final String a1 = getAlias(c);
         final String f1 = getFrom(c);
 
-        if (depth <= 1)
-        {
+        if (depth <= 1) {
             fromClause = f1;
-        }
-        else
-        {
+        } else {
             final StringBuilder query = new StringBuilder();
 
             query.append(f1);
 
-            if (Plane.class.equals(c))
-            {
+            if (Plane.class.equals(c)) {
                 LOGGER.debug("getFrom: Plane JOIN Observation");
 
                 // join to Observation
@@ -345,8 +295,7 @@ public class ADQLGenerator extends AbstractPersistenceService
                 final String upload = getUpload();
 
                 // JOIN on the TAP_UPLOAD first for performance.
-                if (hasUpload())
-                {
+                if (hasUpload()) {
                     final String table = upload.split(",")[0];
 
                     query.append(" JOIN TAP_UPLOAD.");
@@ -354,15 +303,12 @@ public class ADQLGenerator extends AbstractPersistenceService
                     query.append(" as f on ");
 
                     if (StringUtil.hasText(getUploadResolver())
-                        && getUploadResolver().equals("OBJECT"))
-                    {
+                            && getUploadResolver().equals("OBJECT")) {
                         query.append(a2);
                         query.append(".");
                         query.append(getTargetNameField());
                         query.append(" = f.target");
-                    }
-                    else
-                    {
+                    } else {
                         query.append("INTERSECTS(POINT('ICRS', f.ra, f.dec), ");
                         query.append(a1);
                         query.append(".");
@@ -381,9 +327,7 @@ public class ADQLGenerator extends AbstractPersistenceService
                 query.append(".obsID");
 
                 fromClause = query.toString();
-            }
-            else
-            {
+            } else {
                 fromClause = super.getFrom(c, depth);
             }
         }
@@ -398,13 +342,11 @@ public class ADQLGenerator extends AbstractPersistenceService
      * @param utypeSelectList The provided SELECT list.
      * @return String SELECT list.
      */
-    String getSelectList(final String utypeSelectList)
-    {
+    String getSelectList(final String utypeSelectList) {
         final StringBuilder sb = new StringBuilder();
         final String[] parts = utypeSelectList.split(",");
 
-        for (final String item : parts)
-        {
+        for (final String item : parts) {
             final String trimItem = item.trim();
             final String[] ea = trimItem.split(" ");
             if (ea.length == 1) // expression
@@ -413,9 +355,7 @@ public class ADQLGenerator extends AbstractPersistenceService
 
                 sb.append(selectItem);
                 sb.append(", ");
-            }
-            else if ((ea.length >= 3) && "AS".equalsIgnoreCase(ea[1]))
-            {
+            } else if ((ea.length >= 3) && "AS".equalsIgnoreCase(ea[1])) {
                 final String as = " " + ea[1] + " ";
                 final int startAlias = trimItem.indexOf(as) + 4;
                 final String selectItem = getExpression(ea[0]);
@@ -424,54 +364,40 @@ public class ADQLGenerator extends AbstractPersistenceService
                 sb.append(" AS ");
                 sb.append(trimItem.substring(startAlias));
                 sb.append(", ");
-            }
-            else
-            {
+            } else {
                 throw new IllegalArgumentException(
                         "failed to parse select list: found " + ea.length
-                        + " tokens in '" + trimItem + "'");
+                                + " tokens in '" + trimItem + "'");
             }
         }
 
         return sb.substring(0, sb.length() - 2); // strip last comma-space
     }
 
-    private String getExpression(final String e)
-    {
+    private String getExpression(final String e) {
         final StringBuilder sb = new StringBuilder();
 
         // Not a function or an array.
-        if (e.matches("^.*\\(.*\\).*"))
-        {
-            try
-            {
+        if (e.matches("^.*\\(.*\\).*")) {
+            try {
                 final String expressionContent = URLDecoder.decode(e, "UTF-8");
                 final int argStart = expressionContent.indexOf("(");
                 final int argEnd = expressionContent.lastIndexOf(")");
-                final String arguments =
-                        expressionContent.substring(argStart + 1, argEnd);
-                sb.append(expressionContent.substring(0, argStart + 1));
+                final String arguments = expressionContent.substring(argStart + 1, argEnd);
+                sb.append(expressionContent, 0, argStart + 1);
                 sb.append(getExpression(arguments));
                 sb.append(getExpression(expressionContent.substring(argEnd)));
-            }
-            catch (UnsupportedEncodingException exception)
-            {
+            } catch (UnsupportedEncodingException exception) {
                 throw new IllegalArgumentException(
                         "Unable to parse out SELECT list.", exception);
             }
-        }
-        else if (e.contains(","))
-        {
+        } else if (e.contains(",")) {
             final String[] arrayItems = e.split(",");
 
-            for (final String item : arrayItems)
-            {
-                if (!item.contains("."))
-                {
+            for (final String item : arrayItems) {
+                if (!item.contains(".")) {
                     sb.append(item);
-                }
-                else
-                {
+                } else {
                     sb.append(getColumnName(item));
                 }
 
@@ -479,15 +405,10 @@ public class ADQLGenerator extends AbstractPersistenceService
             }
 
             sb.delete(sb.length() - 2, sb.length());
-        }
-        else
-        {
-            if (!e.contains("."))
-            {
+        } else {
+            if (!e.contains(".")) {
                 sb.append(e);
-            }
-            else
-            {
+            } else {
                 LOGGER.debug("Looking up " + e);
                 sb.append(getColumnName(e));
             }
@@ -496,28 +417,23 @@ public class ADQLGenerator extends AbstractPersistenceService
         return sb.toString();
     }
 
-    boolean hasUpload()
-    {
+    boolean hasUpload() {
         return StringUtil.hasText(getUpload());
     }
 
-    public String getUpload()
-    {
+    public String getUpload() {
         return upload;
     }
 
-    private String getUploadResolver()
-    {
+    private String getUploadResolver() {
         return uploadResolver;
     }
 
-    private String getTargetNameField()
-    {
+    private String getTargetNameField() {
         return targetNameField;
     }
 
-    private String getTargetCoordField()
-    {
+    private String getTargetCoordField() {
         return targetCoordField;
     }
 }

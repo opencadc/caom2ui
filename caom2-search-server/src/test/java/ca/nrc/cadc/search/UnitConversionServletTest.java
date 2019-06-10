@@ -38,7 +38,7 @@ package ca.nrc.cadc.search;
 import ca.nrc.cadc.AbstractUnitTest;
 
 import ca.nrc.cadc.date.DateUtil;
-import org.apache.log4j.Level;
+import org.apache.logging.log4j.Level;
 import org.json.JSONObject;
 import org.json.JSONWriter;
 import org.junit.Before;
@@ -52,7 +52,7 @@ import java.util.Map;
 import ca.nrc.cadc.search.form.*;
 import ca.nrc.cadc.search.form.Number;
 import ca.nrc.cadc.search.parser.TargetData;
-import ca.nrc.cadc.util.Log4jInit;
+import org.apache.logging.log4j.core.config.Configurator;
 
 import static ca.nrc.cadc.search.UnitConversionServlet.CAOM2_ENERGY_FIELD;
 import static ca.nrc.cadc.search.UnitConversionServlet.CAOM2_TIME_FIELD;
@@ -60,8 +60,8 @@ import static ca.nrc.cadc.search.UnitConversionServlet.CAOM2_TIME_PRESET_UTYPE;
 import static org.junit.Assert.*;
 
 
-public class UnitConversionServletTest
-    extends AbstractUnitTest<UnitConversionServlet> {
+public class UnitConversionServletTest extends AbstractUnitTest<UnitConversionServlet> {
+
     private StringWriter stringWriter = new StringWriter();
     private JSONWriter jsonWriter = new JSONWriter(stringWriter);
     private Map<String, String[]> parameters = new HashMap<>();
@@ -71,7 +71,7 @@ public class UnitConversionServletTest
 
     @Before
     public void setUp() {
-        Log4jInit.setLevel("ca.nrc.cadc", Level.INFO);
+        Configurator.setLevel("ca.nrc.cadc", Level.INFO);
     }
 
     @Test
@@ -129,8 +129,8 @@ public class UnitConversionServletTest
 
         resetDataMembers();
         getTestSubject()
-            .writeJSON(CAOM2_TIME_FIELD, "> 2010-09-22", jsonWriter,
-                       parameters);
+                .writeJSON(CAOM2_TIME_FIELD, "> 2010-09-22", jsonWriter,
+                           parameters);
         assertEquals("Test 3 - Should be MJD.",
                      "[\" (>= 55461.0 MJD)\"]",
                      stringWriter.toString());
@@ -138,8 +138,8 @@ public class UnitConversionServletTest
         // Test with spaces.
         resetDataMembers();
         getTestSubject()
-            .writeJSON(CAOM2_TIME_FIELD, " > 2010-09-22", jsonWriter,
-                       parameters);
+                .writeJSON(CAOM2_TIME_FIELD, " > 2010-09-22", jsonWriter,
+                           parameters);
         assertEquals("Test 3.5 - Should be MJD.",
                      "[\" (>= 55461.0 MJD)\"]",
                      stringWriter.toString());
@@ -153,71 +153,71 @@ public class UnitConversionServletTest
 
         resetDataMembers();
         getTestSubject()
-            .writeJSON("Plane.time.bounds.width", "1y..2y", jsonWriter,
-                       parameters);
+                .writeJSON("Plane.time.bounds.width", "1y..2y", jsonWriter,
+                           parameters);
         assertEquals("Test 5 - Should be days.",
                      "[\" (365.0..730.0 days)\"]",
                      stringWriter.toString());
 
         resetDataMembers();
         getTestSubject()
-            .writeJSON(CAOM2_ENERGY_FIELD, "800nm", jsonWriter,
-                       parameters);
+                .writeJSON(CAOM2_ENERGY_FIELD, "800nm", jsonWriter,
+                           parameters);
         assertEquals("Test 6 - Should be metres.",
                      "[\" (= 8.000E-7 metres)\"]".toLowerCase(),
                      stringWriter.toString().toLowerCase());
 
         resetDataMembers();
         getTestSubject()
-            .writeJSON(CAOM2_ENERGY_FIELD, "0.21m", jsonWriter,
-                       parameters);
+                .writeJSON(CAOM2_ENERGY_FIELD, "0.21m", jsonWriter,
+                           parameters);
         assertEquals("Test 7 - Should be metres.",
                      "[\" (= 0.21 metres)\"]",
                      stringWriter.toString());
 
         resetDataMembers();
         getTestSubject()
-            .writeJSON(CAOM2_ENERGY_FIELD, "300..400GHz", jsonWriter,
-                       parameters);
+                .writeJSON(CAOM2_ENERGY_FIELD, "300..400GHz", jsonWriter,
+                           parameters);
         assertEquals("Test 8 - Should be metres.",
                      "[\" (7.495E-4..9.993E-4 metres)\"]".toLowerCase(),
                      stringWriter.toString().toLowerCase());
 
         resetDataMembers();
         getTestSubject()
-            .writeJSON("Char.SpectralAxis.Coverage.Bounds.Limits",
-                       "300..400GHz", jsonWriter, parameters);
+                .writeJSON("Char.SpectralAxis.Coverage.Bounds.Limits",
+                           "300..400GHz", jsonWriter, parameters);
         assertEquals("Test 8.1 - Should be metres from ObsCore.",
                      "[\" (7.495E-4..9.993E-4 metres)\"]".toLowerCase(),
                      stringWriter.toString().toLowerCase());
 
         resetDataMembers();
         getTestSubject()
-            .writeJSON("Plane.energy.sampleSize", "2..3GHz", jsonWriter,
-                       parameters);
+                .writeJSON("Plane.energy.sampleSize", "2..3GHz", jsonWriter,
+                           parameters);
         assertEquals("Test 9 - Should be Hz.",
                      "[\" (2.0E9..3.0E9 Hz)\"]",
                      stringWriter.toString());
 
         resetDataMembers();
         getTestSubject()
-            .writeJSON("Plane.energy.sampleSize", "> 3GHz", jsonWriter,
-                       parameters);
+                .writeJSON("Plane.energy.sampleSize", "> 3GHz", jsonWriter,
+                           parameters);
         assertEquals("Test 10 - Should be > 3.0E9Hz.",
                      "[\" (> 3.0E9 Hz)\"]",
                      stringWriter.toString());
 
         resetDataMembers();
         getTestSubject()
-            .writeJSON("Plane.energy.sampleSize", "> ", jsonWriter,
-                       parameters);
+                .writeJSON("Plane.energy.sampleSize", "> ", jsonWriter,
+                           parameters);
         assertEquals("Test 11 - Should be empty array", "[]",
                      stringWriter.toString());
 
         resetDataMembers();
         getTestSubject()
-            .writeJSON("Plane.energy.bounds.width", "< 1000A", jsonWriter,
-                       parameters);
+                .writeJSON("Plane.energy.bounds.width", "< 1000A", jsonWriter,
+                           parameters);
         assertEquals("Test 12 - Should be empty string.",
                      "[\" (< 1.000E-7 metres)\"]".toLowerCase(),
                      stringWriter.toString().toLowerCase());
@@ -241,8 +241,8 @@ public class UnitConversionServletTest
 
         resetDataMembers();
         getTestSubject()
-            .writeJSON("Plane.position.bounds", " m101", jsonWriter,
-                       parameters);
+                .writeJSON("Plane.position.bounds", " m101", jsonWriter,
+                           parameters);
         final JSONObject json = new JSONObject(stringWriter.toString());
 
         assertEquals("Test 11 - Should be trimmed value (m101).",
@@ -251,8 +251,8 @@ public class UnitConversionServletTest
 
         resetDataMembers();
         getTestSubject()
-            .writeJSON("Plane.dataRelease", "1977-11-25..2000", jsonWriter,
-                       parameters);
+                .writeJSON("Plane.dataRelease", "1977-11-25..2000", jsonWriter,
+                           parameters);
 
         assertEquals("Test 12 - Should be date range.",
                      "[\" (1977-11-25 00:00:00.000..2000-01-01 00:00:00.000)\"]",
@@ -265,7 +265,7 @@ public class UnitConversionServletTest
 
         assertEquals("Should be 9.893E-2", "9.893E-2".toLowerCase(),
                      getTestSubject().getNumericDisplayValue(
-                         0.09893083333333333).toLowerCase());
+                             0.09893083333333333).toLowerCase());
 
         assertEquals("Should be 0.256", "0.256",
                      getTestSubject().getNumericDisplayValue(0.256));
@@ -282,32 +282,32 @@ public class UnitConversionServletTest
         setTestSubject(new UnitConversionServlet());
 
         final Number numberFormConstraint =
-            new Number("0.09893083333333333..0.09993083333333333",
-                       "Plane.energy.sampleSize") {
-                /**
-                 * Obtain the validated and normalized numeric lower value
-                 *
-                 * @return Number instance.
-                 */
-                @Override
-                public java.lang.Number getLowerNumber() {
-                    return 0.09893083333333333;
-                }
+                new Number("0.09893083333333333..0.09993083333333333",
+                           "Plane.energy.sampleSize") {
+                    /**
+                     * Obtain the validated and normalized numeric lower value
+                     *
+                     * @return Number instance.
+                     */
+                    @Override
+                    public java.lang.Number getLowerNumber() {
+                        return 0.09893083333333333;
+                    }
 
-                /**
-                 * Obtain the validated and normalized numeric upper value
-                 *
-                 * @return Number instance.
-                 */
-                @Override
-                public java.lang.Number getUpperNumber() {
-                    return 0.09993083333333333;
-                }
-            };
+                    /**
+                     * Obtain the validated and normalized numeric upper value
+                     *
+                     * @return Number instance.
+                     */
+                    @Override
+                    public java.lang.Number getUpperNumber() {
+                        return 0.09993083333333333;
+                    }
+                };
 
         final String s1 =
-            getTestSubject().getNumericRangeValue(numberFormConstraint,
-                                                  "metres");
+                getTestSubject().getNumericRangeValue(numberFormConstraint,
+                                                      "metres");
         assertEquals("Should be (9.893E-2..9.993E-2 metres)",
                      " (9.893E-2..9.993E-2 metres)".toLowerCase(), s1.toLowerCase());
 
@@ -317,37 +317,37 @@ public class UnitConversionServletTest
         setTestSubject(new UnitConversionServlet());
 
         final Number numberFormConstraint2 =
-            new Number("0.09893083333333333..0.09993083333333333hz",
-                       "Plane.energy.bounds.width") {
-                /**
-                 * Obtain the validated and normalized numeric lower value
-                 *
-                 * @return Number instance.
-                 */
-                @Override
-                public java.lang.Number getLowerNumber() {
-                    return 0.09893083333333333;
-                }
+                new Number("0.09893083333333333..0.09993083333333333hz",
+                           "Plane.energy.bounds.width") {
+                    /**
+                     * Obtain the validated and normalized numeric lower value
+                     *
+                     * @return Number instance.
+                     */
+                    @Override
+                    public java.lang.Number getLowerNumber() {
+                        return 0.09893083333333333;
+                    }
 
-                /**
-                 * Obtain the validated and normalized numeric upper value
-                 *
-                 * @return Number instance.
-                 */
-                @Override
-                public java.lang.Number getUpperNumber() {
-                    return 0.09993083333333333;
-                }
+                    /**
+                     * Obtain the validated and normalized numeric upper value
+                     *
+                     * @return Number instance.
+                     */
+                    @Override
+                    public java.lang.Number getUpperNumber() {
+                        return 0.09993083333333333;
+                    }
 
-                @Override
-                public String getUnit() {
-                    return "hz";
-                }
-            };
+                    @Override
+                    public String getUnit() {
+                        return "hz";
+                    }
+                };
 
         final String s2 =
-            getTestSubject().getNumericRangeValue(numberFormConstraint2,
-                                                  "Hz");
+                getTestSubject().getNumericRangeValue(numberFormConstraint2,
+                                                      "Hz");
         assertEquals("Should be (9.893E-2..9.993E-2 Hz)",
                      " (9.893E-2..9.993E-2 Hz)".toLowerCase(), s2.toLowerCase());
 
@@ -357,36 +357,36 @@ public class UnitConversionServletTest
         setTestSubject(new UnitConversionServlet());
 
         final Number numberFormConstraint3 =
-            new Number("0.7..0.9mHz", "Plane.energy.bounds.width") {
-                /**
-                 * Obtain the validated and normalized numeric lower value
-                 *
-                 * @return Number instance.
-                 */
-                @Override
-                public java.lang.Number getLowerNumber() {
-                    return 0.7;
-                }
+                new Number("0.7..0.9mHz", "Plane.energy.bounds.width") {
+                    /**
+                     * Obtain the validated and normalized numeric lower value
+                     *
+                     * @return Number instance.
+                     */
+                    @Override
+                    public java.lang.Number getLowerNumber() {
+                        return 0.7;
+                    }
 
-                /**
-                 * Obtain the validated and normalized numeric upper value
-                 *
-                 * @return Number instance.
-                 */
-                @Override
-                public java.lang.Number getUpperNumber() {
-                    return 0.99;
-                }
+                    /**
+                     * Obtain the validated and normalized numeric upper value
+                     *
+                     * @return Number instance.
+                     */
+                    @Override
+                    public java.lang.Number getUpperNumber() {
+                        return 0.99;
+                    }
 
-                @Override
-                public String getUnit() {
-                    return "mHz";
-                }
-            };
+                    @Override
+                    public String getUnit() {
+                        return "mHz";
+                    }
+                };
 
         final String s3 =
-            getTestSubject().getNumericRangeValue(numberFormConstraint3,
-                                                  "Hz");
+                getTestSubject().getNumericRangeValue(numberFormConstraint3,
+                                                      "Hz");
         assertEquals("Should be (0.7..0.99 Hz)", " (0.7..0.99 Hz)", s3);
     }
 

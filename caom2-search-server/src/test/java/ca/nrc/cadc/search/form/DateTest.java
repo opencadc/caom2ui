@@ -31,6 +31,7 @@
  ****  C A N A D I A N   A S T R O N O M Y   D A T A   C E N T R E  *****
  ************************************************************************
  */
+
 package ca.nrc.cadc.search.form;
 
 import java.util.ArrayList;
@@ -38,14 +39,15 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.TimeZone;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
 import org.junit.Before;
 import org.junit.Test;
 
 import ca.nrc.cadc.caom2.IntervalSearch;
 import ca.nrc.cadc.date.DateUtil;
-import ca.nrc.cadc.util.Log4jInit;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.config.Configurator;
 import ca.nrc.cadc.uws.Job;
 import ca.nrc.cadc.uws.Parameter;
 
@@ -53,48 +55,46 @@ import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 
-public class DateTest extends AbstractNumericFormConstraintTest<Date>
-{
+public class DateTest extends AbstractNumericFormConstraintTest<Date> {
+
     private static final String TIME_UTYPE = "Plane.time.bounds.samples";
     private static final String TIME_PRESET_UTYPE = "Plane.time.bounds.samples_PRESET";
 
-    public static final TimeZone UTC = TimeZone.getTimeZone("UTC");
-    public static final String START_DATE_STRING = "1977-11-25";
-    public static final String END_DATE_STRING = "2007-09-18";
+    private static final TimeZone UTC = TimeZone.getTimeZone("UTC");
+    private static final String START_DATE_STRING = "1977-11-25";
+    private static final String END_DATE_STRING = "2007-09-18";
 
-    public static final String START_DATETIME_STRING =
+    private static final String START_DATETIME_STRING =
             "1977-11-25 03:21:12.125";
-    public static final String END_DATETIME_STRING = "2007-09-18 01:51:12.125";
+    private static final String END_DATETIME_STRING = "2007-09-18 01:51:12.125";
 
-    public static final String IVOA_START_DATETIME_STRING =
+    private static final String IVOA_START_DATETIME_STRING =
             "1977-11-25T03:21:12.125";
-    public static final String IVOA_END_DATETIME_STRING =
+    private static final String IVOA_END_DATETIME_STRING =
             "2007-09-18T01:51:12.125";
 
     // 1977-11-25 03:21:12
-    public static final String START_JD_STRING = "2443472.6";
+    private static final String START_JD_STRING = "2443472.6";
     // 2007-09-18 01:51:12
-    public static final String END_JD_STRING = "2454361.6";
+    private static final String END_JD_STRING = "2454361.6";
 
-    public static final String START_MJD_STRING = "43472"; // 1977-11-25
-    public static final String END_MJD_STRING = "54361"; // 2007-09-18
+    private static final String START_MJD_STRING = "43472"; // 1977-11-25
+    private static final String END_MJD_STRING = "54361"; // 2007-09-18
 
-    public static Calendar startDateCal;
-    public static Calendar endDateCal;
+    private static Calendar startDateCal;
+    private static Calendar endDateCal;
 
-    public static Calendar startDateTimeCal;
-    public static Calendar endDateTimeCal;
+    private static Calendar startDateTimeCal;
+    private static Calendar endDateTimeCal;
 
-    private static Logger log = Logger.getLogger(DateTest.class);
+    private static Logger log = LogManager.getLogger(DateTest.class);
 
-    static
-    {
-        Log4jInit.setLevel("ca.nrc.cadc.search", Level.INFO);
+    static {
+        Configurator.setLevel("ca.nrc.cadc.search", Level.INFO);
     }
 
     @Before
-    public void before()
-    {
+    public void before() {
         startDateCal = Calendar.getInstance(DateUtil.UTC);
         startDateCal.clear();
         startDateCal.setTimeZone(UTC);
@@ -142,8 +142,7 @@ public class DateTest extends AbstractNumericFormConstraintTest<Date>
 
 
     @Test
-    public void isValid() throws Exception
-    {
+    public void isValid() {
         final Job mockJob = createMock(Job.class);
         final FormErrors formErrors = new FormErrors();
         final List<Parameter> parameters = new ArrayList<>();
@@ -161,8 +160,7 @@ public class DateTest extends AbstractNumericFormConstraintTest<Date>
     }
 
     @Test
-    public void searchDateAndDate() throws Exception
-    {
+    public void searchDateAndDate() {
         final Job mockJob = createMock(Job.class);
         final String query = START_DATE_STRING + ".." + END_DATE_STRING;
         final List<Parameter> parameters = new ArrayList<>();
@@ -196,8 +194,7 @@ public class DateTest extends AbstractNumericFormConstraintTest<Date>
     }
 
     @Test
-    public void searchDateTimeAndDate() throws Exception
-    {
+    public void searchDateTimeAndDate() {
         final Job mockJob = createMock(Job.class);
 
         final String queryOne = START_DATETIME_STRING + ".." + END_DATE_STRING;
@@ -256,12 +253,11 @@ public class DateTest extends AbstractNumericFormConstraintTest<Date>
     }
 
     @Test
-    public void searchDateAndDateTime() throws Exception
-    {
+    public void searchDateAndDateTime() {
         final Job mockJob = createMock(Job.class);
         final String queryOne = START_DATE_STRING + ".." + END_DATETIME_STRING;
         final String queryTwo = START_DATE_STRING + ".."
-                                + IVOA_END_DATETIME_STRING;
+                + IVOA_END_DATETIME_STRING;
 
         final List<Parameter> parameters = new ArrayList<>();
         parameters.add(new Parameter(TIME_UTYPE + Date.VALUE, queryOne));
@@ -316,17 +312,16 @@ public class DateTest extends AbstractNumericFormConstraintTest<Date>
     }
 
     @Test
-    public void searchDateTimeAndDateTime() throws Exception
-    {
+    public void searchDateTimeAndDateTime() {
         final Job mockJob = createMock(Job.class);
         final String queryOne = START_DATETIME_STRING + ".."
-                                + END_DATETIME_STRING;
+                + END_DATETIME_STRING;
         final String queryTwo = IVOA_START_DATETIME_STRING + ".."
-                                + END_DATETIME_STRING;
+                + END_DATETIME_STRING;
         final String queryThree = IVOA_START_DATETIME_STRING + ".."
-                                  + IVOA_END_DATETIME_STRING;
+                + IVOA_END_DATETIME_STRING;
         final String queryFour = START_DATETIME_STRING + ".."
-                                 + IVOA_END_DATETIME_STRING;
+                + IVOA_END_DATETIME_STRING;
 
         final List<Parameter> parameters = new ArrayList<>();
         parameters.add(new Parameter(TIME_UTYPE + Date.VALUE, queryOne));
@@ -414,8 +409,7 @@ public class DateTest extends AbstractNumericFormConstraintTest<Date>
     }
 
     @Test
-    public void searchDateAndJD() throws Exception
-    {
+    public void searchDateAndJD() {
         final Job mockJob = createMock(Job.class);
         final String query = START_DATE_STRING + ".." + END_JD_STRING;
         final List<Parameter> parameters = new ArrayList<>();
@@ -438,11 +432,10 @@ public class DateTest extends AbstractNumericFormConstraintTest<Date>
     }
 
     @Test
-    public void searchDateTimeAndJD() throws Exception
-    {
+    public void searchDateTimeAndJD() {
         final String queryOne = START_DATETIME_STRING + ".." + END_JD_STRING;
         final String queryTwo = IVOA_START_DATETIME_STRING + ".."
-                                + END_JD_STRING;
+                + END_JD_STRING;
 
         final Job mockJob = createMock(Job.class);
         final List<Parameter> parameters = new ArrayList<>();
@@ -487,8 +480,7 @@ public class DateTest extends AbstractNumericFormConstraintTest<Date>
     }
 
     @Test
-    public void searchSingleDate() throws Exception
-    {
+    public void searchSingleDate() {
         endDateCal.set(1977, Calendar.NOVEMBER, 25, 0, 0, 0);
         endDateCal.set(Calendar.MILLISECOND, 0);
         endDateCal.add(Calendar.HOUR, 24);
@@ -497,8 +489,7 @@ public class DateTest extends AbstractNumericFormConstraintTest<Date>
     }
 
     @Test
-    public void searchSingleDateTimeYear() throws Exception
-    {
+    public void searchSingleDateTimeYear() {
         final String query = "1977";
 
         final Job mockJob = createMock(Job.class);
@@ -537,8 +528,7 @@ public class DateTest extends AbstractNumericFormConstraintTest<Date>
 
 
     @Test
-    public void searchSingleDateTimeMonth() throws Exception
-    {
+    public void searchSingleDateTimeMonth() {
         final String query = "1977-11";
 
         final Job mockJob = createMock(Job.class);
@@ -576,8 +566,7 @@ public class DateTest extends AbstractNumericFormConstraintTest<Date>
     }
 
     @Test
-    public void searchSingleDateTimeDay() throws Exception
-    {
+    public void searchSingleDateTimeDay() {
         endDateCal.set(1977, Calendar.NOVEMBER, 25, 0, 0, 0);
         endDateCal.set(Calendar.MILLISECOND, 0);
         endDateCal.add(Calendar.HOUR, 24);
@@ -586,8 +575,7 @@ public class DateTest extends AbstractNumericFormConstraintTest<Date>
     }
 
     @Test
-    public void searchSingleDateTimeHour() throws Exception
-    {
+    public void searchSingleDateTimeHour() {
         final String query = START_DATE_STRING + " 01:00:00";
 
         final Job mockJob = createMock(Job.class);
@@ -616,8 +604,7 @@ public class DateTest extends AbstractNumericFormConstraintTest<Date>
     }
 
     @Test
-    public void searchSingleDateTimeMinute() throws Exception
-    {
+    public void searchSingleDateTimeMinute() {
         final String query = START_DATE_STRING + " 01:21:00";
 
         final Job mockJob = createMock(Job.class);
@@ -647,8 +634,7 @@ public class DateTest extends AbstractNumericFormConstraintTest<Date>
     }
 
     @Test
-    public void searchSingleDateTimeSecond() throws Exception
-    {
+    public void searchSingleDateTimeSecond() {
         final String query = START_DATE_STRING + " 01:21:12";
 
         final Job mockJob = createMock(Job.class);
@@ -679,8 +665,7 @@ public class DateTest extends AbstractNumericFormConstraintTest<Date>
     }
 
     @Test
-    public void searchDateAndMJD() throws Exception
-    {
+    public void searchDateAndMJD() {
         final String query = START_DATE_STRING + ".." + END_MJD_STRING;
 
         final Job mockJob = createMock(Job.class);
@@ -704,11 +689,10 @@ public class DateTest extends AbstractNumericFormConstraintTest<Date>
     }
 
     @Test
-    public void searchDateTimeAndMJD() throws Exception
-    {
+    public void searchDateTimeAndMJD() {
         final String queryOne = START_DATETIME_STRING + ".." + END_MJD_STRING;
         final String queryTwo = IVOA_START_DATETIME_STRING + ".."
-                                + END_MJD_STRING;
+                + END_MJD_STRING;
 
         final Job mockJob = createMock(Job.class);
         final List<Parameter> parameters = new ArrayList<>();
@@ -754,8 +738,7 @@ public class DateTest extends AbstractNumericFormConstraintTest<Date>
     }
 
     @Test
-    public void searchJDAndDate() throws Exception
-    {
+    public void searchJDAndDate() {
         final Calendar endCal = Calendar.getInstance(DateUtil.UTC);
         final String query = START_JD_STRING + ".." + END_DATE_STRING;
 
@@ -791,11 +774,10 @@ public class DateTest extends AbstractNumericFormConstraintTest<Date>
     }
 
     @Test
-    public void searchJDAndDateTime() throws Exception
-    {
+    public void searchJDAndDateTime() {
         final String queryOne = START_JD_STRING + ".." + END_DATETIME_STRING;
         final String queryTwo = START_JD_STRING + ".."
-                                + IVOA_END_DATETIME_STRING;
+                + IVOA_END_DATETIME_STRING;
 
         final Job mockJob = createMock(Job.class);
         final List<Parameter> parameters = new ArrayList<>();
@@ -841,20 +823,17 @@ public class DateTest extends AbstractNumericFormConstraintTest<Date>
     }
 
     @Test
-    public void searchJDAndJD() throws Exception
-    {
+    public void searchJDAndJD() {
         verifyDateTest(START_JD_STRING + ".." + END_JD_STRING);
     }
 
     @Test
-    public void searchJDAndMJD() throws Exception
-    {
+    public void searchJDAndMJD() {
         verifyDateTest(START_JD_STRING + ".." + END_MJD_STRING);
     }
 
     @Test
-    public void searchMJDAndDate() throws Exception
-    {
+    public void searchMJDAndDate() {
         final String query = START_MJD_STRING + ".." + END_DATE_STRING;
         final Calendar endCal = Calendar.getInstance(DateUtil.UTC);
 
@@ -888,11 +867,10 @@ public class DateTest extends AbstractNumericFormConstraintTest<Date>
     }
 
     @Test
-    public void searchMJDAndDateTime() throws Exception
-    {
+    public void searchMJDAndDateTime() {
         final String queryOne = START_MJD_STRING + ".." + END_DATETIME_STRING;
         final String queryTwo = START_MJD_STRING + ".."
-                                + IVOA_END_DATETIME_STRING;
+                + IVOA_END_DATETIME_STRING;
 
         final Job mockJob = createMock(Job.class);
         final List<Parameter> parameters = new ArrayList<>();
@@ -938,19 +916,16 @@ public class DateTest extends AbstractNumericFormConstraintTest<Date>
     }
 
     @Test
-    public void searchMJDAndJD() throws Exception
-    {
+    public void searchMJDAndJD() {
         verifyDateTest(START_MJD_STRING + ".." + END_JD_STRING);
     }
 
     @Test
-    public void searchMJDAndMJD() throws Exception
-    {
+    public void searchMJDAndMJD() {
         verifyDateTest(START_MJD_STRING + ".." + END_MJD_STRING);
     }
 
-    private void verifyDateTest(final String query)
-    {
+    private void verifyDateTest(final String query) {
         final Job mockJob = createMock(Job.class);
         final List<Parameter> parameters = new ArrayList<>();
         parameters.add(new Parameter(TIME_UTYPE + Date.VALUE, query));
@@ -971,8 +946,7 @@ public class DateTest extends AbstractNumericFormConstraintTest<Date>
     }
 
     @Test
-    public void searchPreset() throws Exception
-    {
+    public void searchPreset() {
         final Job mockJob = createMock(Job.class);
         final FormErrors formErrors = new FormErrors();
         final List<Parameter> parameters = new ArrayList<>();
@@ -995,8 +969,7 @@ public class DateTest extends AbstractNumericFormConstraintTest<Date>
     }
 
     @Test
-    public void calculatePast24HourValue() throws Exception
-    {
+    public void calculatePast24HourValue() {
         final Calendar cal = Calendar.getInstance(DateUtil.UTC);
         cal.set(1977, Calendar.NOVEMBER, 25, 3, 12, 0);
         cal.set(Calendar.MILLISECOND, 0);
@@ -1010,8 +983,7 @@ public class DateTest extends AbstractNumericFormConstraintTest<Date>
     }
 
     @Test
-    public void calculatePastWeekValue() throws Exception
-    {
+    public void calculatePastWeekValue() {
         final Calendar cal = Calendar.getInstance(DateUtil.UTC);
         cal.set(1977, Calendar.NOVEMBER, 25, 3, 12, 0);
         cal.set(Calendar.MILLISECOND, 0);
@@ -1037,8 +1009,7 @@ public class DateTest extends AbstractNumericFormConstraintTest<Date>
     }
 
     @Test
-    public void calculatePastMonthValue() throws Exception
-    {
+    public void calculatePastMonthValue() {
         final Calendar cal = Calendar.getInstance(DateUtil.UTC);
         cal.set(1977, Calendar.NOVEMBER, 25, 3, 12, 0);
         cal.set(Calendar.MILLISECOND, 0);
@@ -1052,8 +1023,7 @@ public class DateTest extends AbstractNumericFormConstraintTest<Date>
     }
 
     @Test
-    public void getUtype() throws Exception
-    {
+    public void getUtype() {
         final Job mockJob = createMock(Job.class);
         final FormErrors formErrors = new FormErrors();
         final List<Parameter> parameters = new ArrayList<>();
@@ -1073,8 +1043,7 @@ public class DateTest extends AbstractNumericFormConstraintTest<Date>
     }
 
     @Test
-    public void getFormValueUnit() throws Exception
-    {
+    public void getFormValueUnit() {
         Job mockJob = createMock(Job.class);
         FormErrors formErrors = new FormErrors();
         List<Parameter> parameters = new ArrayList<>();
@@ -1110,8 +1079,7 @@ public class DateTest extends AbstractNumericFormConstraintTest<Date>
     }
 
     @Test
-    public void testBuildSearches() throws Exception
-    {
+    public void testBuildSearches() {
         log.debug("testBuildSearches()...");
         String formValue;
         Double expectedLower;
@@ -1144,8 +1112,7 @@ public class DateTest extends AbstractNumericFormConstraintTest<Date>
 
     private void testBuildSearch(final String formValue,
                                  final Double expectedLower,
-                                 final Double expectedUpper)
-    {
+                                 final Double expectedUpper) {
         final Calendar cal = Calendar.getInstance(DateUtil.UTC);
         cal.set(1977, Calendar.NOVEMBER, 25, 3, 12, 0);
         cal.set(Calendar.MILLISECOND, 0);
@@ -1154,40 +1121,31 @@ public class DateTest extends AbstractNumericFormConstraintTest<Date>
         final Date date = new Date(formValue, TIME_UTYPE, cal.getTime());
 
         if ((expectedLower != null) && (expectedUpper != null)
-            && (expectedLower > expectedUpper))
-        {
+                && (expectedLower > expectedUpper)) {
             date.setLowerNumber(expectedLower);
             date.setUpperNumber(expectedUpper);
-        }
-        else
-        {
+        } else {
             final boolean valid = date.isValid(new FormErrors());
 
             log.debug("formValue[" + formValue + "] " + date + " valid: "
-                      + valid);
+                              + valid);
             assertTrue("Validation failed.", valid);
         }
 
-        if (expectedLower == null)
-        {
+        if (expectedLower == null) {
             date.setLowerNumber(null);
         }
 
-        if (expectedUpper == null)
-        {
+        if (expectedUpper == null) {
             date.setUpperNumber(null);
         }
 
         IntervalSearch template = (IntervalSearch) date.buildSearch(errorList);
         if ((expectedLower != null) && (expectedUpper != null) && (expectedLower
-                                                                   > expectedUpper))
-        {
+                > expectedUpper)) {
             assertNull("Expected template to be null.", template);
-        }
-        else
-        {
-            if ((expectedLower == null) && (expectedUpper == null))
-            {
+        } else {
+            if ((expectedLower == null) && (expectedUpper == null)) {
                 Double value = Double.parseDouble(date.getFormValue());
                 assertEquals("Expected lower value is " + date.getFormValue(),
                              value, template.getLower());
@@ -1195,9 +1153,7 @@ public class DateTest extends AbstractNumericFormConstraintTest<Date>
                              value, template.getUpper());
                 assertEquals("Expected errorList to be empty.", 0,
                              errorList.size());
-            }
-            else
-            {
+            } else {
                 assertEquals("Expected lower value is " + expectedLower,
                              expectedLower, template.getLower());
                 assertEquals("Expected upper value is " + expectedUpper,

@@ -37,7 +37,6 @@ import java.util.List;
 import ca.nrc.cadc.caom2.types.*;
 import ca.nrc.cadc.search.parser.AbstractPositionParser;
 import ca.nrc.cadc.search.parser.resolver.ResolverImpl;
-import org.apache.log4j.Logger;
 
 import ca.nrc.cadc.caom2.SearchTemplate;
 import ca.nrc.cadc.caom2.SpatialSearch;
@@ -58,6 +57,9 @@ import java.awt.geom.Point2D;
 
 import jsky.coords.wcscon;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 
 /**
  * Class to represent a Shape1 form component.
@@ -66,7 +68,7 @@ import jsky.coords.wcscon;
  */
 public class Shape1 extends AbstractFormConstraint implements SearchableFormConstraint {
 
-    private static Logger log = Logger.getLogger(Shape1.class);
+    private static Logger log = LogManager.getLogger(Shape1.class);
 
     // Constants used to construct name for form elements
     public static final String NAME = "@Shape1";

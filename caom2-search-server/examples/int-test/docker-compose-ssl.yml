@@ -4,11 +4,12 @@ services:
     hostname: proxy.cadc.dao.nrc.ca
     image: nginx:alpine
     ports:
-      - '80:80'
+      - '443:443'
     networks:
       - 'caom2search'
     volumes:
-      - './default.conf:/etc/nginx/conf.d/default.conf'
+      - 'server_certs:/usr/share/nginx/certs'
+      - './default-ssl.conf:/etc/nginx/conf.d/default.conf'
     depends_on:
       - search.cadc.dao.nrc.ca
       - caom2-meta-ui.cadc.dao.nrc.ca
@@ -44,3 +45,7 @@ services:
 # Create the network 'caom2search' for which this system will run within.
 networks:
   caom2search:
+
+volumes:
+  server_certs:
+    external: true

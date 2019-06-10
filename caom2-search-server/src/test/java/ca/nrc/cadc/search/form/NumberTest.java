@@ -31,18 +31,18 @@
  ****  C A N A D I A N   A S T R O N O M Y   D A T A   C E N T R E  *****
  ************************************************************************
  */
+
 package ca.nrc.cadc.search.form;
 
 import ca.nrc.cadc.caom2.NumericSearch;
-import ca.nrc.cadc.util.Log4jInit;
+
 import ca.nrc.cadc.util.StringUtil;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
 
 import ca.nrc.cadc.uws.Job;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -51,19 +51,20 @@ import java.util.List;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.config.Configurator;
 
-public class NumberTest extends AbstractNumericFormConstraintTest<Number>
-{
-    private static Logger log = Logger.getLogger(NumberTest.class);
 
-    static
-    {
-        Log4jInit.setLevel("ca.nrc.cadc.search", Level.INFO);
+public class NumberTest extends AbstractNumericFormConstraintTest<Number> {
+
+    private static Logger log = LogManager.getLogger(NumberTest.class);
+
+    static {
+        Configurator.setLevel("ca.nrc.cadc.search", Level.INFO);
     }
 
     @Test
-    public void isValid() throws Exception
-    {
+    public void isValid() {
         final Number number = new Number("BOGUS", "Plane.position.sampleSize");
         final Job mockJob = createMock(Job.class);
         reset(mockJob);
@@ -81,8 +82,7 @@ public class NumberTest extends AbstractNumericFormConstraintTest<Number>
     }
 
     @Test
-    public void isValidSingleNumber() throws Exception
-    {
+    public void isValidSingleNumber() {
         setTestSubject(new Number("88.0", "Plane.time.exposure"));
 
         final boolean success1 = getTestSubject().isValid(new FormErrors());
@@ -101,10 +101,8 @@ public class NumberTest extends AbstractNumericFormConstraintTest<Number>
     }
 
     @Test
-    public void swapTrueValuesIfNecessary() throws Exception
-    {
-        setTestSubject(new Number("UTYPE")
-        {
+    public void swapTrueValuesIfNecessary() {
+        setTestSubject(new Number("UTYPE") {
             /**
              * Number is valid if the Number lower and upper values
              * have been successfully validated.
@@ -112,8 +110,7 @@ public class NumberTest extends AbstractNumericFormConstraintTest<Number>
              * @return boolean true if form values are valid, false otherwise.
              */
             @Override
-            public boolean isValid(FormErrors formErrors)
-            {
+            public boolean isValid(FormErrors formErrors) {
                 setLowerNumber(2.3);
                 setUpperNumber(4.9);
 
@@ -132,8 +129,7 @@ public class NumberTest extends AbstractNumericFormConstraintTest<Number>
 
         // TEST 2
 
-        setTestSubject(new Number("UTYPE")
-        {
+        setTestSubject(new Number("UTYPE") {
             /**
              * Number is valid if the Number lower and upper values
              * have been successfully validated.
@@ -141,8 +137,7 @@ public class NumberTest extends AbstractNumericFormConstraintTest<Number>
              * @return boolean true if form values are valid, false otherwise.
              */
             @Override
-            public boolean isValid(final FormErrors formErrors)
-            {
+            public boolean isValid(final FormErrors formErrors) {
                 setLowerNumber(0.258);
                 setUpperNumber(0.005484);
 
@@ -160,10 +155,8 @@ public class NumberTest extends AbstractNumericFormConstraintTest<Number>
     }
 
     @Test
-    public void testEnergyRange()
-    {
-        setTestSubject(new Number("UTYPE")
-        {
+    public void testEnergyRange() {
+        setTestSubject(new Number("UTYPE") {
             /**
              * Number is valid if the Number lower and upper values
              * have been successfully validated.
@@ -171,8 +164,7 @@ public class NumberTest extends AbstractNumericFormConstraintTest<Number>
              * @return boolean true if form values are valid, false otherwise.
              */
             @Override
-            public boolean isValid(FormErrors formErrors)
-            {
+            public boolean isValid(FormErrors formErrors) {
                 setLowerNumber(2.3);
                 setUpperNumber(4.9);
 
@@ -191,12 +183,9 @@ public class NumberTest extends AbstractNumericFormConstraintTest<Number>
 
     /**
      * Test of isValid method, of class Number.
-     *
-     * @throws Exception Any exception.
      */
     @Test
-    public void testIsValidEnergy() throws Exception
-    {
+    public void testIsValidEnergy() {
         String utype = "Plane.energy.bounds.samples";
         String formValue;
         Double expectedLower;
@@ -310,12 +299,9 @@ public class NumberTest extends AbstractNumericFormConstraintTest<Number>
 
     /**
      * Test of isValid method, of class Number.
-     *
-     * @throws Exception Any exception
      */
     @Test
-    public void testIsValidTime() throws Exception
-    {
+    public void testIsValidTime() {
         log.debug("testIsValidTime()...");
         String utype = "Plane.time.exposure";
         String formValue;
@@ -419,13 +405,12 @@ public class NumberTest extends AbstractNumericFormConstraintTest<Number>
                             final Double expectedLower,
                             final Double expectedUpper,
                             final String expectedUnit,
-                            final String formValueUnit)
-    {
+                            final String formValueUnit) {
         final Number number = new Number(formValue, utype);
         final boolean valid = number.isValid(new FormErrors());
 
         log.debug("formValue[" + formValue + "] " + number + " valid: "
-                  + valid);
+                          + valid);
 
         assertTrue("Validation failed.", valid);
         assertEquals("Expected lower value is " + expectedLower,
@@ -435,15 +420,12 @@ public class NumberTest extends AbstractNumericFormConstraintTest<Number>
         assertEquals("Expected unit is " + expectedUnit,
                      expectedUnit, number.getUnit());
 
-        if (formValueUnit == null)
-        {
+        if (formValueUnit == null) {
             assertFalse(String.format(
                     "FormValueUnit should be null or empty, but was '%s'",
                     number.getFormValueUnit()),
                         StringUtil.hasLength(number.getFormValueUnit()));
-        }
-        else
-        {
+        } else {
             assertEquals(String.format("FormValueUnit should be %s, but was %s",
                                        formValueUnit,
                                        number.getFormValueUnit()),
@@ -452,8 +434,7 @@ public class NumberTest extends AbstractNumericFormConstraintTest<Number>
     }
 
     @Test
-    public void testBuildSearches() throws Exception
-    {
+    public void testBuildSearches() {
         log.debug("testBuildSearches()...");
         String utype = "Plane.time.exposure";
         String formValue;
@@ -496,45 +477,38 @@ public class NumberTest extends AbstractNumericFormConstraintTest<Number>
         testBuildSearch(utype, formValue, expectedLower, expectedUpper);
 
         log.debug("testBuildSearches() passed.");
-      
+
     }
-    
+
     private void testBuildSearch(final String utype, final String formValue,
-                                 final Double expectedLower, final Double expectedUpper)
-    {
-        List<FormError> errorList = new ArrayList<FormError>();
+                                 final Double expectedLower, final Double expectedUpper) {
+        final List<FormError> errorList = new ArrayList<>();
         final Number number = new Number(formValue, utype);
         final boolean valid = number.isValid(new FormErrors());
 
         log.debug("formValue[" + formValue + "] " + number + " valid: " + valid);
         assertTrue("Validation failed.", valid);
-        
-        number.setLowerNumber(expectedLower);        
-        number.setUpperNumber(expectedUpper);        
+
+        number.setLowerNumber(expectedLower);
+        number.setUpperNumber(expectedUpper);
         NumericSearch template = (NumericSearch) number.buildSearch(errorList);
-        if (StringUtil.hasText(formValue))
-        {
-            if ((expectedLower == null) && (expectedUpper == null))
-            {
+        if (StringUtil.hasText(formValue)) {
+            if ((expectedLower == null) && (expectedUpper == null)) {
                 Double value = Double.parseDouble(number.getFormValue());
                 assertEquals("Expected lower value is " + number.getFormValue(),
-                        value, template.lower);
+                             value, template.lower);
                 assertEquals("Expected upper value is " + number.getFormValue(),
-                        value, template.upper);
-                assertEquals("Expected errorList to be empty.", 0, errorList.size() );
-            }
-            else
-            {
+                             value, template.upper);
+                assertEquals("Expected errorList to be empty.", 0, errorList.size());
+            } else {
                 assertEquals("Expected lower value is " + expectedLower,
-                        expectedLower, template.lower);
+                             expectedLower, template.lower);
                 assertEquals("Expected upper value is " + expectedUpper,
-                        expectedUpper, template.upper);
-                assertEquals("Expected errorList to be empty.", 0, errorList.size() );        
+                             expectedUpper, template.upper);
+                assertEquals("Expected errorList to be empty.", 0, errorList.size());
             }
-        }
-        else
-        {
+        } else {
             assertNull("Expected template to be null.", template);
-        }        
+        }
     }
 }

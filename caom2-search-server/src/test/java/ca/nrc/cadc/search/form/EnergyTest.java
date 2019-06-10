@@ -9,39 +9,37 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ca.nrc.cadc.caom2.IntervalSearch;
-import ca.nrc.cadc.util.Log4jInit;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import org.apache.logging.log4j.core.config.Configurator;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
+
 /**
  * @author jburke
  */
-public class EnergyTest
-{
-    private static final String ENERGY_FIELD = "Plane.energy.bounds.samples";
-    private static Logger log = Logger.getLogger(EnergyTest.class);
+public class EnergyTest {
 
-    static
-    {
-        Log4jInit.setLevel("ca.nrc.cadc.search", Level.INFO);
+    private static final String ENERGY_FIELD = "Plane.energy.bounds.samples";
+    private static Logger log = LogManager.getLogger(EnergyTest.class);
+
+    static {
+        Configurator.setLevel("ca.nrc.cadc.search", Level.INFO);
     }
 
-    public EnergyTest()
-    {
+    public EnergyTest() {
     }
 
     /**
      * Test of isValid method, of class Energy.
-     *
-     * @throws Exception For a valid exception.
      */
     @Test
-    public void testIsValid() throws Exception
-    {
+    public void testIsValid() {
         log.debug("testIsValid()...");
 
         FormErrors formErrors = new FormErrors();
@@ -173,8 +171,7 @@ public class EnergyTest
     }
 
     @Test
-    public void testBuildSearches() throws Exception
-    {
+    public void testBuildSearches() {
         log.debug("testBuildSearches()...");
 
         String utype = ENERGY_FIELD;
@@ -212,19 +209,15 @@ public class EnergyTest
     }
 
     private void testBuildSearch(final String utype, final String formValue,
-                                 final Double expectedLower, final Double expectedUpper)
-    {
+                                 final Double expectedLower, final Double expectedUpper) {
         List<FormError> errorList = new ArrayList<>();
         final Energy energy = new Energy(formValue, utype);
 
         if ((expectedLower != null) && (expectedUpper != null)
-            && (expectedLower > expectedUpper))
-        {
+                && (expectedLower > expectedUpper)) {
             energy.setLowerNumber(expectedLower);
             energy.setUpperNumber(expectedUpper);
-        }
-        else
-        {
+        } else {
             final boolean valid = energy.isValid(new FormErrors());
 
             log.debug("formValue[" + formValue + "] " + energy + " valid: " + valid);
@@ -234,12 +227,9 @@ public class EnergyTest
         IntervalSearch template = (IntervalSearch) energy
                 .buildSearch(errorList);
         if ((expectedLower != null) && (expectedUpper != null)
-            && (expectedLower > expectedUpper))
-        {
+                && (expectedLower > expectedUpper)) {
             assertNull("Expected template to be null.", template);
-        }
-        else
-        {
+        } else {
             assertEquals("Expected lower value is " + expectedLower,
                          expectedLower, template.getLower());
             assertEquals("Expected upper value is " + expectedUpper,
@@ -250,8 +240,7 @@ public class EnergyTest
     }
 
     @Test
-    public void testUseMeter() throws Exception
-    {
+    public void testUseMeter() {
         log.debug("testUseMeter()...");
 
         String utype = ENERGY_FIELD;

@@ -3,7 +3,7 @@
  *******************  CANADIAN ASTRONOMY DATA CENTRE  *******************
  **************  CENTRE CANADIEN DE DONN√âES ASTRONOMIQUES  **************
  *
- *  (c) 2009.                            (c) 2009.
+ *  (c) 2019.                            (c) 2019.
  *  Government of Canada                 Gouvernement du Canada
  *  National Research Council            Conseil national de recherches
  *  Ottawa, Canada, K1A 0R6              Ottawa, Canada, K1A 0R6
@@ -64,7 +64,8 @@ import java.net.URI;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -77,7 +78,7 @@ public class AdvancedRunner implements JobRunner {
     private static final String ALT_TAP_SERVICE_URI_PROPERTY_KEY = "org.opencadc.search.maq-tap-service-id";
     static final URI DEFAULT_TAP_SERVICE_URI = URI.create("ivo://cadc.nrc.ca/tap");
     static final URI ALTERNATE_TAP_SERVICE_URI = URI.create("ivo://cadc.nrc.ca/sc2tap");
-    private static final Logger LOGGER = Logger.getLogger(AdvancedRunner.class);
+    private static final Logger LOGGER = LogManager.getLogger(AdvancedRunner.class);
     private final ApplicationConfiguration applicationConfiguration;
 
 

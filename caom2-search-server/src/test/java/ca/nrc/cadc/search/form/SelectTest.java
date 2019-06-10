@@ -31,18 +31,19 @@
  ****  C A N A D I A N   A S T R O N O M Y   D A T A   C E N T R E  *****
  ************************************************************************
  */
+
 package ca.nrc.cadc.search.form;
 
 import ca.nrc.cadc.caom2.InList;
 import ca.nrc.cadc.caom2.IsNull;
 import ca.nrc.cadc.caom2.SearchTemplate;
 import ca.nrc.cadc.caom2.TextSearch;
-import ca.nrc.cadc.util.Log4jInit;
-import org.apache.log4j.Level;
+import org.apache.logging.log4j.Level;
 import ca.nrc.cadc.uws.Job;
 import ca.nrc.cadc.uws.Parameter;
 
 import org.junit.Test;
+import org.apache.logging.log4j.core.config.Configurator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,26 +51,23 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 
-public class SelectTest
-{
-    static
-    {
-        Log4jInit.setLevel("ca.nrc.cadc.search", Level.INFO);
+public class SelectTest {
+
+    static {
+        Configurator.setLevel("ca.nrc.cadc.search", Level.INFO);
     }
-    
+
     @Test
-    public void testConstruction() throws Exception
-    {
+    public void testConstruction() {
         // case1: null job, null selectedValues, hidden
         String[] selectedValues = {"someValue"};
-        
+
         Select select = new Select(null, Select.UTYPE, selectedValues, true);
         assertTrue("hidden should be true", select.hidden);
         assertTrue("isHidden() should return true", select.isHidden());
         assertNull("getSelected() should return null", select.getSelected());
-        assertTrue("selectedValues should be non-empty", 
-                   select.getSelectedValues().length == 1);
-        assertTrue("getSelectedValues() should return non-empty list", select.getSelectedValues().length == 1);
+        assertEquals("selectedValues should be non-empty", 1, select.getSelectedValues().length);
+        assertEquals("getSelectedValues() should return non-empty list", 1, select.getSelectedValues().length);
         assertFalse("Should not have any data", select.hasData());
         List<String> selected = new ArrayList<>();
         selected.add("aValue");
@@ -86,15 +84,15 @@ public class SelectTest
         assertNull("selectedValues should be null", select.getSelectedValues());
         assertNull("getSelectedValues() should return non-empty list", select.getSelectedValues());
         assertFalse("Should not have any data", select.hasData());
-        
+
         // case 3: empty job parameter, null selectedValues, not hidden
         Job job = new Job();
         select = new Select(job, Select.UTYPE, null, false);
         assertFalse("hidden should be false", select.hidden);
         assertFalse("isHidden() should return false", select.isHidden());
         assertNull("getSelected() should return null", select.getSelected());
-        assertTrue("selectedValues should be empty", select.getSelectedValues().length == 0);
-        assertTrue("getSelectedValues() should return null", select.getSelectedValues().length == 0);
+        assertEquals("selectedValues should be empty", 0, select.getSelectedValues().length);
+        assertEquals("getSelectedValues() should return null", 0, select.getSelectedValues().length);
         assertFalse("Should not have any data", select.hasData());
 
         // case 4: non-empty job parameter, null selected values
@@ -104,14 +102,13 @@ public class SelectTest
         job.setParameterList(parameterList);
         select = new Select(job, Select.UTYPE, selectedValues, false);
         assertNull("getSelected() should return null", select.getSelected());
-        assertTrue("selectedValues should be non-empty", select.getSelectedValues().length == 1);
-        assertTrue("getSelectedValues() should return non-empty", select.getSelectedValues().length == 1);
+        assertEquals("selectedValues should be non-empty", 1, select.getSelectedValues().length);
+        assertEquals("getSelectedValues() should return non-empty", 1, select.getSelectedValues().length);
         assertFalse("Should not have any data", select.hasData());
     }
-    
+
     @Test
-    public void testToString() throws Exception
-    {
+    public void testToString() {
         List<Parameter> parameterList = new ArrayList<>();
         parameterList.add(new Parameter(Select.UTYPE + Select.NAME, "value1"));
         Job job = new Job();
@@ -137,26 +134,25 @@ public class SelectTest
         expectedString = "Selected[ @Select.utype,  ]";
         assertEquals("toString() returns incorrect value", expectedString, selectString);
     }
-    
+
     @Test
-    public void isValid() throws Exception
-    {
+    public void isValid() {
         FormErrors formErrors = new FormErrors();
 
         // case 1: empty selectedValues
         String[] selectedValues = {};
         Select select = new Select(null, Select.UTYPE, selectedValues, false);
         assertFalse("isValid() should return false", select.isValid(formErrors));
-        
+
         // case 2: non-empty selectedValues, but no element is the array
         selectedValues = new String[1];
         select = new Select(null, Select.UTYPE, selectedValues, false);
-        assertTrue("isValid() should return true", select.isValid(formErrors));       
-        
+        assertTrue("isValid() should return true", select.isValid(formErrors));
+
         // case 3: null selectedValues
         select = new Select(null, Select.UTYPE, null, false);
         assertFalse("isValid() should return false", select.isValid(formErrors));
-        
+
         // case 4: selectedValues is not empty
         selectedValues = new String[1];
         selectedValues[0] = "value1";
@@ -165,7 +161,7 @@ public class SelectTest
         String actualValue = select.getSelected().toArray(new String[0])[0];
         assertEquals("getSelected() should contain the value1", actualValue,
                      selectedValues[0]);
-        
+
         // case 5: selectedValues is not empty, selected is not empty
         List<String> selected = new ArrayList<>();
         selected.add("value0");
@@ -177,41 +173,40 @@ public class SelectTest
         actualValue = actualValues[1];
         assertEquals("getSelected() should contain the value1", "value1", actualValue);
     }
-    
+
     @Test
-    public void testBuildSearch() throws Exception
-    {
+    public void testBuildSearch() {
         // Note: In AbstractScalarFormConstraint.buildScalarSearch(), 
         //       when list.size() == 1 and value not equal to "null"
         //       TextSearch() is instantiated. Although TextSearch() can throw an
         //       IllegalArgumentException, the constructor being used will not
         //       throw an IllegalArgumentException. Hence codes in catch block are not tested.
-        
+
         List<FormError> errorList = new ArrayList<>();
         String[] selectedValues = {};
-        
+
         // case 1: selected == null
         Select select = new Select(null, Select.UTYPE, selectedValues, false);
-        assertNull("SearchTemplate should be null", select.buildSearch(errorList));        
-        
+        assertNull("SearchTemplate should be null", select.buildSearch(errorList));
+
         // case 2: selected is empty
         List<String> selected = new ArrayList<>();
         select.setSelected(selected);
-        assertNull("SearchTemplate should be null", select.buildSearch(errorList));    
-        
+        assertNull("SearchTemplate should be null", select.buildSearch(errorList));
+
         // case 3: selected has one null element
         selected.add("null");
         select.setSelected(selected);
         SearchTemplate searchTemplate = select.buildSearch(errorList);
         assertTrue("Should be an IsNull instance", searchTemplate instanceof IsNull);
-        
+
         // case 4: selected has one non-null element
         selected = new ArrayList<>();
         selected.add("value1");
         select.setSelected(selected);
         searchTemplate = select.buildSearch(errorList);
         assertTrue("Should be an TextSearch instance", searchTemplate instanceof TextSearch);
-        
+
         // case 5: selected has more than one element
         selected = new ArrayList<>();
         selected.add("value1");
@@ -221,7 +216,7 @@ public class SelectTest
         assertTrue("Should be an InList instance", searchTemplate instanceof InList);
         InList inList = (InList) searchTemplate;
         String[] inListValues = inList.getValues().toArray(new String[0]);
-        assertTrue("SearchTemplate should have one element", inListValues.length == 2);
+        assertEquals("SearchTemplate should have one element", 2, inListValues.length);
         assertEquals("Should be 'value1'", "value1", inListValues[0]);
         assertEquals("Should be 'value1'", "value2", inListValues[1]);
     }
