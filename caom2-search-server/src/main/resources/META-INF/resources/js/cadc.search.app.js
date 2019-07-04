@@ -17,7 +17,8 @@
               autocompleteEndpoint: '/search/unitconversion',
               validatorEndpoint: '/search/validate',
               previewsEndpoint: '/search/preview',
-              searchEndpoint: '/search/find'
+              searchEndpoint: '/search/find',
+              showObscoreTab: true
             },
             services: {},
             field_ignore: [
@@ -729,19 +730,19 @@
      * @private
      */
     this._initializeForms = function (caomConfiguration, obsCoreConfiguration) {
+      // Start setting up caomSearchForm
+      // obsCoreSearchForm is set up near the end of this function
+
       var caomSearchForm = new ca.nrc.cadc.search.SearchForm(
-        'queryForm',
-        false,
-        caomConfiguration
-      )
-      var obsCoreSearchForm = new ca.nrc.cadc.search.SearchForm(
-        'obscoreQueryForm',
-        false,
-        obsCoreConfiguration
+          'queryForm',
+          false,
+          caomConfiguration
       )
 
+      // Disable the forms to begin with.
+      caomSearchForm.disable()
+
       this._setCAOMSearchForm(caomSearchForm)
-      this._setObsCoreSearchForm(obsCoreSearchForm)
 
       jQuery.fn.exists = function () {
         return this.length > 0
@@ -749,10 +750,6 @@
 
       // Used to send arrays of values as a parameter to a GET request.
       jQuery.ajaxSettings.traditional = true
-
-      // Disable the forms to begin with.
-      caomSearchForm.disable()
-      obsCoreSearchForm.disable()
 
       // Trap the backspace key to prevent it going 'Back' when not using it to
       // delete characters.                                      tabContainer
@@ -775,10 +772,6 @@
       }
 
       caomSearchForm.subscribe(ca.nrc.cadc.search.events.onCancel, onFormCancel)
-      obsCoreSearchForm.subscribe(
-        ca.nrc.cadc.search.events.onCancel,
-        onFormCancel
-      )
 
       var onFormSubmitComplete = function (eventData, args) {
         if (args.success) {
@@ -793,12 +786,8 @@
       }.bind(this)
 
       caomSearchForm.subscribe(
-        ca.nrc.cadc.search.events.onSubmitComplete,
-        onFormSubmitComplete
-      )
-      obsCoreSearchForm.subscribe(
-        ca.nrc.cadc.search.events.onSubmitComplete,
-        onFormSubmitComplete
+          ca.nrc.cadc.search.events.onSubmitComplete,
+          onFormSubmitComplete
       )
 
       /**
@@ -1038,10 +1027,8 @@
               var columnID = args.column.id
               var filterValue = viewer.getColumnFilters()[columnID]
 
-              this.processFilterValue(filterValue, args, function (
-                  breakdownPureFilterValue,
-                  breakdownDisplayFilterValue
-              ) {
+              this.processFilterValue(filterValue, args, function (breakdownPureFilterValue,
+                                                                   breakdownDisplayFilterValue) {
                 $(args.column).data('pureFilterValue', breakdownPureFilterValue)
 
                 viewer.setColumnFilter(columnID, breakdownDisplayFilterValue)
@@ -1065,7 +1052,7 @@
             ) {
               var $nextRow = resultsVOTV.getRow(selectedRows[arrIndex])
               var $nextPlaneURI =
-                  $nextRow['caom2:Plane.publisherID.downloadable']
+                      $nextRow['caom2:Plane.publisherID.downloadable']
 
               var $input = $('<input>')
               $input.prop('type', 'hidden')
@@ -1079,9 +1066,9 @@
             // Story 1566, when all 'Product Types'
             // checkboxes are checked, do not send any
             var allChecked =
-                downloadForm
-                    .find('input.product_type_option_flag')
-                    .not(':checked').length === 0
+                    downloadForm
+                        .find('input.product_type_option_flag')
+                        .not(':checked').length === 0
             if (allChecked) {
               // disable all 'Product Types' checkboxes
               $.each(
@@ -1142,26 +1129,19 @@
       }.bind(this)
 
       caomSearchForm.subscribe(ca.nrc.cadc.search.events.onValid, onFormValid)
-      obsCoreSearchForm.subscribe(
-        ca.nrc.cadc.search.events.onValid,
-        onFormValid
-      )
+
 
       var onFormInvalid = function (event, args) {
         alert(
-          'Please enter at least one value to search on. (' +
-          args.cadcForm.getName() +
-          ')'
+            'Please enter at least one value to search on. (' +
+            args.cadcForm.getName() +
+            ')'
         )
       }
 
       caomSearchForm.subscribe(
-        ca.nrc.cadc.search.events.onInvalid,
-        onFormInvalid
-      )
-      obsCoreSearchForm.subscribe(
-        ca.nrc.cadc.search.events.onInvalid,
-        onFormInvalid
+          ca.nrc.cadc.search.events.onInvalid,
+          onFormInvalid
       )
 
       $(':reset').click(
@@ -1176,7 +1156,46 @@
         }.bind(this)
       )
 
-      // End form setup.
+      // End caom2 search form setup.
+
+      // Start obscore search form setup.
+      // If the tab is not going to be shown, there's no need to set up
+      // the form
+      var obsCoreSearchForm = null
+
+      if (this.options.showObscoreTab === true) {
+        obsCoreSearchForm = new ca.nrc.cadc.search.SearchForm(
+            'obscoreQueryForm',
+            false,
+            obsCoreConfiguration
+        )
+
+        // Disable the forms to begin with.
+        obsCoreSearchForm.disable()
+        obsCoreSearchForm.subscribe(
+            ca.nrc.cadc.search.events.onCancel,
+            onFormCancel
+        )
+
+        obsCoreSearchForm.subscribe(
+            ca.nrc.cadc.search.events.onSubmitComplete,
+            onFormSubmitComplete
+        )
+
+        obsCoreSearchForm.subscribe(
+            ca.nrc.cadc.search.events.onValid,
+            onFormValid
+        )
+
+        obsCoreSearchForm.subscribe(
+            ca.nrc.cadc.search.events.onInvalid,
+            onFormInvalid
+        )
+      }
+      this._setObsCoreSearchForm(obsCoreSearchForm)
+
+      // End obscore search form setup.
+
     }
 
     // End initForms function.
@@ -1239,9 +1258,13 @@
           $.getJSON(tooltipURL, function (jsonData) {
             tooltipJsonData = jsonData
             caomSearchForm.loadTooltips(jsonData, 'popover')
-            obsCoreSearchForm.loadTooltips(jsonData, 'popover')
             caomSearchForm.loadTooltips(jsonData, 'dt-popover')
-            obsCoreSearchForm.loadTooltips(jsonData, 'dt-popover')
+
+            if (obsCoreSearchForm !== null) {
+              obsCoreSearchForm.loadTooltips(jsonData, 'popover')
+              obsCoreSearchForm.loadTooltips(jsonData, 'dt-popover')
+            }
+
           })
 
           // Don't process the queryfrom the URL if this is not the first page load.
@@ -1388,7 +1411,11 @@
         else {
           // Initialize the data train tooltips
           caomSearchForm.loadTooltips(tooltipJsonData, 'dt-popover')
-          obsCoreSearchForm.loadTooltips(tooltipJsonData, 'dt-popover')
+
+          if (this.options.showObscoreTab === true) {
+            obsCoreSearchForm.loadTooltips(tooltipJsonData, 'dt-popover')
+          }
+
         }
       }.bind(this)
 
@@ -1458,28 +1485,30 @@
           }
         )
 
-      obsCoreSearchForm.subscribe(ca.nrc.cadc.search.events.onInit, function () {
-        obsCoreSearchForm.enable()
-        obsCoreSearchForm.resetFields()
-      })
-
-      obsCoreSearchForm.getDataTrain().subscribe(
-        ca.nrc.cadc.search.datatrain.events.onDataTrainLoaded,
-        function () {
-          obsCoreSearchForm.enableMaqToggle()
-        }.bind(this)
-      )
-
-      obsCoreSearchForm.getDataTrain().subscribe(
-        ca.nrc.cadc.search.datatrain.events.onDataTrainLoadFail,
-        function () {
-          obsCoreSearchForm.enableMaqToggle()
-        }.bind(this)
-      )
-
       // if parameter function returns false the toggle is off
       caomSearchForm.init()
-      obsCoreSearchForm.init()
+
+      if (this.options.showObscoreTab === true) {
+        obsCoreSearchForm.subscribe(ca.nrc.cadc.search.events.onInit, function () {
+          obsCoreSearchForm.enable()
+          obsCoreSearchForm.resetFields()
+        })
+
+        obsCoreSearchForm.getDataTrain().subscribe(
+            ca.nrc.cadc.search.datatrain.events.onDataTrainLoaded,
+            function () {
+              obsCoreSearchForm.enableMaqToggle()
+            }.bind(this)
+        )
+
+        obsCoreSearchForm.getDataTrain().subscribe(
+            ca.nrc.cadc.search.datatrain.events.onDataTrainLoadFail,
+            function () {
+              obsCoreSearchForm.enableMaqToggle()
+            }.bind(this)
+        )
+        obsCoreSearchForm.init()
+      }
     }
 
     // End start method.
