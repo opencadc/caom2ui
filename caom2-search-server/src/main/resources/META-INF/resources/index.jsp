@@ -284,7 +284,8 @@
                                                                                "autoInitFlag": false,
                                                                                "applicationEndpoint": "<%= applicationEndpoint %>",
                                                                                "enableMAQ" : <%= enableMAQ %>,
-                                                                               "activateMAQ": <%= activateMAQ %>
+                                                                               "activateMAQ": <%= activateMAQ %>,
+                                                                                "showObscoreTab" : <%= showObsCoreTab %>
                                                                              });
 
                                 searchApp.subscribe(ca.nrc.cadc.search.events.onAdvancedSearchInit,
