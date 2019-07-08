@@ -18,8 +18,11 @@
         <div class="hidden hierarchy_utype">${param.utype}</div>
         <div class="hidden load_maq_data_train">${param.activateMAQ}</div>
 
-        <div id="${param.utype}.building" class="loading">
+        <div id="${param.utype}.building" class="loading hidden">
           <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span> <fmt:message key="LOADING_MESSAGE" bundle="${langBundle}"/>
+        </div>
+        <div id="reloadHierarchy" class="rl">
+          <button id="reloadHierarchySubmit" type="button" class="btn btn-info"><fmt:message key="RELOAD_CONSTRAINTS" bundle="${langBundle}"/></button>
         </div>
         <div class="${param.modelDataSource}_dtTableDiv"></div>
       </div>
@@ -27,4 +30,5 @@
     <div class="clear"></div>
   </div>
 </div>
+
 

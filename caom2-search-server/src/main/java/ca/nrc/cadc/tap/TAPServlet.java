@@ -71,12 +71,20 @@ package ca.nrc.cadc.tap;
 import ca.nrc.cadc.auth.AuthMethod;
 import ca.nrc.cadc.auth.AuthenticationUtil;
 import ca.nrc.cadc.config.ApplicationConfiguration;
+import ca.nrc.cadc.net.ResourceNotFoundException;
 import ca.nrc.cadc.reg.Standards;
 import ca.nrc.cadc.reg.client.RegistryClient;
+import ca.nrc.cadc.rest.InlineContentHandler;
+import ca.nrc.cadc.rest.SyncInput;
 import ca.nrc.cadc.util.StringUtil;
+
+import ca.nrc.cadc.uws.Job;
+import ca.nrc.cadc.uws.web.InlineContentException;
+import ca.nrc.cadc.uws.web.JobCreator;
 import ca.nrc.cadc.web.ConfigurableServlet;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import javax.security.auth.Subject;
@@ -152,7 +160,13 @@ public class TAPServlet extends ConfigurableServlet {
      */
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        handleRequest(req, resp);
+        final RegistryClient registryClient = getRegistryClient();
+        final Subject currentSubject = AuthenticationUtil.getCurrentSubject();
+        final AuthMethod currentAuthMethod = AuthenticationUtil.getAuthMethod(currentSubject);
+        final URL serviceURL = registryClient.getServiceURL(lookupServiceURI(req), Standards.TAP_10,
+            (currentAuthMethod == null) ? AuthMethod.ANON : currentAuthMethod, Standards.INTERFACE_PARAM_HTTP);
+
+        resp.sendRedirect(serviceURL.toExternalForm() + "/sync?" + req.getQueryString());
     }
 
     /**
@@ -200,18 +214,41 @@ public class TAPServlet extends ConfigurableServlet {
      */
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        handleRequest(req, resp);
+        handlePostRequest(req, resp);
     }
 
-    private void handleRequest(final HttpServletRequest request, final HttpServletResponse response)
+    /**
+     * Set up TAP client job to POST to the tap service. Output is streamed to caller.
+     * @param request
+     * @param response
+     * @throws IOException
+     */
+    private void handlePostRequest(final HttpServletRequest request, final HttpServletResponse response)
         throws IOException {
-        final RegistryClient registryClient = getRegistryClient();
-        final Subject currentSubject = AuthenticationUtil.getCurrentSubject();
-        final AuthMethod currentAuthMethod = AuthenticationUtil.getAuthMethod(currentSubject);
-        final URL serviceURL = registryClient.getServiceURL(lookupServiceURI(request), Standards.TAP_10,
-            (currentAuthMethod == null) ? AuthMethod.ANON : currentAuthMethod, Standards.INTERFACE_PARAM_HTTP);
 
-        response.sendRedirect(serviceURL.toExternalForm() + "/sync?" + request.getQueryString());
+        final RegistryClient registryClient = getRegistryClient();
+
+        final SyncTAPClient client = new DefaultSyncTAPClient(true, registryClient);
+        final JobCreator jobCreator = new JobCreator();
+        final SyncInput syncInput = new SyncInput(request, new InlineContentHandler() {
+            @Override
+            public Content accept(String s, String s1, InputStream inputStream)
+                throws InlineContentException, IOException, ResourceNotFoundException {
+                final Content c = new Content();
+                c.name = s;
+                c.value = s1;
+                return c;
+            }
+        });
+
+        try {
+            syncInput.init();
+        } catch (ResourceNotFoundException e) {
+            throw new IOException(e);
+        }
+
+        final Job job = jobCreator.create(syncInput);
+        client.execute(lookupServiceURI(request), job, response.getOutputStream());
     }
 
     /**

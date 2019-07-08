@@ -206,8 +206,9 @@
      * Initialize this DataTrain.
      */
     this.init = function() {
-      this._toggleLoading(true)
-      this._loadDataTrain()
+      this._setListeners()
+      //this._toggleLoading(true)
+      //this._loadDataTrain()
     }
 
     /**
@@ -217,38 +218,37 @@
     this._loadDataTrain = function() {
       var tapQuery = this._createTAPQuery()
 
-      $.get(
-        this.options.tapSyncEndpoint,
-        {
+      $.ajax({
+        type: "POST",
+        url: this.options.tapSyncEndpoint,
+        data: {
           LANG: 'ADQL',
           FORMAT: 'CSV',
           USEMAQ: this.activateMAQ,
           QUERY: tapQuery
         },
-        {
-          xhrFields: {
-            withCredentials: true
-          },
-          jsonp: false
-        }
+        beforeSend: function(xhr){
+          xhr.withCredentials = true;
+        },
+        jsonp: false
+      })
+      .done(
+        function(data) {
+          this.groups = []
+          this._trigger(
+            ca.nrc.cadc.search.datatrain.events.onDataTrainLoaded,
+            { data: data }
+          )
+        }.bind(this)
       )
-        .done(
-          function(data) {
-            this.groups = []
-            this._trigger(
-              ca.nrc.cadc.search.datatrain.events.onDataTrainLoaded,
-              { data: data }
-            )
-          }.bind(this)
-        )
-        .fail(
-          function(jqXHR) {
-            this._trigger(
-              ca.nrc.cadc.search.datatrain.events.onDataTrainLoadFail,
-              { responseText: jqXHR.responseText }
-            )
-          }.bind(this)
-        )
+      .fail(
+        function(jqXHR) {
+          this._trigger(
+            ca.nrc.cadc.search.datatrain.events.onDataTrainLoadFail,
+            { responseText: jqXHR.responseText }
+          )
+        }.bind(this)
+      )
     }
 
     /**
@@ -444,6 +444,29 @@
     this._toggleLoading = function(turnOn) {
       var building = document.getElementById(this.uType + '.building')
       building.className = turnOn == true ? '' : 'hidden'
+    }
+
+    this._handleRefreshHierarchy = function() {
+      this._toggleLoading(true)
+      this._loadDataTrain()
+    }
+
+    //this._toggleReloadbutton = function(turnOn) {
+    //  var building = document.getElementById(this.uType + '.building')
+    //  building.className = turnOn == true ? '' : 'hidden'
+    //}
+    //
+    //
+    //this._setDataTrainState = function(stateName) {
+    //  switch(stateName) {
+    //    case "loading" :
+    //
+    //  }
+    //}
+
+    this._setListeners = function() {
+      // Set listener to load data train
+      $("#reloadHierarchySubmit").on('click', this._handleRefreshHierarchy)
     }
 
     /**
