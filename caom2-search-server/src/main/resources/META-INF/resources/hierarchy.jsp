@@ -17,12 +17,12 @@
            data-utypes="${param.utyifpe}">
         <div class="hidden hierarchy_utype">${param.utype}</div>
         <div class="hidden load_maq_data_train">${param.activateMAQ}</div>
-
         <div id="${param.utype}.building" class="loading hidden">
-          <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span> <fmt:message key="LOADING_MESSAGE" bundle="${langBundle}"/>
+            <span class="spinner-span glyphicon glyphicon-refresh fast-right-spinner"></span>
+            <span class="info-span"><fmt:message key="LOADING_MESSAGE" bundle="${langBundle}"/></span>
         </div>
-        <div id="reloadHierarchy" class="rl">
-          <button id="reloadHierarchySubmit" type="button" class="btn btn-info"><fmt:message key="RELOAD_CONSTRAINTS" bundle="${langBundle}"/></button>
+        <div>
+          <button type="button" class="btn btn-info reloadHierarchySubmit hidden"><fmt:message key="RELOAD_CONSTRAINTS" bundle="${langBundle}"/></button>
         </div>
         <div class="${param.modelDataSource}_dtTableDiv"></div>
       </div>

@@ -169,6 +169,8 @@
    * @constructor
    */
   function DataTrain(_modelDataSource, _columnManager, _options) {
+    var _dt = this
+
     var stringUtil = new org.opencadc.StringUtil()
 
     this.modelDataSource = _modelDataSource
@@ -207,8 +209,7 @@
      */
     this.init = function() {
       this._setListeners()
-      //this._toggleLoading(true)
-      //this._loadDataTrain()
+      this._reloadDataTrain()
     }
 
     /**
@@ -219,7 +220,7 @@
       var tapQuery = this._createTAPQuery()
 
       $.ajax({
-        type: "POST",
+        type: 'POST',
         url: this.options.tapSyncEndpoint,
         data: {
           LANG: 'ADQL',
@@ -228,7 +229,7 @@
           QUERY: tapQuery
         },
         beforeSend: function(xhr){
-          xhr.withCredentials = true;
+          xhr.withCredentials = true
         },
         jsonp: false
       })
@@ -249,6 +250,15 @@
           )
         }.bind(this)
       )
+    }
+
+    /**
+     * Reload the Data Train.
+     * @private
+     */
+    this._reloadDataTrain = function() {
+      _dt._setDataTrainDisplayState('loading')
+      _dt._loadDataTrain()
     }
 
     /**
@@ -435,38 +445,6 @@
 
       // Return first select.
       return firstSelect
-    }
-
-    /**
-     * Toggle the loading icon.
-     * @private
-     */
-    this._toggleLoading = function(turnOn) {
-      var building = document.getElementById(this.uType + '.building')
-      building.className = turnOn == true ? '' : 'hidden'
-    }
-
-    this._handleRefreshHierarchy = function() {
-      this._toggleLoading(true)
-      this._loadDataTrain()
-    }
-
-    //this._toggleReloadbutton = function(turnOn) {
-    //  var building = document.getElementById(this.uType + '.building')
-    //  building.className = turnOn == true ? '' : 'hidden'
-    //}
-    //
-    //
-    //this._setDataTrainState = function(stateName) {
-    //  switch(stateName) {
-    //    case "loading" :
-    //
-    //  }
-    //}
-
-    this._setListeners = function() {
-      // Set listener to load data train
-      $("#reloadHierarchySubmit").on('click', this._handleRefreshHierarchy)
     }
 
     /**
@@ -1111,6 +1089,51 @@
       return false
     }
 
+    // -------------- Page state (mode) functions ------------------
+    /**
+     * Toggle the loading icon.
+     * @private
+     */
+    this._toggleLoading = function(turnOn) {
+      var building = document.getElementById(this.uType + '.building')
+      building.className = turnOn == true ? '' : 'hidden'
+    }
+
+    /**
+     * Toggle the data train reload button.
+     * @private
+     */
+    this._toggleReloadButton = function(turnOn) {
+      var $hierarchyButton = $('.reloadHierarchySubmit')
+      if (turnOn === true) {
+        $hierarchyButton.removeClass('hidden')
+      } else {
+        $hierarchyButton.addClass('hidden')
+      }
+    }
+
+    /**
+     * Set state of Data Train display.
+     * @private
+     */
+    this._setDataTrainDisplayState = function(stateName) {
+      switch(stateName) {
+        case 'loading' :
+          this._toggleLoading(true)
+          this._toggleReloadButton(false)
+          break
+        case 'reload' :
+          this._toggleLoading(true)
+          this._toggleReloadButton(false)
+          break
+        case 'dataTrain':
+          this._toggleLoading(false)
+          this._toggleReloadButton(false)
+          break
+      }
+    }
+
+    // -------------- Event handling functions ------------------
     /**
      * Fire an event.  Taken from the slick.grid Object.
      *
@@ -1136,13 +1159,14 @@
       $(this).on(_event.type, __handler)
     }
 
-    // Subsribe to events before init is called.
+    // Subscribe to events before init is called.
     this.subscribe(
       ca.nrc.cadc.search.datatrain.events.onDataTrainLoaded,
       function(event, args) {
         var dt = args.dataTrain
         dt.load(args.data)
-        dt._toggleLoading(false)
+        //dt._toggleLoading(false)
+        dt._setDataTrainDisplayState('dataTrain')
       }
     )
 
@@ -1154,9 +1178,19 @@
             args.responseText
         )
         var dt = args.dataTrain
-        dt._toggleLoading(false)
+        //dt._toggleLoading(false)
+        dt._setDataTrainDisplayState('reload')
       }
     )
+
+    /**
+     * Set click listeners for the data train component.
+     * @private
+     */
+    this._setListeners = function() {
+      // Set listener to reload data train
+      $('.reloadHierarchySubmit').on('click', this._reloadDataTrain)
+    }
 
     if (this.options.autoInit === true) {
       this.init()
