@@ -344,7 +344,7 @@
       //
       // this.options.activateMAQ signals the toggle switch is set to 'on'.
 
-      $.get(
+      $.post(
         this.options.tapSyncEndpoint, {
           REQUEST: 'doQuery',
           LANG: 'ADQL',

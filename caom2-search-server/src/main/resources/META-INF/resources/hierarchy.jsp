@@ -21,8 +21,12 @@
             <span class="spinner-span glyphicon glyphicon-refresh fast-right-spinner"></span>
             <span class="info-span"><fmt:message key="LOADING_MESSAGE" bundle="${langBundle}"/></span>
         </div>
-        <div>
-          <button type="button" class="btn btn-info reloadHierarchySubmit hidden"><fmt:message key="RELOAD_CONSTRAINTS" bundle="${langBundle}"/></button>
+        <div class="reloadHierarchy hidden">
+          <div class="dt-unavailable">
+            <fmt:message key="DATATRAIN_UNAVAILABLE" bundle="${langBundle}"/>
+            <fmt:message key="USE_UPPER_SEARCH_FORM" bundle="${langBundle}"/>
+            <button type="button" class="btn btn-default btn-sm dt-unavailable reloadHierarchySubmit"><fmt:message key="RELOAD_CONSTRAINTS" bundle="${langBundle}"/></button>
+          </div>
         </div>
         <div class="${param.modelDataSource}_dtTableDiv"></div>
       </div>

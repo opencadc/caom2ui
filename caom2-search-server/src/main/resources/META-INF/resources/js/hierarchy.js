@@ -1104,11 +1104,11 @@
      * @private
      */
     this._toggleReloadButton = function(turnOn) {
-      var $hierarchyButton = $('.reloadHierarchySubmit')
+      var $reloadHierarchyDiv = $('.reloadHierarchy')
       if (turnOn === true) {
-        $hierarchyButton.removeClass('hidden')
+        $reloadHierarchyDiv.removeClass('hidden')
       } else {
-        $hierarchyButton.addClass('hidden')
+        $reloadHierarchyDiv.addClass('hidden')
       }
     }
 
@@ -1123,8 +1123,8 @@
           this._toggleReloadButton(false)
           break
         case 'reload' :
-          this._toggleLoading(true)
-          this._toggleReloadButton(false)
+          this._toggleLoading(false)
+          this._toggleReloadButton(true)
           break
         case 'dataTrain':
           this._toggleLoading(false)

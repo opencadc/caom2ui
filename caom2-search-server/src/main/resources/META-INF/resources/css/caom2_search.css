@@ -649,10 +649,19 @@ canvas.aladin-imageCanvas {
 }
 
 .spinner-span {
-  margin-left:20px;
+  margin-left: 20px;
 }
 
 .info-span {
-  margin-left:20px;
+  margin-left: 20px;
+  margin-top: 2px;
+}
+
+.dt-unavailable {
+  font-style: italic;
+  font-weight: bold;
+  font-size: 11pt;
+  /* To allow the text to wrap naturally */
+  white-space: normal;
 }
 
