@@ -83,10 +83,13 @@ import ca.nrc.cadc.uws.web.InlineContentException;
 import ca.nrc.cadc.uws.web.JobCreator;
 import ca.nrc.cadc.web.ConfigurableServlet;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
+import java.security.PrivilegedAction;
 import javax.security.auth.Subject;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.ServletResponse;
@@ -248,7 +251,22 @@ public class TAPServlet extends ConfigurableServlet {
         }
 
         final Job job = jobCreator.create(syncInput);
-        client.execute(lookupServiceURI(request), job, response.getOutputStream());
+//        client.execute(lookupServiceURI(request), job, response.getOutputStream());
+        Subject currentSubject = AuthenticationUtil.getCurrentSubject();
+        job.ownerSubject = currentSubject;
+
+        System.out.println("job owner: " + job.ownerSubject.toString());
+
+        // This is the right idea, however, although the return isn't json, as DefaultsyncTapClient
+        // uses, it still has to get out to the response output stream somehow...
+        final OutputStream os = response.getOutputStream();
+        Subject.doAs(currentSubject, new PrivilegedAction<Void>() {
+            @Override
+            public Void run() {
+                client.execute(lookupServiceURI(request), job, os);
+                return null;
+            }
+        });
     }
 
     /**

@@ -29,7 +29,8 @@
            value="<fmt:message key="MAX_ROW_LIMIT_WARNING" bundle="${langBundle}"/>"/>
 
     <div class="col-sm-12 button-holder">
-      <button type="submit"
+      <button disabled
+              type="submit"
               class="btn btn-primary submit-query"
               value="<fmt:message key="SEARCH_BUTTON_LABEL" bundle="${langBundle}" />">
         <fmt:message key="SEARCH_BUTTON_LABEL" bundle="${langBundle}"/>
@@ -161,7 +162,8 @@
     </div>
 
     <div class="col-sm-12 button-holder">
-      <button type="submit"
+      <button disabled
+              type="submit"
               class="btn btn-primary submit-query"
               value="<fmt:message key="SEARCH_BUTTON_LABEL" bundle="${langBundle}" />">
         <fmt:message key="SEARCH_BUTTON_LABEL" bundle="${langBundle}"/>

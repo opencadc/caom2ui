@@ -52,7 +52,7 @@
               },
               tap: {
                 QUERY_TEMPLATE:
-                  'SELECT {1}, CASE WHEN {2} >= {3} THEN 1 ELSE 0 END FROM {4}',
+                  'SELECT {1}, (CASE WHEN {2} >= {3} THEN 1 ELSE 0 END) as cs FROM {4} GROUP BY {1}, cs',
                 INSTRUMENT_FRESH_MJD_FIELD_NAME: {
                   caom2: 'max_time_bounds_cval1',
                   obscore: 'max_t_min'
@@ -144,6 +144,10 @@
                 }
               },
               ENDPOINT: '/tap/sync',
+              BASEURL: '',
+              SYNC_ENDPOINT: '/sync',
+              TAP_MAQ_URI: 'ivo://cadc.nrc.ca/tap/maq',
+              TAP_URI: 'ivo://cadc.nrc.ca/tap',
               DataTrain: DataTrain,
               events: {
                 onDataTrainLoaded: new jQuery.Event(
@@ -160,6 +164,8 @@
     }
   })
 
+  //https://jeevesh.cadc.dao.nrc.ca/tap/cadc-plus-external/sync?LANG=ADQL&FORMAT=CSV&USEMAQ=true&QUERY=SELECT+obs_collection%2Cfacility_name%2Cinstrument_name%2Ccalib_level%2Cdataproduct_type%2C+CASE+WHEN+max_t_min+%3E%3D+56842.621145960875+THEN+1+ELSE+0+END+FROM+caom2.obscoreenumfield
+
   /**
    * @param {String} _modelDataSource   Name of the data source [caom2 | obscore]
    * @param {{}} _options   Options to this DataTrain.
@@ -169,9 +175,9 @@
    * @constructor
    */
   function DataTrain(_modelDataSource, _columnManager, _options) {
-    var _dt = this
-
     var stringUtil = new org.opencadc.StringUtil()
+    var _dt = this
+    var _registryClient = new ca.nrc.cadc.search.registryclient.RegistryClient(_options)
 
     this.modelDataSource = _modelDataSource
     this.pageLanguage = $('html').attr('lang')
@@ -192,6 +198,32 @@
     this.options = $.extend({}, true, this.defaults, _options)
     this.columnManager = _columnManager
 
+
+    //this._registryClient = new Registry({
+    //  baseURL: ''
+    //})
+
+    //this._getBaseUrl = function() {
+    //  if (typeof this.options.baseURL == 'undefined') {
+    //    return ca.nrc.cadc.search.datatrain.BASEURL
+    //  } else {
+    //    return this.options.baseURL
+    //  }
+    //}
+
+    //this.prepareTAPCall = function(baseURI) {
+    //  return this._registryClient
+    //      .getServiceURL(
+    //          baseURI,
+    //          'ivo://ivoa.net/std/TAP',
+    //          'vs:ParamHTTP',
+    //          'cookie'
+    //      )
+    //      .catch(function (err) {
+    //        setAjaxFail('Error obtaining Service URL > ' + err)
+    //      })
+    //}
+
     /**
      * Obtain a column configuration object.
      * @param {String}  _uType    The uType.
@@ -208,8 +240,59 @@
      * Initialize this DataTrain.
      */
     this.init = function() {
-      this._setListeners()
-      this._reloadDataTrain()
+      this._toggleLoading(true)
+      this._loadDataTrain()
+    }
+
+    function postTapRequest(serviceURL, tapQuery) {
+
+      return new Promise(function (resolve, reject) {
+        var request = new XMLHttpRequest()
+
+         //'load' is the XMLHttpRequest 'finished' event
+        request.addEventListener(
+            'load',
+            function () {
+              if (request.status === 200) {
+                //// load metadata into the panel here before resolving promise
+                //// Populate javascript object behind form
+                //
+                ////page.hideInfoModal()
+                ////page.setProgressBar('okay')
+                //var jsonData = page.parseJSONStr(request.responseText)
+                ////$('#doi_number').val(jsonData.resource.identifier['$'])
+                ////var doiSuffix = jsonData.resource.identifier['$'].split('/')[1]
+                ////
+                ////doiDoc.populateDoc(jsonData)
+                ////// Load metadata into the panel here before resolving promise
+                ////populateForm()
+                resolve(jsonData)
+              } else {
+                reject(request)
+              }
+            },
+            false
+        )
+        request.overrideMimeType('application/json')
+        request.withCredentials = true
+        request.open('POST', serviceURL)
+        request.setRequestHeader('Accept', 'application/json')
+        request.send(tapQuery)
+      })
+    }
+
+    this.loadDataTrainOK = function(event, args) {
+      var data = args.data
+      _dt._trigger(
+                        ca.nrc.cadc.search.datatrain.events.onDataTrainLoaded,
+                        { data: data }
+                    )
+    }
+    this.loadDataTrainNOK = function() {
+      _dt._trigger(
+          ca.nrc.cadc.search.datatrain.events.onDataTrainLoadFail,
+          {responseText: jqXHR.responseText}
+      )
     }
 
     /**
@@ -219,46 +302,77 @@
     this._loadDataTrain = function() {
       var tapQuery = this._createTAPQuery()
 
-      $.ajax({
-        type: 'POST',
-        url: this.options.tapSyncEndpoint,
-        data: {
-          LANG: 'ADQL',
-          FORMAT: 'CSV',
-          USEMAQ: this.activateMAQ,
-          QUERY: tapQuery
-        },
-        beforeSend: function(xhr){
-          xhr.withCredentials = true
-        },
-        jsonp: false
-      })
-      .done(
-        function(data) {
-          this.groups = []
-          this._trigger(
-            ca.nrc.cadc.search.datatrain.events.onDataTrainLoaded,
-            { data: data }
-          )
-        }.bind(this)
-      )
-      .fail(
-        function(jqXHR) {
-          this._trigger(
-            ca.nrc.cadc.search.datatrain.events.onDataTrainLoadFail,
-            { responseText: jqXHR.responseText }
-          )
-        }.bind(this)
-      )
-    }
+      _registryClient.subscribe(ca.nrc.cadc.search.registryclient.events.onRegistryClientOK, this.loadDataTrainOK)
+      _registryClient.subscribe(ca.nrc.cadc.search.registryclient.events.onRegistryClientFail, this.loadDataTrainNOK)
+      _registryClient.postTapRequest(tapQuery, 'CSV')
 
-    /**
-     * Reload the Data Train.
-     * @private
-     */
-    this._reloadDataTrain = function() {
-      _dt._setDataTrainDisplayState('loading')
-      _dt._loadDataTrain()
+      //var baseURI = ''
+      //if (this.activateMAQ === true) {
+      //  baseURI = ca.nrc.cadc.search.datatrain.TAP_MAQ_URI
+      //} else {
+      //  baseURI = ca.nrc.cadc.search.datatrain.TAP_URI
+      //}
+      //
+      //Promise.resolve(this.prepareTAPCall(baseURI))
+      //    .then(function(serviceURL) {
+      //
+      //      Promise.resolve(postDoiMetadata(serviceURL + urlAddition, multiPartData))
+      //          .then(function(data) {
+      //              this.groups = []
+      //              this._trigger(
+      //                  ca.nrc.cadc.search.datatrain.events.onDataTrainLoaded,
+      //                  { data: data }
+      //              )
+      //            }.bind(this)
+      //         )
+      //          .catch( function(jqXHR) {
+      //            this._trigger(
+      //                ca.nrc.cadc.search.datatrain.events.onDataTrainLoadFail,
+      //                { responseText: jqXHR.responseText }
+      //            )
+      //          }.bind(this))
+      //    })
+      //    .catch( function(jqXHR) {
+      //      this._trigger(
+      //          ca.nrc.cadc.search.datatrain.events.onDataTrainLoadFail,
+      //          { responseText: jqXHR.responseText }
+      //      )
+      //    }.bind(this))
+
+    //}
+
+      //$.post(
+      //  this.options.tapSyncEndpoint,
+      //  {
+      //    LANG: 'ADQL',
+      //    FORMAT: 'CSV',
+      //    USEMAQ: this.activateMAQ,
+      //    QUERY: tapQuery
+      //  },
+      //  {
+      //    xhrFields: {
+      //      withCredentials: true
+      //    },
+      //    jsonp: false
+      //  }
+      //)
+      //  .done(
+      //    function(data) {
+      //      this.groups = []
+      //      this._trigger(
+      //        ca.nrc.cadc.search.datatrain.events.onDataTrainLoaded,
+      //        { data: data }
+      //      )
+      //    }.bind(this)
+      //  )
+      //  .fail(
+      //    function(jqXHR) {
+      //      this._trigger(
+      //        ca.nrc.cadc.search.datatrain.events.onDataTrainLoadFail,
+      //        { responseText: jqXHR.responseText }
+      //      )
+      //    }.bind(this)
+      //  )
     }
 
     /**
@@ -445,6 +559,15 @@
 
       // Return first select.
       return firstSelect
+    }
+
+    /**
+     * Toggle the loading icon.
+     * @private
+     */
+    this._toggleLoading = function(turnOn) {
+      var building = document.getElementById(this.uType + '.building')
+      building.className = turnOn == true ? '' : 'hidden'
     }
 
     /**
@@ -1089,51 +1212,6 @@
       return false
     }
 
-    // -------------- Page state (mode) functions ------------------
-    /**
-     * Toggle the loading icon.
-     * @private
-     */
-    this._toggleLoading = function(turnOn) {
-      var building = document.getElementById(this.uType + '.building')
-      building.className = turnOn == true ? '' : 'hidden'
-    }
-
-    /**
-     * Toggle the data train reload button.
-     * @private
-     */
-    this._toggleReloadButton = function(turnOn) {
-      var $reloadHierarchyDiv = $('.reloadHierarchy')
-      if (turnOn === true) {
-        $reloadHierarchyDiv.removeClass('hidden')
-      } else {
-        $reloadHierarchyDiv.addClass('hidden')
-      }
-    }
-
-    /**
-     * Set state of Data Train display.
-     * @private
-     */
-    this._setDataTrainDisplayState = function(stateName) {
-      switch(stateName) {
-        case 'loading' :
-          this._toggleLoading(true)
-          this._toggleReloadButton(false)
-          break
-        case 'reload' :
-          this._toggleLoading(false)
-          this._toggleReloadButton(true)
-          break
-        case 'dataTrain':
-          this._toggleLoading(false)
-          this._toggleReloadButton(false)
-          break
-      }
-    }
-
-    // -------------- Event handling functions ------------------
     /**
      * Fire an event.  Taken from the slick.grid Object.
      *
@@ -1159,14 +1237,13 @@
       $(this).on(_event.type, __handler)
     }
 
-    // Subscribe to events before init is called.
+    // Subsribe to events before init is called.
     this.subscribe(
       ca.nrc.cadc.search.datatrain.events.onDataTrainLoaded,
       function(event, args) {
         var dt = args.dataTrain
         dt.load(args.data)
-        //dt._toggleLoading(false)
-        dt._setDataTrainDisplayState('dataTrain')
+        dt._toggleLoading(false)
       }
     )
 
@@ -1178,19 +1255,9 @@
             args.responseText
         )
         var dt = args.dataTrain
-        //dt._toggleLoading(false)
-        dt._setDataTrainDisplayState('reload')
+        dt._toggleLoading(false)
       }
     )
-
-    /**
-     * Set click listeners for the data train component.
-     * @private
-     */
-    this._setListeners = function() {
-      // Set listener to reload data train
-      $('.reloadHierarchySubmit').on('click', this._reloadDataTrain)
-    }
 
     if (this.options.autoInit === true) {
       this.init()
