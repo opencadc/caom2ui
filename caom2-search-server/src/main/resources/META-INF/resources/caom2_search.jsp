@@ -140,7 +140,7 @@
         </div>
       </div>
 
-      <div class="col-sm-12 resolver-result-tooltip">
+      <div class="col-sm-12 resolver-result-tooltip hidden">
         <strong><fmt:message key="RES_TARGET" bundle="${langBundle}"/></strong><br>
         <p class="resolver-result-target"></p>
         <strong><fmt:message key="RES_SERVICE" bundle="${langBundle}"/></strong><br>
