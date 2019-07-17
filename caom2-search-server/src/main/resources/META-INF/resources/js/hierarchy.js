@@ -143,8 +143,6 @@
                   )
                 }
               },
-              ENDPOINT: '/tap/sync',
-              BASEURL: '',
               SYNC_ENDPOINT: '/sync',
               TAP_MAQ_URI: 'ivo://cadc.nrc.ca/tap/maq',
               TAP_URI: 'ivo://cadc.nrc.ca/tap',

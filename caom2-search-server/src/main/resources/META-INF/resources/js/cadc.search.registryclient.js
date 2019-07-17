@@ -156,7 +156,7 @@
     }
 
     /**
-     * Subscribe to one of this form's events.
+     * Subscribe to one of this object's events.
      *
      * @param {jQuery.Event}  _event      Event object.
      * @param {function}  __handler   Handler function.
