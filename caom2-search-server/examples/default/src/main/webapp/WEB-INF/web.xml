@@ -112,11 +112,6 @@
     </servlet>
 
     <servlet>
-        <servlet-name>TAPServlet</servlet-name>
-        <servlet-class>ca.nrc.cadc.tap.TAPServlet</servlet-class>
-    </servlet>
-
-    <servlet>
         <servlet-name>QuickSearchServlet</servlet-name>
         <servlet-class>ca.nrc.cadc.search.QuickSearchServlet</servlet-class>
         <load-on-startup>2</load-on-startup>
@@ -244,11 +239,6 @@
     <servlet-mapping>
         <servlet-name>SearchJobServlet</servlet-name>
         <url-pattern>/find</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>TAPServlet</servlet-name>
-        <url-pattern>/tap/*</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
