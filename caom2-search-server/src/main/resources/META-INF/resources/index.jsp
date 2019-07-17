@@ -173,32 +173,6 @@
 
           <%-- To find pixel lengths of strings. --%>
           <div id="lengthFinder"></div>
-<script type="text/javascript"
-        src="cadcJS/javascript/cadc.util.js?version=@version@"></script>
-<script type="text/javascript"
-        src="js/cadc.search.format.js?version=@version@"></script>
-<script type="text/javascript"
-        src="js/cadc.search.unitconversion.js?version=@version@"></script>
-<script type="text/javascript"
-        src="js/cadc.search.columnbundles.js?version=@version@"></script>
-<script type="text/javascript"
-        src="js/cadc.search.columns.js?version=@version@"></script>
-<script type="text/javascript"
-        src="js/cadc.search.core.js?version=@version@"></script>
-<script type="text/javascript"
-        src="js/cadc.search.form.js?version=@version@"></script>
-<script type="text/javascript"
-        src="js/cadc.search.preview.js?version=@version@"></script>
-<script type="text/javascript"
-        src="js/cadc.search.app.js?version=@version@"></script>
-<script type="text/javascript"
-        src="js/cadc.search.tooltipcreator.js?version=@version@"></script>
-<script type="text/javascript"
-        src="js/hierarchy.js?version=@version@"></script>
-<script type="text/javascript"
-        src="js/validator.js?version=@version@"></script>
-<script type="text/javascript"
-        src="js/cadc.search.uws.js?version=@version@"></script>
 
           <script type="text/javascript">
             $(function ()
@@ -224,7 +198,6 @@
                   src="js/jquery.form.js?version=@version@"></script>
           <script type="text/javascript"
                   src="cadcVOTV/javascript/jquery-ui-1.11.4.min.js?version=@version@"></script>
-
 
 
           <!-- Moment for date parsing and formatting -->
@@ -270,64 +243,66 @@
                   src="cadcVOTV/javascript/cadc.resultstate.js?version=@version@"></script>
           <script type="text/javascript"
                   src="cadcVOTV/javascript/cadc.plugin.footprint-viewer.js?version=@version@"></script>
-          <%--<script type="text/javascript"--%>
-                  <%--src="js/validator.js?version=@version@"></script>--%>
-          <%--<script type="text/javascript"--%>
-                  <%--src="js/cadc.search.uws.js?version=@version@"></script>--%>
-          <%--<script type="text/javascript"--%>
-                  <%--src="cadcJS/javascript/cadc.util.js?version=@version@"></script>--%>
-          <%--<script type="text/javascript"--%>
-                  <%--src="js/cadc.search.format.js?version=@version@"></script>--%>
-          <%--<script type="text/javascript"--%>
-                  <%--src="js/cadc.search.unitconversion.js?version=@version@"></script>--%>
-          <%--<script type="text/javascript"--%>
-                  <%--src="js/cadc.search.columnbundles.js?version=@version@"></script>--%>
-          <%--<script type="text/javascript"--%>
-                  <%--src="js/cadc.search.columns.js?version=@version@"></script>--%>
-          <%--<script type="text/javascript"--%>
-                  <%--src="js/cadc.search.core.js?version=@version@"></script>--%>
-          <%--<script type="text/javascript"--%>
-                  <%--src="js/cadc.search.form.js?version=@version@"></script>--%>
-          <%--<script type="text/javascript"--%>
-                  <%--src="js/cadc.search.preview.js?version=@version@"></script>--%>
-          <%--<script type="text/javascript"--%>
-                  <%--src="js/cadc.search.app.js?version=@version@"></script>--%>
-          <%--<script type="text/javascript"--%>
-                  <%--src="js/cadc.search.tooltipcreator.js?version=@version@"></script>--%>
-          <%--<script type="text/javascript"--%>
-                  <%--src="js/hierarchy.js?version=@version@"></script>--%>
+          <script type="text/javascript"
+                  src="js/validator.js?version=@version@"></script>
+          <script type="text/javascript"
+                  src="js/cadc.search.uws.js?version=@version@"></script>
+          <script type="text/javascript"
+                  src="cadcJS/javascript/cadc.util.js?version=@version@"></script>
+          <script type="text/javascript"
+                  src="js/cadc.search.format.js?version=@version@"></script>
+          <script type="text/javascript"
+                  src="js/cadc.search.unitconversion.js?version=@version@"></script>
+          <script type="text/javascript"
+                  src="js/cadc.search.columnbundles.js?version=@version@"></script>
+          <script type="text/javascript"
+                  src="js/cadc.search.columns.js?version=@version@"></script>
+          <script type="text/javascript"
+                  src="js/cadc.search.core.js?version=@version@"></script>
+          <script type="text/javascript"
+                  src="js/cadc.search.form.js?version=@version@"></script>
+          <script type="text/javascript"
+                  src="js/cadc.search.preview.js?version=@version@"></script>
+          <script type="text/javascript"
+                  src="js/cadc.search.app.js?version=@version@"></script>
+          <script type="text/javascript"
+                  src="js/cadc.search.tooltipcreator.js?version=@version@"></script>
+          <script type="text/javascript"
+                  src="js/hierarchy.js?version=@version@"></script>
 
-<%--Slow loaders, put them later in the process so they don't hang up the form usage--%>
-<script type="text/javascript" charset="utf-8"
-        src="cadcVOTV/javascript/aladin.js?version=@version@"></script>
+            <%--Slow loaders, put them later in the process so they don't hang up the form usage--%>
+            <script type="text/javascript" charset="utf-8"
+                    src="cadcVOTV/javascript/aladin.js?version=@version@"></script>
 
-<%--<script type="text/javascript"--%>
-<%--src="cadcJS/javascript/org.opencadc.js"></script>--%>
 
           <script type="text/javascript">
             $(document).ready(function ()
-                              {
-                                var searchApp =
-                                    new ca.nrc.cadc.search.AdvancedSearchApp({
-                                                                               "tapSyncEndpoint": "<%= tapSyncEndpoint %>",
-                                                                               "pageLanguage": $("html").prop("lang"),
-                                                                               "autoInitFlag": false,
-                                                                               "applicationEndpoint": "<%= applicationEndpoint %>",
-                                                                               "enableMAQ" : <%= enableMAQ %>,
-                                                                               "activateMAQ": <%= activateMAQ %>,
-                                                                                "showObscoreTab" : <%= showObsCoreTab %>
-                                                                             });
+              {
+                var searchApp =
+                    new ca.nrc.cadc.search.AdvancedSearchApp({
+                                                               "tapSyncEndpoint": "<%= tapSyncEndpoint %>",
+                                                               "pageLanguage": $("html").prop("lang"),
+                                                               "autoInitFlag": false,
+                                                               "applicationEndpoint": "<%= applicationEndpoint %>",
+                                                               "enableMAQ" : <%= enableMAQ %>,
+                                                               "activateMAQ": <%= activateMAQ %>,
+                                                                "showObscoreTab" : <%= showObsCoreTab %>
+                                                             });
 
-                                searchApp.subscribe(ca.nrc.cadc.search.events.onAdvancedSearchInit,
-                                                    function (event, args)
-                                                    {
-                                                      // TODO: Deal with situation where error is not null
-                                                      args.application.start();
-                                                    });
+                searchApp.subscribe(ca.nrc.cadc.search.events.onAdvancedSearchInit,
+                  function (event, args) {
+                    args.application.start();
+                  })
 
-                                searchApp.init();
+                searchApp.subscribe(ca.nrc.cadc.search.events.onAdvancedSearchInitFail,
+                  function(event, args) {
+                    // quote usage inverted here because french version of string has apostrophe.
+                    alert("<fmt:message key='ERROR_SEARCH_NOT_AVAILABLE' bundle='${langBundle}'/>")
+                  })
 
-                              });
+                searchApp.init();
+
+              });
 
           </script>
 

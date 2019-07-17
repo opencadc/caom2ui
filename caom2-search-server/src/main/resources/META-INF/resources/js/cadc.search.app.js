@@ -48,6 +48,7 @@
             AdvancedSearchApp: AdvancedSearchApp,
             events: {
               onAdvancedSearchInit: new jQuery.Event('onAdvancedSearchInit'),
+              onAdvancedSearchInitFail: new jQuery.Event('onAdvancedSearchInitFail'),
               onSetBookmarkUrl: new jQuery.Event('onSetBookmarkUrl')
             },
             downloadTypes: ['votable', 'csv', 'tsv']
@@ -100,7 +101,6 @@
     var previousCollections = []
 
     var _registryClient = new ca.nrc.cadc.search.registryclient.RegistryClient(_options)
-    //_registryClient.subscribe(ca.nrc.cadc.search.registryclient.events.onRegistryClientOK, this.loadVOTable)
 
     var tooltipJsonData = {}
 
@@ -321,6 +321,17 @@
       return upload
     }
 
+    this._displayError = function (error) {
+      var errorMessage = 'Metadata field failed to initialize: ' + error
+      console.error(errorMessage)
+      _searchApp._trigger(ca.nrc.cadc.search.events.onAdvancedSearchInitFail, {
+        error: errorMessage
+      })
+    }
+
+    this.reportError = function (event, args) {
+      _searchApp._displayError(args.responseText)
+    }
 
     this.loadVOTable = function (event, args) {
       var data = args.data
@@ -334,69 +345,54 @@
           _searchApp.options
       )
 
-      //function (data) {
-        new cadc.vot.Builder(
-            1000, {
-              xmlDOM: data
-            },
-            function (voTableBuilder) {
-              try {
-                voTableBuilder.build(voTableBuilder.buildRowData)
+      new cadc.vot.Builder(
+          1000, {
+            xmlDOM: data
+          },
+          function (voTableBuilder) {
+            try {
+              voTableBuilder.build(voTableBuilder.buildRowData)
 
-                var voTable = voTableBuilder.getVOTable()
-                var resources = voTable.getResources()
-                var tables = resources[0].getTables()
-                var tableData = tables[0].getTableData()
-                var rows = tableData.getRows()
+              var voTable = voTableBuilder.getVOTable()
+              var resources = voTable.getResources()
+              var tables = resources[0].getTables()
+              var tableData = tables[0].getTableData()
+              var rows = tableData.getRows()
 
-                for (var ri = 0, rl = rows.length; ri < rl; ri++) {
-                  var nextRow = rows[ri]
-                  var cells = nextRow.getCells()
+              for (var ri = 0, rl = rows.length; ri < rl; ri++) {
+                var nextRow = rows[ri]
+                var cells = nextRow.getCells()
 
-                  var tableName
+                var tableName
 
-                  for (var ci = 0, cl = cells.length; ci < cl; ci++) {
-                    var nextCell = cells[ci]
-                    var nextFieldName = nextCell.getField().getName()
+                for (var ci = 0, cl = cells.length; ci < cl; ci++) {
+                  var nextCell = cells[ci]
+                  var nextFieldName = nextCell.getField().getName()
 
-                    if (nextFieldName === 'table_name') {
-                      tableName = nextCell.getValue()
-                      break
-                    }
-                  }
-
-                  if (tableName.indexOf('caom2') >= 0) {
-                    caomFormConfig.addField(nextRow)
-                  } else if (tableName.indexOf('ivoa') >= 0) {
-                    obsCoreFormConfig.addField(nextRow)
+                  if (nextFieldName === 'table_name') {
+                    tableName = nextCell.getValue()
+                    break
                   }
                 }
 
-                //callback(null, caomFormConfig, obsCoreFormConfig)
-                _searchApp._cleanMetadata(caomFormConfig)
-                _searchApp._cleanMetadata(obsCoreFormConfig)
-
-                _searchApp._initializeForms(caomFormConfig, obsCoreFormConfig)
-                _searchApp._trigger(ca.nrc.cadc.search.events.onAdvancedSearchInit, {})
-
-              } catch {
-
-
-                //if (error) {
-                var errorMessage = 'Metadata field failed to initialize: ' + error + ' \nSearch not available. Please refresh the page. If problem persists, contact CADC support.'
-                alert(errorMessage)
-                _searchApp._trigger(ca.nrc.cadc.search.events.onAdvancedSearchInit, {
-                  error: errorMessage
-                })
-                //} else {
-                //  this._cleanMetadata(caomConfiguration)
-                //  this._cleanMetadata(obsCoreConfiguration)
-                //
-                //  this._initializeForms(caomConfiguration, obsCoreConfiguration)
-                //  this._trigger(ca.nrc.cadc.search.events.onAdvancedSearchInit, {})
-                //}
+                if (tableName.indexOf('caom2') >= 0) {
+                  caomFormConfig.addField(nextRow)
+                } else if (tableName.indexOf('ivoa') >= 0) {
+                  obsCoreFormConfig.addField(nextRow)
+                }
               }
+
+              //callback(null, caomFormConfig, obsCoreFormConfig)
+              _searchApp._cleanMetadata(caomFormConfig)
+              _searchApp._cleanMetadata(obsCoreFormConfig)
+
+              _searchApp._initializeForms(caomFormConfig, obsCoreFormConfig)
+              _searchApp._trigger(ca.nrc.cadc.search.events.onAdvancedSearchInit, {})
+
+            } catch {
+              this._displayError(error)
             }
+          }
         )
 
     }
@@ -413,157 +409,9 @@
         "table_name='caom2.Plane') and utype like 'caom2:%') or " +
         "(table_name='ivoa.ObsCore' and utype like 'obscore:%')"
 
-      //var caomFormConfig = new ca.nrc.cadc.search.FormConfiguration(
-      //  new ca.nrc.cadc.search.CAOM2.FormConfiguration(),
-      //  this.options
-      //)
-      //var obsCoreFormConfig = new ca.nrc.cadc.search.FormConfiguration(
-      //  new ca.nrc.cadc.search.ObsCore.FormConfiguration(),
-      //  this.options
-      //)
-
-      // this.options.activateMAQ is passed in from index.jsp, and denotes whether
-      // the toggle is being used at all.
-      //
-      // this.options.activateMAQ signals the toggle switch is set to 'on'.
-
       _registryClient.subscribe(ca.nrc.cadc.search.registryclient.events.onRegistryClientOK, this.loadVOTable)
-      //_registryClient.subscribe(ca.nrc.cadc.search.registryclient.events.onRegistryClientFail, this.reportError)
-
+      _registryClient.subscribe(ca.nrc.cadc.search.registryclient.events.onRegistryClientFail, this.reportError)
       _registryClient.postTapRequest(tapQuery, 'votable')
-
-      //$.ajax({
-      //  type: 'POST',
-      //  url: this.options.tapSyncEndpoint,
-      //  data: {
-      //    REQUEST: 'doQuery',
-      //    LANG: 'ADQL',
-      //    USEMAQ: this.options.activateMAQ || false,
-      //    QUERY: tapQuery,
-      //    FORMAT: 'votable'
-      //  },
-      //  beforeSend: function(xhr){
-      //    xhr.withCredentials = true
-      //  },
-      //  jsonp: false,
-      //  dataType: 'xml'
-      //})
-      //.done(
-      //  function (data) {
-      //    new cadc.vot.Builder(
-      //      1000, {
-      //        xmlDOM: data
-      //      },
-      //      function (voTableBuilder) {
-      //        voTableBuilder.build(voTableBuilder.buildRowData)
-      //
-      //        var voTable = voTableBuilder.getVOTable()
-      //        var resources = voTable.getResources()
-      //        var tables = resources[0].getTables()
-      //        var tableData = tables[0].getTableData()
-      //        var rows = tableData.getRows()
-      //
-      //        for (var ri = 0, rl = rows.length; ri < rl; ri++) {
-      //          var nextRow = rows[ri]
-      //          var cells = nextRow.getCells()
-      //
-      //          var tableName
-      //
-      //          for (var ci = 0, cl = cells.length; ci < cl; ci++) {
-      //            var nextCell = cells[ci]
-      //            var nextFieldName = nextCell.getField().getName()
-      //
-      //            if (nextFieldName === 'table_name') {
-      //              tableName = nextCell.getValue()
-      //              break
-      //            }
-      //          }
-      //
-      //          if (tableName.indexOf('caom2') >= 0) {
-      //            caomFormConfig.addField(nextRow)
-      //          } else if (tableName.indexOf('ivoa') >= 0) {
-      //            obsCoreFormConfig.addField(nextRow)
-      //          }
-      //        }
-      //
-      //        callback(null, caomFormConfig, obsCoreFormConfig)
-      //      }
-      //    )
-      //  }
-      //).fail(function ($xhr, textStatus) {
-      //  callback(
-      //    'ERROR: TAP query failed: ' +
-      //    ($xhr.responseXML ? $xhr.responseXML : $xhr.responseText) +
-      //    '( ' +
-      //    textStatus +
-      //    ' )',
-      //    null,
-      //    null
-      //  )
-      //})
-
-
-      //$.get(
-      //    this.options.tapSyncEndpoint, {
-      //      REQUEST: 'doQuery',
-      //      LANG: 'ADQL',
-      //      USEMAQ: this.options.activateMAQ || false,
-      //      QUERY: tapQuery,
-      //      FORMAT: 'votable'
-      //    },
-      //    function (data) {
-      //      new cadc.vot.Builder(
-      //          1000, {
-      //            xmlDOM: data
-      //          },
-      //          function (voTableBuilder) {
-      //            voTableBuilder.build(voTableBuilder.buildRowData)
-      //
-      //            var voTable = voTableBuilder.getVOTable()
-      //            var resources = voTable.getResources()
-      //            var tables = resources[0].getTables()
-      //            var tableData = tables[0].getTableData()
-      //            var rows = tableData.getRows()
-      //
-      //            for (var ri = 0, rl = rows.length; ri < rl; ri++) {
-      //              var nextRow = rows[ri]
-      //              var cells = nextRow.getCells()
-      //
-      //              var tableName
-      //
-      //              for (var ci = 0, cl = cells.length; ci < cl; ci++) {
-      //                var nextCell = cells[ci]
-      //                var nextFieldName = nextCell.getField().getName()
-      //
-      //                if (nextFieldName === 'table_name') {
-      //                  tableName = nextCell.getValue()
-      //                  break
-      //                }
-      //              }
-      //
-      //              if (tableName.indexOf('caom2') >= 0) {
-      //                caomFormConfig.addField(nextRow)
-      //              } else if (tableName.indexOf('ivoa') >= 0) {
-      //                obsCoreFormConfig.addField(nextRow)
-      //              }
-      //            }
-      //
-      //            callback(null, caomFormConfig, obsCoreFormConfig)
-      //          }
-      //      )
-      //    },
-      //    'xml'
-      //).fail(function ($xhr, textStatus) {
-      //  callback(
-      //      'ERROR: TAP query failed: ' +
-      //      ($xhr.responseXML ? $xhr.responseXML : $xhr.responseText) +
-      //      '( ' +
-      //      textStatus +
-      //      ' )',
-      //      null,
-      //      null
-      //  )
-      //})
     }
 
     /**
@@ -1353,7 +1201,10 @@
         }
         this._setObsCoreSearchForm(obsCoreSearchForm)
       } catch {
-        alert("Error initializing search forms. Please refresh the page to try again. If error persists please contact CADC support.")
+        console.error('Error initializing search forms.')
+        _searchApp._trigger(ca.nrc.cadc.search.events.onAdvancedSearchInitFail, {
+          error: errorMessage
+        })
       }
 
       // End obscore search form setup.

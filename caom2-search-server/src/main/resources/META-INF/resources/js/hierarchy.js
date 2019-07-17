@@ -244,28 +244,16 @@
       this._loadDataTrain()
     }
 
-    function postTapRequest(serviceURL, tapQuery) {
-
+    this.postTapRequest = function(serviceURL, tapQuery) {
       return new Promise(function (resolve, reject) {
         var request = new XMLHttpRequest()
 
          //'load' is the XMLHttpRequest 'finished' event
+        // Called every time the server responds
         request.addEventListener(
             'load',
             function () {
               if (request.status === 200) {
-                //// load metadata into the panel here before resolving promise
-                //// Populate javascript object behind form
-                //
-                ////page.hideInfoModal()
-                ////page.setProgressBar('okay')
-                //var jsonData = page.parseJSONStr(request.responseText)
-                ////$('#doi_number').val(jsonData.resource.identifier['$'])
-                ////var doiSuffix = jsonData.resource.identifier['$'].split('/')[1]
-                ////
-                ////doiDoc.populateDoc(jsonData)
-                ////// Load metadata into the panel here before resolving promise
-                ////populateForm()
                 resolve(jsonData)
               } else {
                 reject(request)
@@ -284,9 +272,9 @@
     this.loadDataTrainOK = function(event, args) {
       var data = args.data
       _dt._trigger(
-                        ca.nrc.cadc.search.datatrain.events.onDataTrainLoaded,
-                        { data: data }
-                    )
+          ca.nrc.cadc.search.datatrain.events.onDataTrainLoaded,
+          { data: data }
+      )
     }
     this.loadDataTrainNOK = function() {
       _dt._trigger(
@@ -305,74 +293,6 @@
       _registryClient.subscribe(ca.nrc.cadc.search.registryclient.events.onRegistryClientOK, this.loadDataTrainOK)
       _registryClient.subscribe(ca.nrc.cadc.search.registryclient.events.onRegistryClientFail, this.loadDataTrainNOK)
       _registryClient.postTapRequest(tapQuery, 'CSV')
-
-      //var baseURI = ''
-      //if (this.activateMAQ === true) {
-      //  baseURI = ca.nrc.cadc.search.datatrain.TAP_MAQ_URI
-      //} else {
-      //  baseURI = ca.nrc.cadc.search.datatrain.TAP_URI
-      //}
-      //
-      //Promise.resolve(this.prepareTAPCall(baseURI))
-      //    .then(function(serviceURL) {
-      //
-      //      Promise.resolve(postDoiMetadata(serviceURL + urlAddition, multiPartData))
-      //          .then(function(data) {
-      //              this.groups = []
-      //              this._trigger(
-      //                  ca.nrc.cadc.search.datatrain.events.onDataTrainLoaded,
-      //                  { data: data }
-      //              )
-      //            }.bind(this)
-      //         )
-      //          .catch( function(jqXHR) {
-      //            this._trigger(
-      //                ca.nrc.cadc.search.datatrain.events.onDataTrainLoadFail,
-      //                { responseText: jqXHR.responseText }
-      //            )
-      //          }.bind(this))
-      //    })
-      //    .catch( function(jqXHR) {
-      //      this._trigger(
-      //          ca.nrc.cadc.search.datatrain.events.onDataTrainLoadFail,
-      //          { responseText: jqXHR.responseText }
-      //      )
-      //    }.bind(this))
-
-    //}
-
-      //$.post(
-      //  this.options.tapSyncEndpoint,
-      //  {
-      //    LANG: 'ADQL',
-      //    FORMAT: 'CSV',
-      //    USEMAQ: this.activateMAQ,
-      //    QUERY: tapQuery
-      //  },
-      //  {
-      //    xhrFields: {
-      //      withCredentials: true
-      //    },
-      //    jsonp: false
-      //  }
-      //)
-      //  .done(
-      //    function(data) {
-      //      this.groups = []
-      //      this._trigger(
-      //        ca.nrc.cadc.search.datatrain.events.onDataTrainLoaded,
-      //        { data: data }
-      //      )
-      //    }.bind(this)
-      //  )
-      //  .fail(
-      //    function(jqXHR) {
-      //      this._trigger(
-      //        ca.nrc.cadc.search.datatrain.events.onDataTrainLoadFail,
-      //        { responseText: jqXHR.responseText }
-      //      )
-      //    }.bind(this)
-      //  )
     }
 
     /**
