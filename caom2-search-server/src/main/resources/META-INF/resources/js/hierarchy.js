@@ -175,8 +175,8 @@
   function DataTrain(_modelDataSource, _columnManager, _options) {
     var stringUtil = new org.opencadc.StringUtil()
     var _dt = this
-    var _registryClient = new ca.nrc.cadc.search.registryclient.RegistryClient(_options)
 
+    this._registryClient = new ca.nrc.cadc.search.registryclient.RegistryClient(_options)
     this.modelDataSource = _modelDataSource
     this.pageLanguage = $('html').attr('lang')
     this.$dataTrainDOM = $("div[id='" + this.modelDataSource + "_data_train']")
@@ -189,7 +189,6 @@
 
     this.defaults = {
       autoInit: false,
-      tapSyncEndpoint: '/search/tap/sync',
       activateMAQ: this.activateMAQ
     }
 
@@ -213,7 +212,13 @@
      */
     this.init = function() {
       this._toggleLoading(true)
+      this.attachListeners()
       this._loadDataTrain()
+    }
+
+    this.attachListeners = function () {
+      this._registryClient.subscribe(ca.nrc.cadc.search.registryclient.events.onRegistryClientOK, this.loadDataTrainOK)
+      this._registryClient.subscribe(ca.nrc.cadc.search.registryclient.events.onRegistryClientFail, this.loadDataTrainNOK)
     }
 
     this.loadDataTrainOK = function(event, args) {
@@ -223,6 +228,7 @@
           { data: data }
       )
     }
+
     this.loadDataTrainNOK = function() {
       _dt._trigger(
           ca.nrc.cadc.search.datatrain.events.onDataTrainLoadFail,
@@ -236,10 +242,7 @@
      */
     this._loadDataTrain = function() {
       var tapQuery = this._createTAPQuery()
-
-      _registryClient.subscribe(ca.nrc.cadc.search.registryclient.events.onRegistryClientOK, this.loadDataTrainOK)
-      _registryClient.subscribe(ca.nrc.cadc.search.registryclient.events.onRegistryClientFail, this.loadDataTrainNOK)
-      _registryClient.postTAPRequest(tapQuery, 'CSV', this.activateMAQ)
+      this._registryClient.postTAPRequest(tapQuery, 'CSV', this.activateMAQ)
     }
 
     /**
