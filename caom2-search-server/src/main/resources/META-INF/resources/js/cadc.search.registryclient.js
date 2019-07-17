@@ -2,7 +2,7 @@
  ************************************************************************
  ****  C A N A D I A N   A S T R O N O M Y   D A T A   C E N T R E  *****
  *
- * (c) 2008.                            (c) 2008.
+ * (c) 2019.                            (c) 2019.
  * National Research Council            Conseil national de recherches
  * Ottawa, Canada, K1A 0R6              Ottawa, Canada, K1A 0R6
  * All rights reserved                  Tous droits reserves
@@ -37,7 +37,6 @@
               TAP_MAQ_URI: 'ivo://cadc.nrc.ca/tap/maq',
               TAP_URI: 'ivo://cadc.nrc.ca/tap',
               TAP_SYNC_ENDPOINT : '/sync',
-              TAP_PLUS_ENDPOINT: '/cadc-plus-external/sync',
               RegistryClient: RegistryClient,
               events: {
                 onRegistryClientOK: new jQuery.Event(
@@ -54,7 +53,6 @@
     }
   })
 
-  //https://jeevesh.cadc.dao.nrc.ca/tap/cadc-plus-external/sync?LANG=ADQL&FORMAT=CSV&USEMAQ=true&QUERY=SELECT+obs_collection%2Cfacility_name%2Cinstrument_name%2Ccalib_level%2Cdataproduct_type%2C+CASE+WHEN+max_t_min+%3E%3D+56842.621145960875+THEN+1+ELSE+0+END+FROM+caom2.obscoreenumfield
 
   /**
    * @param {String} [_options.tapSyncEndpoint=/search/tap/sync]    TAP Endpoint.
@@ -67,20 +65,13 @@
       activateMAQ: true
     }
 
-    var options = $.extend({}, true, this.defaults, _options)
+    this.options = $.extend({}, true, this.defaults, _options)
+
     var _rc = this
 
-    var _regClient = new Registry({
-      baseURL: options.baseURL
-    })
-
-    function _getBaseUrl() {
-      if (typeof this.options.baseURL == 'undefined') {
-        return ca.nrc.cadc.search.datatrain.BASEURL
-      } else {
-        return this.options.baseURL
-      }
-    }
+    var _regClient = this.options.baseURL === '' ?
+                        new Registry() :
+                        new Registry({baseURL: this.options.baseURL})
 
     function prepareTAPCall(baseURI) {
       return _regClient.getServiceURL(
@@ -92,12 +83,12 @@
     }
 
     /**
-     * Make call to server to get TAP data to load into DataTrain
+     * Make call to server to get TAP data
      * @private
      */
-    function postTapRequest(tapQuery, format) {
+    function postTAPRequest(tapQuery, format, activateMAQ) {
       var baseURI = ''
-      if (this.activateMAQ === true) {
+      if (activateMAQ === true) {
         baseURI = ca.nrc.cadc.search.datatrain.TAP_MAQ_URI
       } else {
         baseURI = ca.nrc.cadc.search.datatrain.TAP_URI
@@ -105,20 +96,14 @@
 
       Promise.resolve(this.prepareTAPCall(baseURI))
         .then( function (serviceURL) {
-          // make the call here. ajax or otherwise...
-
-          if (options.activateMAQ === true) {
-            serviceURL = serviceURL + ca.nrc.cadc.search.registryclient.TAP_PLUS_ENDPOINT
-          } else {
-            serviceURL = serviceURL + ca.nrc.cadc.search.registryclient.TAP_SYNC_ENDPOINT
-          }
+          serviceURL = serviceURL + ca.nrc.cadc.search.registryclient.TAP_SYNC_ENDPOINT
 
           $.post(
               serviceURL,
               {
                 LANG: 'ADQL',
                 FORMAT: format,
-                USEMAQ: true, // todo: get correct value in here
+                USEMAQ: activateMAQ,
                 QUERY: tapQuery
               },
               {
@@ -155,8 +140,8 @@
 
     }
 
-    // ---------- Event Handling Functions ----------
 
+    // ---------- Event Handling Functions ----------
     /**
      * Fire an event.  Taken from the slick.grid Object.
      *
@@ -167,8 +152,6 @@
      */
     function trigger(_event, _args) {
       var args = _args || {}
-      args.cadcForm = this
-
       return $(this).trigger(_event, _args)
     }
 
@@ -182,16 +165,14 @@
       $(this).on(_event.type, __handler)
     }
 
-
     // Set these functions as public
     $.extend(this, {
-      postTapRequest: postTapRequest,
+      postTAPRequest: postTAPRequest,
       prepareTAPCall: prepareTAPCall,
       subscribe: subscribe,
       trigger: trigger
     })
 
   }
-
 
 })(jQuery, window)

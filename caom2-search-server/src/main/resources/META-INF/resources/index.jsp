@@ -278,16 +278,22 @@
           <script type="text/javascript">
             $(document).ready(function ()
               {
-                var searchApp =
-                    new ca.nrc.cadc.search.AdvancedSearchApp({
-                                                               "tapSyncEndpoint": "<%= tapSyncEndpoint %>",
-                                                               "pageLanguage": $("html").prop("lang"),
-                                                               "autoInitFlag": false,
-                                                               "applicationEndpoint": "<%= applicationEndpoint %>",
-                                                               "enableMAQ" : <%= enableMAQ %>,
-                                                               "activateMAQ": <%= activateMAQ %>,
-                                                                "showObscoreTab" : <%= showObsCoreTab %>
-                                                             });
+                var searchApp = new ca.nrc.cadc.search.AdvancedSearchApp({
+                  autocompleteEndpoint: '<%= applicationEndpoint %>/unitconversion/',
+                  targetResolverEndpoint: '<%= applicationEndpoint %>/unitconversion/',
+                  tapSyncEndpoint: '<%= tapSyncEndpoint %>',
+                  packageEndpoint: '<%= applicationEndpoint %>/package',
+                  validatorEndpoint: '<%= applicationEndpoint %>/validate',
+                  previewsEndpoint: '<%= applicationEndpoint %>/preview',
+                  searchEndpoint: '<%= applicationEndpoint %>/find',
+                  applicationEndpoint: '<%= applicationEndpoint %>',
+                  pageLanguage: $('html').prop('lang'),
+                  autoInitFlag: false,
+                  enableMAQ : <%= enableMAQ %>,
+                  activateMAQ: <%= activateMAQ %>,
+                  showObscoreTab: <%= showObsCoreTab %>,
+                  baseURL: '${baseURL}'
+                })
 
                 searchApp.subscribe(ca.nrc.cadc.search.events.onAdvancedSearchInit,
                   function (event, args) {

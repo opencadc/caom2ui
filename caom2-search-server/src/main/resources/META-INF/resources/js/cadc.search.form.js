@@ -641,13 +641,14 @@
    *     form.
    * @constructor
    */
-  function SearchForm(_id, _autoInitFlag, _configuration) {
+  function SearchForm(_id, _autoInitFlag, _configuration, _baseURL) {
     var stringUtil = new org.opencadc.StringUtil()
 
     this.id = _id
     this.configuration = _configuration
     this.$form = $('form#' + _id)
     this.currentRequest = null
+    this.baseURL = _baseURL
 
     /**
      * @type {number}
@@ -663,8 +664,10 @@
      */
     this.dataTrain = new ca.nrc.cadc.search.datatrain.DataTrain(
       this.configuration.getName().toLowerCase(),
-      this.configuration.columnManager, {
-        tapSyncEndpoint: this.configuration.options.tapSyncEndpoint
+      this.configuration.columnManager,
+      {
+        tapSyncEndpoint: this.configuration.options.tapSyncEndpoint,
+        baseURL: this.baseURL
       }
     )
 

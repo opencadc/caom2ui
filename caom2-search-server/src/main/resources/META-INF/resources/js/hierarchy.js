@@ -2,7 +2,7 @@
  ************************************************************************
  ****  C A N A D I A N   A S T R O N O M Y   D A T A   C E N T R E  *****
  *
- * (c) 2008.                            (c) 2008.
+ * (c) 2019.                            (c) 2019.
  * National Research Council            Conseil national de recherches
  * Ottawa, Canada, K1A 0R6              Ottawa, Canada, K1A 0R6
  * All rights reserved                  Tous droits reserves
@@ -164,8 +164,6 @@
     }
   })
 
-  //https://jeevesh.cadc.dao.nrc.ca/tap/cadc-plus-external/sync?LANG=ADQL&FORMAT=CSV&USEMAQ=true&QUERY=SELECT+obs_collection%2Cfacility_name%2Cinstrument_name%2Ccalib_level%2Cdataproduct_type%2C+CASE+WHEN+max_t_min+%3E%3D+56842.621145960875+THEN+1+ELSE+0+END+FROM+caom2.obscoreenumfield
-
   /**
    * @param {String} _modelDataSource   Name of the data source [caom2 | obscore]
    * @param {{}} _options   Options to this DataTrain.
@@ -198,32 +196,6 @@
     this.options = $.extend({}, true, this.defaults, _options)
     this.columnManager = _columnManager
 
-
-    //this._registryClient = new Registry({
-    //  baseURL: ''
-    //})
-
-    //this._getBaseUrl = function() {
-    //  if (typeof this.options.baseURL == 'undefined') {
-    //    return ca.nrc.cadc.search.datatrain.BASEURL
-    //  } else {
-    //    return this.options.baseURL
-    //  }
-    //}
-
-    //this.prepareTAPCall = function(baseURI) {
-    //  return this._registryClient
-    //      .getServiceURL(
-    //          baseURI,
-    //          'ivo://ivoa.net/std/TAP',
-    //          'vs:ParamHTTP',
-    //          'cookie'
-    //      )
-    //      .catch(function (err) {
-    //        setAjaxFail('Error obtaining Service URL > ' + err)
-    //      })
-    //}
-
     /**
      * Obtain a column configuration object.
      * @param {String}  _uType    The uType.
@@ -242,31 +214,6 @@
     this.init = function() {
       this._toggleLoading(true)
       this._loadDataTrain()
-    }
-
-    this.postTapRequest = function(serviceURL, tapQuery) {
-      return new Promise(function (resolve, reject) {
-        var request = new XMLHttpRequest()
-
-         //'load' is the XMLHttpRequest 'finished' event
-        // Called every time the server responds
-        request.addEventListener(
-            'load',
-            function () {
-              if (request.status === 200) {
-                resolve(jsonData)
-              } else {
-                reject(request)
-              }
-            },
-            false
-        )
-        request.overrideMimeType('application/json')
-        request.withCredentials = true
-        request.open('POST', serviceURL)
-        request.setRequestHeader('Accept', 'application/json')
-        request.send(tapQuery)
-      })
     }
 
     this.loadDataTrainOK = function(event, args) {
@@ -292,7 +239,7 @@
 
       _registryClient.subscribe(ca.nrc.cadc.search.registryclient.events.onRegistryClientOK, this.loadDataTrainOK)
       _registryClient.subscribe(ca.nrc.cadc.search.registryclient.events.onRegistryClientFail, this.loadDataTrainNOK)
-      _registryClient.postTapRequest(tapQuery, 'CSV')
+      _registryClient.postTAPRequest(tapQuery, 'CSV', this.activateMAQ)
     }
 
     /**

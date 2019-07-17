@@ -100,7 +100,7 @@
     var resultsVOTV
     var previousCollections = []
 
-    var _registryClient = new ca.nrc.cadc.search.registryclient.RegistryClient(_options)
+    var _registryClient = new ca.nrc.cadc.search.registryclient.RegistryClient({"baseURL" : _options.baseURL})
 
     var tooltipJsonData = {}
 
@@ -402,7 +402,7 @@
      * @param {Function} callback   Callback on successful build.
      * @private
      */
-    this._initFormConfigurations = function (callback) {
+    this._initFormConfigurations = function () {
       var tapQuery =
         'select * from TAP_SCHEMA.columns where ' +
         "((table_name='caom2.Observation' or " +
@@ -411,7 +411,7 @@
 
       _registryClient.subscribe(ca.nrc.cadc.search.registryclient.events.onRegistryClientOK, this.loadVOTable)
       _registryClient.subscribe(ca.nrc.cadc.search.registryclient.events.onRegistryClientFail, this.reportError)
-      _registryClient.postTapRequest(tapQuery, 'votable')
+      _registryClient.postTAPRequest(tapQuery, 'votable', this.options.activateMAQ)
     }
 
     /**
@@ -424,24 +424,7 @@
       // jenkinsd 2014.02.13
       //
       wgxpath.install()
-
-      this._initFormConfigurations(
-        function (error, caomConfiguration, obsCoreConfiguration) {
-          if (error) {
-            var errorMessage = 'Metadata field failed to initialize: ' + error + ' \nSearch not available. Please refresh the page. If problem persists, contact CADC support.'
-            alert(errorMessage)
-            this._trigger(ca.nrc.cadc.search.events.onAdvancedSearchInit, {
-              error: errorMessage
-            })
-          } else {
-            this._cleanMetadata(caomConfiguration)
-            this._cleanMetadata(obsCoreConfiguration)
-
-            this._initializeForms(caomConfiguration, obsCoreConfiguration)
-            this._trigger(ca.nrc.cadc.search.events.onAdvancedSearchInit, {})
-          }
-        }.bind(this)
-      )
+      this._initFormConfigurations()
 
       /*
        * Story 1644
@@ -744,7 +727,8 @@
         var caomSearchForm = new ca.nrc.cadc.search.SearchForm(
             'queryForm',
             false,
-            caomConfiguration
+            caomConfiguration,
+            this.options.baseURL
         )
 
         // Disable the forms to begin with.
@@ -1174,7 +1158,8 @@
           obsCoreSearchForm = new ca.nrc.cadc.search.SearchForm(
               'obscoreQueryForm',
               false,
-              obsCoreConfiguration
+              obsCoreConfiguration,
+              this.options.baseURL
           )
 
           // Disable the forms to begin with.
