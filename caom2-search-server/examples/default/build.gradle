@@ -22,7 +22,7 @@ configurations.all {
 dependencies {
 //    compile 'log4j:log4j:1.2.+'
 
-    compile 'org.opencadc:caom2-search-server:[2.10.1,)'
+    compile 'org.opencadc:caom2-search-server:[2.10.2,)'
     compile 'org.opencadc:cadc-uws-server:[1.2.1,)'
     compile 'org.opencadc:cadc-registry:[1.5.0,)'
 
@@ -52,7 +52,7 @@ ext {
 
 sourceCompatibility = 1.7
 group = 'org.opencadc'
-version = '2048'
+version = '2049'
 apply from: '../../../_shared.gradle'
 
 war {
