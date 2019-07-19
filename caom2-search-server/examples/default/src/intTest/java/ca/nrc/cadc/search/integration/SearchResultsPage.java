@@ -117,12 +117,13 @@ public class SearchResultsPage extends AbstractTestWebPage {
     static final String OBSERVATION_DETAILS_LINK_LOCATOR = "caom2:Observation.observationID_%d_observation_details";
     static final By FIRST_QUICKSEARCH_TARGET_LINK = By.cssSelector("a.quicksearch_link:nth-child(1)");
     static final By QUERY_TAB_LOCATOR = By.cssSelector("#tabList > li:nth-child(1)");
+    static final By MAQ_CHECKBOX_BY = By.name("activateMAQ");
 
     // Switches between busy and transparent (idle).
     static final By GRID_HEADER_ICON = By.className("grid-header-icon");
 
     @FindBy(className = "grid-container")
-    private WebElement gridContainer;        waitForElementPresent(MAQ_CHECKBOX_BY);
+    private WebElement gridContainer;
 
 
     public SearchResultsPage(final WebDriver driver) throws Exception {
@@ -240,6 +241,7 @@ public class SearchResultsPage extends AbstractTestWebPage {
     CAOMSearchFormPage queryTab() throws Exception {
         waitFor(1000L);
         click(QUERY_TAB_LOCATOR);
+        waitForElementPresent(MAQ_CHECKBOX_BY);
         waitFor(1000L);
         return new CAOMSearchFormPage(driver);
     }
