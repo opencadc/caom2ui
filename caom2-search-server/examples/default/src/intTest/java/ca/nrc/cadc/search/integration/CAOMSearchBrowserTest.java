@@ -74,9 +74,9 @@ public class CAOMSearchBrowserTest extends AbstractAdvancedSearchIntegrationTest
         //searchFormPage = searchResultsPage.queryTab();
         //searchFormPage.reset();
         //searchFormPage.uncheckMAQ();
-        
+
         searchFormPage.enterCollection("CFHTMEGAPIPE");
-        searchResultsPage = searchFormPage.submitSuccess();
+        SearchResultsPage searchResultsPage = searchFormPage.submitSuccess();
 
         verifyEquals(searchResultsPage.getSelectIQUnit(), "Arcseconds");
 
