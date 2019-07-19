@@ -16,6 +16,7 @@
   final int maxRowLimit = configuration.lookupInt("org.opencadc.search.max-row-count", defaultMaxRowLimit);
   final boolean showObsCoreTab = configuration.lookupBoolean("org.opencadc.search.obs-core", true);
   final String applicationEndpoint = configuration.lookup("org.opencadc.search.app-service-endpoint", "/search");
+    final String tapServiceId = configuration.lookup("org.opencadc.search.tap-service-id");
   final String maqServiceId = configuration.lookup("org.opencadc.search.maq-tap-service-id");
 
   final boolean enableMAQ = StringUtil.hasText(maqServiceId);
@@ -279,6 +280,8 @@
                 var searchApp = new ca.nrc.cadc.search.AdvancedSearchApp({
                   autocompleteEndpoint: '<%= applicationEndpoint %>/unitconversion/',
                   targetResolverEndpoint: '<%= applicationEndpoint %>/unitconversion/',
+                  maqServiceId: '<%= maqServiceId %>',
+                  tapServiceId: '<%= tapServiceId %>',
                   packageEndpoint: '<%= applicationEndpoint %>/package',
                   validatorEndpoint: '<%= applicationEndpoint %>/validate',
                   previewsEndpoint: '<%= applicationEndpoint %>/preview',
