@@ -164,16 +164,18 @@
 
   /**
    * @param {String} _modelDataSource   Name of the data source [caom2 | obscore]
-   * @param {{}} _options   Options to this DataTrain.
    * @param {ColumnManager} _columnManager   Column Manager instance.
+   * @param {{}} _options   Options to instantiate this DataTrain.
    * @param {boolean} [_options.autoInit=false]   Whether to initialize on creation.
-   * @param {String} [_options.tapSyncEndpoint=/search/tap/sync]    TAP Endpoint.
    * @constructor
    */
   function DataTrain(_modelDataSource, _columnManager, _options) {
     var stringUtil = new org.opencadc.StringUtil()
     var _dt = this
 
+    // DataTrain instances have their own registry client because it responds to the thrown
+    // events differently than the containing search app will, so it needs to listen to a
+    // specific instance of registry client calls.
     this._registryClient = new ca.nrc.cadc.search.registryclient.RegistryClient(_options)
     this.modelDataSource = _modelDataSource
     this.pageLanguage = $('html').attr('lang')
@@ -187,7 +189,6 @@
 
     this.defaults = {
       autoInit: false,
-      activateMAQ: this.activateMAQ
     }
 
     this.options = $.extend({}, true, this.defaults, _options)
@@ -210,13 +211,14 @@
      */
     this.init = function() {
       this._toggleLoading(true)
-      this.attachListeners()
+      this._attachListeners()
       this._loadDataTrain()
     }
 
-    this.attachListeners = function () {
+    this._attachListeners = function () {
       this._registryClient.subscribe(ca.nrc.cadc.search.registryclient.events.onRegistryClientOK, this.loadDataTrainOK)
       this._registryClient.subscribe(ca.nrc.cadc.search.registryclient.events.onRegistryClientFail, this.loadDataTrainNOK)
+      $(".reloadHierarchySubmit").on('click', this._reloadDataTrain)
     }
 
     this.loadDataTrainOK = function(event, args) {
@@ -227,10 +229,10 @@
       )
     }
 
-    this.loadDataTrainNOK = function() {
+    this.loadDataTrainNOK = function(event, args) {
       _dt._trigger(
           ca.nrc.cadc.search.datatrain.events.onDataTrainLoadFail,
-          {responseText: jqXHR.responseText}
+          {responseText: args.responseText}
       )
     }
 
@@ -242,6 +244,50 @@
       var tapQuery = this._createTAPQuery()
       this._registryClient.postTAPRequest(tapQuery, 'CSV', this.activateMAQ)
     }
+
+    /**
+     * Reload the Data Train.
+     * @private
+     */
+    this._reloadDataTrain = function() {
+      _dt._setDataTrainDisplayState('loading')
+      _dt._loadDataTrain()
+    }
+
+    /**
+     * Toggle the data train reload button.
+     * @private
+     */
+    this._toggleReloadButton = function(turnOn) {
+      var $reloadHierarchyDiv = $('.reloadHierarchy')
+      if (turnOn === true) {
+        $reloadHierarchyDiv.removeClass('hidden')
+      } else {
+        $reloadHierarchyDiv.addClass('hidden')
+      }
+    }
+
+    /**
+     * Set state of Data Train display.
+     * @private
+     */
+    this._setDataTrainDisplayState = function(stateName) {
+      switch(stateName) {
+        case 'loading' :
+          this._toggleLoading(true)
+          this._toggleReloadButton(false)
+          break
+        case 'reload' :
+          this._toggleLoading(false)
+          this._toggleReloadButton(true)
+          break
+        case 'dataTrain':
+          this._toggleLoading(false)
+          this._toggleReloadButton(false)
+          break
+      }
+    }
+
 
     /**
      * Create the TAP query to obtain the Data Train values.
@@ -1111,19 +1157,18 @@
       function(event, args) {
         var dt = args.dataTrain
         dt.load(args.data)
-        dt._toggleLoading(false)
+        _dt._setDataTrainDisplayState('dataTrain')
       }
     )
 
     this.subscribe(
       ca.nrc.cadc.search.datatrain.events.onDataTrainLoadFail,
       function(event, args) {
-        alert(
+        console.log(
           'Error while querying TAP to initialize the page: ' +
             args.responseText
         )
-        var dt = args.dataTrain
-        dt._toggleLoading(false)
+        _dt._setDataTrainDisplayState('reload')
       }
     )
 

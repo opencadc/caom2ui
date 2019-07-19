@@ -23,8 +23,6 @@
   final boolean activateMAQ = enableMAQ && (configuration.lookupBoolean("org.opencadc.search.maq-activated", false)
                                             || (StringUtil.hasText(activateMAQParam)
                                                 && (activateMAQParam.equals("true") || activateMAQParam.equals("on"))));
-
-  final String tapSyncEndpoint = applicationEndpoint + "/tap/sync";
 %>
 
 <%-- Request scope variables so they can be seen in the imported JSPs --%>
@@ -281,7 +279,6 @@
                 var searchApp = new ca.nrc.cadc.search.AdvancedSearchApp({
                   autocompleteEndpoint: '<%= applicationEndpoint %>/unitconversion/',
                   targetResolverEndpoint: '<%= applicationEndpoint %>/unitconversion/',
-                  tapSyncEndpoint: '<%= tapSyncEndpoint %>',
                   packageEndpoint: '<%= applicationEndpoint %>/package',
                   validatorEndpoint: '<%= applicationEndpoint %>/validate',
                   previewsEndpoint: '<%= applicationEndpoint %>/preview',

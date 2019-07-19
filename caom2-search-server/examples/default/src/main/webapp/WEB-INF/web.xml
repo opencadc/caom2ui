@@ -111,10 +111,10 @@
         </init-param>
     </servlet>
 
-    <servlet>
-        <servlet-name>TAPServlet</servlet-name>
-        <servlet-class>ca.nrc.cadc.tap.TAPServlet</servlet-class>
-    </servlet>
+    <!--<servlet>-->
+        <!--<servlet-name>TAPServlet</servlet-name>-->
+        <!--<servlet-class>ca.nrc.cadc.tap.TAPServlet</servlet-class>-->
+    <!--</servlet>-->
 
     <servlet>
         <servlet-name>QuickSearchServlet</servlet-name>
@@ -246,10 +246,10 @@
         <url-pattern>/find</url-pattern>
     </servlet-mapping>
 
-    <servlet-mapping>
-        <servlet-name>TAPServlet</servlet-name>
-        <url-pattern>/tap/*</url-pattern>
-    </servlet-mapping>
+    <!--<servlet-mapping>-->
+        <!--<servlet-name>TAPServlet</servlet-name>-->
+        <!--<url-pattern>/tap/*</url-pattern>-->
+    <!--</servlet-mapping>-->
 
     <servlet-mapping>
         <servlet-name>QuickSearchServlet</servlet-name>

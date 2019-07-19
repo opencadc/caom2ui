@@ -108,7 +108,7 @@
    * @param {ObsCoreFormConfiguration|CAOM2FormConfiguration} _config   Configuration for concrete instance.
    *   object.
    * @param {{}}  _options    Options for the form config.
-   * @param {String}  [_options.tapSyncEndpoint="/search/tap/sync"]   TAP endpoint.
+   * @param {String}  [_options.tapSyncEndpoint]  TAP endpoint last used by registry client.
    * @param {String}  [_options.searchEndpoint="/search/find"]   Form submission endpoint.
    * @param {String}  [_options.validatorEndpoint="/search/validate"]   Form validator endpoint.
    * @param {String}  [_options.autocompleteEndpoint="/search/unitconversion"]   Autocomplete (units, Observation
@@ -665,10 +665,7 @@
     this.dataTrain = new ca.nrc.cadc.search.datatrain.DataTrain(
       this.configuration.getName().toLowerCase(),
       this.configuration.columnManager,
-      {
-        tapSyncEndpoint: this.configuration.options.tapSyncEndpoint,
-        baseURL: this.baseURL
-      }
+      this.configuration.options
     )
 
     var VALIDATOR_TIMER_DELAY = 500
@@ -767,7 +764,9 @@
                   req.term.toLowerCase()
                 ])
               })
-              // Does anything need to be done differently here for MAQ support?
+
+              // tapSyncEndpoint is set after each data train load, so the autocomplete
+              // should be going to the same endpoint for data.
               $.get(config.options.tapSyncEndpoint, payload).done(function (
                 csvData
               ) {
@@ -978,6 +977,10 @@
 
     this.enableMaqToggle = function () {
       this._toggleMAQToggle(true)
+    }
+
+    this.setTapSyncEndpoint = function() {
+      this.configuration.options.tapSyncEndpoint = this.getDataTrain()._registryClient.getLastEndpoint()
     }
 
     this._toggleMAQToggle = function (enabledFlag) {

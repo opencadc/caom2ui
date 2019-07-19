@@ -11,7 +11,6 @@
               applicationEndpoint: '/search',
               autoInitFlag: true,
               enableOneClickDownload: true,
-              tapSyncEndpoint: '/search/tap/sync',
               targetResolverEndpoint: '/search/unitconversion',
               packageEndpoint: '/search/package',
               autocompleteEndpoint: '/search/unitconversion',
@@ -64,7 +63,6 @@
    * @param {Object} _options   Options to this Application.
    * @param {String} [_options.pageLanguage="en"]   The language from the page.
    * @param {Boolean} [_options.autoInitFlag=true]   Whether to auto-initialize this application.
-   * @param {String} [_options.tapSyncEndpoint="/search/tap/sync"]   Relative URI endpoint to the TAP service.
    * @param {String} [_options.packageEndpoint="/search/package"]   Relative URI endpoint to the CAOM2 package service.
    * @param {String} [_options.previewsEndpoint="/search/preview"]   Relative URI endpoint to the Preview service.
    * @param {String} [_options.validatorEndpoint="/search/validate"]   Relative URI endpoint to the Validator service.
@@ -100,14 +98,13 @@
     var resultsVOTV
     var previousCollections = []
 
-    var _registryClient = new ca.nrc.cadc.search.registryclient.RegistryClient({"baseURL" : _options.baseURL})
+    var _registryClient = new ca.nrc.cadc.search.registryclient.RegistryClient(_options)
 
     var tooltipJsonData = {}
 
     var services = {
       autocompleteEndpoint: _options.autocompleteEndpoint,
       targetResolverEndpoint: _options.targetResolverEndpoint,
-      tapSyncEndpoint: _options.tapSyncEndpoint,
       packageEndpoint: _options.packageEndpoint,
       validatorEndpoint: _options.validatorEndpoint,
       previewsEndpoint: _options.previewsEndpoint,
@@ -382,15 +379,14 @@
                 }
               }
 
-              //callback(null, caomFormConfig, obsCoreFormConfig)
               _searchApp._cleanMetadata(caomFormConfig)
               _searchApp._cleanMetadata(obsCoreFormConfig)
 
               _searchApp._initializeForms(caomFormConfig, obsCoreFormConfig)
               _searchApp._trigger(ca.nrc.cadc.search.events.onAdvancedSearchInit, {})
 
-            } catch {
-              this._displayError(error)
+            } catch (e) {
+              this._displayError(e)
             }
           }
         )
@@ -721,14 +717,17 @@
      */
     this._initializeForms = function (caomConfiguration, obsCoreConfiguration) {
       // Start setting up caomSearchForm
-      // obsCoreSearchForm is set up near the end of this function
+      // obsCoreSearchForm is set up nearer the end of this function
 
       try {
+
+        // Grab current endpoint from registry client so configuration of votable
+        // can be completed
+        caomConfiguration.options.tapSyncEndpoint = _registryClient.getLastEndpoint()
         var caomSearchForm = new ca.nrc.cadc.search.SearchForm(
             'queryForm',
             false,
-            caomConfiguration,
-            this.options.baseURL
+            caomConfiguration
         )
 
         // Disable the forms to begin with.
@@ -1154,12 +1153,15 @@
         // If the tab is not going to be shown, there's no need to set up the form.
         var obsCoreSearchForm = null
 
+
         if (this.options.showObscoreTab === true) {
+          // Grab current endpoint from registry client so configuration of votable
+          // can be completed
+          obsCoreConfiguration.options.tapSyncEndpoint = _registryClient.getLastEndpoint()
           obsCoreSearchForm = new ca.nrc.cadc.search.SearchForm(
               'obscoreQueryForm',
               false,
-              obsCoreConfiguration,
-              this.options.baseURL
+              obsCoreConfiguration
           )
 
           // Disable the forms to begin with.
@@ -1185,8 +1187,8 @@
           )
         }
         this._setObsCoreSearchForm(obsCoreSearchForm)
-      } catch {
-        console.error('Error initializing search forms.')
+      } catch (errorMessage) {
+        console.error('Error initializing search forms: ' + errorMessage)
         _searchApp._trigger(ca.nrc.cadc.search.events.onAdvancedSearchInitFail, {
           error: errorMessage
         })
@@ -1249,6 +1251,9 @@
         // Enable the switch again (was disabled prior to data train load to
         // make sure only one call is out at a time from this page
         activeSearchForm.enableMaqToggle()
+
+        // Set tap endpoint so autocomplete in forms will go to the correct source
+        activeSearchForm.setTapSyncEndpoint()
 
         // set tooltips url
         var tooltipURL = 'json/tooltips_' + this.getPageLanguage() + '.json'
@@ -1690,11 +1695,9 @@
       var queryParam = 'QUERY=' + encodeURIComponent(this._getADQL(true)).replace('!', '%21')
 
       var votableURL =
-        this.options.tapSyncEndpoint +
-        '?LANG=ADQL&REQUEST=doQuery&USEMAQ=' +
-        this.options.activateMAQ +
-        '&' +
-        queryParam
+            _registryClient.getLastURL() +
+            '?LANG=ADQL&REQUEST=doQuery&' +
+            queryParam
 
       var upload = this._getTargetUpload()
       if (upload) {
@@ -2017,6 +2020,9 @@
         }
 
         var activeForm = this._getActiveForm()
+        // Value is not passed as part of payload from _processResults
+        // Turn to the search registry client
+        //var url = _registryClient.getLastURL()
         var url = json.results_url
         var buildInput = {
           url: url,

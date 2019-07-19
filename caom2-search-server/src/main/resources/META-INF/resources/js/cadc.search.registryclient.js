@@ -33,11 +33,8 @@
         cadc: {
           search: {
             registryclient: {
-              BASEURL: '',
-              TAP_MAQ_URI: 'ivo://cadc.nrc.ca/tap/maq',
-              TAP_URI: 'ivo://cadc.nrc.ca/tap',
               TAP_SYNC_ENDPOINT : '/sync',
-              RegistryClient: RegistryClient,
+              SearchTapClient: SearchTapClient,
               events: {
                 onRegistryClientOK: new jQuery.Event(
                     'SearchRegistryClient:onRegistryClientOK'
@@ -53,22 +50,17 @@
     }
   })
 
-
   /**
-   * @param {String} [_options.tapSyncEndpoint=/search/tap/sync]    TAP Endpoint.
+   * @param {String} [_options.baseURL]    URL of host system.
+   * @param {String} [_options.maqServiceId]    Service of MAQ TAP - from org.opencadc.search.properties.
+   * @param {String} [_options.tapServiceId]    Service of TAP - from org.opencadc.search.properties
    * @constructor
    */
-  function RegistryClient(_options) {
-
-    this.defaults = {
-      baseURL: ca.nrc.cadc.search.BASEURL,
-      activateMAQ: true
-    }
-
-    this.options = $.extend({}, true, this.defaults, _options)
+  function SearchTapClient(_options) {
+    this.options = _options
+    this._lastURLUsed = ''
 
     var _rc = this
-
     var _regClient = this.options.baseURL === '' ?
                         new Registry() :
                         new Registry({baseURL: this.options.baseURL})
@@ -89,21 +81,22 @@
     function postTAPRequest(tapQuery, format, activateMAQ) {
       var baseURI = ''
       if (activateMAQ === true) {
-        baseURI = ca.nrc.cadc.search.datatrain.TAP_MAQ_URI
+        baseURI = _rc.options.maqServiceId
       } else {
-        baseURI = ca.nrc.cadc.search.datatrain.TAP_URI
+        baseURI = _rc.options.tapServiceId
       }
 
       Promise.resolve(this.prepareTAPCall(baseURI))
         .then( function (serviceURL) {
           serviceURL = serviceURL + ca.nrc.cadc.search.registryclient.TAP_SYNC_ENDPOINT
+          _rc._lastURLUsed = serviceURL
 
           $.post(
               serviceURL,
               {
                 LANG: 'ADQL',
                 FORMAT: format,
-                USEMAQ: activateMAQ,
+                //USEMAQ: activateMAQ,
                 QUERY: tapQuery
               },
               {
@@ -140,10 +133,19 @@
 
     }
 
+    function getLastURL() {
+      return this._lastURLUsed
+    }
+
+    function getLastEndpoint() {
+      var parts = this._lastURLUsed.match(/https\:\/\/[a-z\.]+\/(.+)/)
+      var lastEndpoint = '/' + parts[1]
+      return lastEndpoint
+    }
 
     // ---------- Event Handling Functions ----------
     /**
-     * Fire an event.  Taken from the slick.grid Object.
+     * Fire an event.
      *
      * @param {jQuery.Event}  _event       The Event to fire.
      * @param {{}}  _args        Arguments to the event.
@@ -167,6 +169,8 @@
 
     // Set these functions as public
     $.extend(this, {
+      getLastEndpoint: getLastEndpoint,
+      getLastURL: getLastURL,
       postTAPRequest: postTAPRequest,
       prepareTAPCall: prepareTAPCall,
       subscribe: subscribe,
