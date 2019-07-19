@@ -63,10 +63,6 @@ public class CAOMSearchBrowserTest extends AbstractAdvancedSearchIntegrationTest
 
         verifyTrue(index > 0);
 
-        searchFormPage = searchResultsPage.queryTab();
-        searchFormPage.reset();
-        searchFormPage.uncheckMAQ();
-
         searchFormPage.enterTarget("M17");
         searchFormPage.enterCollection("JCMT");
 
