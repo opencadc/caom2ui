@@ -37,11 +37,14 @@
               SearchTapClient: SearchTapClient,
               events: {
                 onRegistryClientOK: new jQuery.Event(
-                    'SearchRegistryClient:onRegistryClientOK'
+                  'SearchTapClient:onRegistryClientOK'
                 ),
                 onRegistryClientFail: new jQuery.Event(
-                    'SearchRegistryClient:onRegistryClientFail'
-                )
+                  'SearchTapClient:onRegistryClientFail'
+                ),
+                onRegistryClientReady: new jQuery.Event(
+                  'SearchTapClient:onRegistryClientReady'
+                ),
               }
             }
           }
@@ -58,12 +61,15 @@
    */
   function SearchTapClient(_options) {
     this.options = _options
-    this._lastURLUsed = ''
+    this._lastURLUsed
+
+    this._serviceURLs = {}
 
     var _rc = this
     var _regClient = this.options.baseURL === '' ?
                         new Registry() :
                         new Registry({baseURL: this.options.baseURL})
+
 
     function prepareTAPCall(baseURI) {
       return _regClient.getServiceURL(
@@ -74,62 +80,85 @@
           )
     }
 
+    function setMAQServiceURL(url) {
+      this._serviceURLs.maq = new URL(url)
+    }
+
+    function setTAPServiceURL(url) {
+      this._serviceURLs.tap =  new URL(url)
+    }
+
+    function postRequest(serviceURL, format, tapQuery) {
+      _rc._lastURLUsed = new URL(serviceURL)
+
+        $.post(
+          serviceURL,
+          {
+            LANG: 'ADQL',
+            FORMAT: format,
+            QUERY: tapQuery
+          },
+          {
+            xhrFields: {
+              withCredentials: true
+            },
+            jsonp: false
+          }
+        )
+          .done(
+            function (data) {
+              _rc.trigger(
+                ca.nrc.cadc.search.registryclient.events.onRegistryClientOK,
+                {data: data}
+              )
+            }
+          )
+          .fail(
+            function (jqXHR) {
+              _rc.trigger(
+                ca.nrc.cadc.search.registryclient.events.onRegistryClientFail,
+                {responseText: jqXHR.responseText}
+              )
+            }
+          )
+    }
+
     /**
      * Make call to server to get TAP data
      * @private
      */
     function postTAPRequest(tapQuery, format, activateMAQ) {
-      var baseURI = ''
+      var baseURI
+      var serviceURL
+
       if (activateMAQ === true) {
         baseURI = _rc.options.maqServiceId
+        serviceURL = _rc._serviceURLs['maq']
       } else {
         baseURI = _rc.options.tapServiceId
+        serviceURL = _rc._serviceURLs['tap']
       }
 
-      Promise.resolve(this.prepareTAPCall(baseURI))
-        .then( function (serviceURL) {
-          serviceURL = serviceURL + ca.nrc.cadc.search.registryclient.TAP_SYNC_ENDPOINT
-          _rc._lastURLUsed = serviceURL
-
-          $.post(
-              serviceURL,
-              {
-                LANG: 'ADQL',
-                FORMAT: format,
-                //USEMAQ: activateMAQ,
-                QUERY: tapQuery
-              },
-              {
-                xhrFields: {
-                  withCredentials: true
-                },
-                jsonp: false
-              }
-          )
-          .done(
-              function (data) {
-                _rc.trigger(
-                    ca.nrc.cadc.search.registryclient.events.onRegistryClientOK,
-                    {data: data}
-                )
-              }
-          )
-          .fail(
-              function (jqXHR) {
-                _rc.trigger(
-                    ca.nrc.cadc.search.registryclient.events.onRegistryClientFail,
-                    {responseText: jqXHR.responseText}
-                )
-              }
-          )
-
-        })
-        .catch(function (err) {
-          _rc.trigger(
-            ca.nrc.cadc.search.registryclient.events.onRegistryClientFail,
-            {responseText: err}
-          )
-        })
+      if (typeof serviceURL === 'undefined') {
+        Promise.resolve(this.prepareTAPCall(baseURI))
+          .then(function (serviceURL) {
+            serviceURL = serviceURL + ca.nrc.cadc.search.registryclient.TAP_SYNC_ENDPOINT
+            if (activateMAQ === true) {
+              _rc.setMAQServiceURL(serviceURL)
+            } else {
+              _rc.setTAPServiceURL(serviceURL)
+            }
+            postRequest(serviceURL, format, tapQuery)
+          })
+          .catch(function (err) {
+            _rc.trigger(
+              ca.nrc.cadc.search.registryclient.events.onRegistryClientFail,
+              {responseText: err}
+            )
+          })
+      } else {
+        postRequest(serviceURL.href, format, tapQuery)
+      }
 
     }
 
@@ -138,9 +167,7 @@
     }
 
     function getLastEndpoint() {
-      var parts = this._lastURLUsed.match(/https\:\/\/[a-z\.]+\/(.+)/)
-      var lastEndpoint = '/' + parts[1]
-      return lastEndpoint
+      return this._lastURLUsed.pathname
     }
 
     // ---------- Event Handling Functions ----------
@@ -173,6 +200,8 @@
       getLastURL: getLastURL,
       postTAPRequest: postTAPRequest,
       prepareTAPCall: prepareTAPCall,
+      setMAQServiceURL: setMAQServiceURL,
+      setTAPServiceURL: setTAPServiceURL,
       subscribe: subscribe,
       trigger: trigger
     })

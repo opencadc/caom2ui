@@ -98,7 +98,7 @@
     var resultsVOTV
     var previousCollections = []
 
-    var _registryClient = new ca.nrc.cadc.search.registryclient.RegistryClient(_options)
+    var _registryClient = new ca.nrc.cadc.search.registryclient.SearchTapClient(_options)
 
     var tooltipJsonData = {}
 

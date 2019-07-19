@@ -176,7 +176,7 @@
     // DataTrain instances have their own registry client because it responds to the thrown
     // events differently than the containing search app will, so it needs to listen to a
     // specific instance of registry client calls.
-    this._registryClient = new ca.nrc.cadc.search.registryclient.RegistryClient(_options)
+    this._registryClient = new ca.nrc.cadc.search.registryclient.SearchTapClient(_options)
     this.modelDataSource = _modelDataSource
     this.pageLanguage = $('html').attr('lang')
     this.$dataTrainDOM = $("div[id='" + this.modelDataSource + "_data_train']")
