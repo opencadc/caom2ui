@@ -146,12 +146,20 @@ public class CAOMSearchFormPage extends AbstractSearchFormPage
 
         PageFactory.initElements(driver, this);
 
-        defaultMAQToggleFlag = isMAQEnabled() && Boolean.parseBoolean(findMAQToggleSwitch().findElement
-        (MAQ_CHECKBOX_BY).getAttribute("value"));
+        defaultMAQToggleFlag = isMAQEnabled() && Boolean.parseBoolean(findMAQToggleSwitch().findElement(MAQ_CHECKBOX_BY).getAttribute("value"));
     }
 
     boolean isMAQEnabled() throws Exception {
         return (findMAQToggleSwitch() != null);
+    }
+
+    boolean isMAQOn() throws Exception {
+        WebElement maqSwitch = findMAQToggleSwitch();
+        if (maqSwitch != null && maqSwitch.getAttribute("class").contains("btn-success")) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     WebElement findMAQToggleSwitch() throws Exception {
@@ -242,7 +250,7 @@ public class CAOMSearchFormPage extends AbstractSearchFormPage
     void checkMAQ() throws Exception {
         final WebElement maqToggleSwitch = findMAQToggleSwitch();
         if (isMAQEnabled()) {
-            if (maqToggleSwitch.findElement(MAQ_CHECKBOX_BY).isSelected()) {
+            if (isMAQOn()) {
                 LOGGER.warn(String.format("Checkbox at %s is already checked.", maqToggleSwitch));
             } else {
                 click(maqToggleSwitch);
@@ -255,7 +263,7 @@ public class CAOMSearchFormPage extends AbstractSearchFormPage
     void waitForMAQActivated() throws Exception {
         if (isMAQEnabled()) {
             waitForElementPresent(By.cssSelector("div.toggle.btn-success"));
-            verifyTrue(findMAQToggleSwitch().findElement(MAQ_CHECKBOX_BY).isSelected());
+            verifyTrue(isMAQOn());
             waitFor(1000L);
             waitForElementPresent(DATA_TRAIN_COLLECTION_MENU);
         }
@@ -265,7 +273,7 @@ public class CAOMSearchFormPage extends AbstractSearchFormPage
         final WebElement maqToggleSwitch = findMAQToggleSwitch();
 
         if (isMAQEnabled()) {
-            if (!maqToggleSwitch.findElement(MAQ_CHECKBOX_BY).isSelected()) {
+            if (!isMAQOn()) {
                 LOGGER.warn(String.format("Checkbox at %s is already unchecked.", maqToggleSwitch));
             } else {
                 click(maqToggleSwitch);
@@ -277,7 +285,7 @@ public class CAOMSearchFormPage extends AbstractSearchFormPage
     void waitForMAQDeactivated() throws Exception {
         if (isMAQEnabled()) {
             waitForElementPresent(By.cssSelector("div.toggle.off"));
-            verifyFalse(findMAQToggleSwitch().findElement(MAQ_CHECKBOX_BY).isSelected());
+            verifyFalse(isMAQOn());
             waitFor(1000L);
             waitForElementPresent(DATA_TRAIN_COLLECTION_MENU);
         }
