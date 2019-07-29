@@ -95,7 +95,7 @@ public class CAOMSearchBrowserTest extends AbstractAdvancedSearchIntegrationTest
         // Nav back to query tab for next test
         searchFormPage = searchResultsPage.queryTab();
         searchFormPage.reset();
-        searchFormPage.uncheckMAQ();
+//        searchFormPage.uncheckMAQ();
 
         // Do this test last as the quickSearchTarget download can tie up a TAP
         // service on slower machines
