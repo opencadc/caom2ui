@@ -136,13 +136,14 @@ public class CAOMSearchFormPage extends AbstractSearchFormPage
     {
         super(driver, DEFAULT_TIMEOUT_IN_SECONDS);
 
-        waitForElementPresent(DATA_TRAIN_LOCATOR);
-        waitForElementPresent(DATA_TRAIN_COLLECTION_MENU);
+
         waitForElementPresent(TARGET_INPUT);
         waitForElementPresent(By.id(SPECTRAL_COVERAGE_INPUT_ID));
         waitForElementPresent(By.id(OBSERVATION_DATE_INPUT_ID));
         waitForElementPresent(SSOIS_LINK_BY);
         waitForElementPresent(By.id("Observation.observationID"));
+        waitForElementPresent(DATA_TRAIN_LOCATOR);
+        waitForElementPresent(DATA_TRAIN_COLLECTION_MENU);
 
         PageFactory.initElements(driver, this);
 
