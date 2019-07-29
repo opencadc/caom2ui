@@ -143,7 +143,9 @@ public class CAOMSearchFormPage extends AbstractSearchFormPage
         waitForElementPresent(SSOIS_LINK_BY);
         waitForElementPresent(By.id("Observation.observationID"));
         waitForElementPresent(DATA_TRAIN_LOCATOR);
-        waitForElementPresent(DATA_TRAIN_COLLECTION_MENU);
+        WebElement myDynamicElement = (new WebDriverWait(driver, 10))
+            .until(ExpectedConditions.presenceOfElementLocated(DATA_TRAIN_COLLECTION_MENU));
+//        waitForElementPresent(DATA_TRAIN_COLLECTION_MENU);
 
         PageFactory.initElements(driver, this);
 
