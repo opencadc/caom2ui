@@ -97,9 +97,6 @@
     var columnManager = new ca.nrc.cadc.search.columns.ColumnManager()
     var resultsVOTV
     var previousCollections = []
-
-    var _searchTapClient = new ca.nrc.cadc.search.tapclient.SearchTapClient(_options)
-
     var tooltipJsonData = {}
 
     var services = {
@@ -110,13 +107,11 @@
       previewsEndpoint: _options.previewsEndpoint,
       searchEndpoint: _options.searchEndpoint,
       applicationEndpoint: _options.applicationEndpoint,
-
     }
 
     $.extend(true, ca.nrc.cadc.search.services, services)
 
     this.options = $.extend({}, ca.nrc.cadc.search.defaults, _options)
-    this.options.tapClient = _searchTapClient
 
     /**
      * @type {ca.nrc.cadc.search.SearchForm|SearchForm}
@@ -128,8 +123,26 @@
      */
     this.obsCoreSearchForm = null
 
-    // The active Form's ID being used to submit the last query.  Default is CAOM-2.
+    // The active Form's ID being used to submit the last query.
     this.activeFormID = 'queryForm'
+
+    // ------ start SearchTapClient setup & related functions ------
+
+    var _searchTapClient = new ca.nrc.cadc.search.tapclient.SearchTapClient(_options)
+    // Set _searchTapClient as part of the option set that
+    this.options.tapClient = _searchTapClient
+
+    this._detachTapClientListeners = function() {
+      _searchTapClient.unsubscribe(ca.nrc.cadc.search.tapclient.events.onTAPClientOK, this.loadVOTable)
+      _searchTapClient.unsubscribe(ca.nrc.cadc.search.tapclient.events.onTAPClientFail, this.reportError)
+    }
+
+    this._attachTapClientListeners = function() {
+      _searchTapClient.subscribe(ca.nrc.cadc.search.tapclient.events.onTAPClientOK, this.loadVOTable)
+      _searchTapClient.subscribe(ca.nrc.cadc.search.tapclient.events.onTAPClientFail, this.reportError)
+    }
+
+    // ------ end SearchTapClient setup & related functions ------
 
     /**
      * @return {String}
@@ -329,16 +342,21 @@
     }
 
     this.reportError = function (event, args) {
-      _searchTapClient.unsubscribe(ca.nrc.cadc.search.tapclient.events.onTAPClientOK, this.loadVOTable)
-      _searchTapClient.unsubscribe(ca.nrc.cadc.search.tapclient.events.onTAPClientFail, this.reportError)
+      _searchApp._detachTapClientListeners()
       _searchApp._displayError(args.responseText)
     }
 
+    /**
+     * Perform CAOM-2 and Obscore form configuration and initialization.
+     * Called after initial TAP schema call succeeds. Second step in making search
+     * forms available for use.
+     *
+     * @param event
+     * @param args
+     */
     this.loadVOTable = function (event, args) {
       var data = args.data
-
-      _searchTapClient.unsubscribe(ca.nrc.cadc.search.tapclient.events.onTAPClientOK, this.loadVOTable)
-      _searchTapClient.unsubscribe(ca.nrc.cadc.search.tapclient.events.onTAPClientFail, this.reportError)
+      _searchApp._detachTapClientListeners()
 
       var caomFormConfig = new ca.nrc.cadc.search.FormConfiguration(
           new ca.nrc.cadc.search.CAOM2.FormConfiguration(),
@@ -399,10 +417,11 @@
         )
 
     }
+
     /**
-     * Initialize the form configurations.
+     * Gather search form configuration information.
+     * First step in making search form available for use.
      *
-     * @param {Function} callback   Callback on successful build.
      * @private
      */
     this._initFormConfigurations = function () {
@@ -412,8 +431,12 @@
         "table_name='caom2.Plane') and utype like 'caom2:%') or " +
         "(table_name='ivoa.ObsCore' and utype like 'obscore:%')"
 
-      _searchTapClient.subscribe(ca.nrc.cadc.search.tapclient.events.onTAPClientOK, this.loadVOTable)
-      _searchTapClient.subscribe(ca.nrc.cadc.search.tapclient.events.onTAPClientFail, this.reportError)
+      // Start by gathering the TAP schema information
+      // using SearchTapClient instance. OK and Fail events issued by the class
+      // are responded to in functions named in _attachTapClientListeners().
+      // Listeners are removed after inital page load so response to these events
+      // only occurs at startup.
+      _searchApp._attachTapClientListeners()
       _searchTapClient.postTAPRequest(tapQuery, 'votable', this.options.activateMAQ)
     }
 
@@ -717,6 +740,7 @@
 
     /**
      * Initialize the form instances.
+     * Third step in making search forms available for use.
      *
      * @param {ca.nrc.cadc.search.CAOM2.FormConfiguration}  caomConfiguration CAOM2 form configuration.
      * @param {ca.nrc.cadc.search.ObsCore.FormConfiguration}  obsCoreConfiguration  ObsCore form configuration.
@@ -727,7 +751,6 @@
       // obsCoreSearchForm is set up nearer the end of this function
 
       try {
-
         // Grab current endpoint from registry client so configuration of votable
         // can be completed
         caomConfiguration.options.tapSyncEndpoint = _searchTapClient.getLastEndpoint()
