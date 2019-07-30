@@ -173,10 +173,6 @@
     var stringUtil = new org.opencadc.StringUtil()
     var _dt = this
 
-    // DataTrain instances have their own registry client because it responds to the thrown
-    // events differently than the containing search app will, so it needs to listen to a
-    // specific instance of registry client calls.
-    this._registryClient = new ca.nrc.cadc.search.registryclient.SearchTapClient(_options)
     this.modelDataSource = _modelDataSource
     this.pageLanguage = $('html').attr('lang')
     this.$dataTrainDOM = $("div[id='" + this.modelDataSource + "_data_train']")
@@ -192,6 +188,9 @@
     }
 
     this.options = $.extend({}, true, this.defaults, _options)
+
+    // tapClient is available at this.options.tapClient
+
     this.columnManager = _columnManager
 
     /**
@@ -216,8 +215,8 @@
     }
 
     this._attachListeners = function () {
-      this._registryClient.subscribe(ca.nrc.cadc.search.registryclient.events.onRegistryClientOK, this.loadDataTrainOK)
-      this._registryClient.subscribe(ca.nrc.cadc.search.registryclient.events.onRegistryClientFail, this.loadDataTrainNOK)
+      this.options.tapClient.subscribe(ca.nrc.cadc.search.tapclient.events.onTAPClientOK, this.loadDataTrainOK)
+      this.options.tapClient.subscribe(ca.nrc.cadc.search.tapclient.events.onTAPClientFail, this.loadDataTrainNOK)
       $(".reloadHierarchySubmit").on('click', this._reloadDataTrain)
     }
 
@@ -242,7 +241,7 @@
      */
     this._loadDataTrain = function() {
       var tapQuery = this._createTAPQuery()
-      this._registryClient.postTAPRequest(tapQuery, 'CSV', this.activateMAQ)
+      this.options.tapClient.postTAPRequest(tapQuery, 'CSV', this.activateMAQ)
     }
 
     /**

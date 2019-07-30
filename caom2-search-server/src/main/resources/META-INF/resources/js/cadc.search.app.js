@@ -98,7 +98,7 @@
     var resultsVOTV
     var previousCollections = []
 
-    var _registryClient = new ca.nrc.cadc.search.registryclient.SearchTapClient(_options)
+    var _searchTapClient = new ca.nrc.cadc.search.tapclient.SearchTapClient(_options)
 
     var tooltipJsonData = {}
 
@@ -109,12 +109,14 @@
       validatorEndpoint: _options.validatorEndpoint,
       previewsEndpoint: _options.previewsEndpoint,
       searchEndpoint: _options.searchEndpoint,
-      applicationEndpoint: _options.applicationEndpoint
+      applicationEndpoint: _options.applicationEndpoint,
+
     }
 
     $.extend(true, ca.nrc.cadc.search.services, services)
 
     this.options = $.extend({}, ca.nrc.cadc.search.defaults, _options)
+    this.options.tapClient = _searchTapClient
 
     /**
      * @type {ca.nrc.cadc.search.SearchForm|SearchForm}
@@ -327,11 +329,16 @@
     }
 
     this.reportError = function (event, args) {
+      _searchTapClient.unsubscribe(ca.nrc.cadc.search.tapclient.events.onTAPClientOK, this.loadVOTable)
+      _searchTapClient.unsubscribe(ca.nrc.cadc.search.tapclient.events.onTAPClientFail, this.reportError)
       _searchApp._displayError(args.responseText)
     }
 
     this.loadVOTable = function (event, args) {
       var data = args.data
+
+      _searchTapClient.unsubscribe(ca.nrc.cadc.search.tapclient.events.onTAPClientOK, this.loadVOTable)
+      _searchTapClient.unsubscribe(ca.nrc.cadc.search.tapclient.events.onTAPClientFail, this.reportError)
 
       var caomFormConfig = new ca.nrc.cadc.search.FormConfiguration(
           new ca.nrc.cadc.search.CAOM2.FormConfiguration(),
@@ -405,9 +412,9 @@
         "table_name='caom2.Plane') and utype like 'caom2:%') or " +
         "(table_name='ivoa.ObsCore' and utype like 'obscore:%')"
 
-      _registryClient.subscribe(ca.nrc.cadc.search.registryclient.events.onRegistryClientOK, this.loadVOTable)
-      _registryClient.subscribe(ca.nrc.cadc.search.registryclient.events.onRegistryClientFail, this.reportError)
-      _registryClient.postTAPRequest(tapQuery, 'votable', this.options.activateMAQ)
+      _searchTapClient.subscribe(ca.nrc.cadc.search.tapclient.events.onTAPClientOK, this.loadVOTable)
+      _searchTapClient.subscribe(ca.nrc.cadc.search.tapclient.events.onTAPClientFail, this.reportError)
+      _searchTapClient.postTAPRequest(tapQuery, 'votable', this.options.activateMAQ)
     }
 
     /**
@@ -723,7 +730,7 @@
 
         // Grab current endpoint from registry client so configuration of votable
         // can be completed
-        caomConfiguration.options.tapSyncEndpoint = _registryClient.getLastEndpoint()
+        caomConfiguration.options.tapSyncEndpoint = _searchTapClient.getLastEndpoint()
         var caomSearchForm = new ca.nrc.cadc.search.SearchForm(
             'queryForm',
             false,
@@ -1157,7 +1164,7 @@
         if (this.options.showObscoreTab === true) {
           // Grab current endpoint from registry client so configuration of votable
           // can be completed
-          obsCoreConfiguration.options.tapSyncEndpoint = _registryClient.getLastEndpoint()
+          obsCoreConfiguration.options.tapSyncEndpoint = _searchTapClient.getLastEndpoint()
           obsCoreSearchForm = new ca.nrc.cadc.search.SearchForm(
               'obscoreQueryForm',
               false,
@@ -1251,9 +1258,6 @@
         // Enable the switch again (was disabled prior to data train load to
         // make sure only one call is out at a time from this page
         activeSearchForm.enableMaqToggle()
-
-        // Set tap endpoint so autocomplete in forms will go to the correct source
-        activeSearchForm.setTapSyncEndpoint()
 
         // set tooltips url
         var tooltipURL = 'json/tooltips_' + this.getPageLanguage() + '.json'
@@ -1695,7 +1699,7 @@
       var queryParam = 'QUERY=' + encodeURIComponent(this._getADQL(true)).replace('!', '%21')
 
       var votableURL =
-            _registryClient.getLastURL() +
+            _searchTapClient.getLastURL() +
             '?LANG=ADQL&REQUEST=doQuery&' +
             queryParam
 
@@ -2020,9 +2024,6 @@
         }
 
         var activeForm = this._getActiveForm()
-        // Value is not passed as part of payload from _processResults
-        // Turn to the search registry client
-        //var url = _registryClient.getLastURL()
         var url = json.results_url
         var buildInput = {
           url: url,

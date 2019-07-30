@@ -32,18 +32,18 @@
       nrc: {
         cadc: {
           search: {
-            registryclient: {
+            tapclient: {
               TAP_SYNC_ENDPOINT : '/sync',
               SearchTapClient: SearchTapClient,
               events: {
-                onRegistryClientOK: new jQuery.Event(
-                  'SearchTapClient:onRegistryClientOK'
+                onTAPClientOK: new jQuery.Event(
+                  'SearchTapClient:onTAPClientOK'
                 ),
-                onRegistryClientFail: new jQuery.Event(
-                  'SearchTapClient:onRegistryClientFail'
+                onTAPClientFail: new jQuery.Event(
+                  'SearchTapClient:onTAPClientFail'
                 ),
-                onRegistryClientReady: new jQuery.Event(
-                  'SearchTapClient:onRegistryClientReady'
+                onTAPClientReady: new jQuery.Event(
+                  'SearchTapClient:onTAPClientReady'
                 ),
               }
             }
@@ -108,7 +108,7 @@
           .done(
             function (data) {
               _rc.trigger(
-                ca.nrc.cadc.search.registryclient.events.onRegistryClientOK,
+                ca.nrc.cadc.search.tapclient.events.onTAPClientOK,
                 {data: data}
               )
             }
@@ -116,7 +116,7 @@
           .fail(
             function (jqXHR) {
               _rc.trigger(
-                ca.nrc.cadc.search.registryclient.events.onRegistryClientFail,
+                ca.nrc.cadc.search.tapclient.events.onTAPClientFail,
                 {responseText: jqXHR.responseText}
               )
             }
@@ -142,7 +142,7 @@
       if (typeof serviceURL === 'undefined') {
         Promise.resolve(this.prepareTAPCall(baseURI))
           .then(function (serviceURL) {
-            serviceURL = serviceURL + ca.nrc.cadc.search.registryclient.TAP_SYNC_ENDPOINT
+            serviceURL = serviceURL + ca.nrc.cadc.search.tapclient.TAP_SYNC_ENDPOINT
             if (activateMAQ === true) {
               _rc.setMAQServiceURL(serviceURL)
             } else {
@@ -152,7 +152,7 @@
           })
           .catch(function (err) {
             _rc.trigger(
-              ca.nrc.cadc.search.registryclient.events.onRegistryClientFail,
+              ca.nrc.cadc.search.tapclient.events.onTAPClientFail,
               {responseText: err}
             )
           })
@@ -194,6 +194,16 @@
       $(this).on(_event.type, __handler)
     }
 
+    /**
+     * Unsubscribe to one of this object's events.
+     *
+     * @param {jQuery.Event}  _event      Event object.
+     * @param {function}  __handler   Handler function.
+     */
+    function unsubscribe(_event, __handler) {
+      $(this).off(_event.type, __handler)
+    }
+
     // Set these functions as public
     $.extend(this, {
       getLastEndpoint: getLastEndpoint,
@@ -203,7 +213,8 @@
       setMAQServiceURL: setMAQServiceURL,
       setTAPServiceURL: setTAPServiceURL,
       subscribe: subscribe,
-      trigger: trigger
+      trigger: trigger,
+      unsubscribe: unsubscribe
     })
 
   }

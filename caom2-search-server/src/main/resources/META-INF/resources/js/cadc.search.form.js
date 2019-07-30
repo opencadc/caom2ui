@@ -767,7 +767,7 @@
 
               // tapSyncEndpoint is set after each data train load, so the autocomplete
               // should be going to the same endpoint for data.
-              $.get(config.options.tapSyncEndpoint, payload).done(function (
+              $.get(config.options.tapClient.getLastEndpoint(), payload).done(function (
                 csvData
               ) {
                 var csvArray = csvData.split('\n')
@@ -977,10 +977,6 @@
 
     this.enableMaqToggle = function () {
       this._toggleMAQToggle(true)
-    }
-
-    this.setTapSyncEndpoint = function() {
-      this.configuration.options.tapSyncEndpoint = this.getDataTrain()._registryClient.getLastEndpoint()
     }
 
     this._toggleMAQToggle = function (enabledFlag) {
