@@ -765,8 +765,8 @@
                 ])
               })
 
-              // tapSyncEndpoint is set after each data train load, so the autocomplete
-              // should be going to the same endpoint for data.
+              // The TAP endpoint could be different after each data train load, (depending on whether
+              // the MAQ switch was toggled.) so the autocomplete should be going to the same endpoint for data.
               $.get(config.options.tapClient.getLastEndpoint(), payload).done(function (
                 csvData
               ) {
