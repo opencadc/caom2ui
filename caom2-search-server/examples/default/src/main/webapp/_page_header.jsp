@@ -53,10 +53,10 @@
     <!-- Bootstrap core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
     <link href="css/bootstrap-theme.min.css" rel="stylesheet" media="screen">
-    <link href="css/caom2_search_bootstrap_override.css" rel="stylesheet" media="screen">
+    <link href="css/bootstrap-toggle.min.css" rel="stylesheet" media="screen">
 
     <!-- CustomCSSStart -->
-
+    <link href="css/caom2_search_bootstrap_override.css" rel="stylesheet" media="screen">
     <!-- CustomCSSEnd -->
 
   </head>
