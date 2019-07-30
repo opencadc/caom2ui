@@ -189,14 +189,16 @@
                     .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"cadcVOTV/css/slick-default-theme.css?version=@version@\" />");
               });
           </script>
-            <script type="application/javascript" src="js/bootstrap.min.js"></script>
-            <script type="application/javascript" src="js/bootstrap-toggle.min.js"></script>
+          <script type="application/javascript" src="js/bootstrap.min.js"></script>
+          <script type="application/javascript" src="js/bootstrap-toggle.min.js"></script>
           <script type="text/javascript"
                   src="cadcVOTV/javascript/jquery.event.drag-2.2.min.js?version=@version@"></script>
           <script type="text/javascript"
                   src="js/jquery.form.js?version=@version@"></script>
           <script type="text/javascript"
                   src="cadcVOTV/javascript/jquery-ui-1.11.4.min.js?version=@version@"></script>
+          <script type="text/javascript"
+                  src="cadcJS/javascript/org.opencadc.js"></script>
 
 
           <!-- Moment for date parsing and formatting -->
@@ -269,9 +271,9 @@
           <script type="text/javascript"
                   src="js/hierarchy.js?version=@version@"></script>
 
-            <%--Slow loaders, put them later in the process so they don't hang up the form usage--%>
-            <script type="text/javascript" charset="utf-8"
-                    src="cadcVOTV/javascript/aladin.js?version=@version@"></script>
+          <%--Slow loaders, put them later in the process so they don't hang up the form usage--%>
+          <script type="text/javascript" charset="utf-8"
+                  src="cadcVOTV/javascript/aladin.js?version=@version@"></script>
 
 
           <script type="text/javascript">
