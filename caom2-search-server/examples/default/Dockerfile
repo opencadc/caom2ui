@@ -16,3 +16,4 @@ COPY build/libs/*.war webapps/
 VOLUME /root/config
 
 COPY org.opencadc.search.properties /root/config/
+COPY reg-resource-caps.properties /root/config/

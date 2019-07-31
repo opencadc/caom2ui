@@ -221,18 +221,26 @@
     }
 
     this.loadDataTrainOK = function(event, args) {
-      var data = args.data
-      _dt._trigger(
+      var callingId = args.callerId
+
+      if (callingId === _dt.modelDataSource) {
+        var data = args.data
+        _dt._trigger(
           ca.nrc.cadc.search.datatrain.events.onDataTrainLoaded,
-          { data: data }
-      )
+          {data: data}
+        )
+      }
     }
 
     this.loadDataTrainNOK = function(event, args) {
-      _dt._trigger(
+      var callingId = args.callerId
+
+      if (callingId === _dt.modelDataSource) {
+        _dt._trigger(
           ca.nrc.cadc.search.datatrain.events.onDataTrainLoadFail,
           {responseText: args.responseText}
-      )
+        )
+      }
     }
 
     /**
@@ -241,7 +249,7 @@
      */
     this._loadDataTrain = function() {
       var tapQuery = this._createTAPQuery()
-      this.options.tapClient.postTAPRequest(tapQuery, 'CSV', this.activateMAQ)
+      this.options.tapClient.postTAPRequest(tapQuery, 'CSV', this.activateMAQ, this.modelDataSource)
     }
 
     /**

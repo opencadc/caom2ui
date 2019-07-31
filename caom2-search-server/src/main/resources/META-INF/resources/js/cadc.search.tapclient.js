@@ -88,7 +88,7 @@
       this._serviceURLs.tap =  new URL(url)
     }
 
-    function postRequest(serviceURL, format, tapQuery) {
+    function postRequest(serviceURL, format, tapQuery, callerId) {
       _rc._lastURLUsed = new URL(serviceURL)
 
         $.post(
@@ -109,7 +109,10 @@
             function (data) {
               _rc.trigger(
                 ca.nrc.cadc.search.tapclient.events.onTAPClientOK,
-                {data: data}
+                {
+                  data: data,
+                  callerId: callerId
+                }
               )
             }
           )
@@ -117,7 +120,10 @@
             function (jqXHR) {
               _rc.trigger(
                 ca.nrc.cadc.search.tapclient.events.onTAPClientFail,
-                {responseText: jqXHR.responseText}
+                {
+                  responseText: jqXHR.responseText,
+                  callerId: callerId
+                }
               )
             }
           )
@@ -127,7 +133,9 @@
      * Make call to server to get TAP data
      * @private
      */
-    function postTAPRequest(tapQuery, format, activateMAQ) {
+    function postTAPRequest(tapQuery, format, activateMAQ, callerId) {
+      // callerId is so the listeners can determine if an event coming
+      // from an instance of this object belongs to them or not.
       var baseURI
       var serviceURL
 
@@ -148,7 +156,7 @@
             } else {
               _rc.setTAPServiceURL(serviceURL)
             }
-            postRequest(serviceURL, format, tapQuery)
+            postRequest(serviceURL, format, tapQuery, callerId)
           })
           .catch(function (err) {
             _rc.trigger(
@@ -157,7 +165,7 @@
             )
           })
       } else {
-        postRequest(serviceURL.href, format, tapQuery)
+        postRequest(serviceURL.href, format, tapQuery, callerId)
       }
 
     }

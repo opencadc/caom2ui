@@ -203,7 +203,7 @@
 <script type="text/javascript"
         src="cadcVOTV/javascript/jquery-ui-1.11.4.min.js?version=@version@"></script>
 <script type="text/javascript"
-                  src="cadcJS/javascript/org.opencadc.js"></script>
+        src="cadcJS/javascript/org.opencadc.js"></script>
 
 
 <!-- Moment for date parsing and formatting -->
@@ -278,7 +278,7 @@
 <script type="text/javascript"
         src="js/hierarchy.js?version=@version@"></script>
 <script type="text/javascript"
-        src="/cadc/bootstrap/js/registry-client.js"></script>
+        src="cadcJS/javascript/registry-client.js"></script>
 
 
 <script type="text/javascript">
