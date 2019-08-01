@@ -11,7 +11,6 @@
               applicationEndpoint: '/search',
               autoInitFlag: true,
               enableOneClickDownload: true,
-              tapSyncEndpoint: '/search/tap/sync',
               targetResolverEndpoint: '/search/unitconversion',
               packageEndpoint: '/search/package',
               autocompleteEndpoint: '/search/unitconversion',
@@ -48,6 +47,7 @@
             AdvancedSearchApp: AdvancedSearchApp,
             events: {
               onAdvancedSearchInit: new jQuery.Event('onAdvancedSearchInit'),
+              onAdvancedSearchInitFail: new jQuery.Event('onAdvancedSearchInitFail'),
               onSetBookmarkUrl: new jQuery.Event('onSetBookmarkUrl')
             },
             downloadTypes: ['votable', 'csv', 'tsv']
@@ -63,7 +63,6 @@
    * @param {Object} _options   Options to this Application.
    * @param {String} [_options.pageLanguage="en"]   The language from the page.
    * @param {Boolean} [_options.autoInitFlag=true]   Whether to auto-initialize this application.
-   * @param {String} [_options.tapSyncEndpoint="/search/tap/sync"]   Relative URI endpoint to the TAP service.
    * @param {String} [_options.packageEndpoint="/search/package"]   Relative URI endpoint to the CAOM2 package service.
    * @param {String} [_options.previewsEndpoint="/search/preview"]   Relative URI endpoint to the Preview service.
    * @param {String} [_options.validatorEndpoint="/search/validate"]   Relative URI endpoint to the Validator service.
@@ -76,6 +75,7 @@
   function AdvancedSearchApp(_options) {
     // Stat fields to show on result table.
     var netEnd, loadStart, loadEnd
+    var _searchApp = this
 
     /**
      * @property
@@ -97,18 +97,16 @@
     var columnManager = new ca.nrc.cadc.search.columns.ColumnManager()
     var resultsVOTV
     var previousCollections = []
-
     var tooltipJsonData = {}
 
     var services = {
       autocompleteEndpoint: _options.autocompleteEndpoint,
       targetResolverEndpoint: _options.targetResolverEndpoint,
-      tapSyncEndpoint: _options.tapSyncEndpoint,
       packageEndpoint: _options.packageEndpoint,
       validatorEndpoint: _options.validatorEndpoint,
       previewsEndpoint: _options.previewsEndpoint,
       searchEndpoint: _options.searchEndpoint,
-      applicationEndpoint: _options.applicationEndpoint
+      applicationEndpoint: _options.applicationEndpoint,
     }
 
     $.extend(true, ca.nrc.cadc.search.services, services)
@@ -125,8 +123,26 @@
      */
     this.obsCoreSearchForm = null
 
-    // The active Form's ID being used to submit the last query.  Default is CAOM-2.
+    // The active Form's ID being used to submit the last query.
     this.activeFormID = 'queryForm'
+
+    // ------ start SearchTapClient setup & related functions ------
+
+    var _searchTapClient = new ca.nrc.cadc.search.tapclient.SearchTapClient(_options)
+    // Set _searchTapClient as part of the option set that
+    this.options.tapClient = _searchTapClient
+
+    this._detachTapClientListeners = function() {
+      _searchTapClient.unsubscribe(ca.nrc.cadc.search.tapclient.events.onTAPClientOK, this.loadVOTable)
+      _searchTapClient.unsubscribe(ca.nrc.cadc.search.tapclient.events.onTAPClientFail, this.reportError)
+    }
+
+    this._attachTapClientListeners = function() {
+      _searchTapClient.subscribe(ca.nrc.cadc.search.tapclient.events.onTAPClientOK, this.loadVOTable)
+      _searchTapClient.subscribe(ca.nrc.cadc.search.tapclient.events.onTAPClientFail, this.reportError)
+    }
+
+    // ------ end SearchTapClient setup & related functions ------
 
     /**
      * @return {String}
@@ -317,47 +333,46 @@
       return upload
     }
 
+    this._displayError = function (error) {
+      var errorMessage = 'Metadata field failed to initialize: ' + error
+      console.error(errorMessage)
+      _searchApp._trigger(ca.nrc.cadc.search.events.onAdvancedSearchInitFail, {
+        error: errorMessage
+      })
+    }
+
+    this.reportError = function (event, args) {
+      _searchApp._detachTapClientListeners()
+      _searchApp._displayError(args.responseText)
+    }
+
     /**
-     * Initialize the form configurations.
+     * Perform CAOM-2 and Obscore form configuration and initialization.
+     * Called after initial TAP schema call succeeds. Second step in making search
+     * forms available for use.
      *
-     * @param {Function} callback   Callback on successful build.
-     * @private
+     * @param event
+     * @param args
      */
-    this._initFormConfigurations = function (callback) {
-      var tapQuery =
-        'select * from TAP_SCHEMA.columns where ' +
-        "((table_name='caom2.Observation' or " +
-        "table_name='caom2.Plane') and utype like 'caom2:%') or " +
-        "(table_name='ivoa.ObsCore' and utype like 'obscore:%')"
+    this.loadVOTable = function (event, args) {
+      var data = args.data
+      _searchApp._detachTapClientListeners()
 
       var caomFormConfig = new ca.nrc.cadc.search.FormConfiguration(
-        new ca.nrc.cadc.search.CAOM2.FormConfiguration(),
-        this.options
+          new ca.nrc.cadc.search.CAOM2.FormConfiguration(),
+          _searchApp.options
       )
       var obsCoreFormConfig = new ca.nrc.cadc.search.FormConfiguration(
-        new ca.nrc.cadc.search.ObsCore.FormConfiguration(),
-        this.options
+          new ca.nrc.cadc.search.ObsCore.FormConfiguration(),
+          _searchApp.options
       )
 
-      // this.options.activateMAQ is passed in from index.jsp, and denotes whether
-      // the toggle is being used at all.
-      //
-      // this.options.activateMAQ signals the toggle switch is set to 'on'.
-
-      $.get(
-        this.options.tapSyncEndpoint, {
-          REQUEST: 'doQuery',
-          LANG: 'ADQL',
-          USEMAQ: this.options.activateMAQ || false,
-          QUERY: tapQuery,
-          FORMAT: 'votable'
-        },
-        function (data) {
-          new cadc.vot.Builder(
-            1000, {
-              xmlDOM: data
-            },
-            function (voTableBuilder) {
+      new cadc.vot.Builder(
+          1000, {
+            xmlDOM: data
+          },
+          function (voTableBuilder) {
+            try {
               voTableBuilder.build(voTableBuilder.buildRowData)
 
               var voTable = voTableBuilder.getVOTable()
@@ -389,22 +404,40 @@
                 }
               }
 
-              callback(null, caomFormConfig, obsCoreFormConfig)
+              _searchApp._cleanMetadata(caomFormConfig)
+              _searchApp._cleanMetadata(obsCoreFormConfig)
+
+              _searchApp._initializeForms(caomFormConfig, obsCoreFormConfig)
+              _searchApp._trigger(ca.nrc.cadc.search.events.onAdvancedSearchInit, {})
+
+            } catch (e) {
+              this._displayError(e)
             }
-          )
-        },
-        'xml'
-      ).fail(function ($xhr, textStatus) {
-        callback(
-          'ERROR: TAP query failed: ' +
-          ($xhr.responseXML ? $xhr.responseXML : $xhr.responseText) +
-          '( ' +
-          textStatus +
-          ' )',
-          null,
-          null
+          }
         )
-      })
+
+    }
+
+    /**
+     * Gather search form configuration information.
+     * First step in making search form available for use.
+     *
+     * @private
+     */
+    this._initFormConfigurations = function () {
+      var tapQuery =
+        'select * from TAP_SCHEMA.columns where ' +
+        "((table_name='caom2.Observation' or " +
+        "table_name='caom2.Plane') and utype like 'caom2:%') or " +
+        "(table_name='ivoa.ObsCore' and utype like 'obscore:%')"
+
+      // Start by gathering the TAP schema information
+      // using SearchTapClient instance. OK and Fail events issued by the class
+      // are responded to in functions named in _attachTapClientListeners().
+      // Listeners are removed after inital page load so response to these events
+      // only occurs at startup.
+      _searchApp._attachTapClientListeners()
+      _searchTapClient.postTAPRequest(tapQuery, 'votable', this.options.activateMAQ)
     }
 
     /**
@@ -417,24 +450,7 @@
       // jenkinsd 2014.02.13
       //
       wgxpath.install()
-
-      this._initFormConfigurations(
-        function (error, caomConfiguration, obsCoreConfiguration) {
-          if (error) {
-            var errorMessage = 'Metadata field failed to initialize: ' + error
-            console.error(errorMessage)
-            this._trigger(ca.nrc.cadc.search.events.onAdvancedSearchInit, {
-              error: errorMessage
-            })
-          } else {
-            this._cleanMetadata(caomConfiguration)
-            this._cleanMetadata(obsCoreConfiguration)
-
-            this._initializeForms(caomConfiguration, obsCoreConfiguration)
-            this._trigger(ca.nrc.cadc.search.events.onAdvancedSearchInit, {})
-          }
-        }.bind(this)
-      )
+      this._initFormConfigurations()
 
       /*
        * Story 1644
@@ -724,6 +740,7 @@
 
     /**
      * Initialize the form instances.
+     * Third step in making search forms available for use.
      *
      * @param {ca.nrc.cadc.search.CAOM2.FormConfiguration}  caomConfiguration CAOM2 form configuration.
      * @param {ca.nrc.cadc.search.ObsCore.FormConfiguration}  obsCoreConfiguration  ObsCore form configuration.
@@ -731,470 +748,486 @@
      */
     this._initializeForms = function (caomConfiguration, obsCoreConfiguration) {
       // Start setting up caomSearchForm
-      // obsCoreSearchForm is set up near the end of this function
+      // obsCoreSearchForm is set up nearer the end of this function
 
-      var caomSearchForm = new ca.nrc.cadc.search.SearchForm(
-          'queryForm',
-          false,
-          caomConfiguration
-      )
-
-      // Disable the forms to begin with.
-      caomSearchForm.disable()
-
-      this._setCAOMSearchForm(caomSearchForm)
-
-      jQuery.fn.exists = function () {
-        return this.length > 0
-      }
-
-      // Used to send arrays of values as a parameter to a GET request.
-      jQuery.ajaxSettings.traditional = true
-
-      // Trap the backspace key to prevent it going 'Back' when not using it to
-      // delete characters.                                      tabContainer
-      // Story 959 - Task 2920.
-      // jenkinsd 2012.05.24
-      //
-      $('html').keydown(function (event) {
-        if (event.keyCode === 8) {
-          var currentFocus = $('*:focus')
-
-          if (!currentFocus.is('input') && !currentFocus.is('textarea')) {
-            event.preventDefault()
-          }
-        }
-      })
-
-      var onFormCancel = function () {
-        console.warn('Cancelling search.')
-        queryOverlay.modal('hide')
-      }
-
-      caomSearchForm.subscribe(ca.nrc.cadc.search.events.onCancel, onFormCancel)
-
-      var onFormSubmitComplete = function (eventData, args) {
-        if (args.success) {
-          this._processResults(args.data, args.startDate, function () {
-            queryOverlay.modal('hide')
-            $('#resultTableTabLink').tab('show')
-          })
-          this._setBookmarkURL(new cadc.web.util.currentURI())
-        } else {
-          this._processErrorResults(args.error_url)
-        }
-      }.bind(this)
-
-      caomSearchForm.subscribe(
-          ca.nrc.cadc.search.events.onSubmitComplete,
-          onFormSubmitComplete
-      )
-
-      /**
-       * Form validation succeeded.
-       */
-      var onFormValid = function (eventData, args) {
-        var preserveColumnState = false
-        var prevColumns = []
-        var prevDisplayedColumns = []
-        var prevColumnSelects = {}
-        var prevSortOptions = {}
-        var selectedCollections = this._getActiveForm().getCollectionSelectID()
-        var currentCollections = $(
-            '#' + selectedCollections.replace('.', '\\.')).val()
-        if (resultsVOTV) {
-          if (currentCollections.sort().join('') ===
-              previousCollections.sort().join('')) {
-            // Save viewer state from previous search
-            preserveColumnState = true
-            prevColumns = resultsVOTV.getColumns()
-            prevDisplayedColumns = resultsVOTV.getDisplayedColumns()
-            prevColumnSelects = resultsVOTV.getUpdatedColumnSelects()
-            prevSortOptions['sortcol'] = resultsVOTV.sortcol
-            prevSortOptions['sortAsc'] = resultsVOTV.sortAsc
-          }
-
-          resultsVOTV.destroy()
-        }
-        previousCollections = currentCollections
-
-        var cadcForm = args.cadcForm
-
-        // Searching on different data.  Switch the columns.
-        if (!this.activeFormID || !cadcForm.isActive(this.activeFormID)) {
-          // This is now the active form.
-          this.activeFormID = cadcForm.getID()
-        }
-
-        var formatCheckbox = function ($rowItem) {
-          if (
-              !stringUtil.hasText(
-                  $rowItem[this._getActiveForm().getDownloadAccessKey()]
-              )
-          ) {
-            var $checkboxSelect = $('input:checkbox._select_' + $rowItem.id)
-            var $parentContainer = $checkboxSelect.parent('div')
-
-            $parentContainer.empty()
-            $('<span class="_select_' + $rowItem.id + '">N/A</span>').appendTo(
-                $parentContainer
-            )
-          }
-        }.bind(this)
-
-        // To be used when the grid.onRenderedRows event is
-        // fired.
-        var onRowRendered = function ($rowItem, rowIndex) {
-          if ($rowItem) {
-            formatCheckbox($rowItem, rowIndex)
-          }
-        }
-
-        var isRowDisabled = function (row) {
-          var downloadableColumnName = this._getActiveForm().getDownloadAccessKey()
-          var downloadableColumnValue = row.getCellValue(downloadableColumnName)
-
-          return downloadableColumnValue === null
-        }.bind(this)
-
-        var rowCountMessage = function (totalRows, rowCount) {
-          return stringUtil.format(
-              ca.nrc.cadc.search.i18n[this.getPageLanguage()][
-                  'ROW_COUNT_MESSAGE'
-                  ],
-              [totalRows, rowCount]
-          )
-        }.bind(this)
-
-        var oneClickDownloadTitle = function () {
-          return ca.nrc.cadc.search.i18n[this.getPageLanguage()][
-              'ONE_CLICK_DOWNLOAD_TIP'
-              ]
-        }.bind(this)
-
-        var activeForm = this._getActiveForm()
-        var heightOffset = $('header').height() + $('#tabList').height() + 110
-
-        // Options for the CADC VOTV instance
-        var cadcVOTVOptions = {
-          editable: false,
-          enableAddRow: false,
-          showHeaderRow: true,
-          showTopPanel: false,
-          enableCellNavigation: true,
-          asyncEditorLoading: true,
-          defaultColumnWidth: 100,
-          explicitInitialization: false,
-          enableAsyncPostRender: true,
-          fullWidthRows: false,
-          pager: false,
-          headerRowHeight: 52,
-          variableViewportHeight: true,
-          heightOffset: heightOffset,
-          multiSelect: true,
-          propagateEvents: true,
-          leaveSpaceForNewRows: false,
-          // ID of the sort column (Start Date).
-          sortColumn: activeForm.getConfiguration().getDefaultSortColumnID(),
-          sortDir: 'desc',
-          topPanelHeight: 25,
-          enableTextSelectionOnCells: true,
-          gridResizable: false,
-          rerenderOnResize: false,
-          emptyResultsMessageSelector: '#cadcvotv-empty-results-message',
-          frozenColumn: 0,
-          frozenBottom: false,
-          enableSelection: true,
-          suggest_maxRowCount: 7,
-          targetNodeSelector: '#resultTable', // Shouldn't really be an
-          // option as it's mandatory!
-          columnFilterPluginName: 'suggest',
-          enableOneClickDownload: this.options.enableOneClickDownload,
-          oneClickDownloadTitle: oneClickDownloadTitle(),
-          oneClickDownloadURL: this.options.packageEndpoint,
-          oneClickDownloadURLColumnID: activeForm
-              .getConfiguration()
-              .getDownloadAccessKey(),
-          oneClickInvisibleDefault: true,
-          headerCheckboxLabel: 'Mark',
-          headerCheckboxWidth: 70,
-          rowManager: {
-            onRowRendered: onRowRendered,
-            isRowDisabled: isRowDisabled
-          },
-          columnManager: {
-            filterable: true,
-            forceFitColumns: false,
-            resizable: true,
-
-            // Story 1647
-            // Generic formatter.  Needs to have a format(column, value)
-            // method.
-            formatter: columnManager,
-            picker: {
-              style: 'dialog',
-              options: {
-                showAllButtonText: $(
-                    '#COLUMN_MANAGER_SHOW_ALL_BUTTON_TEXT'
-                ).text(),
-                resetButtonText: $(
-                    '#COLUMN_MANAGER_DEFAULT_COLUMNS_BUTTON_TEXT'
-                ).text(),
-                orderAlphaButtonText: $(
-                    '#COLUMN_MANAGER_ORDER_ALPHABETICALLY_BUTTON_TEXT'
-                ).text(),
-                dialogTriggerID: 'change_column_button',
-                targetSelector: $('#column_manager_container')
-                    .find('.column_manager_columns')
-                    .first(),
-                position: {
-                  my: 'right',
-                  at: 'right bottom'
-                },
-                closeDialogSelector: '.dialog-close',
-                refreshPositions: true
-              }
-            }
-          },
-          maxRowLimit: this.getMaxRecordCount(),
-          maxRowLimitWarning: $('#max_row_limit_warning').val(),
-          rowCountMessage: rowCountMessage,
-          plugins: {
-            footprint: {
-              hidden: true,
-              enabled: true,
-              onHover: false,
-              onClick: true,
-              maxRowCount: 10000,
-              renderedRowsOnly: false,
-              toggleSwitchSelector: '#slick-visualize',
-              footprintFieldID: activeForm
-                  .getConfiguration()
-                  .getFootprintColumnID(),
-              fovFieldID: activeForm.getConfiguration().getFOVColumnID(),
-              raFieldID: activeForm.getConfiguration().getRAColumnID(),
-              decFieldID: activeForm.getConfiguration().getDecColumnID()
-            }
-          },
-          columnOptions: columnManager.getColumnOptions()
-        }
-
-        resultsVOTV = new cadc.vot.Viewer(
-            ca.nrc.cadc.search.GRID_SELECTOR,
-            cadcVOTVOptions
+      try {
+        // Grab current endpoint from registry client so configuration of votable
+        // can be completed
+        caomConfiguration.options.tapSyncEndpoint = _searchTapClient.getLastEndpoint()
+        var caomSearchForm = new ca.nrc.cadc.search.SearchForm(
+            'queryForm',
+            false,
+            caomConfiguration
         )
 
-        // Unfortunately this has to be selected at the Document level since the items in question (located by
-        // ca.nrc.cadc.search.QUICKSEARCH_SELECTOR) aren't actually created yet.
-        // jenkinsd 2015.05.08
+        // Disable the forms to begin with.
+        caomSearchForm.disable()
+
+        this._setCAOMSearchForm(caomSearchForm)
+
+        jQuery.fn.exists = function () {
+          return this.length > 0
+        }
+
+        // Used to send arrays of values as a parameter to a GET request.
+        jQuery.ajaxSettings.traditional = true
+
+        // Trap the backspace key to prevent it going 'Back' when not using it to
+        // delete characters.                                      tabContainer
+        // Story 959 - Task 2920.
+        // jenkinsd 2012.05.24
         //
-        $(document).on(
-            'click',
-            ca.nrc.cadc.search.QUICKSEARCH_SELECTOR,
-            function (event) {
-              var hrefURI = new cadc.web.util.URI(event.target.href)
-              var href = hrefURI.toString()
+        $('html').keydown(function (event) {
+          if (event.keyCode === 8) {
+            var currentFocus = $('*:focus')
 
-              // Strip off the fragment part of the
-              // href url if necessary.
-              var index = href.indexOf('#')
-              if (index !== -1) {
-                href = href.substring(0, index)
-              }
-
-              var serializer = new cadc.vot.ResultStateSerializer(
-                  href,
-                  resultsVOTV.sortcol,
-                  resultsVOTV.sortDir ? 'asc' : 'dsc',
-                  resultsVOTV.getDisplayedColumns(),
-                  resultsVOTV.getResizedColumns(),
-                  resultsVOTV.getColumnFilters(),
-                  resultsVOTV.getUpdatedColumnSelects()
-              )
-
-              var windowName = '_' + $(event.target).text()
-
-              window.open(serializer.getResultStateUrl(), windowName, '')
-
-              return false
-            }
-        )
-
-        resultsVOTV.subscribe(
-            cadc.vot.events.onUnitChanged,
-            function (event, args) {
-              var viewer = args.application
-              var columnID = args.column.id
-              var filterValue = viewer.getColumnFilters()[columnID]
-
-              this.processFilterValue(filterValue, args, function (breakdownPureFilterValue,
-                                                                   breakdownDisplayFilterValue) {
-                $(args.column).data('pureFilterValue', breakdownPureFilterValue)
-
-                viewer.setColumnFilter(columnID, breakdownDisplayFilterValue)
-                viewer.getColumnFilters()[columnID] = breakdownDisplayFilterValue
-              })
-            }.bind(this)
-        )
-
-        downloadFormSubmit.off().click(function (event) {
-          event.preventDefault()
-
-          downloadForm.find("input[name='uri']").remove()
-
-          if (resultsVOTV.getSelectedRows().length <= 0) {
-            translated_message = downloadForm.find('span#NO_OBSERVATIONS_SELECTED_MESSAGE').text()
-            alert(translated_message)
-          } else {
-            var selectedRows = resultsVOTV.getSelectedRows()
-            for (
-                var arrIndex = 0, srl = selectedRows.length; arrIndex < srl; arrIndex++
-            ) {
-              var $nextRow = resultsVOTV.getRow(selectedRows[arrIndex])
-              var $nextPlaneURI =
-                      $nextRow['caom2:Plane.publisherID.downloadable']
-
-              var $input = $('<input>')
-              $input.prop('type', 'hidden')
-              $input.prop('name', 'uri')
-              $input.prop('id', $nextPlaneURI)
-              $input.val($nextPlaneURI)
-
-              downloadForm.append($input)
-            }
-
-            // Story 1566, when all 'Product Types'
-            // checkboxes are checked, do not send any
-            var allChecked =
-                    downloadForm
-                        .find('input.product_type_option_flag')
-                        .not(':checked').length === 0
-            if (allChecked) {
-              // disable all 'Product Types' checkboxes
-              $.each(
-                  downloadForm.find('input.product_type_option_flag:checked'),
-                  function () {
-                    $(this).prop('disabled', true)
-                  }
-              )
-            }
-
-            window.open('', 'DOWNLOAD', '')
-            downloadForm.submit()
-
-            // Story 1566, re-enable all product types
-            // checkbox
-            if (allChecked) {
-              // re-enable all 'Product Types'
-              // checkboxes
-              $.each(
-                  downloadForm.find('input.product_type_option_flag:checked'),
-                  function () {
-                    $(this).prop('disabled', false)
-                  }
-              )
+            if (!currentFocus.is('input') && !currentFocus.is('textarea')) {
+              event.preventDefault()
             }
           }
         })
 
-        $('#results_bookmark').click(
-            function (event) {
-              event.preventDefault()
-              this._setBookmarkURL(new cadc.web.util.URI(event.target.href))
-              $('#bookmark_link').modal('show')
-            }.bind(this)
-        )
-
-        if (preserveColumnState) {
-          resultsVOTV.setColumns(prevColumns)
-          resultsVOTV.setDisplayColumns(prevDisplayedColumns)
-          resultsVOTV.setUpdatedColumnSelects(prevColumnSelects)
-
-          // Set default sort column and direction.
-          if (prevSortOptions.hasOwnProperty('sortcol')) {
-            resultsVOTV['sortcol'] = prevSortOptions['sortcol']
-          }
-          if (prevSortOptions.hasOwnProperty('sortAsc')) {
-            resultsVOTV['sortAsc'] = prevSortOptions['sortAsc']
-          }
-        } else {
-          resultsVOTV.setDisplayColumns([])
+        var onFormCancel = function () {
+          console.warn('Cancelling search.')
+          queryOverlay.modal('hide')
         }
 
-        // Set the default columns and units.
-        this._setDefaultColumns(resultsVOTV)
-        this._setDefaultUnitTypes(resultsVOTV)
+        caomSearchForm.subscribe(ca.nrc.cadc.search.events.onCancel, onFormCancel)
 
-        queryOverlay.modal('show')
-      }.bind(this)
-
-      caomSearchForm.subscribe(ca.nrc.cadc.search.events.onValid, onFormValid)
-
-
-      var onFormInvalid = function (event, args) {
-        alert(
-            'Please enter at least one value to search on. (' +
-            args.cadcForm.getName() +
-            ')'
-        )
-      }
-
-      caomSearchForm.subscribe(
-          ca.nrc.cadc.search.events.onInvalid,
-          onFormInvalid
-      )
-
-      $(':reset').click(
-        function () {
-          this._getActiveForm().resetFields()
+        var onFormSubmitComplete = function (eventData, args) {
+          if (args.success) {
+            this._processResults(args.data, args.startDate, function () {
+              queryOverlay.modal('hide')
+              $('#resultTableTabLink').tab('show')
+            })
+            this._setBookmarkURL(new cadc.web.util.currentURI())
+          } else {
+            this._processErrorResults(args.error_url)
+          }
         }.bind(this)
-      )
 
-      $('#cancel_search').click(
-        function () {
-          this._getActiveForm().cancel()
-        }.bind(this)
-      )
-
-      // End caom2 search form setup.
-
-      // Start obscore search form setup.
-      // If the tab is not going to be shown, there's no need to set up
-      // the form
-      var obsCoreSearchForm = null
-
-      if (this.options.showObscoreTab === true) {
-        obsCoreSearchForm = new ca.nrc.cadc.search.SearchForm(
-            'obscoreQueryForm',
-            false,
-            obsCoreConfiguration
-        )
-
-        // Disable the forms to begin with.
-        obsCoreSearchForm.disable()
-        obsCoreSearchForm.subscribe(
-            ca.nrc.cadc.search.events.onCancel,
-            onFormCancel
-        )
-
-        obsCoreSearchForm.subscribe(
+        caomSearchForm.subscribe(
             ca.nrc.cadc.search.events.onSubmitComplete,
             onFormSubmitComplete
         )
 
-        obsCoreSearchForm.subscribe(
-            ca.nrc.cadc.search.events.onValid,
-            onFormValid
-        )
+        /**
+         * Form validation succeeded.
+         */
+        var onFormValid = function (eventData, args) {
+          var preserveColumnState = false
+          var prevColumns = []
+          var prevDisplayedColumns = []
+          var prevColumnSelects = {}
+          var prevSortOptions = {}
+          var selectedCollections = this._getActiveForm().getCollectionSelectID()
+          var currentCollections = $(
+              '#' + selectedCollections.replace('.', '\\.')).val()
+          if (resultsVOTV) {
+            if (currentCollections.sort().join('') ===
+                previousCollections.sort().join('')) {
+              // Save viewer state from previous search
+              preserveColumnState = true
+              prevColumns = resultsVOTV.getColumns()
+              prevDisplayedColumns = resultsVOTV.getDisplayedColumns()
+              prevColumnSelects = resultsVOTV.getUpdatedColumnSelects()
+              prevSortOptions['sortcol'] = resultsVOTV.sortcol
+              prevSortOptions['sortAsc'] = resultsVOTV.sortAsc
+            }
 
-        obsCoreSearchForm.subscribe(
+            resultsVOTV.destroy()
+          }
+          previousCollections = currentCollections
+
+          var cadcForm = args.cadcForm
+
+          // Searching on different data.  Switch the columns.
+          if (!this.activeFormID || !cadcForm.isActive(this.activeFormID)) {
+            // This is now the active form.
+            this.activeFormID = cadcForm.getID()
+          }
+
+          var formatCheckbox = function ($rowItem) {
+            if (
+                !stringUtil.hasText(
+                    $rowItem[this._getActiveForm().getDownloadAccessKey()]
+                )
+            ) {
+              var $checkboxSelect = $('input:checkbox._select_' + $rowItem.id)
+              var $parentContainer = $checkboxSelect.parent('div')
+
+              $parentContainer.empty()
+              $('<span class="_select_' + $rowItem.id + '">N/A</span>').appendTo(
+                  $parentContainer
+              )
+            }
+          }.bind(this)
+
+          // To be used when the grid.onRenderedRows event is
+          // fired.
+          var onRowRendered = function ($rowItem, rowIndex) {
+            if ($rowItem) {
+              formatCheckbox($rowItem, rowIndex)
+            }
+          }
+
+          var isRowDisabled = function (row) {
+            var downloadableColumnName = this._getActiveForm().getDownloadAccessKey()
+            var downloadableColumnValue = row.getCellValue(downloadableColumnName)
+
+            return downloadableColumnValue === null
+          }.bind(this)
+
+          var rowCountMessage = function (totalRows, rowCount) {
+            return stringUtil.format(
+                ca.nrc.cadc.search.i18n[this.getPageLanguage()][
+                    'ROW_COUNT_MESSAGE'
+                    ],
+                [totalRows, rowCount]
+            )
+          }.bind(this)
+
+          var oneClickDownloadTitle = function () {
+            return ca.nrc.cadc.search.i18n[this.getPageLanguage()][
+                'ONE_CLICK_DOWNLOAD_TIP'
+                ]
+          }.bind(this)
+
+          var activeForm = this._getActiveForm()
+          var heightOffset = $('header').height() + $('#tabList').height() + 110
+
+          // Options for the CADC VOTV instance
+          var cadcVOTVOptions = {
+            editable: false,
+            enableAddRow: false,
+            showHeaderRow: true,
+            showTopPanel: false,
+            enableCellNavigation: true,
+            asyncEditorLoading: true,
+            defaultColumnWidth: 100,
+            explicitInitialization: false,
+            enableAsyncPostRender: true,
+            fullWidthRows: false,
+            pager: false,
+            headerRowHeight: 52,
+            variableViewportHeight: true,
+            heightOffset: heightOffset,
+            multiSelect: true,
+            propagateEvents: true,
+            leaveSpaceForNewRows: false,
+            // ID of the sort column (Start Date).
+            sortColumn: activeForm.getConfiguration().getDefaultSortColumnID(),
+            sortDir: 'desc',
+            topPanelHeight: 25,
+            enableTextSelectionOnCells: true,
+            gridResizable: false,
+            rerenderOnResize: false,
+            emptyResultsMessageSelector: '#cadcvotv-empty-results-message',
+            frozenColumn: 0,
+            frozenBottom: false,
+            enableSelection: true,
+            suggest_maxRowCount: 7,
+            targetNodeSelector: '#resultTable', // Shouldn't really be an
+            // option as it's mandatory!
+            columnFilterPluginName: 'suggest',
+            enableOneClickDownload: this.options.enableOneClickDownload,
+            oneClickDownloadTitle: oneClickDownloadTitle(),
+            oneClickDownloadURL: this.options.packageEndpoint,
+            oneClickDownloadURLColumnID: activeForm
+                .getConfiguration()
+                .getDownloadAccessKey(),
+            oneClickInvisibleDefault: true,
+            headerCheckboxLabel: 'Mark',
+            headerCheckboxWidth: 70,
+            rowManager: {
+              onRowRendered: onRowRendered,
+              isRowDisabled: isRowDisabled
+            },
+            columnManager: {
+              filterable: true,
+              forceFitColumns: false,
+              resizable: true,
+
+              // Story 1647
+              // Generic formatter.  Needs to have a format(column, value)
+              // method.
+              formatter: columnManager,
+              picker: {
+                style: 'dialog',
+                options: {
+                  showAllButtonText: $(
+                      '#COLUMN_MANAGER_SHOW_ALL_BUTTON_TEXT'
+                  ).text(),
+                  resetButtonText: $(
+                      '#COLUMN_MANAGER_DEFAULT_COLUMNS_BUTTON_TEXT'
+                  ).text(),
+                  orderAlphaButtonText: $(
+                      '#COLUMN_MANAGER_ORDER_ALPHABETICALLY_BUTTON_TEXT'
+                  ).text(),
+                  dialogTriggerID: 'change_column_button',
+                  targetSelector: $('#column_manager_container')
+                      .find('.column_manager_columns')
+                      .first(),
+                  position: {
+                    my: 'right',
+                    at: 'right bottom'
+                  },
+                  closeDialogSelector: '.dialog-close',
+                  refreshPositions: true
+                }
+              }
+            },
+            maxRowLimit: this.getMaxRecordCount(),
+            maxRowLimitWarning: $('#max_row_limit_warning').val(),
+            rowCountMessage: rowCountMessage,
+            plugins: {
+              footprint: {
+                hidden: true,
+                enabled: true,
+                onHover: false,
+                onClick: true,
+                maxRowCount: 10000,
+                renderedRowsOnly: false,
+                toggleSwitchSelector: '#slick-visualize',
+                footprintFieldID: activeForm
+                    .getConfiguration()
+                    .getFootprintColumnID(),
+                fovFieldID: activeForm.getConfiguration().getFOVColumnID(),
+                raFieldID: activeForm.getConfiguration().getRAColumnID(),
+                decFieldID: activeForm.getConfiguration().getDecColumnID()
+              }
+            },
+            columnOptions: columnManager.getColumnOptions()
+          }
+
+          resultsVOTV = new cadc.vot.Viewer(
+              ca.nrc.cadc.search.GRID_SELECTOR,
+              cadcVOTVOptions
+          )
+
+          // Unfortunately this has to be selected at the Document level since the items in question (located by
+          // ca.nrc.cadc.search.QUICKSEARCH_SELECTOR) aren't actually created yet.
+          // jenkinsd 2015.05.08
+          //
+          $(document).on(
+              'click',
+              ca.nrc.cadc.search.QUICKSEARCH_SELECTOR,
+              function (event) {
+                var hrefURI = new cadc.web.util.URI(event.target.href)
+                var href = hrefURI.toString()
+
+                // Strip off the fragment part of the
+                // href url if necessary.
+                var index = href.indexOf('#')
+                if (index !== -1) {
+                  href = href.substring(0, index)
+                }
+
+                var serializer = new cadc.vot.ResultStateSerializer(
+                    href,
+                    resultsVOTV.sortcol,
+                    resultsVOTV.sortDir ? 'asc' : 'dsc',
+                    resultsVOTV.getDisplayedColumns(),
+                    resultsVOTV.getResizedColumns(),
+                    resultsVOTV.getColumnFilters(),
+                    resultsVOTV.getUpdatedColumnSelects()
+                )
+
+                var windowName = '_' + $(event.target).text()
+
+                window.open(serializer.getResultStateUrl(), windowName, '')
+
+                return false
+              }
+          )
+
+          resultsVOTV.subscribe(
+              cadc.vot.events.onUnitChanged,
+              function (event, args) {
+                var viewer = args.application
+                var columnID = args.column.id
+                var filterValue = viewer.getColumnFilters()[columnID]
+
+                this.processFilterValue(filterValue, args, function (breakdownPureFilterValue,
+                                                                     breakdownDisplayFilterValue) {
+                  $(args.column).data('pureFilterValue', breakdownPureFilterValue)
+
+                  viewer.setColumnFilter(columnID, breakdownDisplayFilterValue)
+                  viewer.getColumnFilters()[columnID] = breakdownDisplayFilterValue
+                })
+              }.bind(this)
+          )
+
+          downloadFormSubmit.off().click(function (event) {
+            event.preventDefault()
+
+            downloadForm.find("input[name='uri']").remove()
+
+            if (resultsVOTV.getSelectedRows().length <= 0) {
+              translated_message = downloadForm.find('span#NO_OBSERVATIONS_SELECTED_MESSAGE').text()
+              alert(translated_message)
+            } else {
+              var selectedRows = resultsVOTV.getSelectedRows()
+              for (
+                  var arrIndex = 0, srl = selectedRows.length; arrIndex < srl; arrIndex++
+              ) {
+                var $nextRow = resultsVOTV.getRow(selectedRows[arrIndex])
+                var $nextPlaneURI =
+                        $nextRow['caom2:Plane.publisherID.downloadable']
+
+                var $input = $('<input>')
+                $input.prop('type', 'hidden')
+                $input.prop('name', 'uri')
+                $input.prop('id', $nextPlaneURI)
+                $input.val($nextPlaneURI)
+
+                downloadForm.append($input)
+              }
+
+              // Story 1566, when all 'Product Types'
+              // checkboxes are checked, do not send any
+              var allChecked =
+                      downloadForm
+                          .find('input.product_type_option_flag')
+                          .not(':checked').length === 0
+              if (allChecked) {
+                // disable all 'Product Types' checkboxes
+                $.each(
+                    downloadForm.find('input.product_type_option_flag:checked'),
+                    function () {
+                      $(this).prop('disabled', true)
+                    }
+                )
+              }
+
+              window.open('', 'DOWNLOAD', '')
+              downloadForm.submit()
+
+              // Story 1566, re-enable all product types
+              // checkbox
+              if (allChecked) {
+                // re-enable all 'Product Types'
+                // checkboxes
+                $.each(
+                    downloadForm.find('input.product_type_option_flag:checked'),
+                    function () {
+                      $(this).prop('disabled', false)
+                    }
+                )
+              }
+            }
+          })
+
+          $('#results_bookmark').click(
+              function (event) {
+                event.preventDefault()
+                this._setBookmarkURL(new cadc.web.util.URI(event.target.href))
+                $('#bookmark_link').modal('show')
+              }.bind(this)
+          )
+
+          if (preserveColumnState) {
+            resultsVOTV.setColumns(prevColumns)
+            resultsVOTV.setDisplayColumns(prevDisplayedColumns)
+            resultsVOTV.setUpdatedColumnSelects(prevColumnSelects)
+
+            // Set default sort column and direction.
+            if (prevSortOptions.hasOwnProperty('sortcol')) {
+              resultsVOTV['sortcol'] = prevSortOptions['sortcol']
+            }
+            if (prevSortOptions.hasOwnProperty('sortAsc')) {
+              resultsVOTV['sortAsc'] = prevSortOptions['sortAsc']
+            }
+          } else {
+            resultsVOTV.setDisplayColumns([])
+          }
+
+          // Set the default columns and units.
+          this._setDefaultColumns(resultsVOTV)
+          this._setDefaultUnitTypes(resultsVOTV)
+
+          queryOverlay.modal('show')
+        }.bind(this)
+
+        caomSearchForm.subscribe(ca.nrc.cadc.search.events.onValid, onFormValid)
+
+
+        var onFormInvalid = function (event, args) {
+          alert(
+              'Please enter at least one value to search on. (' +
+              args.cadcForm.getName() +
+              ')'
+          )
+        }
+
+        caomSearchForm.subscribe(
             ca.nrc.cadc.search.events.onInvalid,
             onFormInvalid
         )
+
+        $(':reset').click(
+            function () {
+              this._getActiveForm().resetFields()
+            }.bind(this)
+        )
+
+        $('#cancel_search').click(
+            function () {
+              this._getActiveForm().cancel()
+            }.bind(this)
+        )
+
+        // End caom2 search form and results tab setup.
+
+        // Start obscore search form setup.
+        // If the tab is not going to be shown, there's no need to set up the form.
+        var obsCoreSearchForm = null
+
+
+        if (this.options.showObscoreTab === true) {
+          // Grab current endpoint from registry client so configuration of votable
+          // can be completed
+          obsCoreConfiguration.options.tapSyncEndpoint = _searchTapClient.getLastEndpoint()
+          obsCoreSearchForm = new ca.nrc.cadc.search.SearchForm(
+              'obscoreQueryForm',
+              false,
+              obsCoreConfiguration
+          )
+
+          // Disable the forms to begin with.
+          obsCoreSearchForm.disable()
+          obsCoreSearchForm.subscribe(
+              ca.nrc.cadc.search.events.onCancel,
+              onFormCancel
+          )
+
+          obsCoreSearchForm.subscribe(
+              ca.nrc.cadc.search.events.onSubmitComplete,
+              onFormSubmitComplete
+          )
+
+          obsCoreSearchForm.subscribe(
+              ca.nrc.cadc.search.events.onValid,
+              onFormValid
+          )
+
+          obsCoreSearchForm.subscribe(
+              ca.nrc.cadc.search.events.onInvalid,
+              onFormInvalid
+          )
+        }
+        this._setObsCoreSearchForm(obsCoreSearchForm)
+      } catch (errorMessage) {
+        console.error('Error initializing search forms: ' + errorMessage)
+        _searchApp._trigger(ca.nrc.cadc.search.events.onAdvancedSearchInitFail, {
+          error: errorMessage
+        })
       }
-      this._setObsCoreSearchForm(obsCoreSearchForm)
 
       // End obscore search form setup.
+
+      // Enable submit buttons for both forms, now they are ready to be used
+      $('.submit-query').removeAttr('disabled')
 
     }
 
@@ -1689,11 +1722,9 @@
       var queryParam = 'QUERY=' + encodeURIComponent(this._getADQL(true)).replace('!', '%21')
 
       var votableURL =
-        this.options.tapSyncEndpoint +
-        '?LANG=ADQL&REQUEST=doQuery&USEMAQ=' +
-        this.options.activateMAQ +
-        '&' +
-        queryParam
+            _searchTapClient.getLastURL() +
+            '?LANG=ADQL&REQUEST=doQuery&' +
+            queryParam
 
       var upload = this._getTargetUpload()
       if (upload) {

@@ -108,7 +108,7 @@
    * @param {ObsCoreFormConfiguration|CAOM2FormConfiguration} _config   Configuration for concrete instance.
    *   object.
    * @param {{}}  _options    Options for the form config.
-   * @param {String}  [_options.tapSyncEndpoint="/search/tap/sync"]   TAP endpoint.
+   * @param {String}  [_options.tapSyncEndpoint]  TAP endpoint last used by registry client.
    * @param {String}  [_options.searchEndpoint="/search/find"]   Form submission endpoint.
    * @param {String}  [_options.validatorEndpoint="/search/validate"]   Form validator endpoint.
    * @param {String}  [_options.autocompleteEndpoint="/search/unitconversion"]   Autocomplete (units, Observation
@@ -641,13 +641,14 @@
    *     form.
    * @constructor
    */
-  function SearchForm(_id, _autoInitFlag, _configuration) {
+  function SearchForm(_id, _autoInitFlag, _configuration, _baseURL) {
     var stringUtil = new org.opencadc.StringUtil()
 
     this.id = _id
     this.configuration = _configuration
     this.$form = $('form#' + _id)
     this.currentRequest = null
+    this.baseURL = _baseURL
 
     /**
      * @type {number}
@@ -663,9 +664,8 @@
      */
     this.dataTrain = new ca.nrc.cadc.search.datatrain.DataTrain(
       this.configuration.getName().toLowerCase(),
-      this.configuration.columnManager, {
-        tapSyncEndpoint: this.configuration.options.tapSyncEndpoint
-      }
+      this.configuration.columnManager,
+      this.configuration.options
     )
 
     var VALIDATOR_TIMER_DELAY = 500
@@ -764,8 +764,10 @@
                   req.term.toLowerCase()
                 ])
               })
-              // Does anything need to be done differently here for MAQ support?
-              $.get(config.options.tapSyncEndpoint, payload).done(function (
+
+              // The TAP endpoint could be different after each data train load, (depending on whether
+              // the MAQ switch was toggled.) so the autocomplete should be going to the same endpoint for data.
+              $.get(config.options.tapClient.getLastEndpoint(), payload).done(function (
                 csvData
               ) {
                 var csvArray = csvData.split('\n')

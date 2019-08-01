@@ -2,7 +2,7 @@
  ************************************************************************
  ****  C A N A D I A N   A S T R O N O M Y   D A T A   C E N T R E  *****
  *
- * (c) 2008.                            (c) 2008.
+ * (c) 2019.                            (c) 2019.
  * National Research Council            Conseil national de recherches
  * Ottawa, Canada, K1A 0R6              Ottawa, Canada, K1A 0R6
  * All rights reserved                  Tous droits reserves
@@ -52,7 +52,7 @@
               },
               tap: {
                 QUERY_TEMPLATE:
-                  'SELECT {1}, CASE WHEN {2} >= {3} THEN 1 ELSE 0 END FROM {4}',
+                  'SELECT {1}, (CASE WHEN {2} >= {3} THEN 1 ELSE 0 END) as cs FROM {4} GROUP BY {1}, cs',
                 INSTRUMENT_FRESH_MJD_FIELD_NAME: {
                   caom2: 'max_time_bounds_cval1',
                   obscore: 'max_t_min'
@@ -143,7 +143,9 @@
                   )
                 }
               },
-              ENDPOINT: '/tap/sync',
+              SYNC_ENDPOINT: '/sync',
+              TAP_MAQ_URI: 'ivo://cadc.nrc.ca/tap/maq',
+              TAP_URI: 'ivo://cadc.nrc.ca/tap',
               DataTrain: DataTrain,
               events: {
                 onDataTrainLoaded: new jQuery.Event(
@@ -162,14 +164,14 @@
 
   /**
    * @param {String} _modelDataSource   Name of the data source [caom2 | obscore]
-   * @param {{}} _options   Options to this DataTrain.
    * @param {ColumnManager} _columnManager   Column Manager instance.
+   * @param {{}} _options   Options to instantiate this DataTrain.
    * @param {boolean} [_options.autoInit=false]   Whether to initialize on creation.
-   * @param {String} [_options.tapSyncEndpoint=/search/tap/sync]    TAP Endpoint.
    * @constructor
    */
   function DataTrain(_modelDataSource, _columnManager, _options) {
     var stringUtil = new org.opencadc.StringUtil()
+    var _dt = this
 
     this.modelDataSource = _modelDataSource
     this.pageLanguage = $('html').attr('lang')
@@ -183,11 +185,12 @@
 
     this.defaults = {
       autoInit: false,
-      tapSyncEndpoint: '/search/tap/sync',
-      activateMAQ: this.activateMAQ
     }
 
     this.options = $.extend({}, true, this.defaults, _options)
+
+    // tapClient is available at this.options.tapClient
+
     this.columnManager = _columnManager
 
     /**
@@ -207,7 +210,37 @@
      */
     this.init = function() {
       this._toggleLoading(true)
+      this._attachListeners()
       this._loadDataTrain()
+    }
+
+    this._attachListeners = function () {
+      this.options.tapClient.subscribe(ca.nrc.cadc.search.tapclient.events.onTAPClientOK, this.loadDataTrainOK)
+      this.options.tapClient.subscribe(ca.nrc.cadc.search.tapclient.events.onTAPClientFail, this.loadDataTrainNOK)
+      $(".reloadHierarchySubmit").on('click', this._reloadDataTrain)
+    }
+
+    this.loadDataTrainOK = function(event, args) {
+      var callingId = args.callerId
+
+      if (callingId === _dt.modelDataSource) {
+        var data = args.data
+        _dt._trigger(
+          ca.nrc.cadc.search.datatrain.events.onDataTrainLoaded,
+          {data: data}
+        )
+      }
+    }
+
+    this.loadDataTrainNOK = function(event, args) {
+      var callingId = args.callerId
+
+      if (callingId === _dt.modelDataSource) {
+        _dt._trigger(
+          ca.nrc.cadc.search.datatrain.events.onDataTrainLoadFail,
+          {responseText: args.responseText}
+        )
+      }
     }
 
     /**
@@ -216,40 +249,52 @@
      */
     this._loadDataTrain = function() {
       var tapQuery = this._createTAPQuery()
-
-      $.get(
-        this.options.tapSyncEndpoint,
-        {
-          LANG: 'ADQL',
-          FORMAT: 'CSV',
-          USEMAQ: this.activateMAQ,
-          QUERY: tapQuery
-        },
-        {
-          xhrFields: {
-            withCredentials: true
-          },
-          jsonp: false
-        }
-      )
-        .done(
-          function(data) {
-            this.groups = []
-            this._trigger(
-              ca.nrc.cadc.search.datatrain.events.onDataTrainLoaded,
-              { data: data }
-            )
-          }.bind(this)
-        )
-        .fail(
-          function(jqXHR) {
-            this._trigger(
-              ca.nrc.cadc.search.datatrain.events.onDataTrainLoadFail,
-              { responseText: jqXHR.responseText }
-            )
-          }.bind(this)
-        )
+      this.options.tapClient.postTAPRequest(tapQuery, 'CSV', this.activateMAQ, this.modelDataSource)
     }
+
+    /**
+     * Reload the Data Train.
+     * @private
+     */
+    this._reloadDataTrain = function() {
+      _dt._setDataTrainDisplayState('loading')
+      _dt._loadDataTrain()
+    }
+
+    /**
+     * Toggle the data train reload button.
+     * @private
+     */
+    this._toggleReloadButton = function(turnOn) {
+      var $reloadHierarchyDiv = $('.reloadHierarchy')
+      if (turnOn === true) {
+        $reloadHierarchyDiv.removeClass('hidden')
+      } else {
+        $reloadHierarchyDiv.addClass('hidden')
+      }
+    }
+
+    /**
+     * Set state of Data Train display.
+     * @private
+     */
+    this._setDataTrainDisplayState = function(stateName) {
+      switch(stateName) {
+        case 'loading' :
+          this._toggleLoading(true)
+          this._toggleReloadButton(false)
+          break
+        case 'reload' :
+          this._toggleLoading(false)
+          this._toggleReloadButton(true)
+          break
+        case 'dataTrain':
+          this._toggleLoading(false)
+          this._toggleReloadButton(false)
+          break
+      }
+    }
+
 
     /**
      * Create the TAP query to obtain the Data Train values.
@@ -1119,19 +1164,18 @@
       function(event, args) {
         var dt = args.dataTrain
         dt.load(args.data)
-        dt._toggleLoading(false)
+        _dt._setDataTrainDisplayState('dataTrain')
       }
     )
 
     this.subscribe(
       ca.nrc.cadc.search.datatrain.events.onDataTrainLoadFail,
       function(event, args) {
-        alert(
+        console.log(
           'Error while querying TAP to initialize the page: ' +
             args.responseText
         )
-        var dt = args.dataTrain
-        dt._toggleLoading(false)
+        _dt._setDataTrainDisplayState('reload')
       }
     )
 
