@@ -55,7 +55,6 @@
 
   /**
    * @param {String} [_options.baseURL]    URL of host system.
-   * @param {String} [_options.maqServiceId]    Service of MAQ TAP - from org.opencadc.search.properties.
    * @param {String} [_options.tapServiceId]    Service of TAP - from org.opencadc.search.properties
    * @constructor
    */
@@ -78,10 +77,6 @@
               'vs:ParamHTTP',
               'cookie'
           )
-    }
-
-    function setMAQServiceURL(url) {
-      this._serviceURLs.maq = new URL(url)
     }
 
     function setTAPServiceURL(url) {
@@ -133,29 +128,18 @@
      * Make call to server to get TAP data
      * @private
      */
-    function postTAPRequest(tapQuery, format, activateMAQ, callerId) {
+      function postTAPRequest(tapQuery, format, callerId) {
       // callerId is so the listeners can determine if an event coming
       // from an instance of this object belongs to them or not.
-      var baseURI
-      var serviceURL
 
-      if (activateMAQ === true) {
-        baseURI = _rc.options.maqServiceId
-        serviceURL = _rc._serviceURLs['maq']
-      } else {
-        baseURI = _rc.options.tapServiceId
-        serviceURL = _rc._serviceURLs['tap']
-      }
+      var baseURI = _rc.options.tapServiceId
+      var serviceURL = _rc._serviceURLs['tap']
 
       if (typeof serviceURL === 'undefined') {
         Promise.resolve(this.prepareTAPCall(baseURI))
           .then(function (serviceURL) {
             serviceURL = serviceURL + ca.nrc.cadc.search.tapclient.TAP_SYNC_ENDPOINT
-            if (activateMAQ === true) {
-              _rc.setMAQServiceURL(serviceURL)
-            } else {
-              _rc.setTAPServiceURL(serviceURL)
-            }
+            _rc.setTAPServiceURL(serviceURL)
             postRequest(serviceURL, format, tapQuery, callerId)
           })
           .catch(function (err) {
@@ -218,7 +202,6 @@
       getLastURL: getLastURL,
       postTAPRequest: postTAPRequest,
       prepareTAPCall: prepareTAPCall,
-      setMAQServiceURL: setMAQServiceURL,
       setTAPServiceURL: setTAPServiceURL,
       subscribe: subscribe,
       trigger: trigger,

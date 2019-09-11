@@ -30,7 +30,7 @@ Example content:
 ::
 
     # The TAP Service ID to resolve.
-    # org.opencadc.search.tap-service-id = ivo://cadc.nrc.ca/tap
+    org.opencadc.search.tap-service-id = ivo://cadc.nrc.ca/tap
 
     # Alternate TAP Service ID to resolve.
     # org.opencadc.search.maq-tap-service-id = ivo://cadc.nrc.ca/tap/maq

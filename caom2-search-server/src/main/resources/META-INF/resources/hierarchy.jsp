@@ -16,7 +16,6 @@
            class="width-100 text-align advanced_search_data_train modelDataSource_${param.modelDataSource} ${param.colcount}"
            data-utypes="${param.utyifpe}">
         <div class="hidden hierarchy_utype">${param.utype}</div>
-        <div class="hidden load_maq_data_train">${param.activateMAQ}</div>
         <div id="${param.utype}.building" class="loading hidden">
             <span class="spinner-span glyphicon glyphicon-refresh fast-right-spinner"></span>
             <span class="info-span"><fmt:message key="LOADING_MESSAGE" bundle="${langBundle}"/></span>

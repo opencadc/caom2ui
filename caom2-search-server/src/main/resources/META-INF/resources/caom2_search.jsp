@@ -40,29 +40,6 @@
               value="<fmt:message key="RESET_BUTTON_LABEL" bundle="${langBundle}" />">
         <fmt:message key="RESET_BUTTON_LABEL" bundle="${langBundle}"/>
       </button>
-      <!-- enableMAQ = true means display this checkbox -->
-      <c:if test="${param.enableMAQ eq 'true'}">
-        <div class="maq-div">
-          <input class="activateMAQ caom2"
-                  name="activateMAQ"
-                  type="checkbox"
-                  data-toggle="toggle"
-                  data-size="mini"
-                  data-on="<fmt:message key="YES_FORM_LABEL" bundle="${langBundle}"/>"
-                  data-off="<fmt:message key="NO_FORM_LABEL" bundle="${langBundle}"/>"
-                  value="${param.activateMAQ}"
-                  data-onstyle="success" <c:if test="${param.activateMAQ eq 'true'}">checked="checked"</c:if> />
-          <label class="maq-label">
-            <fmt:message key="USE_MAQ_FORM_LABEL" bundle="${langBundle}"/>&nbsp;&nbsp;
-            <div data-toggle="popover"
-                data-utype="activateMAQ"
-                data-placement="right"
-                data-title="<fmt:message key="USE_MAQ_FORM_LABEL" bundle="${langBundle}"/>"
-                class="advancedsearch-tooltip glyphicon glyphicon-question-sign popover-blue popover-right">
-            </div>
-          </label>
-        </div>
-      </c:if>
     </div>
 
     <div class="col-sm-12">
@@ -155,10 +132,9 @@
         <strong><fmt:message key="RES_TIME" bundle="${langBundle}"/></strong><br>
         <p class="resolver-result-time"></p>
       </div>
-      
-      <c:import
-          url="hierarchy.jsp?colcount=seven-col&utype=Plane.energy.emBand/Observation.collection/Observation.instrument.name/Plane.energy.bandpassName/Plane.calibrationLevel/Plane.dataProductType/Observation.type&modelDataSource=caom2&activateMAQ=${param.activateMAQ}" />
 
+      <c:import
+          url="hierarchy.jsp?colcount=seven-col&utype=Plane.energy.emBand/Observation.collection/Observation.instrument.name/Plane.energy.bandpassName/Plane.calibrationLevel/Plane.dataProductType/Observation.type&modelDataSource=caom2" />
     </div>
 
     <div class="col-sm-12 button-holder">

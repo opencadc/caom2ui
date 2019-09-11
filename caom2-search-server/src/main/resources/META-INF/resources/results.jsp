@@ -122,9 +122,6 @@
                         data-close="<fmt:message key="CLOSE_BUTTON_LABEL" bundle="${langBundle}" />">
                     <fmt:message key="RESULTS_VISUALIZE_BUTTON_LABEL" bundle="${langBundle}" />
                 </button>
-
-                    <span id="resultsMaqEnabled" class="label label-info <c:if test="${not param.activateMAQ eq
-                    'true'}">cadc-display-none</c:if>">MAQ Enabled</span>
             </form>
 
 
