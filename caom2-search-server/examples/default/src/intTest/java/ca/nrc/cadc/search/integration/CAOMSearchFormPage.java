@@ -102,9 +102,6 @@ public class CAOMSearchFormPage extends AbstractSearchFormPage
     static final String OBSERVATION_DATE_INPUT_ID = "Plane.time.bounds.samples";
     static final String PIXEL_SCALE_INPUT_ID = "Plane.position.sampleSize";
     static final By RESET_BUTTON_SELECTOR = By.cssSelector("button[type=\"reset\"]");
-    static final By MAQ_TOGGLE_SWITCH_BY = By.cssSelector("div.toggle");
-    static final By MAQ_CHECKBOX_BY = By.name("activateMAQ");
-
 
     @FindBy(id = "caom2_data_train")
     WebElement dataTrain;
@@ -123,10 +120,6 @@ public class CAOMSearchFormPage extends AbstractSearchFormPage
 
     @FindBy(id = "ssois_link")
     WebElement ssoisLink;
-
-
-    final boolean defaultMAQToggleFlag;
-
 
     /**
      * Constructors need to be public for reflection to find them.
@@ -147,28 +140,9 @@ public class CAOMSearchFormPage extends AbstractSearchFormPage
         waitForElementPresent(DATA_TRAIN_LOCATOR);
         WebElement myDynamicElement = (new WebDriverWait(driver, 30))
             .until(ExpectedConditions.presenceOfElementLocated(DATA_TRAIN_COLLECTION_MENU));
-//        waitForElementPresent(DATA_TRAIN_COLLECTION_MENU);
+        waitForElementPresent(DATA_TRAIN_COLLECTION_MENU);
 
         PageFactory.initElements(driver, this);
-
-        defaultMAQToggleFlag = isMAQEnabled() && Boolean.parseBoolean(findMAQToggleSwitch().findElement(MAQ_CHECKBOX_BY).getAttribute("value"));
-    }
-
-    boolean isMAQEnabled() throws Exception {
-        return (findMAQToggleSwitch() != null);
-    }
-
-    boolean isMAQOn() throws Exception {
-        WebElement maqSwitch = findMAQToggleSwitch();
-        if (maqSwitch != null && maqSwitch.getAttribute("class").contains("btn-success")) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    WebElement findMAQToggleSwitch() throws Exception {
-        return find(MAQ_TOGGLE_SWITCH_BY);
     }
 
     void enterObservationID(final String observationIDValue) throws Exception
@@ -252,58 +226,4 @@ public class CAOMSearchFormPage extends AbstractSearchFormPage
         selectWindow(curWindowTitle);
     }
 
-    void checkMAQ() throws Exception {
-        final WebElement maqToggleSwitch = findMAQToggleSwitch();
-        if (isMAQEnabled()) {
-            if (isMAQOn()) {
-                LOGGER.warn(String.format("Checkbox at %s is already checked.", maqToggleSwitch));
-            } else {
-                click(maqToggleSwitch);
-            }
-
-            waitForMAQActivated();
-        }
-    }
-
-    void waitForMAQActivated() throws Exception {
-        if (isMAQEnabled()) {
-            waitForElementPresent(By.cssSelector("div.toggle.btn-success"));
-            verifyTrue(isMAQOn());
-            waitFor(1000L);
-            waitForElementPresent(DATA_TRAIN_COLLECTION_MENU);
-        }
-    }
-
-    void uncheckMAQ() throws Exception {
-        final WebElement maqToggleSwitch = findMAQToggleSwitch();
-
-        if (isMAQEnabled()) {
-            if (!isMAQOn()) {
-                LOGGER.warn(String.format("Checkbox at %s is already unchecked.", maqToggleSwitch));
-            } else {
-                click(maqToggleSwitch);
-            }
-            waitForMAQDeactivated();
-        }
-    }
-
-    void waitForMAQDeactivated() throws Exception {
-        if (isMAQEnabled()) {
-            waitForElementPresent(By.cssSelector("div.toggle.off"));
-            verifyFalse(isMAQOn());
-            waitFor(1000L);
-            waitForElementPresent(DATA_TRAIN_COLLECTION_MENU);
-        }
-    }
-
-    @Override
-    void waitForMAQToggleReset() throws Exception {
-        if (isMAQEnabled()) {
-            if (defaultMAQToggleFlag) {
-                waitForMAQActivated();
-            } else {
-                waitForMAQDeactivated();
-            }
-        }
-    }
 }

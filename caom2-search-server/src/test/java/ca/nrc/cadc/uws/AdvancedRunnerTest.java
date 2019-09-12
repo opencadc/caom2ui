@@ -100,7 +100,7 @@ public class AdvancedRunnerTest extends AbstractUnitTest<AdvancedRunner> {
                                             ExecutionPhase.EXECUTING,
                                             cal.getTime())).andReturn(
             ExecutionPhase.EXECUTING).once();
-        expect(getMockJob().getParameterList()).andReturn(EMPTY_PARAMETER_LIST).times(3);
+        expect(getMockJob().getParameterList()).andReturn(EMPTY_PARAMETER_LIST).times(2);
 
         getMockSearcher().search(getMockJob(), AdvancedRunner.DEFAULT_TAP_SERVICE_URI, getMockJobUpdater(),
                                  mockSyncResponseWriter);

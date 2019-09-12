@@ -135,7 +135,7 @@ public class FormData
                     final String uType = names[0];
 
                     // Ignore the cutouts.
-                    if (!uType.endsWith("DOWNLOADCUTOUT") && !uType.endsWith("Maq"))
+                    if (!uType.endsWith("DOWNLOADCUTOUT"))
                     {
                         log.debug("init: utype " + uType + ", component " + component);
 

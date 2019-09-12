@@ -56,7 +56,6 @@ public class CAOMSearchBrowserTest extends AbstractAdvancedSearchIntegrationTest
         searchFormPage.enterValidTarget("210.05  54.3");
 
         searchFormPage.reset();
-        searchFormPage.uncheckMAQ();
 
         final int index = searchFormPage.findDataTrainValueIndex(By.id("Observation.instrument.name"), "SPACER",
                                                                  false);
@@ -73,7 +72,6 @@ public class CAOMSearchBrowserTest extends AbstractAdvancedSearchIntegrationTest
         //
         //searchFormPage = searchResultsPage.queryTab();
         //searchFormPage.reset();
-        //searchFormPage.uncheckMAQ();
 
         searchFormPage.enterCollection("CFHTMEGAPIPE");
         SearchResultsPage searchResultsPage = searchFormPage.submitSuccess();
@@ -82,7 +80,6 @@ public class CAOMSearchBrowserTest extends AbstractAdvancedSearchIntegrationTest
 
         searchFormPage = searchResultsPage.queryTab();
         searchFormPage.reset();
-        searchFormPage.uncheckMAQ();
 
         searchFormPage.enterCollection("IRIS");
         searchResultsPage = searchFormPage.submitSuccess();
@@ -95,7 +92,6 @@ public class CAOMSearchBrowserTest extends AbstractAdvancedSearchIntegrationTest
         // Nav back to query tab for next test
         searchFormPage = searchResultsPage.queryTab();
         searchFormPage.reset();
-//        searchFormPage.uncheckMAQ();
 
         // Do this test last as the quickSearchTarget download can tie up a TAP
         // service on slower machines
