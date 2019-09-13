@@ -28,6 +28,8 @@ services:
     depends_on:
       - uwspg.cadc.dao.nrc.ca
       - caom2-meta-ui.cadc.dao.nrc.ca
+    env_file:
+      - 'org.opencadc.search.env.properties'
     volumes:
       - './search##2048.war:/usr/local/tomcat/webapps/search##2048.war'
   uwspg.cadc.dao.nrc.ca:
