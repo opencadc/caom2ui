@@ -27,6 +27,8 @@ services:
     depends_on:
       - uwspg.cadc.dao.nrc.ca
       - caom2-meta-ui.cadc.dao.nrc.ca
+    env_file:
+      - '../default/org.opencadc.search.end.properties'
   uwspg.cadc.dao.nrc.ca:
     image: opencadc/uws-postgres:alpine
     networks:
