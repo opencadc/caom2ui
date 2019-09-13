@@ -144,7 +144,6 @@
                 }
               },
               SYNC_ENDPOINT: '/sync',
-              //TAP_URI: 'ivo://cadc.nrc.ca/tap',
               DataTrain: DataTrain,
               events: {
                 onDataTrainLoaded: new jQuery.Event(

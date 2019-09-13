@@ -131,10 +131,10 @@ public class AdvancedRunner implements JobRunner {
 
 
     URI getTapServiceURI() {
-        final URI tapServiceURI;
-        final String tapServiceKey;
-        tapServiceURI = DEFAULT_TAP_SERVICE_URI;
-        tapServiceKey = TAP_SERVICE_URI_PROPERTY_KEY;
+        final URI tapServiceURI = DEFAULT_TAP_SERVICE_URI;
+        final String tapServiceKey = TAP_SERVICE_URI_PROPERTY_KEY;
+//        tapServiceURI = DEFAULT_TAP_SERVICE_URI;
+//        tapServiceKey = TAP_SERVICE_URI_PROPERTY_KEY;
         return applicationConfiguration.lookupServiceURI(tapServiceKey, tapServiceURI);
     }
 
