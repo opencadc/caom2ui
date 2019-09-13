@@ -18,13 +18,6 @@
   final boolean showObsCoreTab = configuration.lookupBoolean("org.opencadc.search.obs-core", true);
   final String applicationEndpoint = configuration.lookup("org.opencadc.search.app-service-endpoint", "/search");
   final String tapServiceId = configuration.lookup("org.opencadc.search.tap-service-id");
-  final String maqServiceId = configuration.lookup("org.opencadc.search.maq-tap-service-id");
-
-  final boolean enableMAQ = StringUtil.hasText(maqServiceId);
-  final String activateMAQParam = request.getParameter("activateMAQ");
-  final boolean activateMAQ = enableMAQ && (configuration.lookupBoolean("org.opencadc.search.maq-activated", false)
-                                            || (StringUtil.hasText(activateMAQParam)
-                                                && (activateMAQParam.equals("true") || activateMAQParam.equals("on"))));
 %>
 
 <%-- Request scope variables so they can be seen in the imported JSPs --%>
@@ -96,13 +89,13 @@
 
   <div class="tab-content">
     <!-- CAOM2 Search Query Tab -->
-    <c:import url='<%= "caom2_search.jsp?maxRowLimit=" + maxRowLimit  + "&enableMAQ=" + enableMAQ + "&activateMAQ=" + activateMAQ %>' />
+    <c:import url='<%= "caom2_search.jsp?maxRowLimit=" + maxRowLimit %>' />
 
     <!-- ObsCore Query Tab -->
-    <c:import url='<%= "obscore_search.jsp?maxRowLimit=" + maxRowLimit  + "&enableMAQ=" + enableMAQ + "&activateMAQ=" + activateMAQ %>' />
+    <c:import url='<%= "obscore_search.jsp?maxRowLimit=" + maxRowLimit %>' />
 
     <!-- Result Tab -->
-    <c:import url='<%= "results.jsp?maxRowLimit=" + maxRowLimit + "&enableMAQ=" + enableMAQ %>' />
+    <c:import url='<%= "results.jsp?maxRowLimit=" + maxRowLimit %>' />
 
     <!-- Error Tab -->
     <div role="tabpanel" class="tab-pane" id="errorTableTab">
@@ -287,7 +280,6 @@
       var searchApp = new ca.nrc.cadc.search.AdvancedSearchApp({
         autocompleteEndpoint: '<%= applicationEndpoint %>/unitconversion/',
         targetResolverEndpoint: '<%= applicationEndpoint %>/unitconversion/',
-        maqServiceId: '<%= maqServiceId %>',
         tapServiceId: '<%= tapServiceId %>',
         packageEndpoint: '<%= applicationEndpoint %>/package',
         validatorEndpoint: '<%= applicationEndpoint %>/validate',
@@ -296,8 +288,6 @@
         applicationEndpoint: '<%= applicationEndpoint %>',
         pageLanguage: $('html').prop('lang'),
         autoInitFlag: false,
-        enableMAQ : <%= enableMAQ %>,
-        activateMAQ: <%= activateMAQ %>,
         showObscoreTab: <%= showObsCoreTab %>
       })
 

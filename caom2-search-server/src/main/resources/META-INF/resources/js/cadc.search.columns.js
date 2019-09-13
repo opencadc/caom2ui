@@ -1396,8 +1396,6 @@
       $(format(value, columnUType, value, toUnit)) :
       $(formatOutputHTML(value, columnUType, value))
 
-    var maqKey = 'activateMAQ'
-
     if ($output.text()) {
       var currentURIStr = cadc.web.util.currentURI().toString()
       // Trim off existing query and tab reference
@@ -1406,9 +1404,7 @@
       )
 
       $.each(_searchItems, function (name, value) {
-        if (name != maqKey) {
-          baseURI.setQueryValue(name, encodeURIComponent(value))
-        }
+        baseURI.setQueryValue(name, encodeURIComponent(value))
       })
 
       // Then issue the href (target) of the link.
@@ -1416,15 +1412,7 @@
 
       // Force open in a new window.  This MUST be set to _blank.
       $link.attr('target', '_blank')
-      var $enabledMAQ = $('#downloadForm').find('#resultsMaqEnabled')
-
-      var useMaqStr =
-        '&' +
-        maqKey +
-        '=' +
-        ($enabledMAQ.length > 0 && !$enabledMAQ.hasClass('cadc-display-none'))
-
-      $link.attr('href', baseURI.toString() + useMaqStr)
+      $link.attr('href', baseURI.toString())
       $link.addClass('quicksearch_link').addClass('no-propagate-event')
       $link.text($output.text())
 

@@ -75,9 +75,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class AdvancedRunner implements JobRunner {
     private static final String TAP_SERVICE_URI_PROPERTY_KEY = "org.opencadc.search.tap-service-id";
-    private static final String ALT_TAP_SERVICE_URI_PROPERTY_KEY = "org.opencadc.search.maq-tap-service-id";
-    static final URI DEFAULT_TAP_SERVICE_URI = URI.create("ivo://cadc.nrc.ca/tap");
-    static final URI ALTERNATE_TAP_SERVICE_URI = URI.create("ivo://cadc.nrc.ca/sc2tap");
+    static final URI DEFAULT_TAP_SERVICE_URI = URI.create("ivo://cadc.nrc.ca/argus");
     private static final Logger LOGGER = LogManager.getLogger(AdvancedRunner.class);
     private final ApplicationConfiguration applicationConfiguration;
 
@@ -133,17 +131,8 @@ public class AdvancedRunner implements JobRunner {
 
 
     URI getTapServiceURI() {
-        final URI tapServiceURI;
-        final String tapServiceKey;
-        final String maqActivatedParam = ParameterUtil.findParameterValue("activateMAQ", job.getParameterList());
-
-        if (StringUtil.hasText(maqActivatedParam)) {
-            tapServiceURI = ALTERNATE_TAP_SERVICE_URI;
-            tapServiceKey = ALT_TAP_SERVICE_URI_PROPERTY_KEY;
-        } else {
-            tapServiceURI = DEFAULT_TAP_SERVICE_URI;
-            tapServiceKey = TAP_SERVICE_URI_PROPERTY_KEY;
-        }
+        final URI tapServiceURI = DEFAULT_TAP_SERVICE_URI;
+        final String tapServiceKey = TAP_SERVICE_URI_PROPERTY_KEY;
         return applicationConfiguration.lookupServiceURI(tapServiceKey, tapServiceURI);
     }
 

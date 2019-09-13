@@ -144,8 +144,6 @@
                 }
               },
               SYNC_ENDPOINT: '/sync',
-              TAP_MAQ_URI: 'ivo://cadc.nrc.ca/tap/maq',
-              TAP_URI: 'ivo://cadc.nrc.ca/tap',
               DataTrain: DataTrain,
               events: {
                 onDataTrainLoaded: new jQuery.Event(
@@ -178,8 +176,6 @@
     this.$dataTrainDOM = $("div[id='" + this.modelDataSource + "_data_train']")
     this.$dtTableDOM = $('.' + this.modelDataSource + '_dtTableDiv')
     this.uType = this.$dataTrainDOM.find('.hierarchy_utype').text()
-    this.activateMAQ =
-      this.$dataTrainDOM.find('.load_maq_data_train').text() === 'true'
     this.groups = []
     this.freshInstruments = []
 
@@ -188,9 +184,7 @@
     }
 
     this.options = $.extend({}, true, this.defaults, _options)
-
     // tapClient is available at this.options.tapClient
-
     this.columnManager = _columnManager
 
     /**
@@ -249,7 +243,7 @@
      */
     this._loadDataTrain = function() {
       var tapQuery = this._createTAPQuery()
-      this.options.tapClient.postTAPRequest(tapQuery, 'CSV', this.activateMAQ, this.modelDataSource)
+      this.options.tapClient.postTAPRequest(tapQuery, 'CSV', this.modelDataSource)
     }
 
     /**
@@ -307,9 +301,6 @@
 
       for (var i = 0, ul = uTypes.length; i < ul; i++) {
         var nextUType = uTypes[i]
-        if (nextUType === 'activateMAQ') {
-          continue
-        }
         var colOpts = this._getColumnConfig(nextUType)
 
         if (colOpts.hasOwnProperty('tap_column_name')) {
@@ -402,21 +393,6 @@
       var select = this._buildTable(group)
 
       this.updateLists(select, true)
-    }
-
-    /**
-     * Load MAQ data into DataTrain if activateMAQ = true
-     * @param {boolean} activateMAQ
-     */
-    this.setMaqMode = function(activateMAQ) {
-      this._clearTable()
-      this._toggleLoading(true)
-      this.activateMAQ = activateMAQ
-      this._loadDataTrain()
-    }
-
-    this.isMAQMode = function() {
-      return this.activateMAQ
     }
 
     /**

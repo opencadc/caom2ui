@@ -30,13 +30,7 @@ Example content:
 ::
 
     # The TAP Service ID to resolve.
-    # org.opencadc.search.tap-service-id = ivo://cadc.nrc.ca/tap
-
-    # Alternate TAP Service ID to resolve.
-    # org.opencadc.search.maq-tap-service-id = ivo://cadc.nrc.ca/tap/maq
-
-    # Activate (toggle on) the MAQ slider switch.
-    # org.opencadc.search.maq-activated = false
+    org.opencadc.search.tap-service-id = ivo://cadc.nrc.ca/argus
 
     # The endpoint for this application. 
     # org.opencadc.search.app-service-endpoint = /search
@@ -47,22 +41,6 @@ Example content:
     # Max row count for results
     # org.opencadc.search.max-row-count = 10000
 
-Secondary TAP data source
-^^^^^^^^^^^^^^^^^^^^^^^^^
-
-On the query form, there is the option of enabling a toggle to allow
-Archive Search to switch between two TAP data services.
-
-The primary service is defined in the Properties file using:
-``org.opencadc.search.tap-service-id``
-
-The secondary as ``org.opencadc.search.maq-tap-service-id``
-
-To enable the toggle, include a key/value pair using the secondary key
-in the Properties File.
-
-You can also optionally enable the switch by default by setting:
-``org.opencadc.search.maq-activated`` to ``true``
 
 Running
 ~~~~~~~

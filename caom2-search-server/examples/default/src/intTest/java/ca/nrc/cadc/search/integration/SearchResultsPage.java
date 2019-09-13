@@ -93,7 +93,6 @@ public class SearchResultsPage extends AbstractTestWebPage {
     static final By PROPOSAL_PROJECT_COLUMN_HEADER = By.cssSelector("div[id$='caom2:Observation.proposal.project']");
     static final By REST_FRAME_ENERGY_UNIT_SELECT_LOCATOR = By.id("caom2:Plane.energy.restwav_unitselect");
     static final By IQ_UNIT_SELECT_LOCATOR = By.id("caom2:Plane.position.resolution_unitselect");
-    private static final By MAQ_LABEL_BY = By.id("resultsMaqEnabled");
     private static final By FILTER_FILTER_BY = By.id("caom2:Plane.energy.bandpassName_filter");
     private static final By RA_FILTER_BY = By.id("caom2:Plane.position.bounds.cval1_filter");
     private static final By DEC_FILTER_BY = By.id("caom2:Plane.position.bounds.cval2_filter");
@@ -117,7 +116,6 @@ public class SearchResultsPage extends AbstractTestWebPage {
     static final String OBSERVATION_DETAILS_LINK_LOCATOR = "caom2:Observation.observationID_%d_observation_details";
     static final By FIRST_QUICKSEARCH_TARGET_LINK = By.cssSelector("a.quicksearch_link:nth-child(1)");
     static final By QUERY_TAB_LOCATOR = By.cssSelector("#tabList > li:nth-child(1)");
-    static final By MAQ_CHECKBOX_BY = By.name("activateMAQ");
 
     // Switches between busy and transparent (idle).
     static final By GRID_HEADER_ICON = By.className("grid-header-icon");
@@ -241,8 +239,6 @@ public class SearchResultsPage extends AbstractTestWebPage {
     CAOMSearchFormPage queryTab() throws Exception {
         waitFor(1000L);
         click(QUERY_TAB_LOCATOR);
-        waitForElementPresent(MAQ_CHECKBOX_BY);
-        waitFor(1000L);
         return new CAOMSearchFormPage(driver);
     }
 
@@ -286,7 +282,4 @@ public class SearchResultsPage extends AbstractTestWebPage {
         waitForElementVisible(MARK_ALL_CHECKBOX_BY);
     }
 
-    void ensureMAQEnabled() throws Exception {
-        waitForElementVisible(MAQ_LABEL_BY);
-    }
 }

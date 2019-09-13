@@ -87,10 +87,7 @@
     var queryOverlay = $('#queryOverlay')
     var queryTab = $('#queryTab')
     var $tabContainer = $('#tabContainer')
-
-    // For controlling MAQ Switch triggering data train load
     var isFirstLoad = true
-    var maqKey = 'activateMAQ'
 
     // Text area containing the ADQL query.
     var $queryCode = $('#query')
@@ -437,7 +434,7 @@
       // Listeners are removed after inital page load so response to these events
       // only occurs at startup.
       _searchApp._attachTapClientListeners()
-      _searchTapClient.postTAPRequest(tapQuery, 'votable', this.options.activateMAQ)
+      _searchTapClient.postTAPRequest(tapQuery, 'votable')
     }
 
     /**
@@ -724,15 +721,11 @@
           field.value &&
           ca.nrc.cadc.search.field_ignore.indexOf(field.name) < 0
         ) {
-          if (field.name === maqKey) {
-            parameters.push(field.name + '=' + field.value)
-          } else {
-            parameters.push(
-              $activeFormObject.find("[name='" + field.name + "']").attr('id') +
-              '=' +
-              encodeURIComponent(field.value.replace(/\%/g, '*'))
-            )
-          }
+          parameters.push(
+            $activeFormObject.find("[name='" + field.name + "']").attr('id') +
+            '=' +
+            encodeURIComponent(field.value.replace(/\%/g, '*'))
+          )
         }
       })
       return parameters.length > 0 ? '?' + parameters.join('&') : ''
@@ -1278,10 +1271,6 @@
       var postDataTrainLoad = function (_continue) {
         var activeSearchForm = this._getActiveForm()
 
-        // Enable the switch again (was disabled prior to data train load to
-        // make sure only one call is out at a time from this page
-        activeSearchForm.enableMaqToggle()
-
         // set tooltips url
         var tooltipURL = 'json/tooltips_' + this.getPageLanguage() + '.json'
 
@@ -1324,22 +1313,9 @@
                     qKey,
                     decodeURIComponent(qValue.join())
                   )
-                } else if (qKey !== maqKey) {
-                  // enableMAQ has been handled prior to the data train being loaded
-                  activeSearchForm.setInputValue(
-                    qKey,
-                    decodeURIComponent(qValue.join())
-                  )
                 }
 
                 doSubmit = true
-              }
-            })
-
-            $submitForm.find('input').each(function (item, index) {
-              // Explicitly skip the enableMAQ input toggle
-              if (this.className !== maqKey) {
-                $(this).change()
               }
             })
 
@@ -1526,20 +1502,6 @@
           obsCoreSearchForm.enable()
           obsCoreSearchForm.resetFields()
         })
-
-        obsCoreSearchForm.getDataTrain().subscribe(
-            ca.nrc.cadc.search.datatrain.events.onDataTrainLoaded,
-            function () {
-              obsCoreSearchForm.enableMaqToggle()
-            }.bind(this)
-        )
-
-        obsCoreSearchForm.getDataTrain().subscribe(
-            ca.nrc.cadc.search.datatrain.events.onDataTrainLoadFail,
-            function () {
-              obsCoreSearchForm.enableMaqToggle()
-            }.bind(this)
-        )
         obsCoreSearchForm.init()
       }
     }

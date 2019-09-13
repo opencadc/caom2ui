@@ -5,8 +5,6 @@
       nrc: {
         cadc: {
           search: {
-            activateMAQName: 'activateMAQ',
-            activateMAQSelector: '.activateMAQ',
             ignore_fields: ['collection', 'noexec'],
             CAOM2_TARGET_NAME_FIELD_ID: 'Plane.position.bounds',
             OBSCORE_TARGET_NAME_FIELD_ID: 'Char.SpatialAxis.Coverage.Support.Area',
@@ -122,7 +120,6 @@
 
     this.config = _config
     this.options = _options
-    this.maqToggleEnabled = false
 
     /**
      * @type {Metadata|cadc.vot.Metadata}
@@ -765,8 +762,6 @@
                 ])
               })
 
-              // The TAP endpoint could be different after each data train load, (depending on whether
-              // the MAQ switch was toggled.) so the autocomplete should be going to the same endpoint for data.
               $.get(config.options.tapClient.getLastEndpoint(), payload).done(function (
                 csvData
               ) {
@@ -835,23 +830,6 @@
       $currForm.find('.targetList_clear').click(
         function () {
           this._clearTargetList()
-        }.bind(this)
-      )
-
-      $currForm.find('.activateMAQ').change(
-        function (event) {
-          var maqSelectedFlag =
-            event.currentTarget.checked === 'true' ||
-            event.currentTarget.checked === true
-          // toggle results table header element
-          this.setResultsMaqMode(maqSelectedFlag)
-
-          // Don't reload the train if nothing has changed.
-          if (this.dataTrain.isMAQMode() !== maqSelectedFlag) {
-            this.disableMaqToggle()
-            this.dataTrain.setMaqMode(maqSelectedFlag)
-            this.enableMaqToggle()
-          }
         }.bind(this)
       )
 
@@ -961,36 +939,6 @@
         this._trigger(ca.nrc.cadc.search.events.onInit, {})
       } catch (err) {
         console.error('Error found.\n' + err)
-      }
-    }
-
-    this.setMaqToggle = function (setOn) {
-      this.$form
-        .find(ca.nrc.cadc.search.activateMAQSelector)
-        .bootstrapToggle(setOn === true ? 'on' : 'off')
-      this.disableMaqToggle()
-    }
-
-    this.disableMaqToggle = function () {
-      this._toggleMAQToggle(false)
-    }
-
-    this.enableMaqToggle = function () {
-      this._toggleMAQToggle(true)
-    }
-
-    this._toggleMAQToggle = function (enabledFlag) {
-      this.maqToggleEnabled = enabledFlag
-      this.$form
-        .find(ca.nrc.cadc.search.activateMAQSelector)
-        .bootstrapToggle(enabledFlag ? 'enable' : 'disable')
-    }
-
-    this.setResultsMaqMode = function (setOn) {
-      if (setOn === true || setOn === 'true') {
-        $('#resultsMaqEnabled').removeClass('cadc-display-none')
-      } else {
-        $('#resultsMaqEnabled').addClass('cadc-display-none')
       }
     }
 
@@ -1800,14 +1748,6 @@
     this.resetFields = function () {
       // function that resets all fields to default values
       this.$form.find('input:text').val('')
-      this.$form.find(ca.nrc.cadc.search.activateMAQSelector).val(function () {
-        var $self = $(this)
-        var defaultVal = $self.prop('defaultValue')
-        $self
-          .prop('checked', defaultVal === true || defaultVal === 'true')
-          .change()
-        return this.defaultValue
-      })
 
       $('#UPLOAD').remove()
 
@@ -1898,14 +1838,6 @@
       var $inputItem = this.$form.find("input[id='" + _inputID + "']")
       var $formItem = this.$form.find("[id='" + _inputID + "']")
 
-      // Classname used instead of id for this element because it exists on both caom2 and obscore
-      // search forms
-      if (_inputID === ca.nrc.cadc.search.activateMAQName) {
-        // Note that changing this box will kick off a data train update as well,
-        // which may affect timing on Additional Constraints (hierarchy.js) fields that need to be updated
-        $inputItem = this.$form.find("input[class='" + _inputID + "']")
-      }
-
       if ($inputItem.length > 0) {
         if ($inputItem.is(':checkbox')) {
           // Default value is checked.
@@ -1949,11 +1881,6 @@
         this.$form.append($newHidden)
         this.$form.append($newHiddenFormName)
       }
-    }
-
-    this.toggleMaqMode = function () {
-      // check if toggle is enabled for application first
-      this.$form.find('.activateMAQ').click()
     }
 
     /**
