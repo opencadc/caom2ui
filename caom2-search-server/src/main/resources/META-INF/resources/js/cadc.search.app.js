@@ -1249,9 +1249,12 @@
 
       var serializedUrl = serializer.getResultStateUrl()
 
+      // Build an href and place it in the bookmark div.
+      var bookmarkLink = '<a href="' + serializedUrl + '" target=_blank>' + serializedUrl + '</a>'
+
       $('#bookmark_link')
         .find('#bookmark_url_display')
-        .text(serializedUrl)
+        .html(bookmarkLink)
 
       this._trigger(ca.nrc.cadc.search.events.onSetBookmarkUrl, {
         url: serializedUrl
@@ -1313,6 +1316,9 @@
                     qKey,
                     decodeURIComponent(qValue.join())
                   )
+                }
+                else {
+                  activeSearchForm.setInputValue(qKey, decodeURIComponent(qValue.join()))
                 }
 
                 doSubmit = true
