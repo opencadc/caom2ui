@@ -1316,6 +1316,12 @@
                     qKey,
                     decodeURIComponent(qValue.join())
                   )
+                } else if (qKey === 'Plane.time.bounds.samples_PRESET') {
+                  activeSearchForm.setSelectValue(
+                    ca.nrc.cadc.search.TIME_BOUNDS_FIELD_ID,
+                    qKey,
+                    decodeURIComponent(qValue.join())
+                  )
                 }
                 else {
                   activeSearchForm.setInputValue(qKey, decodeURIComponent(qValue.join()))
