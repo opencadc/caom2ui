@@ -1250,7 +1250,7 @@
       var serializedUrl = serializer.getResultStateUrl()
 
       // Build an href and place it in the bookmark div.
-      var bookmarkLink = '<a href="' + serializedUrl + '" target=_blank>' + serializedUrl + '</a>'
+      var bookmarkLink = '<a href="' + serializedUrl + '" target="_blank">' + serializedUrl + '</a>'
 
       $('#bookmark_link')
         .find('#bookmark_url_display')
