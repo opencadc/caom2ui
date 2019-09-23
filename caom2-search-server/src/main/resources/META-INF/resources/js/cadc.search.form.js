@@ -8,6 +8,7 @@
             ignore_fields: ['collection', 'noexec'],
             CAOM2_TARGET_NAME_FIELD_ID: 'Plane.position.bounds',
             OBSCORE_TARGET_NAME_FIELD_ID: 'Char.SpatialAxis.Coverage.Support.Area',
+            TIME_BOUNDS_FIELD_ID: 'Plane.time.bounds.samples',
             FORM_LABEL_INPUT_LENGTH: 12,
             TARGET_FORM_LABEL_INPUT_LENGTH: 24,
             CHECKBOX_CHECKED_REGEX: /^true|on$/g,
