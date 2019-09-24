@@ -1851,17 +1851,18 @@
           $inputItem.prop('checked', checkedFlag)
         } else {
           $inputItem.val(_inputValue).change()
+
+          var $detailsItem = this.$form.find(
+            "details[id='" + _inputID + "_details']"
+          )
+
+          if (_inputValue) {
+            this.openDetailsItem($detailsItem)
+          } else {
+            this.closeDetailsItem($detailsItem)
+          }
         }
 
-        var $detailsItem = this.$form.find(
-          "details[id='" + _inputID + "_details']"
-        )
-
-        if (_inputValue) {
-          this.openDetailsItem($detailsItem)
-        } else {
-          this.closeDetailsItem($detailsItem)
-        }
       } else if (
         $formItem.length === 0 &&
         ca.nrc.cadc.search.ignore_fields.indexOf(_inputID) < 0
