@@ -641,7 +641,7 @@
                 extended: true
               },
               'caom2:Plane.position.bounds': {
-                label: 'Polygon'
+                label: 'Shape'
               },
               'caom2:Plane.energy.resolvingPower': {
                 label: 'Resolving Power',

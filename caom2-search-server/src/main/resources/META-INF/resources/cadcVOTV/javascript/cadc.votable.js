@@ -230,7 +230,7 @@
       'adql:VARCHAR',
       'adql:CLOB',
       'adql:REGION',
-      'polygon',
+      'shape',
       'point',
       'circle',
       'interval',
