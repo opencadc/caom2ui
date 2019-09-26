@@ -329,7 +329,7 @@
       var raValues = []
       var decValues = []
 
-      if (_footprint.region === CIRCLE) {
+      if (_footprint.region === CIRCLE_DATA_KEY) {
         var ra = _footprint.coords[0]
         var dec = _footprint.coords[1]
         var radius = _footprint.coords[2]
@@ -503,13 +503,13 @@
         var footprint = footprints[i]
 
         if (footprint.region === CIRCLE_DATA_KEY) {
-          _self.aladinOverlay.addFootprints([
+          _self.aladinOverlay.add(
             A.circle(
               footprint.coords[0],
               footprint.coords[1],
               footprint.coords[2]
             )
-          ])
+          )
         } else if (footprint.region === POLYGON_DATA_KEY) {
           _self.aladinOverlay.addFootprints([A.polygon(footprint.coords)])
         } else {
@@ -572,65 +572,8 @@
           }
       } // end if (footprintString)
 
-      // Can be empty if footprintString is empty, or if coordinates.length > 3
       return footprints
     }
-
-    //function _getFootprintsOld(footprintString) {
-    //  var footprints = []
-    //
-    //  if (footprintString) {
-    //    var region = null
-    //    var coordinates = []
-    //    var shapes = footprintString.split(/(Polygon|Circle)/)
-    //    for (var i = 0, len = shapes.length; i < len; i++) {
-    //      var shape = shapes[i].trim()
-    //      if (shape.length > 0) {
-    //        if (shape === POLYGON || shape === CIRCLE) {
-    //          region = shape
-    //        } else {
-    //          var coords = shape.split(/[\s()]+/)
-    //          var lenj = coords.length
-    //
-    //          if (lenj >= 3) {
-    //            for (var j = 0; j < lenj; j++) {
-    //              var coord = coords[j]
-    //              if (coord.length > 0 && !isNaN(coord)) {
-    //                coordinates.push(Number(coord))
-    //              }
-    //            }
-    //
-    //            if (!region && coordinates.length > 0) {
-    //              var isPolygon = coordinates.length % 2 === 0
-    //              var isCircle = coordinates.length === 3
-    //
-    //              if (isPolygon) {
-    //                region = POLYGON
-    //              } else if (isCircle) {
-    //                region = CIRCLE
-    //              }
-    //            }
-    //
-    //            if (region && coordinates.length > 0) {
-    //              // split polygon array into 2 segment chunks
-    //              if (region === POLYGON) {
-    //                var vertices = []
-    //                while (coordinates.length) {
-    //                  vertices.push(coordinates.splice(0, 2))
-    //                }
-    //                coordinates = vertices
-    //              }
-    //              footprints.push({ region: region, coords: coordinates })
-    //              region = null
-    //              coordinates = []
-    //            }
-    //          }
-    //        }
-    //      }
-    //    }
-    //  }
-    //  return footprints
-    //}
 
     /**
      * Set the Field of View.  This is used when the data is done loading completely, or the data has filtered down.
