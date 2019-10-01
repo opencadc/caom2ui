@@ -25,8 +25,8 @@
    * @constructor
    */
   function AladinLiteFootprintViewer(_inputs) {
-    var POLYGON = 'Polygon'
-    var CIRCLE = 'Circle'
+    var POLYGON_DATA_KEY = 'polygon'
+    var CIRCLE_DATA_KEY = 'circle'
     var DEFAULT_FOV_DEGREES = 180
     var DEFAULT_FOV_BUFFER = 500 / 100
 
@@ -329,7 +329,7 @@
       var raValues = []
       var decValues = []
 
-      if (_footprint.region === CIRCLE) {
+      if (_footprint.region === CIRCLE_DATA_KEY) {
         var ra = _footprint.coords[0]
         var dec = _footprint.coords[1]
         var radius = _footprint.coords[2]
@@ -421,7 +421,7 @@
         for (var i = 0, len = selectedFootprints.length; i < len; i++) {
           var selectedFootprint = selectedFootprints[i]
 
-          if (selectedFootprint.region === CIRCLE) {
+          if (selectedFootprint.region === CIRCLE_DATA_KEY) {
             _self.currentFootprint.add(
               A.circle(
                 selectedFootprint.coords[0],
@@ -429,7 +429,7 @@
                 selectedFootprint.coords[2]
               )
             )
-          } else if (selectedFootprint.region === POLYGON) {
+          } else if (selectedFootprint.region === POLYGON_DATA_KEY) {
             _self.currentFootprint.addFootprints([
               A.polygon(selectedFootprint.coords)
             ])
@@ -502,7 +502,7 @@
       for (var i = 0, len = footprints.length; i < len; i++) {
         var footprint = footprints[i]
 
-        if (footprint.region === CIRCLE) {
+        if (footprint.region === CIRCLE_DATA_KEY) {
           _self.aladinOverlay.add(
             A.circle(
               footprint.coords[0],
@@ -510,7 +510,7 @@
               footprint.coords[2]
             )
           )
-        } else if (footprint.region === POLYGON) {
+        } else if (footprint.region === POLYGON_DATA_KEY) {
           _self.aladinOverlay.addFootprints([A.polygon(footprint.coords)])
         } else {
           console.log('Unknown footprint ' + footprint)
@@ -529,55 +529,49 @@
       var footprints = []
 
       if (footprintString) {
-        var region = null
         var coordinates = []
-        var shapes = footprintString.split(/(Polygon|Circle)/)
-        for (var i = 0, len = shapes.length; i < len; i++) {
-          var shape = shapes[i].trim()
-          if (shape.length > 0) {
-            if (shape === POLYGON || shape === CIRCLE) {
-              region = shape
-            } else {
-              var coords = shape.split(/[\s()]+/)
-              var lenj = coords.length
+        // format of Bounds data is polygon|circle # # # ...
+        var regionFromData = footprintString.substring(0, footprintString.indexOf(' '))
+        var region = null
 
-              if (lenj >= 3) {
-                for (var j = 0; j < lenj; j++) {
-                  var coord = coords[j]
-                  if (coord.length > 0 && !isNaN(coord)) {
-                    coordinates.push(Number(coord))
-                  }
-                }
+        if (regionFromData.toLowerCase() === POLYGON_DATA_KEY ||
+          regionFromData.toLowerCase() === CIRCLE_DATA_KEY) {
 
-                if (!region && coordinates.length > 0) {
-                  var isPolygon = coordinates.length % 2 === 0
-                  var isCircle = coordinates.length === 3
+          region = regionFromData.toLowerCase()
 
-                  if (isPolygon) {
-                    region = POLYGON
-                  } else if (isCircle) {
-                    region = CIRCLE
-                  }
-                }
+          var shapeStr = footprintString.substring(footprintString.indexOf(' ')+1)
+          var coords = shapeStr.split(/[\s()]+/)
 
-                if (region && coordinates.length > 0) {
-                  // split polygon array into 2 segment chunks
-                  if (region === POLYGON) {
-                    var vertices = []
-                    while (coordinates.length) {
-                      vertices.push(coordinates.splice(0, 2))
-                    }
-                    coordinates = vertices
-                  }
-                  footprints.push({ region: region, coords: coordinates })
-                  region = null
-                  coordinates = []
-                }
+          if (coords.length > 0) {
+            var lenj = coords.length
+
+            for (var j = 0; j < lenj; j++) {
+              var coord = coords[j]
+              if (coord.length > 0 && !isNaN(coord)) {
+                coordinates.push(Number(coord))
               }
             }
-          }
+
+            if (region && coordinates.length > 0) {
+              // Collapse the coordinates back into pairs if region is polygon
+              // for circle, the coordinates are single entries
+              if (region === POLYGON_DATA_KEY) {
+                var vertices = []
+                while (coordinates.length) {
+                  vertices.push(coordinates.splice(0, 2))
+                }
+                coordinates = vertices
+              }
+              footprints.push({ region: region, coords: coordinates })
+            }
+          }  // end if (shape.length > 0)
         }
-      }
+        else {
+            // Invalid data. write to console and continue
+            console.log("Invalid region found for footprint: " + footprintString)
+          }
+      } // end if (footprintString)
+
       return footprints
     }
 
