@@ -336,7 +336,7 @@
 
         raValues.push(ra + radius, ra - radius)
         decValues.push(dec + radius, dec - radius)
-      } else if (_footprint.region === POLYGON) {
+      } else if (_footprint.region === POLYGON_DATA_KEY) {
         for (var i = 0, len = _footprint.coords.length; i < len; i++) {
           // Even numbers are RA values.
           raValues.push(_footprint.coords[i][0])

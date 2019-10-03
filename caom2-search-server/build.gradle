@@ -27,7 +27,7 @@ dependencies {
     compile 'org.opencadc:cadc-adql:[1.1.6,)'
     compile 'org.opencadc:cadc-util:[1.2.14,)'
     compile 'org.opencadc:cadc-dali:[1.1.1,)'
-    compile 'org.opencadc:caom2:[2.2.5,)'
+    compile 'org.opencadc:caom2:[2.2.5, 2.4.0)'
     compile 'org.opencadc:caom2-compute:[2.2.5,)'
     compile 'org.opencadc:cadc-registry:[1.5.0,)'
     compile 'org.opencadc:cadc-vosi:[1.2,)'
@@ -46,4 +46,4 @@ dependencies {
 
 sourceCompatibility = 1.7
 group = 'org.opencadc'
-version = '2.11.4'
+version = '2.11.5'
