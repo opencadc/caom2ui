@@ -19,20 +19,12 @@ configurations.all {
     }
 }
 
-dependencies {
-//    compile 'log4j:log4j:1.2.+'
+apply from: file('../../../int_test.gradle')
 
-    compile 'org.opencadc:caom2-search-server:[2.11.0,)'
+dependencies {
+    compile 'org.opencadc:caom2-search-server:[2.11.6,)'
     compile 'org.opencadc:cadc-uws-server:[1.2.1,)'
     compile 'org.opencadc:cadc-registry:[1.5.0,)'
-
-//    providedCompile 'javax.servlet:javax.servlet-api:3.1.+'
-//    providedCompile 'javax.servlet:javax.servlet-api:3.0.+'
-
-//    runtime 'commons-logging:commons-logging:1.+'
-//    runtime 'org.postgresql:postgresql:42.2.5.jre7'
-//    runtime 'javax.servlet.jsp.jstl:jstl-api:1.2'
-//    runtime 'org.apache.taglibs:taglibs-standard-impl:1.2.5'
 
     testCompile 'org.opencadc:cadc-web-test:[2.1.2, )'
     testCompile 'junit:junit:[4.12,)'
@@ -50,10 +42,8 @@ ext {
     default_docker_image_name = 'opencadc/caom2-search:' + project.version
 }
 
-sourceCompatibility = 1.7
 group = 'org.opencadc'
-version = '2049'
-apply from: '../../../_shared.gradle'
+version = '2050'
 
 war {
     // Trying to fix static file caching on new build.

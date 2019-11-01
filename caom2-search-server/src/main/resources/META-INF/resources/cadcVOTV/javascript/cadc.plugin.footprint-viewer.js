@@ -111,8 +111,13 @@
     this.fieldOfViewSetFlag = false
 
     this.addHooks = function() {
-      // t75446 - Add VLASS to AladinLite Image laters
-      var hipsDir = 'http://archive-new.nrao.edu/vlass/HiPS/VLASS1.1/Quicklook/'
+      // WebRT 76120
+      // VLASS output for HiPS VLASS tiles.
+      //
+      // at88mph/jenkinsd 2019.11.01
+      //
+      var hipsDir = 'https://archive-new.nrao.edu/vlass/HiPS/VLASS_Epoch1/Quicklook/'
+
       var label = 'VLASS1.1-QL-20180625'
       var currA = _self.aladin
       var currBaseImage = currA.getBaseImageLayer()

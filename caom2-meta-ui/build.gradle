@@ -11,6 +11,8 @@ repositories {
     jcenter()
 }
 
+apply from: rootProject.file('int_test.gradle')
+
 sourceCompatibility = '1.7'
 group = 'ca.nrc.cadc'
 version = '1014'
@@ -35,5 +37,3 @@ ext {
 war {
     archiveName = 'caom2ui##' + project.version + '.war'
 }
-
-apply from: '../_shared.gradle'
