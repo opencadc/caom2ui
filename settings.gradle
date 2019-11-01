@@ -1,0 +1,2 @@
+rootProject.name = 'caom2ui'
+include 'caom2-search-lib', 'caom2-search-server', 'caom2-ui-server', 'caom2-meta-ui'

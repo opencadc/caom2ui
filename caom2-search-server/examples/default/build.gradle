@@ -53,7 +53,6 @@ ext {
 sourceCompatibility = 1.7
 group = 'org.opencadc'
 version = '2049'
-apply from: '../../../_shared.gradle'
 
 war {
     // Trying to fix static file caching on new build.

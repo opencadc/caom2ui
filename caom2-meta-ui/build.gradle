@@ -35,5 +35,3 @@ ext {
 war {
     archiveName = 'caom2ui##' + project.version + '.war'
 }
-
-apply from: '../_shared.gradle'
