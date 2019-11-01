@@ -1,0 +1,51 @@
+sourceSets {
+    intTest
+}
+
+configurations {
+    intTestCompile
+    intTestCompile.extendsFrom(testCompile)
+}
+
+['firefox', 'chrome'].each { driver ->
+    task "intTest${driver.capitalize()}"(type: Test) { driverTest ->
+        testClassesDirs = sourceSets.intTest.output.classesDirs
+        classpath = sourceSets.intTest.runtimeClasspath
+        reports {
+            html.destination = reporting.file("$name/html")
+        }
+        dependencies {
+            intTestCompile 'junit:junit:[4.12,)'
+            intTestCompile 'org.opencadc:cadc-web-test:[2.1.2,)'
+            intTestCompile 'org.seleniumhq.selenium:selenium-java:[3.18,)'
+        }
+
+        systemProperty "driver", "${driver}"
+
+        if (project.hasProperty('intTest_selenium_server_url')) {
+            systemProperty 'selenium.server.url', project.intTest_selenium_server_url
+        } else {
+            systemProperty 'selenium.server.url', 'http://cadcint2.cadc.dao.nrc.ca:3444'
+        }
+
+        if (project.hasProperty('intTest_web_app_url')) {
+            systemProperty 'web.app.url', project.intTest_web_app_url
+        }
+
+        if (project.hasProperty('intTest_user_name')) {
+            systemProperty 'user.name', project.intTest_user_name
+        }
+
+        if (project.hasProperty('intTest_user_password')) {
+            systemProperty 'user.password', project.intTest_user_password
+        }
+    }
+}
+
+idea {
+    module {
+        //and some extra test source dirs
+        testSourceDirs += file('src/intTest/java')
+        scopes.TEST.plus += [configurations.intTestCompile]
+    }
+}

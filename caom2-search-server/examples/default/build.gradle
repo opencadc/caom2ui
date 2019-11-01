@@ -19,6 +19,8 @@ configurations.all {
     }
 }
 
+apply from: file('../../../int_test.gradle')
+
 dependencies {
     compile 'org.opencadc:caom2-search-server:[2.11.6,)'
     compile 'org.opencadc:cadc-uws-server:[1.2.1,)'
@@ -40,9 +42,8 @@ ext {
     default_docker_image_name = 'opencadc/caom2-search:' + project.version
 }
 
-sourceCompatibility = 1.7
 group = 'org.opencadc'
-version = '2049'
+version = '2050'
 
 war {
     // Trying to fix static file caching on new build.
