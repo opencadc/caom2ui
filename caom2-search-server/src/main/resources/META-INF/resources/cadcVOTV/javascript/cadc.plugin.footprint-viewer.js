@@ -118,7 +118,7 @@
       //
       var hipsDir = 'https://archive-new.nrao.edu/vlass/HiPS/VLASS_Epoch1/Quicklook/'
 
-      var label = 'VLASS1.1-QL-20180625'
+      var label = 'VLASS Epoch 1'
       var currA = _self.aladin
       var currBaseImage = currA.getBaseImageLayer()
 

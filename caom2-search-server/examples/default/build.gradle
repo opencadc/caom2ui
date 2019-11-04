@@ -22,7 +22,7 @@ configurations.all {
 apply from: file('../../../int_test.gradle')
 
 dependencies {
-    compile 'org.opencadc:caom2-search-server:[2.11.6,)'
+    compile 'org.opencadc:caom2-search-server:[2.11.7,)'
     compile 'org.opencadc:cadc-uws-server:[1.2.1,)'
     compile 'org.opencadc:cadc-registry:[1.5.0,)'
 
