@@ -62,7 +62,7 @@
     this.options = _options
     this._lastURLUsed
 
-    this._serviceURLs = {}
+    this._TAPServiceURL = {}
 
     var _rc = this
     var _regClient = this.options.baseURL === '' ?
@@ -79,15 +79,18 @@
           )
     }
 
-    function setTAPServiceURL(url) {
-      this._serviceURLs.tap =  new URL(url)
+    function setTAPServiceURL(url, path) {
+        _rc._TAPServiceURL = {
+          'href' : url + path,
+          'pathname' : path,
+        }
     }
 
     function postRequest(serviceURL, format, tapQuery, callerId) {
-      _rc._lastURLUsed = new URL(serviceURL)
+      _rc._lastURLUsed = serviceURL
 
         $.post(
-          serviceURL,
+          serviceURL.href,
           {
             LANG: 'ADQL',
             FORMAT: format,
@@ -131,16 +134,13 @@
       function postTAPRequest(tapQuery, format, callerId) {
       // callerId is so the listeners can determine if an event coming
       // from an instance of this object belongs to them or not.
-
       var baseURI = _rc.options.tapServiceId
-      var serviceURL = _rc._serviceURLs['tap']
 
-      if (typeof serviceURL === 'undefined') {
+      if (typeof _rc._TAPServiceURL.href === 'undefined') {
         Promise.resolve(this.prepareTAPCall(baseURI))
           .then(function (serviceURL) {
-            serviceURL = serviceURL + ca.nrc.cadc.search.tapclient.TAP_SYNC_ENDPOINT
-            _rc.setTAPServiceURL(serviceURL)
-            postRequest(serviceURL, format, tapQuery, callerId)
+            _rc.setTAPServiceURL(serviceURL, ca.nrc.cadc.search.tapclient.TAP_SYNC_ENDPOINT)
+            postRequest(_rc._TAPServiceURL, format, tapQuery, callerId)
           })
           .catch(function (err) {
             _rc.trigger(
@@ -149,7 +149,7 @@
             )
           })
       } else {
-        postRequest(serviceURL.href, format, tapQuery, callerId)
+        postRequest(_rc._TAPServiceURL, format, tapQuery, callerId)
       }
 
     }
