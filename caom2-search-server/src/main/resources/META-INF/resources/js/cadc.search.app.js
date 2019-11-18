@@ -1696,7 +1696,7 @@
       var queryParam = 'QUERY=' + encodeURIComponent(this._getADQL(true)).replace('!', '%21')
 
       var votableURL =
-            _searchTapClient.getLastURL() +
+            _searchTapClient.getLastURL().href +
             '?LANG=ADQL&REQUEST=doQuery&' +
             queryParam
 
