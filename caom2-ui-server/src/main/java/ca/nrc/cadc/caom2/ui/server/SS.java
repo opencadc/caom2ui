@@ -137,9 +137,11 @@ public class SS {
                 sb.append("<br>").append("sampleSize: ").append(comp.sampleSize);
                 sb.append("<br>").append("resolution: ")
                   .append(comp.resolvingPower);
+                // TODO: format of this will change for caom24
                 sb.append("<br>").append("emBand: ").append(comp.emBand);
                 sb.append("<br>").append("transition: ").append(comp.transition);
-                // missing restwav from caom2.3 spec
+                sb.append("<br>").append("restwav: ").append(comp.restwav);
+
                 // add resolvingPowerBounds, energyBands from caom24 spec - labels??
             }
         } catch (Exception ex) {
@@ -161,7 +163,9 @@ public class SS {
                 sb.append("<br>").append("sampleSize: ").append(comp.sampleSize);
                 sb.append("<br>").append("resolution: ").append(comp.resolution);
                 sb.append("<br>").append("exposure: ").append(comp.exposure);
-                // missing newAttr
+                // This value is in the 2.3 spec, but not in the Time.java class in caom2?
+//                sb.append("<br>").append("newAttr: ").append(comp.newattr);
+
                 // caom24 add: resolutionBounds
             }
         } catch (Exception ex) {
@@ -545,7 +549,6 @@ public class SS {
             sb.append(wcs.velang);
 
             fillBuffer(wcs.getAxis(), sb);
-            // todo: where is 'transition' (EnergyTransition)? caom23 back fill...
         }
 
         return sb.toString();
@@ -559,11 +562,16 @@ public class SS {
             sb.append(wcs.exposure);
             sb.append("<br>resolution: ");
             sb.append(wcs.resolution);
+            sb.append("<br>mjdref: ");
+            sb.append(wcs.mjdref);
+            sb.append("<br>trefpos: ");
+            sb.append(wcs.trefpos);
+            sb.append("<br>timesys: ");
+            sb.append(wcs.timesys);
             fillBuffer(wcs.getAxis(), sb);
         }
 
         return sb.toString();
-        // caom23 missing: mjdref, trefpos, timesys
     }
 
     public static String toString(PolarizationWCS wcs) {
