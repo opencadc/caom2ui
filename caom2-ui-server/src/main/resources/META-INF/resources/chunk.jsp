@@ -100,5 +100,6 @@ request.setAttribute("chunk", c);
       <td><%= SS.toString(chunk.observable) %>
       </td>
     </tr>
+<%--    TODO: caom24: add customAxis + WCS section --%>
   </table>
 </div>

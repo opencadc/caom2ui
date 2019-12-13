@@ -97,12 +97,16 @@ This JSP page renders an HTML table with the Observation metadata.
       <td><%= SS.toString(obs.target) %>
       </td>
     </tr>
+    <tr class="even">
+      <td>target position</td>
+      <td><%= SS.toString(obs.targetPosition) %>
+      </td>
+    </tr>
     <tr>
       <td>environment</td>
       <td><%= SS.toString(obs.environment) %>
       </td>
     </tr>
-
   </table>
 
   <%

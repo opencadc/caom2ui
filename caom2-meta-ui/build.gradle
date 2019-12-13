@@ -13,19 +13,26 @@ repositories {
 
 apply from: rootProject.file('int_test.gradle')
 
+configurations.all {
+    resolutionStrategy {
+        force 'org.apache.commons:commons-configuration2:2.3'
+        force 'org.apache.commons:commons-lang3:3.8.1'
+    }
+}
+
 sourceCompatibility = '1.7'
 group = 'ca.nrc.cadc'
-version = '1014'
+version = '1015'
 
 dependencies {
-    compile 'org.opencadc:caom2-ui-server:1.2.1'
+    compile 'org.opencadc:caom2-ui-server:[1.2.2,)'
 
-    providedCompile 'javax.servlet:javax.servlet-api:3.1.+'
-    providedCompile 'javax.servlet:javax.servlet-api:3.0.+'
-    runtime 'jstl:jstl:1.+'
+    providedCompile 'javax.servlet:javax.servlet-api:[3.1.0,)'
+    providedCompile 'javax.servlet:javax.servlet-api:[3.0.0,)'
+    runtime 'jstl:jstl:[1.0,)'
 
-    testCompile 'junit:junit:4.+'
-    testCompile 'org.easymock:easymock:4.+'
+    testCompile 'junit:junit:[4.0,)'
+    testCompile 'org.easymock:easymock:[4.0,)'
 }
 
 ext {

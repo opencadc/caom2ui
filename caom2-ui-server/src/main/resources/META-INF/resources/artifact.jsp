@@ -54,7 +54,12 @@ request.setAttribute("artifact", a);
       <td><%= artifact.contentLength %>
       </td>
     </tr>
-
+    <tr>
+      <td>contentChecksum</td>
+      <td><%= artifact.contentChecksum.toString() %>
+      </td>
+    </tr>
+<%--    TODO: caom24: add contentRelease and contentReadGroups --%>
   </table>
 
   <%

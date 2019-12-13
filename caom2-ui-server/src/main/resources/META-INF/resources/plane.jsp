@@ -91,6 +91,7 @@ request.setAttribute("plane", p);
       <td><%= SS.getPlanePolarization(plane) %>
       </td>
     </tr>
+<%--    // TODO: caom24: add SS.getPlaneCustom and SS.getPlaneObservable--%>
   </table>
 
   <%
