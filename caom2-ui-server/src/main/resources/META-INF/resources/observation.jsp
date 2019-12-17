@@ -18,20 +18,13 @@ This JSP page renders an HTML table with the Observation metadata.
 
 <div class="observation" style="margin-left: <%= indent.intValue() %>em">
 
-  <h2><%= obs.getClass().getSimpleName() %>
-  </h2>
+  <h2><%= obs.getClass().getSimpleName() %></h2>
 
   <table class="content">
-    <tr class="even">
-      <td>obsID</td>
-      <td><%= obs.getID() %> aka <%= obs.getID().getLeastSignificantBits() %>
-      </td>
-    </tr>
-    <tr>
-      <td>lastModified</td>
-      <td><%= SS.toString(obs.getLastModified()) %>
-      </td>
-    </tr>
+    <%--    Provide entity id first --%>
+    <%= SS.getCaomEntityID(obs)%>
+
+    <%--      Provide data specific to class --%>
     <tr class="even">
       <td>collection</td>
       <td><%= obs.getCollection() %>
@@ -47,59 +40,44 @@ This JSP page renders an HTML table with the Observation metadata.
       <td><%= SS.toString(obs.metaRelease) %>
       </td>
     </tr>
-    <tr>
+    <tr >
+      <td>metaReadGroups</td>
+      <td><%= SS.serializeURISet(obs.getMetaReadGroups()) %>
+      </td>
+    </tr>
+    <tr class="even">
       <td>sequenceNumber</td>
       <td><%= SS.toString(obs.sequenceNumber) %>
       </td>
     </tr>
-    <tr class="even">
-      <td>algorithm</td>
-      <td><%= SS.toString(obs.getAlgorithm()) %>
-      </td>
-    </tr>
     <tr>
-      <td>members</td>
-      <td><%= SS.toMemberString(request.getContextPath(), obs, request.getParameter("ID")) %>
-      </td>
-    </tr>
-    <tr class="even">
       <td>type</td>
       <td><%= SS.toString(obs.type) %>
       </td>
     </tr>
-    <tr>
+    <tr class="even">
       <td>intent</td>
       <td><%= SS.toString(obs.intent) %>
       </td>
     </tr>
     <tr class="even">
-      <td>proposal</td>
-      <td><%= SS.toString(obs.proposal) %>
+      <td>members</td>
+      <td><%= SS.toMemberString(request.getContextPath(), obs, request.getParameter("ID")) %>
       </td>
     </tr>
     <tr>
-      <td>requirements</td>
-      <td><%= SS.toString(obs.requirements) %>
+      <td>algorithm</td>
+      <td><%= SS.toString(obs.getAlgorithm()) %>
       </td>
     </tr>
-    <tr class="even">
+    <tr>
       <td>telescope</td>
       <td><%= SS.toString(obs.telescope) %>
       </td>
     </tr>
-    <tr>
+    <tr class="even">
       <td>instrument</td>
       <td><%= SS.toString(obs.instrument) %>
-      </td>
-    </tr>
-    <tr class="even">
-      <td>target</td>
-      <td><%= SS.toString(obs.target) %>
-      </td>
-    </tr>
-    <tr class="even">
-      <td>target position</td>
-      <td><%= SS.toString(obs.targetPosition) %>
       </td>
     </tr>
     <tr>
@@ -107,6 +85,29 @@ This JSP page renders an HTML table with the Observation metadata.
       <td><%= SS.toString(obs.environment) %>
       </td>
     </tr>
+    <tr>
+      <td>proposal</td>
+      <td><%= SS.toString(obs.proposal) %>
+      </td>
+    </tr>
+    <tr>
+      <td>target</td>
+      <td><%= SS.toString(obs.target) %>
+      </td>
+    </tr>
+    <tr class="even">
+      <td>targetPosition</td>
+      <td><%= SS.toString(obs.targetPosition) %>
+      </td>
+    </tr>
+    <tr class="even">
+      <td>requirements</td>
+      <td><%= SS.toString(obs.requirements) %>
+      </td>
+    </tr>
+
+    <%--    Populate in the rest of the CaomEntity member values --%>
+    <%= SS.getCaomEntityPortion(obs)%>
   </table>
 
   <%

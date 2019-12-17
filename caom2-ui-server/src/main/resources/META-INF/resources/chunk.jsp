@@ -19,17 +19,9 @@ request.setAttribute("chunk", c);
   <h3>Chunk</h3>
 
   <table class="content">
-    <tr>
-      <td>chunkID</td>
-      <td><%= chunk.getID() %> aka <%= chunk.getID()
-          .getLeastSignificantBits() %>
-      </td>
-    </tr>
-    <tr>
-      <td>lastModified</td>
-      <td><%= SS.toString(chunk.getLastModified()) %>
-      </td>
-    </tr>
+    <%--    Provide entity id first --%>
+    <%= SS.getCaomEntityID(chunk)%>
+
     <tr>
       <td>productType</td>
       <td><%= SS.toString(chunk.productType) %>
@@ -91,6 +83,17 @@ request.setAttribute("chunk", c);
     </tr>
 
     <tr class="even">
+      <td>customAxis</td>
+      <td><%= chunk.customAxis %>
+      </td>
+    </tr>
+    <tr>
+      <td>custom</td>
+      <td><%= SS.toString(chunk.custom) %>
+      </td>
+    </tr>
+
+    <tr class="even">
       <td>observableAxis</td>
       <td><%= chunk.observableAxis %>
       </td>
@@ -100,6 +103,8 @@ request.setAttribute("chunk", c);
       <td><%= SS.toString(chunk.observable) %>
       </td>
     </tr>
-<%--    TODO: caom24: add customAxis + WCS section --%>
+
+    <%--    Populate in the rest of the CaomEntity member values --%>
+    <%= SS.getCaomEntityPortion(chunk)%>
   </table>
 </div>

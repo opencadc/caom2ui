@@ -20,20 +20,17 @@ request.setAttribute("plane", p);
   <h2>Plane</h2>
 
   <table class="content">
-    <tr class="even">
-      <td>planeID</td>
-      <td><%= plane.getID() %> aka <%= plane.getID()
-          .getLeastSignificantBits() %>
-      </td>
-    </tr>
-    <tr>
-      <td>lastModified</td>
-      <td><%= SS.toString(plane.getLastModified()) %>
-      </td>
-    </tr>
+    <%--    Provide entity id first --%>
+    <%= SS.getCaomEntityID(plane)%>
+
     <tr class="even">
       <td>productID</td>
       <td><%= plane.getProductID() %>
+      </td>
+    </tr>
+    <tr>
+      <td>creatorID</td>
+      <td><%= plane.creatorID %>
       </td>
     </tr>
     <tr>
@@ -42,8 +39,18 @@ request.setAttribute("plane", p);
       </td>
     </tr>
     <tr class="even">
+      <td>metaReadGroups</td>
+      <td><%= SS.serializeURISet(plane.getMetaReadGroups()) %>
+      </td>
+    </tr>
+    <tr>
       <td>dataRelease</td>
       <td><%= SS.toString(plane.dataRelease) %>
+      </td>
+    </tr>
+    <tr class="even">
+      <td>dataReadGroups</td>
+      <td><%= SS.serializeURISet(plane.getDataReadGroups()) %>
       </td>
     </tr>
     <tr>
@@ -56,19 +63,20 @@ request.setAttribute("plane", p);
       <td><%= SS.toString(plane.calibrationLevel) %>
       </td>
     </tr>
-    <tr class="provenance">
-      <td>provenance</td>
-      <td><%= SS.toString(plane.provenance) %>
-      </td>
-    </tr>
-    <tr class="even">
-      <td>metrics</td>
-      <td><%= SS.toString(plane.metrics) %>
+
+    <tr>
+      <td>observable</td>
+      <td><%= SS.toString(plane.observable) %>
       </td>
     </tr>
     <tr>
       <td>quality</td>
       <td><%= SS.toString(plane.quality) %>
+      </td>
+    </tr>
+    <tr class="even">
+      <td>metrics</td>
+      <td><%= SS.toString(plane.metrics) %>
       </td>
     </tr>
     <tr class="even">
@@ -91,7 +99,19 @@ request.setAttribute("plane", p);
       <td><%= SS.getPlanePolarization(plane) %>
       </td>
     </tr>
-<%--    // TODO: caom24: add SS.getPlaneCustom and SS.getPlaneObservable--%>
+    <tr>
+      <td>custom</td>
+      <td><%= SS.getPlaneCustom(plane) %>
+      </td>
+    </tr>
+    <tr class="provenance">
+      <td>provenance</td>
+      <td><%= SS.toString(plane.provenance) %>
+      </td>
+    </tr>
+    <%--    Populate in the rest of the CaomEntity member values --%>
+    <%= SS.getCaomEntityPortion(plane)%>
+
   </table>
 
   <%

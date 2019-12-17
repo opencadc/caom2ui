@@ -69,7 +69,7 @@
 
 package ca.nrc.cadc.caom2.ui.server;
 
-import ca.nrc.cadc.caom2.CompositeObservation;
+import ca.nrc.cadc.caom2.DerivedObservation;
 import ca.nrc.cadc.caom2.ObservationURI;
 import ca.nrc.cadc.caom2.PlaneURI;
 import ca.nrc.cadc.caom2.Provenance;
@@ -106,21 +106,30 @@ public class SSTest {
         provenance.getInputs().add(new PlaneURI(URI.create("caom:COLL1/PLANE2/456")));
 
         final String out = SS.toString(provenance);
-        final String expected = "name: TESTPROV<br>version: null<br>producer: TESTPRODUCER<br>project: TESTPROJ<br>" +
-            "reference: <a class=\"provenance-reference\" href=\"http://mysite.com/reference\">http://mysite" +
-            ".com/reference</a><br>runID: null" +
-            "<br>lastExecuted: 1977-11-25 01:15:00.000<br>inputs: caom:COLL1/PLANE1/123 caom:COLL1/PLANE2/123 " +
-            "caom:COLL1/PLANE2/456 <br>keywords: ";
+        final String expected = "name: TESTPROV" +
+            "<br>reference: <a class=\"provenance-reference\" href=\"http://mysite.com/reference\">http://mysite.com/reference</a>" +
+            "<br>version: null" +
+            "<br>project: TESTPROJ" +
+            "<br>producer: TESTPRODUCER" +
+            "<br>runID: null" +
+            "<br>lastExecuted: 1977-11-25 01:15:00.000" +
+            "<br>keywords: " +
+            "<br>inputs: caom:COLL1/PLANE1/123 caom:COLL1/PLANE2/123 caom:COLL1/PLANE2/456 ";
 
         assertEquals("Wrong output.", expected, out);
 
         provenance.reference = null;
 
         final String out2 = SS.toString(provenance);
-        final String expected2 = "name: TESTPROV<br>version: null<br>producer: TESTPRODUCER<br>project: TESTPROJ<br>" +
-            "reference: null<br>runID: null" +
-            "<br>lastExecuted: 1977-11-25 01:15:00.000<br>inputs: caom:COLL1/PLANE1/123 caom:COLL1/PLANE2/123 " +
-            "caom:COLL1/PLANE2/456 <br>keywords: ";
+        final String expected2 = "name: TESTPROV" +
+            "<br>reference: null" +
+            "<br>version: null" +
+            "<br>project: TESTPROJ" +
+            "<br>producer: TESTPRODUCER" +
+            "<br>runID: null" +
+            "<br>lastExecuted: 1977-11-25 01:15:00.000" +
+            "<br>keywords: " +
+            "<br>inputs: caom:COLL1/PLANE1/123 caom:COLL1/PLANE2/123 caom:COLL1/PLANE2/456 ";
 
         assertEquals("Wrong output.", expected2, out2);
     }
@@ -143,38 +152,47 @@ public class SSTest {
         provenance.getInputs().add(new PlaneURI(URI.create("caom:COLL1/PLANE2/456")));
 
         final String out = SS.toString(provenance);
-        final String expected = "name: TESTPROV<br>version: null<br>producer: TESTPRODUCER<br>project: TESTPROJ<br>" +
-            "reference: <a class=\"provenance-reference\" href=\"http://mysite.com/reference\">http://mysite" +
-            ".com/reference</a><br>runID: null" +
-            "<br>lastExecuted: 1977-11-25 01:15:00.000<br>inputs: caom:COLL1/PLANE1/123 caom:COLL1/PLANE2/123 " +
-            "caom:COLL1/PLANE2/456 <br>keywords: ";
+        final String expected = "name: TESTPROV" +
+            "<br>reference: <a class=\"provenance-reference\" href=\"http://mysite.com/reference\">http://mysite.com/reference</a>" +
+            "<br>version: null" +
+            "<br>project: TESTPROJ" +
+            "<br>producer: TESTPRODUCER" +
+            "<br>runID: null" +
+            "<br>lastExecuted: 1977-11-25 01:15:00.000" +
+            "<br>keywords: " +
+            "<br>inputs: caom:COLL1/PLANE1/123 caom:COLL1/PLANE2/123 caom:COLL1/PLANE2/456 ";
 
         assertEquals("Wrong output.", expected, out);
 
         provenance.reference = null;
 
         final String out2 = SS.toString(provenance);
-        final String expected2 = "name: TESTPROV<br>version: null<br>producer: TESTPRODUCER<br>project: TESTPROJ<br>" +
-            "reference: null<br>runID: null" +
-            "<br>lastExecuted: 1977-11-25 01:15:00.000<br>inputs: caom:COLL1/PLANE1/123 caom:COLL1/PLANE2/123 " +
-            "caom:COLL1/PLANE2/456 <br>keywords: ";
+        final String expected2 = "name: TESTPROV" +
+            "<br>reference: null" +
+            "<br>version: null" +
+            "<br>project: TESTPROJ" +
+            "<br>producer: TESTPRODUCER" +
+            "<br>runID: null" +
+            "<br>lastExecuted: 1977-11-25 01:15:00.000" +
+            "<br>keywords: " +
+            "<br>inputs: caom:COLL1/PLANE1/123 caom:COLL1/PLANE2/123 caom:COLL1/PLANE2/456 ";
 
         assertEquals("Wrong output.", expected2, out2);
     }
 
     @Test
     public void toMemberString() {
-        final CompositeObservation mockCompositeObservation = createMock(CompositeObservation.class);
+        final DerivedObservation mockDerivedObservation = createMock(DerivedObservation.class);
         final Set<ObservationURI> members = new HashSet<>();
 
         members.add(new ObservationURI(URI.create("caom:CFHT/2069333")));
         members.add(new ObservationURI(URI.create("caom:CFHT/2069334")));
 
-        expect(mockCompositeObservation.getMembers()).andReturn(members).once();
+        expect(mockDerivedObservation.getMembers()).andReturn(members).once();
 
-        replay(mockCompositeObservation);
+        replay(mockDerivedObservation);
 
-        final String out = SS.toMemberString("/caom2ui", mockCompositeObservation, "ivo://cadc.nrc" +
+        final String out = SS.toMemberString("/caom2ui", mockDerivedObservation, "ivo://cadc.nrc" +
             ".ca/CFHTMEGAPIPE?G025.045.358+41.104");
 
         final String expected = "<a " +
@@ -184,6 +202,6 @@ public class SSTest {
 
         assertEquals("Wrong member output", expected, out);
 
-        verify(mockCompositeObservation);
+        verify(mockDerivedObservation);
     }
 }
