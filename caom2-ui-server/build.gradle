@@ -21,7 +21,7 @@ dependencies {
     compile 'org.opencadc:cadc-adql:1.+'
     compile 'org.opencadc:cadc-web-util:1.1.0'
     compile 'org.opencadc:cadc-dali:1.+'
-    compile 'org.opencadc:caom2:2.+'
+    compile 'org.opencadc:caom2:[2.3,2.4)'
     compile 'org.opencadc:cadc-registry:1.+'
     compile 'org.opencadc:cadc-vosi:1.+'
 
@@ -37,4 +37,4 @@ dependencies {
 sourceCompatibility = '1.7'
 
 group = 'org.opencadc'
-version = '1.2.1'
+version = '1.2.3'
