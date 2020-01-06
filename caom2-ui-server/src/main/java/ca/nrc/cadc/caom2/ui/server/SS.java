@@ -245,8 +245,6 @@ public class SS {
                 final String linkID =
                     parentURI.getScheme() + "://" + parentURI.getAuthority() + "/" + collectionObsID[0] + "?" + collectionObsID[1];
                 sb.append("<a href=\"").append(contextPath).append("/view");
-//                sb.append("?ID=").append(parentURI.getScheme()).append("://").append(parentURI.getAuthority())
-//                .append("/").append(u.getURI().getPath());
                 sb.append("?ID=").append(NetUtil.encode(linkID));
                 sb.append("\">");
                 sb.append(observationURI.toASCIIString());
