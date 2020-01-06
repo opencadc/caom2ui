@@ -50,7 +50,7 @@ public class WalkthroughTest extends AbstractWebApplicationIntegrationTest {
     public void observationViewTest() throws Exception {
         // TODO: need an observation that exists in dev, production and (beta?)
         final ObservationViewPage observationViewPage =
-            goTo(getEndpoint(DEFAULT_ENDPOINT) + "view?ivo://cadc.nrc.ca/IRIS?f008h000",
+            goTo(String.format("%s/view?ivo://cadc.nrc.ca/IRIS?f008h000", DEFAULT_ENDPOINT),
                  null, ObservationViewPage.class);
         observationViewPage.ensureLoaded();
         observationViewPage.ensureProvenanceReferenceLink();
