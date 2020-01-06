@@ -177,7 +177,10 @@ public class SSTest {
         final String out = SS.toMemberString("/caom2ui", mockCompositeObservation, "ivo://cadc.nrc" +
             ".ca/CFHTMEGAPIPE?G025.045.358+41.104");
 
-        final String expected = "<ul><li>caom:CFHT/2069334</li><li>caom:CFHT/2069333</li></ul>";
+        final String expected = "<a " +
+            "href=\"/caom2ui/view?ID=ivo%3A%2F%2Fcadc.nrc.ca%2FCFHT%3F2069334\">"
+            + "caom:CFHT/2069334</a> <a href=\"/caom2ui/view?ID=ivo%3A%2F%2Fcadc.nrc.ca%2FCFHT%3F2069333\">"
+            + "caom:CFHT/2069333</a> ";
 
         assertEquals("Wrong member output", expected, out);
 

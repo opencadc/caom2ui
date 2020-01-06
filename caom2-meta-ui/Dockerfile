@@ -1,5 +1,6 @@
-FROM opencadc/tomcat:8.5-jdk11-slim
+FROM opencadc/tomcat:alpine
 
 COPY build/libs/*.war webapps/
 
 EXPOSE 5555
+
