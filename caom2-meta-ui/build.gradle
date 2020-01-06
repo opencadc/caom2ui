@@ -15,10 +15,10 @@ apply from: file('../int_test.gradle')
 
 sourceCompatibility = '1.7'
 group = 'ca.nrc.cadc'
-version = '1014'
+version = '1015'
 
 dependencies {
-    compile 'org.opencadc:caom2-ui-server:1.2.1'
+    compile 'org.opencadc:caom2-ui-server:1.2.3'
 
     providedCompile 'javax.servlet:javax.servlet-api:3.1.+'
     providedCompile 'javax.servlet:javax.servlet-api:3.0.+'
