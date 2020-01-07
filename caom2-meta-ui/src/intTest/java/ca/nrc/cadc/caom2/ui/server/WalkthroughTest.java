@@ -35,12 +35,17 @@
 package ca.nrc.cadc.caom2.ui.server;
 
 
+import ca.nrc.cadc.net.NetUtil;
 import ca.nrc.cadc.web.selenium.AbstractWebApplicationIntegrationTest;
+import org.junit.Assert;
 import org.junit.Test;
+
+import java.net.URI;
+import java.net.URL;
+import java.util.Map;
 
 
 public class WalkthroughTest extends AbstractWebApplicationIntegrationTest {
-    private static final String DEFAULT_ENDPOINT = "/caom2ui/";
 
     public WalkthroughTest() throws Exception {
         super();
@@ -50,9 +55,48 @@ public class WalkthroughTest extends AbstractWebApplicationIntegrationTest {
     public void observationViewTest() throws Exception {
         // TODO: need an observation that exists in dev, production and (beta?)
         final ObservationViewPage observationViewPage =
-            goTo(String.format("%s/view?ivo://cadc.nrc.ca/IRIS?f008h000", DEFAULT_ENDPOINT),
-                 null, ObservationViewPage.class);
+                goTo("/view", String.format("ID=%s", NetUtil.encode("ivo://cadc.nrc.ca/IRIS?f008h000")),
+                     ObservationViewPage.class);
         observationViewPage.ensureLoaded();
         observationViewPage.ensureProvenanceReferenceLink();
+    }
+
+    @Test
+    public void observationViewTestCFHTMEGAPIPE() throws Exception {
+        // TODO: need an observation that exists in dev, production and (beta?)
+        final ObservationViewPage observationViewPage =
+                goTo("/view", String.format("ID=%s", NetUtil.encode("ivo://cadc.nrc.ca/CFHTMEGAPIPE?MegaPipe.189.210")),
+                     ObservationViewPage.class);
+        observationViewPage.ensureLoaded();
+        observationViewPage.ensureProvenanceReferenceLink();
+        observationViewPage.ensureMemberLinkCount(136);
+    }
+
+    @Test
+    public void observationViewTestHST() throws Exception {
+        // TODO: need an observation that exists in dev, production and (beta?)
+        final ObservationViewPage observationViewPage =
+                goTo("/view", String.format("ID=%s", NetUtil.encode("ivo://cadc.nrc.ca/mirror/HST?jbeoft020")),
+                     ObservationViewPage.class);
+        observationViewPage.ensureLoaded();
+        observationViewPage.ensureProvenanceReferenceLink();
+        observationViewPage.ensureMemberLinkCount(2);
+
+        final Map<URI, URL> memberLinkMap = observationViewPage.getMemberLinks();
+        final URI firstKey = URI.create("caom:HST/jbeoftneq");
+        final URL firstURL = memberLinkMap.get(firstKey);
+
+        Assert.assertTrue(
+                String.format("Expected to see %s but got %s.", NetUtil.encode("/mirror/HST?jbeoftneq"),
+                              firstURL.toExternalForm()),
+                firstURL.toExternalForm().contains(NetUtil.encode("/mirror/HST?jbeoftneq")));
+
+        final URI secondKey = URI.create("caom:HST/jbeoftnhq");
+        final URL secondURL = memberLinkMap.get(secondKey);
+
+        Assert.assertTrue(
+                String.format("Expected to see %s but got %s.", NetUtil.encode("/mirror/HST?jbeoftnhq"),
+                              secondURL.toExternalForm()),
+                secondURL.toExternalForm().contains(NetUtil.encode("/mirror/HST?jbeoftnhq")));
     }
 }
