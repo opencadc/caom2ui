@@ -12,6 +12,7 @@ import ca.nrc.cadc.caom2.*;
 import ca.nrc.cadc.caom2.wcs.*;
 import ca.nrc.cadc.date.DateUtil;
 import ca.nrc.cadc.net.NetUtil;
+import ca.nrc.cadc.util.StringUtil;
 
 
 /**
@@ -20,6 +21,7 @@ import ca.nrc.cadc.net.NetUtil;
  * @author pdowler
  */
 public class SS {
+
     private static final DateFormat FORMAT_UTC = DateUtil.getDateFormat(DateUtil.ISO_DATE_FORMAT, DateUtil.UTC);
 
     public static String toString(Number s) {
@@ -72,7 +74,7 @@ public class SS {
             }
         } catch (Exception ex) {
             sb.append(
-                "<span class=\"error\">ERROR: failed to compute: </span>");
+                    "<span class=\"error\">ERROR: failed to compute: </span>");
             sb.append(ex);
         }
         return sb.toString();
@@ -92,7 +94,7 @@ public class SS {
             }
         } catch (Exception ex) {
             sb.append(
-                "<span class=\"error\">ERROR: failed to compute: </span>");
+                    "<span class=\"error\">ERROR: failed to compute: </span>");
             sb.append(ex);
         }
         return sb.toString();
@@ -113,7 +115,7 @@ public class SS {
             }
         } catch (Exception ex) {
             sb.append(
-                "<span class=\"error\">ERROR: failed to compute: </span>");
+                    "<span class=\"error\">ERROR: failed to compute: </span>");
             sb.append(ex);
         }
         return sb.toString();
@@ -152,33 +154,33 @@ public class SS {
 
     public static String toString(Proposal p) {
         return (p == null) ? "" : "ID: " +
-            p.getID() +
-            "<br>project: " +
-            p.project +
-            "<br>PI: " +
-            p.pi +
-            "<br>title: " +
-            p.title +
-            "<br>keywords: " +
-            encodeListString(p.getKeywords());
+                                  p.getID() +
+                                  "<br>project: " +
+                                  p.project +
+                                  "<br>PI: " +
+                                  p.pi +
+                                  "<br>title: " +
+                                  p.title +
+                                  "<br>keywords: " +
+                                  encodeListString(p.getKeywords());
     }
 
     public static String toString(Telescope t) {
         return (t == null) ? "" : "name: " +
-            t.getName() +
-            "<br>geocentric location: " +
-            t.geoLocationX +
-            "," +
-            t.geoLocationY +
-            "," +
-            t.geoLocationZ +
-            "<br>keywords: " +
-            encodeListString(t.getKeywords());
+                                  t.getName() +
+                                  "<br>geocentric location: " +
+                                  t.geoLocationX +
+                                  "," +
+                                  t.geoLocationY +
+                                  "," +
+                                  t.geoLocationZ +
+                                  "<br>keywords: " +
+                                  encodeListString(t.getKeywords());
     }
 
     public static String toString(Instrument i) {
         return (i == null) ? "" : "name: " + i.getName() + "<br>keywords: "
-            + encodeListString(i.getKeywords());
+                                  + encodeListString(i.getKeywords());
     }
 
     public static String toString(Target t) {
@@ -212,40 +214,64 @@ public class SS {
 
     public static String toString(Environment e) {
         return (e == null) ? "" :
-            "ambientTemp: " + e.ambientTemp + "<br>elevation: "
-                + e.elevation + "<br>humidity: " + e.humidity + "<br>seeing: "
-                + e.seeing + "<br>tau: " + e.tau + "<br>wavelengthTau: "
-                + e.wavelengthTau + "<br>photometric: " + e.photometric;
+               "ambientTemp: " + e.ambientTemp + "<br>elevation: "
+               + e.elevation + "<br>humidity: " + e.humidity + "<br>seeing: "
+               + e.seeing + "<br>tau: " + e.tau + "<br>wavelengthTau: "
+               + e.wavelengthTau + "<br>photometric: " + e.photometric;
     }
 
     public static String toString(Metrics m) {
         return (m == null) ? "" : "background: " +
-            m.background +
-            "<br>backgroundStddev: " +
-            m.backgroundStddev +
-            "<br>fluxDensityLimit: " +
-            m.fluxDensityLimit +
-            "<br>magLimit: " +
-            m.magLimit +
-            "<br>sourceNumberDensity: " +
-            m.sourceNumberDensity;
+                                  m.background +
+                                  "<br>backgroundStddev: " +
+                                  m.backgroundStddev +
+                                  "<br>fluxDensityLimit: " +
+                                  m.fluxDensityLimit +
+                                  "<br>magLimit: " +
+                                  m.magLimit +
+                                  "<br>sourceNumberDensity: " +
+                                  m.sourceNumberDensity;
     }
 
     public static String toMemberString(final String contextPath, final Observation o, final String parentID) {
         final StringBuilder sb = new StringBuilder();
 
-        if ((o instanceof CompositeObservation)) {
+        if (o instanceof CompositeObservation) {
             final CompositeObservation co = (CompositeObservation) o;
             final URI parentURI = URI.create(parentID);
+            final String parentPath = parentURI.getPath();
+            final String extraParentPath;
+
+            if (StringUtil.hasLength(parentPath)) {
+                final String trimmedPath;
+                if (parentPath.trim().endsWith("/")) {
+                    trimmedPath = parentPath.trim().substring(0, parentPath.length() - 1);
+                } else {
+                    trimmedPath = parentPath.trim();
+                }
+
+                extraParentPath = trimmedPath.substring(0, trimmedPath.lastIndexOf("/"));
+            } else {
+                extraParentPath = null;
+            }
 
             for (final ObservationURI u : co.getMembers()) {
                 final URI observationURI = u.getURI();
                 final String schemeSpecificPart = observationURI.getSchemeSpecificPart();
                 final String[] collectionObsID = schemeSpecificPart.split("/");
-                final String linkID =
-                    parentURI.getScheme() + "://" + parentURI.getAuthority() + "/" + collectionObsID[0] + "?" + collectionObsID[1];
+                final String linkIDQueryParameter;
+                if (StringUtil.hasLength(extraParentPath)) {
+                    linkIDQueryParameter = String.format("%s://%s%s/%s?%s", parentURI.getScheme(),
+                                                         parentURI.getAuthority(), extraParentPath,
+                                                         collectionObsID[0], collectionObsID[1]);
+                } else {
+                    linkIDQueryParameter = String.format("%s://%s/%s?%s", parentURI.getScheme(),
+                                                         parentURI.getAuthority(),
+                                                         collectionObsID[0], collectionObsID[1]);
+                }
+
                 sb.append("<a href=\"").append(contextPath).append("/view");
-                sb.append("?ID=").append(NetUtil.encode(linkID));
+                sb.append("?ID=").append(NetUtil.encode(linkIDQueryParameter));
                 sb.append("\">");
                 sb.append(observationURI.toASCIIString());
                 sb.append("</a> ");
