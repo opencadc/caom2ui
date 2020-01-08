@@ -106,6 +106,7 @@ public class SSTest {
         provenance.getInputs().add(new PlaneURI(URI.create("caom:COLL1/PLANE2/456")));
 
         final String out = SS.toString(provenance);
+
         final String expected = "name: TESTPROV" +
             "<br>reference: <a class=\"provenance-reference\" href=\"http://mysite.com/reference\">http://mysite.com/reference</a>" +
             "<br>version: null" +
@@ -121,6 +122,7 @@ public class SSTest {
         provenance.reference = null;
 
         final String out2 = SS.toString(provenance);
+
         final String expected2 = "name: TESTPROV" +
             "<br>reference: null" +
             "<br>version: null" +
@@ -152,6 +154,7 @@ public class SSTest {
         provenance.getInputs().add(new PlaneURI(URI.create("caom:COLL1/PLANE2/456")));
 
         final String out = SS.toString(provenance);
+
         final String expected = "name: TESTPROV" +
             "<br>reference: <a class=\"provenance-reference\" href=\"http://mysite.com/reference\">http://mysite.com/reference</a>" +
             "<br>version: null" +
@@ -167,6 +170,7 @@ public class SSTest {
         provenance.reference = null;
 
         final String out2 = SS.toString(provenance);
+
         final String expected2 = "name: TESTPROV" +
             "<br>reference: null" +
             "<br>version: null" +
@@ -192,13 +196,38 @@ public class SSTest {
 
         replay(mockDerivedObservation);
 
-        final String out = SS.toMemberString("/caom2ui", mockDerivedObservation, "ivo://cadc.nrc" +
-            ".ca/CFHTMEGAPIPE?G025.045.358+41.104");
+        final String out = SS.toMemberString("/caom2ui", mockDerivedObservation,
+            "ivo://cadc.nrc.ca/CFHTMEGAPIPE?G025.045.358+41.104");
 
-        final String expected = "<a " +
-            "href=\"/caom2ui/view?ID=ivo%3A%2F%2Fcadc.nrc.ca%2FCFHT%3F2069334\">"
-            + "caom:CFHT/2069334</a> <a href=\"/caom2ui/view?ID=ivo%3A%2F%2Fcadc.nrc.ca%2FCFHT%3F2069333\">"
-            + "caom:CFHT/2069333</a> ";
+        final String expected = "<a href=\"/caom2ui/view?ID=ivo%3A%2F%2Fcadc.nrc.ca%2FCFHT%3F2069334\">"
+                                + "caom:CFHT/2069334</a> "
+                                + "<a href=\"/caom2ui/view?ID=ivo%3A%2F%2Fcadc.nrc.ca%2FCFHT%3F2069333\">"
+                                + "caom:CFHT/2069333</a> ";
+
+        assertEquals("Wrong member output", expected, out);
+
+        verify(mockDerivedObservation);
+    }
+
+    @Test
+    public void toMemberStringWithPath() {
+        final DerivedObservation mockDerivedObservation = createMock(DerivedObservation.class);
+        final Set<ObservationURI> members = new HashSet<>();
+
+        members.add(new ObservationURI(URI.create("caom:CFHT/2069333")));
+        members.add(new ObservationURI(URI.create("caom:CFHT/2069334")));
+
+        expect(mockDerivedObservation.getMembers()).andReturn(members).once();
+
+        replay(mockDerivedObservation);
+
+        final String out = SS.toMemberString("/caom2ui", mockDerivedObservation,
+                                             "ivo://cadc.nrc.ca/mirror/v2/CFHTMEGAPIPE?G025.045.358+41.104");
+
+        final String expected = "<a href=\"/caom2ui/view?ID=ivo%3A%2F%2Fcadc.nrc.ca%2Fmirror%2Fv2%2FCFHT%3F2069334\">"
+                                + "caom:CFHT/2069334</a> "
+                                + "<a href=\"/caom2ui/view?ID=ivo%3A%2F%2Fcadc.nrc.ca%2Fmirror%2Fv2%2FCFHT%3F2069333\">"
+                                + "caom:CFHT/2069333</a> ";
 
         assertEquals("Wrong member output", expected, out);
 

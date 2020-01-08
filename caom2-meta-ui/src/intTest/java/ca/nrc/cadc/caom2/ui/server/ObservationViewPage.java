@@ -76,8 +76,12 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.events.WebDriverEventListener;
 
+import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class ObservationViewPage extends AbstractTestWebPage {
@@ -88,6 +92,10 @@ public class ObservationViewPage extends AbstractTestWebPage {
 
     @FindBy(css = "body > div.main > div.observation > div.plane")
     private WebElement firstPlane;
+
+    @FindBy(css = "body > div > div > table > tbody > tr:nth-child(8) > td:nth-child(2)")
+    private WebElement membersLinksTD;
+
 
     /**
      * Constructors need to be public for reflection to find them.
@@ -108,7 +116,7 @@ public class ObservationViewPage extends AbstractTestWebPage {
         h3headers.add("Chunk");
 
         final List<String> h2headers = new ArrayList<>();
-        h2headers.add("SimpleObservation");
+        h2headers.add("Observation");
         h2headers.add("Plane");
         h2headers.add("Artifact");
         h2headers.add("Part");
@@ -122,6 +130,25 @@ public class ObservationViewPage extends AbstractTestWebPage {
             final String xpath = "//h2[contains(text(),'" + h2header + "')]";
             find(By.xpath(xpath));
         }
+    }
+
+    /**
+     * Obtain a mapping of URI (caom://{collection}/{obsid}) to URL (http://www.site.com/meta) values.
+     * @return  Map or URI to URL link representations.  Never null;
+     * @throws Exception    For any finding issues.
+     */
+    public Map<URI, URL> getMemberLinks() throws Exception {
+        final Map<URI, URL> memberLinkMap = new HashMap<>();
+        for (final WebElement webElement : membersLinksTD.findElements(By.tagName("a"))) {
+            memberLinkMap.put(URI.create(webElement.getText()), new URL(webElement.getAttribute("href")));
+        }
+
+        return memberLinkMap;
+    }
+
+    public void ensureMemberLinkCount(final int count) throws Exception {
+        final List<WebElement> memberLinkElements = membersLinksTD.findElements(By.tagName("a"));
+        verifyEquals(count, memberLinkElements.size());
     }
 
     public void ensureProvenanceReferenceLink() throws Exception {

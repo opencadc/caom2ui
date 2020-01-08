@@ -11,7 +11,7 @@ repositories {
     jcenter()
 }
 
-apply from: rootProject.file('int_test.gradle')
+apply from: file('../int_test.gradle')
 
 configurations.all {
     resolutionStrategy {
@@ -25,7 +25,7 @@ group = 'ca.nrc.cadc'
 version = '1015'
 
 dependencies {
-    compile 'org.opencadc:caom2-ui-server:[1.2.2,)'
+    compile 'org.opencadc:caom2-ui-server:[1.2.5,)'
 
     providedCompile 'javax.servlet:javax.servlet-api:[3.1.0,)'
     providedCompile 'javax.servlet:javax.servlet-api:[3.0.0,)'
@@ -38,7 +38,6 @@ dependencies {
 ext {
     // Change this value to test other locations, such as Production or RC.
     intTest_default_web_app_url = 'http://rc.cadc-ccda.hia-iha.nrc-cnrc.gc.ca'
-    intTest_default_web_app_endpoint = '/caom2ui/'
 }
 
 war {
