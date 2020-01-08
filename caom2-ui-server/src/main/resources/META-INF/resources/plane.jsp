@@ -23,7 +23,7 @@ request.setAttribute("plane", p);
     <%--    Provide entity id first --%>
     <%= SS.getCaomEntityID(plane)%>
 
-    <tr class="even">
+    <tr>
       <td>productID</td>
       <td><%= plane.getProductID() %>
       </td>
@@ -38,7 +38,7 @@ request.setAttribute("plane", p);
       <td><%= SS.toString(plane.metaRelease) %>
       </td>
     </tr>
-    <tr class="even">
+    <tr>
       <td>metaReadGroups</td>
       <td><%= SS.serializeURISet(plane.getMetaReadGroups()) %>
       </td>
@@ -48,7 +48,7 @@ request.setAttribute("plane", p);
       <td><%= SS.toString(plane.dataRelease) %>
       </td>
     </tr>
-    <tr class="even">
+    <tr>
       <td>dataReadGroups</td>
       <td><%= SS.serializeURISet(plane.getDataReadGroups()) %>
       </td>
@@ -58,7 +58,7 @@ request.setAttribute("plane", p);
       <td><%= SS.toString(plane.dataProductType) %>
       </td>
     </tr>
-    <tr class="even">
+    <tr>
       <td>calibrationLevel</td>
       <td><%= SS.toString(plane.calibrationLevel) %>
       </td>
@@ -74,12 +74,12 @@ request.setAttribute("plane", p);
       <td><%= SS.toString(plane.quality) %>
       </td>
     </tr>
-    <tr class="even">
+    <tr>
       <td>metrics</td>
       <td><%= SS.toString(plane.metrics) %>
       </td>
     </tr>
-    <tr class="even">
+    <tr>
       <td>position</td>
       <td><%= SS.getPlanePosition(plane) %>
       </td>
@@ -89,7 +89,7 @@ request.setAttribute("plane", p);
       <td><%= SS.getPlaneEnergy(plane) %>
       </td>
     </tr>
-    <tr class="even">
+    <tr>
       <td>time</td>
       <td><%= SS.getPlaneTime(plane) %>
       </td>

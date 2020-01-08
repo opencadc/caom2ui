@@ -33,12 +33,12 @@ request.setAttribute("chunk", c);
       </td>
     </tr>
 
-    <tr class="even">
+    <tr>
       <td>positionAxis1</td>
       <td><%= chunk.positionAxis1 %>
       </td>
     </tr>
-    <tr class="even">
+    <tr>
       <td>positionAxis2</td>
       <td><%= chunk.positionAxis2 %>
       </td>
@@ -49,7 +49,7 @@ request.setAttribute("chunk", c);
       </td>
     </tr>
 
-    <tr class="even">
+    <tr>
       <td>energyAxis</td>
       <td><%= chunk.energyAxis %>
       </td>
@@ -60,7 +60,7 @@ request.setAttribute("chunk", c);
       </td>
     </tr>
 
-    <tr class="even">
+    <tr>
       <td>timeAxis</td>
       <td><%= chunk.timeAxis %>
       </td>
@@ -71,7 +71,7 @@ request.setAttribute("chunk", c);
       </td>
     </tr>
 
-    <tr class="even">
+    <tr>
       <td>polarizationAxis</td>
       <td><%= chunk.polarizationAxis %>
       </td>
@@ -82,7 +82,7 @@ request.setAttribute("chunk", c);
       </td>
     </tr>
 
-    <tr class="even">
+    <tr>
       <td>customAxis</td>
       <td><%= chunk.customAxis %>
       </td>
@@ -93,7 +93,7 @@ request.setAttribute("chunk", c);
       </td>
     </tr>
 
-    <tr class="even">
+    <tr>
       <td>observableAxis</td>
       <td><%= chunk.observableAxis %>
       </td>

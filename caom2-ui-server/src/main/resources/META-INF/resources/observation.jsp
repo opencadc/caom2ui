@@ -25,7 +25,7 @@ This JSP page renders an HTML table with the Observation metadata.
     <%= SS.getCaomEntityID(obs)%>
 
     <%--      Provide data specific to class --%>
-    <tr class="even">
+    <tr>
       <td>collection</td>
       <td><%= obs.getCollection() %>
       </td>
@@ -35,7 +35,7 @@ This JSP page renders an HTML table with the Observation metadata.
       <td><%= obs.getObservationID() %>
       </td>
     </tr>
-    <tr class="even">
+    <tr>
       <td>metaRelease</td>
       <td><%= SS.toString(obs.metaRelease) %>
       </td>
@@ -45,7 +45,7 @@ This JSP page renders an HTML table with the Observation metadata.
       <td><%= SS.serializeURISet(obs.getMetaReadGroups()) %>
       </td>
     </tr>
-    <tr class="even">
+    <tr>
       <td>sequenceNumber</td>
       <td><%= SS.toString(obs.sequenceNumber) %>
       </td>
@@ -55,7 +55,7 @@ This JSP page renders an HTML table with the Observation metadata.
       <td><%= SS.toString(obs.type) %>
       </td>
     </tr>
-    <tr class="even">
+    <tr>
       <td>intent</td>
       <td><%= SS.toString(obs.intent) %>
       </td>
@@ -65,7 +65,7 @@ This JSP page renders an HTML table with the Observation metadata.
       <td><%= SS.toMemberString(request.getContextPath(), obs, request.getParameter("ID")) %>
       </td>
     </tr>
-    <tr class="even">
+    <tr>
       <td>algorithm</td>
       <td><%= SS.toString(obs.getAlgorithm()) %>
       </td>
@@ -75,7 +75,7 @@ This JSP page renders an HTML table with the Observation metadata.
       <td><%= SS.toString(obs.telescope) %>
       </td>
     </tr>
-    <tr class="even">
+    <tr>
       <td>instrument</td>
       <td><%= SS.toString(obs.instrument) %>
       </td>
@@ -85,7 +85,7 @@ This JSP page renders an HTML table with the Observation metadata.
       <td><%= SS.toString(obs.environment) %>
       </td>
     </tr>
-    <tr class="even">
+    <tr>
       <td>proposal</td>
       <td><%= SS.toString(obs.proposal) %>
       </td>
@@ -95,7 +95,7 @@ This JSP page renders an HTML table with the Observation metadata.
       <td><%= SS.toString(obs.target) %>
       </td>
     </tr>
-    <tr class="even">
+    <tr>
       <td>targetPosition</td>
       <td><%= SS.toString(obs.targetPosition) %>
       </td>
