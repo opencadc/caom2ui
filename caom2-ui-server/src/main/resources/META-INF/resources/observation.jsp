@@ -60,12 +60,12 @@ This JSP page renders an HTML table with the Observation metadata.
       <td><%= SS.toString(obs.intent) %>
       </td>
     </tr>
-    <tr class="even">
+    <tr>
       <td>members</td>
       <td><%= SS.toMemberString(request.getContextPath(), obs, request.getParameter("ID")) %>
       </td>
     </tr>
-    <tr>
+    <tr class="even">
       <td>algorithm</td>
       <td><%= SS.toString(obs.getAlgorithm()) %>
       </td>
@@ -85,7 +85,7 @@ This JSP page renders an HTML table with the Observation metadata.
       <td><%= SS.toString(obs.environment) %>
       </td>
     </tr>
-    <tr>
+    <tr class="even">
       <td>proposal</td>
       <td><%= SS.toString(obs.proposal) %>
       </td>
@@ -100,7 +100,7 @@ This JSP page renders an HTML table with the Observation metadata.
       <td><%= SS.toString(obs.targetPosition) %>
       </td>
     </tr>
-    <tr class="even">
+    <tr>
       <td>requirements</td>
       <td><%= SS.toString(obs.requirements) %>
       </td>
