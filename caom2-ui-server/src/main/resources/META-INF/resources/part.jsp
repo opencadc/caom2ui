@@ -20,16 +20,9 @@ request.setAttribute("part", p);
   <h2>Part</h2>
 
   <table class="content">
-    <tr>
-      <td>partID</td>
-      <td><%= part.getID() %> aka <%= part.getID().getLeastSignificantBits() %>
-      </td>
-    </tr>
-    <tr>
-      <td>lastModified</td>
-      <td><%= SS.toString(part.getLastModified()) %>
-      </td>
-    </tr>
+    <%--    Provide entity id first --%>
+    <%= SS.getCaomEntityID(part)%>
+
     <tr>
       <td>name</td>
       <td><%= part.getName() %>
@@ -41,6 +34,8 @@ request.setAttribute("part", p);
       </td>
     </tr>
 
+    <%--    Populate in the rest of the CaomEntity member values --%>
+    <%= SS.getCaomEntityPortion(part)%>
   </table>
   <%
     for (final Chunk chunk : part.getChunks())

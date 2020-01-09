@@ -1,4 +1,73 @@
-
+/*
+ ************************************************************************
+ *******************  CANADIAN ASTRONOMY DATA CENTRE  *******************
+ **************  CENTRE CANADIEN DE DONNÉES ASTRONOMIQUES  **************
+ *
+ *  (c) 2019.                            (c) 2019.
+ *  Government of Canada                 Gouvernement du Canada
+ *  National Research Council            Conseil national de recherches
+ *  Ottawa, Canada, K1A 0R6              Ottawa, Canada, K1A 0R6
+ *  All rights reserved                  Tous droits réservés
+ *
+ *  NRC disclaims any warranties,        Le CNRC dénie toute garantie
+ *  expressed, implied, or               énoncée, implicite ou légale,
+ *  statutory, of any kind with          de quelque nature que ce
+ *  respect to the software,             soit, concernant le logiciel,
+ *  including without limitation         y compris sans restriction
+ *  any warranty of merchantability      toute garantie de valeur
+ *  or fitness for a particular          marchande ou de pertinence
+ *  purpose. NRC shall not be            pour un usage particulier.
+ *  liable in any event for any          Le CNRC ne pourra en aucun cas
+ *  damages, whether direct or           être tenu responsable de tout
+ *  indirect, special or general,        dommage, direct ou indirect,
+ *  consequential or incidental,         particulier ou général,
+ *  arising from the use of the          accessoire ou fortuit, résultant
+ *  software.  Neither the name          de l'utilisation du logiciel. Ni
+ *  of the National Research             le nom du Conseil National de
+ *  Council of Canada nor the            Recherches du Canada ni les noms
+ *  names of its contributors may        de ses  participants ne peuvent
+ *  be used to endorse or promote        être utilisés pour approuver ou
+ *  products derived from this           promouvoir les produits dérivés
+ *  software without specific prior      de ce logiciel sans autorisation
+ *  written permission.                  préalable et particulière
+ *                                       par écrit.
+ *
+ *  This file is part of the             Ce fichier fait partie du projet
+ *  OpenCADC project.                    OpenCADC.
+ *
+ *  OpenCADC is free software:           OpenCADC est un logiciel libre ;
+ *  you can redistribute it and/or       vous pouvez le redistribuer ou le
+ *  modify it under the terms of         modifier suivant les termes de
+ *  the GNU Affero General Public        la “GNU Affero General Public
+ *  License as published by the          License” telle que publiée
+ *  Free Software Foundation,            par la Free Software Foundation
+ *  either version 3 of the              : soit la version 3 de cette
+ *  License, or (at your option)         licence, soit (à votre gré)
+ *  any later version.                   toute version ultérieure.
+ *
+ *  OpenCADC is distributed in the       OpenCADC est distribué
+ *  hope that it will be useful,         dans l’espoir qu’il vous
+ *  but WITHOUT ANY WARRANTY;            sera utile, mais SANS AUCUNE
+ *  without even the implied             GARANTIE : sans même la garantie
+ *  warranty of MERCHANTABILITY          implicite de COMMERCIALISABILITÉ
+ *  or FITNESS FOR A PARTICULAR          ni d’ADÉQUATION À UN OBJECTIF
+ *  PURPOSE.  See the GNU Affero         PARTICULIER. Consultez la Licence
+ *  General Public License for           Générale Publique GNU Affero
+ *  more details.                        pour plus de détails.
+ *
+ *  You should have received             Vous devriez avoir reçu une
+ *  a copy of the GNU Affero             copie de la Licence Générale
+ *  General Public License along         Publique GNU Affero avec
+ *  with OpenCADC.  If not, see          OpenCADC ; si ce n’est
+ *  <http://www.gnu.org/licenses/>.      pas le cas, consultez :
+ *                                       <http://www.gnu.org/licenses/>.
+ *
+ *  $Revision: 5 $
+ *  (First Published prior to 2011)
+ *  Last update: Dec 2019
+ *
+ ************************************************************************
+ */
 package ca.nrc.cadc.caom2.ui.server;
 
 import java.net.MalformedURLException;
@@ -9,7 +78,9 @@ import java.text.MessageFormat;
 import java.util.*;
 
 import ca.nrc.cadc.caom2.*;
+import ca.nrc.cadc.caom2.Observable;
 import ca.nrc.cadc.caom2.wcs.*;
+import ca.nrc.cadc.caom2.types.Point;
 import ca.nrc.cadc.date.DateUtil;
 import ca.nrc.cadc.net.NetUtil;
 import ca.nrc.cadc.util.StringUtil;
@@ -45,9 +116,10 @@ public class SS {
             if (comp != null) {
                 sb.append("bounds: ").append(comp.bounds);
                 sb.append("<br>").append("dimension: ").append(comp.dimension);
-                sb.append("<br>").append("sampleSize: ").append(comp.sampleSize);
                 sb.append("<br>").append("resolution: ").append(comp.resolution);
-                sb.append("<br>").append("time dependent: ").append(comp.timeDependent);
+                sb.append("<br>").append("resolutionBounds: ").append(comp.resolutionBounds);
+                sb.append("<br>").append("sampleSize: ").append(comp.sampleSize);
+                sb.append("<br>").append("timeDependent: ").append(comp.timeDependent);
             }
         } catch (Exception ex) {
             sb.append("<span class=\"error\">ERROR: failed to compute: </span>");
@@ -66,11 +138,20 @@ public class SS {
                 sb.append("bandpassName: ").append(comp.bandpassName);
                 sb.append("<br>").append("bounds: ").append(comp.bounds);
                 sb.append("<br>").append("dimension: ").append(comp.dimension);
+                sb.append("<br>").append("resolvingPower: ")
+                    .append(comp.resolvingPower);
+                sb.append("<br>").append("resolvingPowerBounds: ")
+                    .append(comp.resolvingPowerBounds);
                 sb.append("<br>").append("sampleSize: ").append(comp.sampleSize);
-                sb.append("<br>").append("resolution: ")
-                  .append(comp.resolvingPower);
-                sb.append("<br>").append("emBand: ").append(comp.emBand);
+
+                sb.append("<br>").append("energyBands: ");
+                Set<EnergyBand> eb = comp.getEnergyBands();
+                Iterator i = eb.iterator();
+                while (i.hasNext()) {
+                    sb.append(i.next());
+                }
                 sb.append("<br>").append("transition: ").append(comp.transition);
+                sb.append("<br>").append("restwav: ").append(comp.restwav);
             }
         } catch (Exception ex) {
             sb.append(
@@ -88,8 +169,9 @@ public class SS {
             if (comp != null) {
                 sb.append("bounds: ").append(comp.bounds);
                 sb.append("<br>").append("dimension: ").append(comp.dimension);
-                sb.append("<br>").append("sampleSize: ").append(comp.sampleSize);
                 sb.append("<br>").append("resolution: ").append(comp.resolution);
+                sb.append("<br>").append("resolutionBounds: ").append(comp.resolutionBounds);
+                sb.append("<br>").append("sampleSize: ").append(comp.sampleSize);
                 sb.append("<br>").append("exposure: ").append(comp.exposure);
             }
         } catch (Exception ex) {
@@ -121,12 +203,35 @@ public class SS {
         return sb.toString();
     }
 
+    public static String getPlaneCustom(Plane p) {
+        final StringBuilder sb = new StringBuilder();
+
+        try {
+            final CustomAxis customAxis = p.custom;
+
+            if (customAxis != null) {
+                sb.append("ctype: ").append(customAxis.getCtype());
+                sb.append("<br>bounds: ").append(customAxis.bounds);
+                sb.append("<br>dimension: ").append(customAxis.dimension);
+            }
+        } catch (Exception ex) {
+            sb.append("<span class=\"error\">ERROR: failed to get custom axis: </span>");
+            sb.append(ex);
+        }
+
+        return sb.toString();
+    }
+
     public static String toString(Requirements t) {
         return (t == null) ? "" : "flag: " + t.getFlag().getValue();
     }
 
     public static String toString(DataQuality t) {
         return (t == null) ? "" : "flag: " + t.getFlag().getValue();
+    }
+
+    public static String toString(Observable o) {
+        return (o == null) ? "" : "ucd: " + o.getUCD();
     }
 
     public static String toString(DataProductType t) {
@@ -203,6 +308,25 @@ public class SS {
             sb.append(t.moving);
             sb.append("<br>keywords: ");
             sb.append(encodeListString(t.getKeywords()));
+            sb.append("<br>targetID:  ");
+
+            if (t.targetID != null) {
+                sb.append(t.targetID);
+            }
+        }
+
+        return sb.toString();
+    }
+
+    public static String toString(TargetPosition tp) {
+        final StringBuilder sb = new StringBuilder();
+
+        if (tp != null) {
+            final Point coords = tp.getCoordinates();
+            sb.append("coordsys: ");
+            sb.append(tp.getCoordsys());
+            sb.append("<br>coordinates: ");
+            sb.append(coords.cval1 + ", " + coords.cval2);
         }
 
         return sb.toString();
@@ -221,23 +345,25 @@ public class SS {
     }
 
     public static String toString(Metrics m) {
-        return (m == null) ? "" : "background: " +
-                                  m.background +
-                                  "<br>backgroundStddev: " +
-                                  m.backgroundStddev +
-                                  "<br>fluxDensityLimit: " +
-                                  m.fluxDensityLimit +
-                                  "<br>magLimit: " +
-                                  m.magLimit +
-                                  "<br>sourceNumberDensity: " +
-                                  m.sourceNumberDensity;
+        return (m == null) ? "" : "sourceNumberDensity: " +
+            m.sourceNumberDensity +
+            "<br>background: " +
+            m.background +
+            "<br>backgroundStddev: " +
+            m.backgroundStddev +
+            "<br>fluxDensityLimit: " +
+            m.fluxDensityLimit +
+            "<br>magLimit: " +
+            m.magLimit +
+            "<br>sampleSNR: " +
+            m.sampleSNR;
     }
 
     public static String toMemberString(final String contextPath, final Observation o, final String parentID) {
         final StringBuilder sb = new StringBuilder();
 
-        if (o instanceof CompositeObservation) {
-            final CompositeObservation co = (CompositeObservation) o;
+        if ((o instanceof DerivedObservation)) {
+            final DerivedObservation dObs = (DerivedObservation) o;
             final URI parentURI = URI.create(parentID);
             final String parentPath = parentURI.getPath();
             final String extraParentPath;
@@ -255,7 +381,7 @@ public class SS {
                 extraParentPath = null;
             }
 
-            for (final ObservationURI u : co.getMembers()) {
+            for (final ObservationURI u : dObs.getMembers()) {
                 final URI observationURI = u.getURI();
                 final String schemeSpecificPart = observationURI.getSchemeSpecificPart();
                 final String[] collectionObsID = schemeSpecificPart.split("/");
@@ -281,6 +407,7 @@ public class SS {
         return sb.toString();
     }
 
+
     public static String toString(final URI uri) throws MalformedURLException {
         final MessageFormat format = new MessageFormat("<a class=\"provenance-reference\" href=\"{0}\">{0}</a>");
         final URL url = uri.isAbsolute() ? uri.toURL() : new URL("http://" + uri.toString());
@@ -293,37 +420,35 @@ public class SS {
         if (p != null) {
             sb.append("name: ");
             sb.append(p.getName());
-            sb.append("<br>version: ");
-            sb.append(p.version);
-            sb.append("<br>producer: ");
-            sb.append(p.producer);
-            sb.append("<br>project: ");
-            sb.append(p.project);
             sb.append("<br>reference: ");
             try {
                 sb.append((p.reference == null) ? "null" : SS.toString(p.reference));
             } catch (MalformedURLException e) {
                 sb.append(String.format("Unable to display Reference URL %s", p.reference.toString()));
             }
-
+            sb.append("<br>version: ");
+            sb.append(p.version);
+            sb.append("<br>project: ");
+            sb.append(p.project);
+            sb.append("<br>producer: ");
+            sb.append(p.producer);
             sb.append("<br>runID: ");
             sb.append(p.runID);
-            sb.append("<br>lastExecuted: ");
 
+            sb.append("<br>lastExecuted: ");
             if (p.lastExecuted != null) {
                 sb.append(FORMAT_UTC.format(p.lastExecuted));
             } else {
                 sb.append("null");
             }
 
-            sb.append("<br>inputs: ");
+            sb.append("<br>keywords: ");
+            sb.append(encodeListString(p.getKeywords()));
 
+            sb.append("<br>inputs: ");
             for (PlaneURI pu : p.getInputs()) {
                 sb.append(pu.getURI().toASCIIString()).append(" ");
             }
-
-            sb.append("<br>keywords: ");
-            sb.append(encodeListString(p.getKeywords()));
         }
 
         return sb.toString();
@@ -455,12 +580,12 @@ public class SS {
         if (wcs != null) {
             sb.append("bandpassName: ");
             sb.append(wcs.bandpassName);
-            sb.append("<br>resolvingPower: ");
-            sb.append(wcs.resolvingPower);
             sb.append("<br>specsys: ");
             sb.append(wcs.getSpecsys());
             sb.append("<br>ssysobs: ");
             sb.append(wcs.ssysobs);
+            sb.append("<br>ssyssrc: ");
+            sb.append(wcs.ssyssrc);
             sb.append("<br>restfrq: ");
             sb.append(wcs.restfrq);
             sb.append("<br>restwav: ");
@@ -469,10 +594,12 @@ public class SS {
             sb.append(wcs.velosys);
             sb.append("<br>zsource: ");
             sb.append(wcs.zsource);
-            sb.append("<br>ssyssrc: ");
-            sb.append(wcs.ssyssrc);
             sb.append("<br>velang: ");
             sb.append(wcs.velang);
+            sb.append("<br>transition: ");
+            sb.append(wcs.transition);
+            sb.append("<br>resolvingPower: ");
+            sb.append(wcs.resolvingPower);
 
             fillBuffer(wcs.getAxis(), sb);
         }
@@ -484,6 +611,12 @@ public class SS {
         final StringBuilder sb = new StringBuilder();
 
         if (wcs != null) {
+            sb.append("<br>timesys: ");
+            sb.append(wcs.timesys);
+            sb.append("<br>trefpos: ");
+            sb.append(wcs.trefpos);
+            sb.append("<br>mjdref: ");
+            sb.append(wcs.mjdref);
             sb.append("exposure: ");
             sb.append(wcs.exposure);
             sb.append("<br>resolution: ");
@@ -503,6 +636,19 @@ public class SS {
 
         return sb.toString();
     }
+
+    public static String toString(CustomWCS wcs) {
+        final StringBuilder sb = new StringBuilder();
+
+        if (wcs != null) {
+            fillBuffer(wcs.getAxis(), sb);
+        }
+
+        return sb.toString();
+    }
+
+
+    // todo: caom24 add: CustomWCS, similar function to PolarizationWCS toString above...
 
     public static String toString(ObservableAxis observable) {
         final StringBuilder sb = new StringBuilder();
@@ -598,6 +744,87 @@ public class SS {
         } else {
             sb.append("<br>range: null ");
         }
+    }
+
+    public static String getMetaReadGroups(final Observation o) throws MalformedURLException {
+        Set<URI> metaReadGroups = o.getMetaReadGroups();
+        final StringBuilder sb = new StringBuilder();
+
+        if (metaReadGroups != null) {
+            Iterator tsi = o.getMetaReadGroups().iterator();
+            while (tsi.hasNext()) {
+                sb.append(tsi.next().toString());
+                sb.append("&nbsp;");
+            }
+        }
+        return sb.toString();
+    }
+
+    public static String getMetaReadGroups(final Plane p) throws MalformedURLException {
+        Set<URI> metaReadGroups = p.getMetaReadGroups();
+        final StringBuilder sb = new StringBuilder();
+
+        if (metaReadGroups != null) {
+            Iterator rgIter = p.getMetaReadGroups().iterator();
+            while (rgIter.hasNext()) {
+                sb.append(rgIter.next().toString());
+                sb.append("&nbsp;");
+            }
+        }
+        return sb.toString();
+    }
+
+    public static String serializeURISet(Set<URI> uriSet) {
+        final StringBuilder sb = new StringBuilder();
+
+        if (uriSet != null) {
+            Iterator iter = uriSet.iterator();
+            while (iter.hasNext()) {
+                sb.append(iter.next().toString());
+                sb.append("&nbsp;");
+            }
+        }
+        return sb.toString();
+    }
+
+    public static String getCaomEntityID(CaomEntity ce) {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("<tr>");
+        sb.append("<td>ID</td> ");
+        sb.append("<td>" + ce.getID() + " aka " + ce.getID().getLeastSignificantBits() +  "</td>");
+        sb.append("</tr>");
+        return sb.toString();
+    }
+
+    public static String getCaomEntityPortion(CaomEntity ce) {
+        final StringBuilder sb = new StringBuilder();
+
+        sb.append("<tr>");
+        sb.append("<td>lastModified</td> ");
+        sb.append("<td>" + ce.getLastModified() +  "</td>");
+        sb.append("</tr>");
+
+        sb.append("<tr>");
+        sb.append("<td>maxLastModified</td> ");
+        sb.append("<td>" + ce.getMaxLastModified() +  "</td>");
+        sb.append("</tr>");
+
+        sb.append("<tr>");
+        sb.append("<td>metaChecksum</td> ");
+        sb.append("<td>" + ce.getMetaChecksum() +  "</td>");
+        sb.append("</tr>");
+
+        sb.append("<tr>");
+        sb.append("<td>accMetaChecksum</td> ");
+        sb.append("<td>" + ce.getAccMetaChecksum() +  "</td>");
+        sb.append("</tr>");
+
+        sb.append("<tr>");
+        sb.append("<td>metaProducer</td> ");
+        sb.append("<td>" + ce.metaProducer +  "</td>");
+        sb.append("</tr>");
+
+        return sb.toString();
     }
 
 }

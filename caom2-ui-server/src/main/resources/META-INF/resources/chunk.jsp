@@ -19,17 +19,9 @@ request.setAttribute("chunk", c);
   <h3>Chunk</h3>
 
   <table class="content">
-    <tr>
-      <td>chunkID</td>
-      <td><%= chunk.getID() %> aka <%= chunk.getID()
-          .getLeastSignificantBits() %>
-      </td>
-    </tr>
-    <tr>
-      <td>lastModified</td>
-      <td><%= SS.toString(chunk.getLastModified()) %>
-      </td>
-    </tr>
+    <%--    Provide entity id first --%>
+    <%= SS.getCaomEntityID(chunk)%>
+
     <tr>
       <td>productType</td>
       <td><%= SS.toString(chunk.productType) %>
@@ -41,12 +33,12 @@ request.setAttribute("chunk", c);
       </td>
     </tr>
 
-    <tr class="even">
+    <tr>
       <td>positionAxis1</td>
       <td><%= chunk.positionAxis1 %>
       </td>
     </tr>
-    <tr class="even">
+    <tr>
       <td>positionAxis2</td>
       <td><%= chunk.positionAxis2 %>
       </td>
@@ -57,7 +49,7 @@ request.setAttribute("chunk", c);
       </td>
     </tr>
 
-    <tr class="even">
+    <tr>
       <td>energyAxis</td>
       <td><%= chunk.energyAxis %>
       </td>
@@ -68,7 +60,7 @@ request.setAttribute("chunk", c);
       </td>
     </tr>
 
-    <tr class="even">
+    <tr>
       <td>timeAxis</td>
       <td><%= chunk.timeAxis %>
       </td>
@@ -79,7 +71,7 @@ request.setAttribute("chunk", c);
       </td>
     </tr>
 
-    <tr class="even">
+    <tr>
       <td>polarizationAxis</td>
       <td><%= chunk.polarizationAxis %>
       </td>
@@ -90,7 +82,18 @@ request.setAttribute("chunk", c);
       </td>
     </tr>
 
-    <tr class="even">
+    <tr>
+      <td>customAxis</td>
+      <td><%= chunk.customAxis %>
+      </td>
+    </tr>
+    <tr>
+      <td>custom</td>
+      <td><%= SS.toString(chunk.custom) %>
+      </td>
+    </tr>
+
+    <tr>
       <td>observableAxis</td>
       <td><%= chunk.observableAxis %>
       </td>
@@ -100,5 +103,8 @@ request.setAttribute("chunk", c);
       <td><%= SS.toString(chunk.observable) %>
       </td>
     </tr>
+
+    <%--    Populate in the rest of the CaomEntity member values --%>
+    <%= SS.getCaomEntityPortion(chunk)%>
   </table>
 </div>

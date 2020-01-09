@@ -21,28 +21,21 @@ request.setAttribute("artifact", a);
   <h2>Artifact</h2>
 
   <table class="content">
-    <tr>
-      <td>artifactID</td>
-      <td><%= artifact.getID() %> aka <%= artifact.getID()
-          .getLeastSignificantBits() %>
-      </td>
-    </tr>
-    <tr>
-      <td>lastModified</td>
-      <td><%= SS.toString(artifact.getLastModified()) %>
-      </td>
-    </tr>
+    <%--    Provide entity id first --%>
+    <%= SS.getCaomEntityID(artifact)%>
+
     <tr>
       <td>uri</td>
       <td><%= artifact.getURI() %>
       </td>
     </tr>
     <tr>
-        <td>productType</td><td><%= SS.toString(artifact.getProductType()) %></td>
+      <td>productType</td>
+      <td><%= SS.toString(artifact.getProductType()) %></td>
     </tr>
     <tr>
-        <td>releaseType</td><td><%= SS.toString(artifact.getReleaseType()) %></td>
-    </tr>
+      <td>releaseType</td>
+      <td><%= SS.toString(artifact.getReleaseType()) %></td>
     </tr>
     <tr>
       <td>contentType</td>
@@ -54,7 +47,24 @@ request.setAttribute("artifact", a);
       <td><%= artifact.contentLength %>
       </td>
     </tr>
+    <tr>
+      <td>contentChecksum</td>
+      <td><%= artifact.contentChecksum.toString() %>
+      </td>
+    </tr>
+    <tr>
+      <td>contentRelease</td>
+      <td><%= artifact.contentRelease %>
+      </td>
+    </tr>
+    <tr>
+      <td>contentReadGroups</td>
+      <td><%= SS.serializeURISet(artifact.getContentReadGroups()) %>
+      </td>
+    </tr>
 
+    <%--    Populate in the rest of the CaomEntity member values --%>
+    <%= SS.getCaomEntityPortion(artifact)%>
   </table>
 
   <%
