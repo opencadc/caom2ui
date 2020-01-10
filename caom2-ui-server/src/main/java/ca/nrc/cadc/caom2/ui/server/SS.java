@@ -358,7 +358,7 @@ public class SS {
             "<br>sampleSNR: " +
             m.sampleSNR;
     }
-
+    
     public static String toMemberString(final String contextPath, final Observation o, final String parentID) {
         final StringBuilder sb = new StringBuilder();
 
@@ -407,11 +407,22 @@ public class SS {
         return sb.toString();
     }
 
-
     public static String toString(final URI uri) throws MalformedURLException {
         final MessageFormat format = new MessageFormat("<a class=\"provenance-reference\" href=\"{0}\">{0}</a>");
-        final URL url = uri.isAbsolute() ? uri.toURL() : new URL("http://" + uri.toString());
-        return format.format(new Object[] {url.toExternalForm()});
+        //Default is to return an empty string if the uri is null
+        String uriString = "";
+        if (uri != null ) {
+            final URL url = uri.isAbsolute() ? uri.toURL() : new URL("http://" + uri.toString());
+            uriString = format.format(new Object[] {url.toExternalForm()});
+        }
+        return uriString;
+    }
+
+    // URIs for checksums start with md5: which fails the toString(URI) above with a MalformedURLException
+    // This function guards against nulls in the data set which cause a Null Pointer Exception
+    // if/when encountered during jsp processing.
+    public static String getChecksum(final URI checksumUri) {
+        return (checksumUri == null) ? "" : checksumUri.toString();
     }
 
     public static String toString(Provenance p) {

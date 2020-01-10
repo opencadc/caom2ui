@@ -22,10 +22,10 @@ configurations.all {
 
 sourceCompatibility = '1.7'
 group = 'ca.nrc.cadc'
-version = '1015'
+version = '1016'
 
 dependencies {
-    compile 'org.opencadc:caom2-ui-server:[1.2.5,)'
+    compile 'org.opencadc:caom2-ui-server:[1.2.6,)'
 
     providedCompile 'javax.servlet:javax.servlet-api:[3.1.0,)'
     providedCompile 'javax.servlet:javax.servlet-api:[3.0.0,)'
