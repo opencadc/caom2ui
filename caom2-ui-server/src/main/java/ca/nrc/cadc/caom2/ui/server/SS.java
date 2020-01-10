@@ -358,8 +358,7 @@ public class SS {
             "<br>sampleSNR: " +
             m.sampleSNR;
     }
-
-
+    
     public static String toMemberString(final String contextPath, final Observation o, final String parentID) {
         final StringBuilder sb = new StringBuilder();
 
