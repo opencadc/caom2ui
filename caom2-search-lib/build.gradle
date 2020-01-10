@@ -11,20 +11,20 @@ repositories {
 }
 
 dependencies {
-    compile 'log4j:log4j:1.2.+'
-    compile 'org.jdom:jdom2:2.+'
-    compile 'commons-io:commons-io:2.+'
+    compile 'log4j:log4j:1.2.17'
+    compile 'org.jdom:jdom2:[2.0.6,)'
+    compile 'commons-io:commons-io:2.6'
 
-    compile 'org.opencadc:cadc-dali:1.+'
-    compile 'org.opencadc:cadc-util:1.+'
+    compile 'org.opencadc:cadc-dali:[1.0,)'
+    compile 'org.opencadc:cadc-util:[1.0,)'
     compile 'org.opencadc:cadc-uws-server:[1.2.1, )'
-    compile 'org.opencadc:caom2-compute:[2.2.5, )'
+    compile 'org.opencadc:caom2-compute:[2.2.5, 2.4.0)'
 
-    testCompile 'junit:junit:4.+'
-    testCompile 'org.mockito:mockito-core:2.+'
-    testCompile 'org.easymock:easymock:3.+'
+    testCompile 'junit:junit:[4.0,5.0)'
+    testCompile 'org.mockito:mockito-core:[2.0,)'
+    testCompile 'org.easymock:easymock:[3.6,)'
 }
 
 sourceCompatibility = 1.7
 group = 'org.opencadc'
-version = '2.4.2'
+version = '2.4.3'
