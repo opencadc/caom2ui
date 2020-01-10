@@ -39,22 +39,22 @@ request.setAttribute("artifact", a);
     </tr>
     <tr>
       <td>contentType</td>
-      <td><%= artifact.contentType %>
+      <td><%= SS.toString(artifact.contentType) %>
       </td>
     </tr>
     <tr>
       <td>contentLength</td>
-      <td><%= artifact.contentLength %>
+      <td><%= SS.toString(artifact.contentLength) %>
       </td>
     </tr>
     <tr>
       <td>contentChecksum</td>
-      <td><%= artifact.contentChecksum.toString() %>
+      <td><%= SS.getChecksum(artifact.contentChecksum) %>
       </td>
     </tr>
     <tr>
       <td>contentRelease</td>
-      <td><%= artifact.contentRelease %>
+      <td><%= SS.toString(artifact.contentRelease) %>
       </td>
     </tr>
     <tr>
