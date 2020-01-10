@@ -24,7 +24,7 @@ dependencies {
     compile 'org.opencadc:cadc-access-control-identity:[1.0.7,2.0)'
     compile 'org.opencadc:cadc-uws:[1.0.3,)'
     compile 'org.opencadc:cadc-uws-server:[1.2.1,)'
-    compile 'org.opencadc:cadc-web-util:[1.2,)'
+    compile 'org.opencadc:cadc-web-util:[1.2.7,)'
     compile 'org.opencadc:cadc-adql:[1.1.6,)'
     compile 'org.opencadc:cadc-util:[1.2.14,)'
     compile 'org.opencadc:cadc-dali:[1.1.1,)'

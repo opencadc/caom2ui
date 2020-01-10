@@ -57,8 +57,8 @@ import java.awt.geom.Point2D;
 
 import jsky.coords.wcscon;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
+import org.apache.log4j.Logger;
 
 
 /**
@@ -68,7 +68,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class Shape1 extends AbstractFormConstraint implements SearchableFormConstraint {
 
-    private static Logger log = LogManager.getLogger(Shape1.class);
+    private static Logger log = Logger.getLogger(Shape1.class);
 
     // Constants used to construct name for form elements
     public static final String NAME = "@Shape1";

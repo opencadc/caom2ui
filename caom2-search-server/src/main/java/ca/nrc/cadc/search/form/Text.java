@@ -30,8 +30,8 @@ package ca.nrc.cadc.search.form;
 
 import java.util.List;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
+import org.apache.log4j.Logger;
 
 import ca.nrc.cadc.caom2.SearchTemplate;
 import ca.nrc.cadc.caom2.TextSearch;
@@ -48,7 +48,7 @@ import ca.nrc.cadc.uws.Parameter;
  */
 public class Text extends AbstractFormConstraint implements SearchableFormConstraint {
 
-    private static Logger log = LogManager.getLogger(Text.class);
+    private static Logger log = Logger.getLogger(Text.class);
 
     // Constants used to construct name for form elements.
     public static final String NAME = "@Text";

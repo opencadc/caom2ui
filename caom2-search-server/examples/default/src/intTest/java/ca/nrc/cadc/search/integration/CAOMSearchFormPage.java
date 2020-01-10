@@ -68,8 +68,8 @@
 
 package ca.nrc.cadc.search.integration;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
+import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -84,7 +84,7 @@ import java.util.List;
 
 public class CAOMSearchFormPage extends AbstractSearchFormPage
 {
-    private static final Logger LOGGER = LogManager.getLogger(CAOMSearchFormPage.class);
+    private static final Logger LOGGER = Logger.getLogger(CAOMSearchFormPage.class);
 
     private static final int DEFAULT_TIMEOUT_IN_SECONDS = 25;
     private static final By H1_HEADER = By.cssSelector("h1");

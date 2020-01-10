@@ -39,15 +39,15 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.TimeZone;
 
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
+import org.apache.log4j.Level;
+
 import org.junit.Before;
 import org.junit.Test;
 
 import ca.nrc.cadc.caom2.IntervalSearch;
 import ca.nrc.cadc.date.DateUtil;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.core.config.Configurator;
+import org.apache.log4j.Logger;
+import ca.nrc.cadc.util.Log4jInit;
 import ca.nrc.cadc.uws.Job;
 import ca.nrc.cadc.uws.Parameter;
 
@@ -87,10 +87,10 @@ public class DateTest extends AbstractNumericFormConstraintTest<Date> {
     private static Calendar startDateTimeCal;
     private static Calendar endDateTimeCal;
 
-    private static Logger log = LogManager.getLogger(DateTest.class);
+    private static Logger log = Logger.getLogger(DateTest.class);
 
     static {
-        Configurator.setLevel("ca.nrc.cadc.search", Level.INFO);
+        Log4jInit.setLevel("ca.nrc.cadc.search", Level.INFO);
     }
 
     @Before

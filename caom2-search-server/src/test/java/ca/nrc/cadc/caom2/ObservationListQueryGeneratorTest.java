@@ -2,11 +2,11 @@
 package ca.nrc.cadc.caom2;
 
 import ca.nrc.cadc.AbstractUnitTest;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import ca.nrc.cadc.util.Log4jInit;
+import org.apache.log4j.Level;
 
-import org.apache.logging.log4j.core.config.Configurator;
+import org.apache.log4j.Logger;
+
 import org.junit.*;
 
 import java.util.ArrayList;
@@ -18,10 +18,10 @@ import java.util.List;
  */
 public class ObservationListQueryGeneratorTest extends AbstractUnitTest<ObservationListQueryGenerator> {
 
-    private static final Logger log = LogManager.getLogger(ObservationListQueryGeneratorTest.class);
+    private static final Logger log = Logger.getLogger(ObservationListQueryGeneratorTest.class);
 
     static {
-        Configurator.setLevel("ca.nrc.cadc.caom2", Level.INFO);
+        Log4jInit.setLevel("ca.nrc.cadc.caom2", Level.INFO);
     }
 
     public ObservationListQueryGeneratorTest() {

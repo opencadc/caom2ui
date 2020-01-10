@@ -36,8 +36,8 @@ package ca.nrc.cadc.search.form;
 
 import ca.nrc.cadc.caom2.SearchTemplate;
 import ca.nrc.cadc.caom2.TextSearch;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.core.config.Configurator;
+import org.apache.log4j.Level;
+import ca.nrc.cadc.util.Log4jInit;
 import ca.nrc.cadc.uws.Job;
 import ca.nrc.cadc.uws.Parameter;
 
@@ -52,7 +52,7 @@ import static org.junit.Assert.*;
 public class TextTest {
 
     static {
-        Configurator.setLevel("ca.nrc.cadc.search", Level.INFO);
+        Log4jInit.setLevel("ca.nrc.cadc.search", Level.INFO);
     }
 
     @Test

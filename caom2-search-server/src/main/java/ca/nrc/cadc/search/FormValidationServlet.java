@@ -37,8 +37,8 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.*;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
+import org.apache.log4j.Logger;
 
 import org.json.JSONException;
 import org.json.JSONWriter;
@@ -57,7 +57,7 @@ public class FormValidationServlet extends HttpServlet {
 
     private static final long serialVersionUID = 201310020918L;
 
-    private static Logger LOGGER = LogManager.getLogger(FormValidationServlet.class);
+    private static Logger LOGGER = Logger.getLogger(FormValidationServlet.class);
 
     @Override
     public void init(ServletConfig config) throws ServletException {

@@ -4,8 +4,8 @@ import javax.sql.DataSource;
 import java.net.URI;
 import java.util.*;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
+import org.apache.log4j.Logger;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
@@ -20,7 +20,7 @@ import ca.nrc.cadc.search.ObsModel;
  */
 public abstract class AbstractPersistenceService implements PersistenceService {
 
-    private static Logger LOGGER = LogManager.getLogger(AbstractPersistenceService.class);
+    private static Logger LOGGER = Logger.getLogger(AbstractPersistenceService.class);
 
     protected static final String BASE_PKG = "ca.nrc.cadc.caom2";
 

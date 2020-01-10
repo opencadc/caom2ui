@@ -35,8 +35,8 @@
 package ca.nrc.cadc.search;
 
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
+import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONWriter;
 
@@ -54,7 +54,7 @@ import java.util.*;
  */
 public class ColumnUnitServlet extends HttpServlet {
 
-    private static Logger LOGGER = LogManager.getLogger(ColumnUnitServlet.class);
+    private static Logger LOGGER = Logger.getLogger(ColumnUnitServlet.class);
 
     // Create Map to hold Column Names and the key/value items to pass
     // from it.  The key of the value map is the column name, and the value is

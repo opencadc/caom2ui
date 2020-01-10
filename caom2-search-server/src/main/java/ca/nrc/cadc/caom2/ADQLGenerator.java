@@ -3,8 +3,8 @@ package ca.nrc.cadc.caom2;
 import ca.nrc.cadc.caom2.types.*;
 import ca.nrc.cadc.util.StringUtil;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
+import org.apache.log4j.Logger;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -24,7 +24,7 @@ public class ADQLGenerator extends AbstractPersistenceService {
     private static final String OBSCORE_TIME_UTYPE = "Char.TemporalAxis.Coverage.Bounds.Limits";
 
 
-    private static Logger LOGGER = LogManager.getLogger(ADQLGenerator.class);
+    private static Logger LOGGER = Logger.getLogger(ADQLGenerator.class);
 
     private final String upload;
     private final String uploadResolver;

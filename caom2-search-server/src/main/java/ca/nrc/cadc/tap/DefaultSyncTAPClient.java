@@ -45,8 +45,8 @@ import ca.nrc.cadc.uws.JobAttribute;
 import ca.nrc.cadc.uws.Parameter;
 
 import org.apache.http.client.utils.URIBuilder;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
+import org.apache.log4j.Logger;
 
 import java.io.*;
 import java.net.URI;
@@ -62,7 +62,7 @@ import java.util.Map;
  */
 public class DefaultSyncTAPClient implements SyncTAPClient {
 
-    private static final Logger LOGGER = LogManager.getLogger(DefaultSyncTAPClient.class);
+    private static final Logger LOGGER = Logger.getLogger(DefaultSyncTAPClient.class);
 
 
     private final boolean followToResults;
