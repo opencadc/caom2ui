@@ -64,8 +64,8 @@ import java.net.URI;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
+import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -76,7 +76,7 @@ import javax.servlet.http.HttpServletResponse;
 public class AdvancedRunner implements JobRunner {
     private static final String TAP_SERVICE_URI_PROPERTY_KEY = "org.opencadc.search.tap-service-id";
     static final URI DEFAULT_TAP_SERVICE_URI = URI.create("ivo://cadc.nrc.ca/argus");
-    private static final Logger LOGGER = LogManager.getLogger(AdvancedRunner.class);
+    private static final Logger LOGGER = Logger.getLogger(AdvancedRunner.class);
     private final ApplicationConfiguration applicationConfiguration;
 
 

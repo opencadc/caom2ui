@@ -59,8 +59,8 @@ import ca.nrc.cadc.uws.ParameterUtil;
 import ca.nrc.cadc.uws.RegexParameterUtil;
 import ca.nrc.cadc.uws.SyncResponseWriter;
 import ca.nrc.cadc.uws.server.JobUpdater;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
+import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONWriter;
 
@@ -82,7 +82,7 @@ import java.util.Map;
  */
 public class TAPSearcher implements Searcher {
 
-    private static final Logger LOGGER = LogManager.getLogger(TAPSearcher.class);
+    private static final Logger LOGGER = Logger.getLogger(TAPSearcher.class);
 
     private static final String CAOM2_RESOLVER_VALUE_KEY = "Plane.position.bounds@Shape1Resolver.value";
     private static final String CAOM2_TARGET_NAME_VALUE_KEY = "Plane.position.bounds@Shape1.value";

@@ -50,13 +50,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.client.utils.URIBuilder;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
+import org.apache.log4j.Logger;
 
 
 public class SearchPreviewServlet extends ConfigurableServlet {
 
-    private static Logger log = LogManager.getLogger(SearchPreviewServlet.class);
+    private static Logger log = Logger.getLogger(SearchPreviewServlet.class);
 
     private PreviewRequestHandler previewRequestHandler;
 

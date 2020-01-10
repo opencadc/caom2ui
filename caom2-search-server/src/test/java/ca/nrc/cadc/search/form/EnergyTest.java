@@ -10,11 +10,11 @@ import java.util.List;
 
 import ca.nrc.cadc.caom2.IntervalSearch;
 
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.apache.log4j.Level;
 
-import org.apache.logging.log4j.core.config.Configurator;
+import org.apache.log4j.Logger;
+
+import ca.nrc.cadc.util.Log4jInit;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -26,10 +26,10 @@ import static org.junit.Assert.*;
 public class EnergyTest {
 
     private static final String ENERGY_FIELD = "Plane.energy.bounds.samples";
-    private static Logger log = LogManager.getLogger(EnergyTest.class);
+    private static Logger log = Logger.getLogger(EnergyTest.class);
 
     static {
-        Configurator.setLevel("ca.nrc.cadc.search", Level.INFO);
+        Log4jInit.setLevel("ca.nrc.cadc.search", Level.INFO);
     }
 
     public EnergyTest() {

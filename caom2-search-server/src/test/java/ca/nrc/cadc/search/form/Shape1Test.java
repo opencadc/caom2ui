@@ -39,13 +39,13 @@ import ca.nrc.cadc.caom2.SearchTemplate;
 import ca.nrc.cadc.caom2.SpatialSearch;
 import ca.nrc.cadc.caom2.TextSearch;
 import ca.nrc.cadc.caom2.types.Circle;
-import org.apache.logging.log4j.Level;
+import org.apache.log4j.Level;
 import ca.nrc.cadc.uws.Job;
 import ca.nrc.cadc.uws.Parameter;
 
 import org.junit.Test;
 
-import org.apache.logging.log4j.core.config.Configurator;
+import ca.nrc.cadc.util.Log4jInit;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +56,7 @@ import static org.junit.Assert.*;
 public class Shape1Test {
 
     static {
-        Configurator.setLevel("ca.nrc.cadc.search", Level.INFO);
+        Log4jInit.setLevel("ca.nrc.cadc.search", Level.INFO);
     }
 
     @Test

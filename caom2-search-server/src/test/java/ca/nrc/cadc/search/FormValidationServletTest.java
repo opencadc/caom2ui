@@ -37,13 +37,13 @@ import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.logging.log4j.Level;
+import org.apache.log4j.Level;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ca.nrc.cadc.AbstractUnitTest;
 import ca.nrc.cadc.search.form.*;
-import org.apache.logging.log4j.core.config.Configurator;
+import ca.nrc.cadc.util.Log4jInit;
 
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
@@ -63,7 +63,7 @@ public class FormValidationServletTest
 
     @BeforeClass
     public static void setUpClass() {
-        Configurator.setLevel("ca.nrc.cadc", Level.INFO);
+        Log4jInit.setLevel("ca.nrc.cadc", Level.INFO);
     }
 
     @Test

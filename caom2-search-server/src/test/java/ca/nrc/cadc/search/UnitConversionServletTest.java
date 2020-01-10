@@ -38,7 +38,7 @@ package ca.nrc.cadc.search;
 import ca.nrc.cadc.AbstractUnitTest;
 
 import ca.nrc.cadc.date.DateUtil;
-import org.apache.logging.log4j.Level;
+import org.apache.log4j.Level;
 import org.json.JSONObject;
 import org.json.JSONWriter;
 import org.junit.Before;
@@ -52,7 +52,7 @@ import java.util.Map;
 import ca.nrc.cadc.search.form.*;
 import ca.nrc.cadc.search.form.Number;
 import ca.nrc.cadc.search.parser.TargetData;
-import org.apache.logging.log4j.core.config.Configurator;
+import ca.nrc.cadc.util.Log4jInit;
 
 import static ca.nrc.cadc.search.UnitConversionServlet.CAOM2_ENERGY_FIELD;
 import static ca.nrc.cadc.search.UnitConversionServlet.CAOM2_TIME_FIELD;
@@ -71,7 +71,7 @@ public class UnitConversionServletTest extends AbstractUnitTest<UnitConversionSe
 
     @Before
     public void setUp() {
-        Configurator.setLevel("ca.nrc.cadc", Level.INFO);
+        Log4jInit.setLevel("ca.nrc.cadc", Level.INFO);
     }
 
     @Test

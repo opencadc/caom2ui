@@ -38,8 +38,8 @@ import ca.nrc.cadc.caom2.NumericSearch;
 
 import ca.nrc.cadc.util.StringUtil;
 
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
+import org.apache.log4j.Level;
+
 
 import ca.nrc.cadc.uws.Job;
 
@@ -51,16 +51,16 @@ import java.util.List;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.core.config.Configurator;
+import org.apache.log4j.Logger;
+import ca.nrc.cadc.util.Log4jInit;
 
 
 public class NumberTest extends AbstractNumericFormConstraintTest<Number> {
 
-    private static Logger log = LogManager.getLogger(NumberTest.class);
+    private static Logger log = Logger.getLogger(NumberTest.class);
 
     static {
-        Configurator.setLevel("ca.nrc.cadc.search", Level.INFO);
+        Log4jInit.setLevel("ca.nrc.cadc.search", Level.INFO);
     }
 
     @Test

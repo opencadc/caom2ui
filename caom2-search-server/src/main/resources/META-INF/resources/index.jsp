@@ -24,7 +24,11 @@
 <fmt:setLocale value="<%= requestHeaderLang %>" scope="request"/>
 <fmt:setBundle basename="Caom2SearchBundle" var="langBundle" scope="request"/>
 
-<c:import url='<%= "_page_header.jsp?lang=" + requestHeaderLang %>'/>
+<c:url value="_page_header.jsp" var="pageHeaderURL">
+  <c:param name="lang" value="${requestHeaderLang}" />
+</c:url>
+
+<c:import url='${pageHeaderURL' />
 
 
 <body>

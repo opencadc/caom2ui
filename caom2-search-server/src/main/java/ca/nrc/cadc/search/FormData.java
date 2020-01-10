@@ -44,8 +44,8 @@ import ca.nrc.cadc.uws.Parameter;
 import java.lang.reflect.Constructor;
 import java.util.*;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
+import org.apache.log4j.Logger;
 
 
 /**
@@ -58,7 +58,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class FormData
 {
-    private static Logger log = LogManager.getLogger(FormData.class);
+    private static Logger log = Logger.getLogger(FormData.class);
 
     private static final String ENERGY_FREQ_WIDTH_UTYPE = "Plane.energy.freqWidth";
     private static final String ENERGY_FREQ_SAMPLE_SIZE_UTYPE = "Plane.energy.freqSampleSize";
