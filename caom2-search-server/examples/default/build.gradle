@@ -13,16 +13,10 @@ repositories {
     jcenter()
 }
 
-configurations.all {
-    resolutionStrategy {
-        force 'org.apache.commons:commons-configuration2:2.3'
-    }
-}
-
 apply from: file('../../../int_test.gradle')
 
 dependencies {
-    compile 'org.opencadc:caom2-search-server:[2.11.9,)'
+    compile 'org.opencadc:caom2-search-server:[2.12.0,)'
     compile 'org.opencadc:cadc-uws-server:[1.2.1,)'
     compile 'org.opencadc:cadc-registry:[1.5.0,)'
 
@@ -43,7 +37,7 @@ ext {
 }
 
 group = 'org.opencadc'
-version = '2051'
+version = '2052'
 
 war {
     // Trying to fix static file caching on new build.

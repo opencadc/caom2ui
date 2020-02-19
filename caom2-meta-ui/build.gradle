@@ -13,16 +13,9 @@ repositories {
 
 apply from: file('../int_test.gradle')
 
-configurations.all {
-    resolutionStrategy {
-        force 'org.apache.commons:commons-configuration2:2.3'
-        force 'org.apache.commons:commons-lang3:3.8.1'
-    }
-}
-
-sourceCompatibility = '1.7'
+sourceCompatibility = '1.8'
 group = 'ca.nrc.cadc'
-version = '1016'
+version = '1017'
 
 dependencies {
     compile 'org.opencadc:caom2-ui-server:[1.2.6,)'
