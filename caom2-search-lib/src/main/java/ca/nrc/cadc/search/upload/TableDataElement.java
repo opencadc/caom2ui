@@ -53,7 +53,7 @@ import org.jdom2.Namespace;
 public class TableDataElement extends Element {
 
     // Iterator used to populate the TABLEDATA element.
-    private Iterator iterator;
+    private Iterator<String> iterator;
 
     // Counts of table rows and processing errors.
     UploadResults uploadResults;
@@ -66,7 +66,7 @@ public class TableDataElement extends Element {
      * @param namespace     XML Namespace.
      * @param uploadResults Upload Results of the uploaded file.
      */
-    public TableDataElement(final Iterator iterator, final Namespace namespace, final UploadResults uploadResults) {
+    public TableDataElement(final Iterator<String> iterator, final Namespace namespace, final UploadResults uploadResults) {
         super("TABLEDATA", namespace);
         this.iterator = iterator;
         this.namespace = namespace;
@@ -84,5 +84,4 @@ public class TableDataElement extends Element {
     public List getContent() {
         return new StreamingIteratorList(iterator, namespace, uploadResults);
     }
-
 }
