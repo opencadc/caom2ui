@@ -49,6 +49,8 @@ import java.util.Iterator;
 
 import ca.nrc.cadc.dali.tables.votable.VOTableWriter;
 import org.apache.commons.io.LineIterator;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
@@ -57,6 +59,9 @@ import org.jdom2.output.XMLOutputter;
 
 
 public class StreamingVOTableWriter extends VOTableWriter {
+
+    private static final Logger LOGGER = LogManager.getLogger(StreamingVOTableWriter.class);
+
     // Counts of table rows and processing errors.
     private UploadResults uploadResults;
 
@@ -69,12 +74,12 @@ public class StreamingVOTableWriter extends VOTableWriter {
     public void write(final InputStream in, final OutputStream out) throws IOException {
         // Get an Iterator to the text of the InputStream.
         final BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-        final Iterator iterator = new LineIterator(reader);
+        final Iterator<String> iterator = new LineIterator(reader);
 
         write(iterator, out);
     }
 
-    public void write(final Iterator iterator, final OutputStream out) throws IOException {
+    public void write(final Iterator<String> iterator, final OutputStream out) throws IOException {
         Document document = createDocument();
         Element root = document.getRootElement();
         Namespace namespace = root.getNamespace();
@@ -110,6 +115,7 @@ public class StreamingVOTableWriter extends VOTableWriter {
         Element tableData = new TableDataElement(iterator, namespace, uploadResults);
         data.addContent(tableData);
 
+        LOGGER.debug("Writing out to Output Stream.");
         write(document, out);
     }
 
@@ -122,12 +128,12 @@ public class StreamingVOTableWriter extends VOTableWriter {
      * @throws IOException For any unforeseen error(s).
      */
     protected void write(final Document document, final OutputStream out)
-        throws IOException {
+            throws IOException {
         // Write out the VOTABLE.
         final XMLOutputter outputter =
-            new XMLOutputter(Format.getPrettyFormat(),
-                             new TableDataXMLOutputProcessor(
-                                 Integer.MAX_VALUE));
+                new XMLOutputter(Format.getPrettyFormat(),
+                                 new TableDataXMLOutputProcessor(
+                                         Integer.MAX_VALUE));
         outputter.output(document, out);
     }
 
