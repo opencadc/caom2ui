@@ -75,6 +75,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Date;
 
 import static org.junit.Assert.*;
 import static org.easymock.EasyMock.*;
@@ -95,8 +96,10 @@ public class GroupRowMapperTest extends AbstractUnitTest<GroupRowMapper>
                 createMock(ResultSetMetaData.class);
         final Calendar cal = Calendar.getInstance(DateUtil.UTC);
 
-        cal.set(2015, Calendar.MARCH, 22, 3, 55, 38);
-        cal.set(Calendar.MILLISECOND, 0);
+        // Make a date some time in the past, something less
+        // than 5 years as instruments are considered stale after that
+        Date freshInstrumentDate = new Date();
+        long stillFreshDateMillis = freshInstrumentDate.getTime() - 10000000L;
 
         expect(mockResultSet.getMetaData()).andReturn(
                 mockResultSetMetaData).once();
@@ -115,7 +118,7 @@ public class GroupRowMapperTest extends AbstractUnitTest<GroupRowMapper>
         expect(mockResultSet.getString(1)).andReturn("VAL1").once();
         expect(mockResultSet.getString(2)).andReturn("VAL2").once();
         expect(mockResultSet.getTimestamp(3)).
-                andReturn(new Timestamp(cal.getTime().getTime())).once();
+                andReturn(new Timestamp(stillFreshDateMillis)).once();
         expect(mockResultSet.getString(4)).andReturn("VAL4").once();
         expect(mockResultSet.getString(5)).andReturn("VAL5").once();
         expect(mockResultSet.getString(6)).andReturn("VAL6").once();
