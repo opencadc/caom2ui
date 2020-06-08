@@ -692,8 +692,7 @@
       )
 
       $currForm
-        .find("input:file[id$='" +
-          "targetList']")
+        .find("input:file[id$='_targetList']")
         .change(
           function (event) {
             if ($(event.target).val() !== '') {
