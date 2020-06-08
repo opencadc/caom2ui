@@ -692,7 +692,8 @@
       )
 
       $currForm
-        .find("input:file[id$='_targetList']")
+        .find("input:file[id$='" +
+          "targetList']")
         .change(
           function (event) {
             if ($(event.target).val() !== '') {
@@ -703,10 +704,24 @@
                 ),
                 true
               )
+              $("input[name$='.DOWNLOADCUTOUT']").prop('checked', false)
+              this.toggleDisabled(
+                $(
+                  '#' + this.id + " input[name$='.DOWNLOADCUTOUT']"
+                ),
+                true
+              )
+
             } else {
               this.toggleDisabled(
                 $(
                   '#' + this.id + " input[id='" + this.targetNameFieldID + "']"
+                ),
+                false
+              )
+              this.toggleDisabled(
+                $(
+                  '#' + this.id + " input[name$='.DOWNLOADCUTOUT']"
                 ),
                 false
               )
@@ -1772,7 +1787,13 @@
         $(this).val('')
       })
 
-      $("input[name$='.DOWNLOADCUTOUT']").prop('checked', false)
+      $('#' + this.id + "input[name$='.DOWNLOADCUTOUT']").prop('checked', false)
+      this.toggleDisabled(
+        $(
+          '#' + this.id + " input[name$='.DOWNLOADCUTOUT']"
+        ),
+        false
+      )
 
       this.$form.find('input.search_criteria_input').each(
         function (key, value) {
