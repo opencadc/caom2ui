@@ -40,7 +40,10 @@
                 footprint_column_id: 'caom2:Plane.position.bounds',
                 ra_column_id: 'caom2:Plane.position.bounds.cval1',
                 dec_column_id: 'caom2:Plane.position.bounds.cval2',
-                fov_column_id: 'caom2:Plane.position.bounds.area'
+                fov_column_id: 'caom2:Plane.position.bounds.area',
+                upload_target_name_id: 'caom2:Upload.target',
+                upload_target_ra_id: 'caom2:Upload.ra',
+                upload_target_dec_id: 'caom2:Upload.dec',
               }
             },
             ObsCore: {
@@ -53,7 +56,10 @@
                 footprint_column_id: 'obscore:Char.SpatialAxis.Coverage.Support.Area',
                 ra_column_id: 'obscore:Char.SpatialAxis.Coverage.Location.Coord.Position2D.Value2.C1',
                 dec_column_id: 'obscore:Char.SpatialAxis.Coverage.Location.Coord.Position2D.Value2.C2',
-                fov_column_id: 'obscore:Char.SpatialAxis.Coverage.Bounds.Extent.diameter'
+                fov_column_id: 'obscore:Char.SpatialAxis.Coverage.Bounds.Extent.diameter',
+                upload_target_name_id: 'obscore:Upload.target',
+                upload_target_ra_id: 'obscore:Upload.ra',
+                upload_target_dec_id: 'obscore:Upload.dec',
               }
             },
             types: {
@@ -65,7 +71,10 @@
                 footprint_column_id: 'caom2:Plane.position.bounds',
                 ra_column_id: 'caom2:Plane.position.bounds.cval1',
                 dec_column_id: 'caom2:Plane.position.bounds.cval2',
-                fov_column_id: 'caom2:Plane.position.bounds.area'
+                fov_column_id: 'caom2:Plane.position.bounds.area',
+                upload_target_name_id: 'caom2:Upload.target',
+                upload_target_ra_id: 'caom2:Upload.ra',
+                upload_target_dec_id: 'caom2:Upload.dec',
               },
               ObsCore: {
                 id: 'ObsCore',
@@ -75,7 +84,10 @@
                 footprint_column_id: 'obscore:Char.SpatialAxis.Coverage.Support.Area',
                 ra_column_id: 'obscore:Char.SpatialAxis.Coverage.Location.Coord.Position2D.Value2.C1',
                 dec_column_id: 'obscore:Char.SpatialAxis.Coverage.Location.Coord.Position2D.Value2.C2',
-                fov_column_id: 'obscore:Char.SpatialAxis.Coverage.Bounds.Extent.diameter'
+                fov_column_id: 'obscore:Char.SpatialAxis.Coverage.Bounds.Extent.diameter',
+                upload_target_name_id: 'obscore:Upload.target',
+                upload_target_ra_id: 'obscore:Upload.ra',
+                upload_target_dec_id: 'obscore:Upload.dec',
               }
             },
             SearchForm: SearchForm,
@@ -160,9 +172,9 @@
      *
      * @return {Metadata|cadc.vot.Metadata}
      */
-    this.getResultsTableMetadata = function () {
+    this.getResultsTableMetadata = function (columnIDs) {
       // Current order of column IDs.
-      var columnIDs = this.config.getAllColumnIDs()
+      //var columnIDs = this.config.getAllColumnIDs()
       var currentMetadata = new cadc.vot.Metadata(
         null,
         null,
@@ -253,7 +265,7 @@
       var order
 
       if (uType in this.getColumnOptions()) {
-        var allColumnIDs = this.config.getAllColumnIDs()
+        var allColumnIDs = this.config.getCompleteColumnIDList()
         order = allColumnIDs.indexOf(uType)
 
         this._addFieldsForUType(
@@ -268,6 +280,12 @@
         )
 
         // Hack to include non-standard UTypes into the mix.
+        // June 2020: this method isn't scalable, leaving it in
+        // place until there's cycles to be able to test Advancd Search
+        // against MS Edge, Safari, Firefox, Chrome as using Object.* to
+        // iterate through this.config.getConfig().keys() may or may not
+        // break any of them.
+
         if (uType === this.getFootprintColumnID()) {
           var raColumnID = this.getRAColumnID()
           order = allColumnIDs.indexOf(raColumnID)
@@ -339,6 +357,49 @@
       return rowData
     }
 
+    this.addExtraUtypeFields = function () {
+      var utypeConfig = this.config.getConfig()
+      var ucd = ""
+      var unit = ""
+      var datatype = "char"
+      var arraySize = 0
+      var description = "target upload file data identifier"
+      var xtype = ""
+
+      this._addFieldsForUType(
+        utypeConfig.upload_target_name_id,
+        ucd,
+        unit,
+        datatype,
+        undefined,
+        description,
+        xtype,
+        1
+      )
+
+      this._addFieldsForUType(
+        utypeConfig.upload_target_ra_id,
+        ucd,
+        unit,
+        datatype,
+        undefined,
+        description,
+        xtype,
+        2
+      )
+
+      this._addFieldsForUType(
+        utypeConfig.upload_target_dec_id,
+        ucd,
+        unit,
+        datatype,
+        undefined,
+        description,
+        xtype,
+        3
+      )
+    }
+
     /**
      * Iterate through all of the individual columns for the given UType, and
      * add them to the table metadata, if appropriate.
@@ -394,18 +455,27 @@
      * @param {boolean} _includeExtendedColumns   Flag to indicate whether extended (hidden) columns are to be included.
      * @returns {string}    ADQL Select clause, or empty string.  Never null.
      */
-    this.getSelectListString = function (_includeExtendedColumns) {
-      var selectColumnIDs = this.config.getAllColumnIDs()
+    this.getSelectListString = function (_includeExtendedColumns, formFieldColumns, allColumnIDs) {
+      var selectColumnIDs = allColumnIDs //this.config.getAllColumnIDs()
       var thisColumnOptions = this.getColumnOptions()
       var lowercaseName = this.getName().toLowerCase()
       var selectListString = ''
+
 
       for (var i = 0; i < selectColumnIDs.length; i++) {
         var columnID = selectColumnIDs[i]
         if (columnID.indexOf(lowercaseName) === 0) {
           var field = thisColumnOptions[columnID]
           if (field) {
-            if (!field.extended || _includeExtendedColumns) {
+            // First clause here will include any extended columns that are part of
+            // the data set but not linked to a particular form field
+            // Second clause will include any columns specific to a named form field
+            if ( (typeof(field.extended) === 'undefined') && (typeof(field.formField) === 'undefined')
+              || ((typeof(field.extended) !== 'undefined') && _includeExtendedColumns)
+              || ((typeof(field.formField) !== 'undefined') && formFieldColumns.includes(field.formField)) )
+            //if ( (!field.extended || _includeExtendedColumns) &&
+            //  (!field.formField || !formFieldColumns.includes(field.formField)) )
+            {
               var selector = this._getSelect(columnID, field)
               var selectorSplit = selector.split(/\.(.+)/)
               var selectorValue
@@ -503,6 +573,11 @@
       return this.config.getDefaultColumnIDs()
     }
 
+    // TODO: add decent docs for this
+    this.addUploadColumns = function(columnIDs) {
+      return this.config.addUploadColumns(columnIDs)
+    }
+
     /**
      * Obtain a hash of default unit types.
      * @return {{}}
@@ -551,6 +626,19 @@
       return this.columnBundleManager.getDefaultColumnIDs(selectedCollections)
     }
 
+    //. TODO: add docs for this
+    this.addUploadColumns = function(columnIDs) {
+      // upload cols need to be in display order
+      // add this bundle right after the 'Preview' column
+      var uploadColumnIDs = [
+        this.config.upload_target_name_id,
+        this.config.upload_target_ra_id,
+        this.config.upload_target_dec_id
+      ]
+      var firstEl = columnIDs.slice(0,1); // uri has to be first in display
+      return firstEl.concat(uploadColumnIDs.concat(columnIDs.slice(1, columnIDs.length)))
+    }
+
     /**
      * Obtain the full set of column IDs that will be in the select list, based
      * on some conditions at search time.
@@ -560,6 +648,12 @@
     this.getAllColumnIDs = function () {
       var selectedCollections = this._getSelectedCollections()
       return this.columnBundleManager.getAllColumnIDs(selectedCollections)
+    }
+
+    this.getCompleteColumnIDList = function () {
+      var selectedCollections = this._getSelectedCollections()
+      var completeIDList = this.columnBundleManager.getAllColumnIDs(selectedCollections)
+      return this.addUploadColumns(completeIDList)
     }
 
     /**
@@ -599,6 +693,20 @@
      */
     this.getDefaultColumnIDs = function () {
       return this.columnBundleManager.getDefaultColumnIDs([this.config.id])
+    }
+
+    this.getCompleteColumnIDList = function () {
+      return this.getAllColumnIDs()
+    }
+
+    // TODO: add docs for this
+    this.addUploadColumns = function($columnIDs) {
+      //var uploadColumnIDs = [
+      //  this.config.upload_target_name_id,
+      //  this.config.upload_target_ra_id,
+      //  this.config.upload_target_dec_id
+      //]
+      return $columnIDs
     }
 
     /**
@@ -1343,7 +1451,8 @@
      * @returns {cadc.vot.Metadata|*}
      */
     this.getResultsTableMetadata = function () {
-      return this.configuration.getResultsTableMetadata()
+      var columnIDs = this.getAllColumnIDs()
+      return this.configuration.getResultsTableMetadata(columnIDs)
     }
 
     /**
@@ -1622,18 +1731,49 @@
       resolverPopover.popover('hide')
     }
 
+    this.hasInputFile = function () {
+      var inputFile = this.$form.find('input:file.target-list')
+
+      return (inputFile.length > 0 &&
+        !inputFile.prop('disabled') &&
+        inputFile.val() !== '')
+    }
+
+    this.getDefaultColumnIDs = function() {
+      var columnIDs = this.configuration.getDefaultColumnIDs()
+      if (this.hasInputFile() === true) {
+        // functions that use this are expecting a jquery object
+        columnIDs = $(this.configuration.addUploadColumns(columnIDs.toArray()))
+      }
+      return columnIDs
+    }
+
+    this.getAllColumnIDs = function () {
+      var allColumnIDs = this.configuration.getAllColumnIDs()
+      if (this.hasInputFile() === true) {
+        allColumnIDs = this.configuration.addUploadColumns(allColumnIDs)
+      }
+      return allColumnIDs
+    }
+
+    this.getSelectListString = function(_includeExtendedCols, formFields) {
+      return this.configuration.getSelectListString(_includeExtendedCols, formFields, this.getAllColumnIDs())
+    }
+
     /**
      * Action to perform before form serialization begins.
      * @private
      */
     this._beforeSerialize = function () {
-      var inputFile = this.$form.find('input:file.target-list')
+      //var inputFile = this.$form.find('input:file.target-list')
 
-      if (
-        inputFile.length > 0 &&
-        !inputFile.prop('disabled') &&
-        inputFile.val() !== ''
-      ) {
+      //if (
+      //  inputFile.length > 0 &&
+      //  !inputFile.prop('disabled') &&
+      //  inputFile.val() !== ''
+      //) {
+
+      if (this.hasInputFile()) {
 
         // Update the file input name with the value from the target list select.
         var resolverSelect = this.$form.find('select.resolver-select')
@@ -1641,6 +1781,7 @@
         // Renaming the field is a terrible idea, but cloning it doesn't work in some browsers.
         // jenkinsd 2017.07.10
         //
+        var inputFile = this.$form.find('input:file.target-list')
         inputFile.prop('name', 'targetList:' + resolverSelect.val())
       }
 
@@ -1685,9 +1826,14 @@
         var netStart = new Date().getTime()
 
         try {
+          var formFieldColumns = []
+          if (this.hasInputFile()) {
+            formFieldColumns.push('targetList')
+          }
           this.$form
             .find('input.' + this.configuration.getName() + '_selectlist')
-            .val(this.configuration.getSelectListString(false))
+            .val(this.getSelectListString(false, formFieldColumns))
+            //.val(this.configuration.getSelectListString(false, formFieldColumns))
         } catch (e) {
           this.cancel()
           alert('Error: ' + e.message)

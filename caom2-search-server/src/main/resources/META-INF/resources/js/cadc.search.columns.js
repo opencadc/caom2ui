@@ -33,6 +33,24 @@
               }
             },
             columnOptions: {
+              'caom2:Upload.target': {
+                tap_column_name: 'Upload.target',
+                label: 'Upload Target',
+                fitMax: true,
+                formField: 'targetList'
+              },
+              'caom2:Upload.ra': {
+                tap_column_name: 'Upload.ra',
+                label: 'Upload Target RA',
+                fitMax: true,
+                formField: 'targetList'
+              },
+              'caom2:Upload.dec': {
+                tap_column_name: 'Upload.dec',
+                label: 'Upload Target Dec',
+                fitMax: true,
+                formField: 'targetList'
+              },
               'caom2:Observation.observationID': {
                 label: 'Obs. ID',
                 fitMax: true,

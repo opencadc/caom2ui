@@ -43,10 +43,11 @@ public class ObservationListQueryGenerator
         sb.append("SELECT ");
         sb.append(adqlGenerator.getSelectList(selectClauseItems));
 
-        if (adqlGenerator.hasUpload())
-        {
-            sb.append(",f.target,f.ra,f.dec,f.radius");
-        }
+//        if (adqlGenerator.hasUpload())
+//        {
+//            sb.append(",f.target as \"Upload Target\"");
+//            sb.append(",f.target,f.ra,f.dec,f.radius");
+//        }
 
         sb.append(" FROM ");
         sb.append(adqlGenerator.getFrom(Plane.class, 2));

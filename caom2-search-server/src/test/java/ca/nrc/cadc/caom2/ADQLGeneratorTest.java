@@ -380,9 +380,10 @@ public class ADQLGeneratorTest extends AbstractUnitTest<ADQLGenerator>
 
         final String fromClause = getTestSubject().getFrom(Plane.class, 2);
 
+        System.out.println("BLAAAAA!!!!!" + fromClause);
         assertEquals("From clause is wrong.",
                      "caom2.Plane AS Plane "
-                     + "JOIN TAP_UPLOAD.search_upload as f on INTERSECTS(POINT('ICRS', f.ra, f.dec), Plane.position_bounds) = 1 "
+                     + "JOIN TAP_UPLOAD.search_upload as Upload on INTERSECTS(POINT('ICRS', Upload.ra, Upload.dec), Plane.position_bounds) = 1 "
                      + "JOIN caom2.Observation AS Observation ON Plane.obsID = Observation.obsID",
                      fromClause);
     }
@@ -398,7 +399,7 @@ public class ADQLGeneratorTest extends AbstractUnitTest<ADQLGenerator>
 
         assertEquals("From clause is wrong.",
                      "ivoa.obscore.Plane AS Plane "
-                     + "JOIN TAP_UPLOAD.search_upload as f on INTERSECTS(POINT('ICRS', f.ra, f.dec), Plane.s_fov) = 1 "
+                     + "JOIN TAP_UPLOAD.search_upload as Upload on INTERSECTS(POINT('ICRS', Upload.ra, Upload.dec), Plane.s_fov) = 1 "
                      + "JOIN ivoa.obscore.Observation AS Observation ON Plane.obsID = Observation.obsID",
                      fromClause);
     }

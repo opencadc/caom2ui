@@ -304,8 +304,9 @@
         adqlText = uwsJobParser.getJob().getParameterValue('QUERY')
 
         var selectListString = this._getActiveForm()
-          .getConfiguration()
-          .getSelectListString(_includeExtendedColumns)
+          .getSelectListString(_includeExtendedColumns, [])
+          //.getConfiguration()
+          //.getSelectListString(_includeExtendedColumns, [])
 
         adqlText =
           'SELECT ' +
@@ -401,6 +402,9 @@
                 }
               }
 
+              // Ouch - hack to make utypes for extra form fields
+              // be added in
+              caomFormConfig.addExtraUtypeFields()
               _searchApp._cleanMetadata(caomFormConfig)
               _searchApp._cleanMetadata(obsCoreFormConfig)
 
@@ -822,6 +826,12 @@
               // Save viewer state from previous search
               preserveColumnState = true
               prevColumns = resultsVOTV.getColumns()
+
+              // Note: known bug here where additional form field columns
+              //  are retained  if the collections set is the same,
+              //  In future, this is the best point in the code to
+              //  remove any formField columns that do not currrently apply
+              // HJ, June 2020
               prevDisplayedColumns = resultsVOTV.getDisplayedColumns()
               prevColumnSelects = resultsVOTV.getUpdatedColumnSelects()
               prevSortOptions['sortcol'] = resultsVOTV.sortcol
@@ -1136,8 +1146,18 @@
           }
 
           // Set the default columns and units.
+          // activeForm.getForm().find("input:file.target-list").length > 0 is available
+          // here if it's right to add the cutcout columns at this point.
           this._setDefaultColumns(resultsVOTV)
           this._setDefaultUnitTypes(resultsVOTV)
+
+          // Check to see if this search has an input file
+          // s 2741 - get values if necessary
+          if (this._getActiveForm().hasInputFile()) {
+            // add targetName & coordinates columns in the results grid
+            // Assuming the search will return these values anyway
+            // (what extra work needs to be done to add these to the ADQL values returned?
+          }
 
           queryOverlay.modal('show')
         }.bind(this)
@@ -1593,8 +1613,17 @@
         !_viewer.getOptions().defaultColumnIDs ||
         _viewer.getOptions().defaultColumnIDs.length === 0
       ) {
-        var $activeFormConfiguration = this._getActiveForm().getConfiguration()
-        _viewer.getOptions().defaultColumnIDs = $activeFormConfiguration.getDefaultColumnIDs()
+        var $activeForm = this._getActiveForm()
+        var $activeFormConfiguration = $activeForm.getConfiguration()
+        //var columnIDs = $activeFormConfiguration.getDefaultColumnIDs()
+        //if ($activeForm.hasInputFile() === true) {
+        //  columnIDs = $activeFormConfiguration.addUploadColumns(columnIDs)
+        //}
+
+        // function will add upload columns if required, based on
+        // how active form is currently filled out
+        var columnIDs = $activeForm.getDefaultColumnIDs()
+        _viewer.getOptions().defaultColumnIDs = columnIDs
       }
     }
 
