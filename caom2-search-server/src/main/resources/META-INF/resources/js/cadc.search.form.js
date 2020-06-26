@@ -173,8 +173,10 @@
      * @return {Metadata|cadc.vot.Metadata}
      */
     this.getResultsTableMetadata = function (columnIDs) {
-      // Current order of column IDs.
-      //var columnIDs = this.config.getAllColumnIDs()
+      // columnIDs are passed in here because the list may need to be
+      // augmented depending on whether form fields are populated or not,
+      // information which is not currently the domain of the FormConfiguration
+      // object, but of the parent Form.
       var currentMetadata = new cadc.vot.Metadata(
         null,
         null,
@@ -265,6 +267,8 @@
       var order
 
       if (uType in this.getColumnOptions()) {
+        // Get full list including any form field columns so
+        // columns don't inadvertently end up with the same order value
         var allColumnIDs = this.config.getCompleteColumnIDList()
         order = allColumnIDs.indexOf(uType)
 
@@ -459,6 +463,9 @@
      * @returns {string}    ADQL Select clause, or empty string.  Never null.
      */
     this.getSelectListString = function (_includeExtendedColumns, formFieldColumns, allColumnIDs) {
+      // column ID list passed in here because it may bee augmented if certain form fields
+      // are filled out (ie target upload.) - that information is part of the parent Form object's
+      // state, not FormConfiguration.
       var selectColumnIDs = allColumnIDs
       var thisColumnOptions = this.getColumnOptions()
       var lowercaseName = this.getName().toLowerCase()
@@ -574,7 +581,13 @@
       return this.config.getDefaultColumnIDs()
     }
 
-    // TODO: add decent docs for this
+    /**
+     * Augment the list provided with additional column IDs associated
+     * with the target upload form field
+     * @param columnIDs
+     * @returns {*|any[]|string}
+     */
+
     this.addUploadColumns = function(columnIDs) {
       return this.config.addUploadColumns(columnIDs)
     }
@@ -628,7 +641,8 @@
     }
 
     /**
-     * Insert column IDs for target upload form field
+     * Augment the list provided with additional column IDs associated
+     * with the target upload form field
      * @param columnIDs
      * @returns {*|any[]|string}
      */
@@ -644,7 +658,7 @@
         this.config.upload_target_ra_id,
         this.config.upload_target_dec_id
       ]
-      var firstEl = columnIDs.slice(0,1); // uri has to be first in display
+      var firstEl = columnIDs.slice(0,1) // uri has to be first in display
       return firstEl.concat(uploadColumnIDs.concat(columnIDs.slice(1, columnIDs.length)))
     }
 
