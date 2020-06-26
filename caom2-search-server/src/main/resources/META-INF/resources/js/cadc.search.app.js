@@ -398,8 +398,9 @@
                 }
               }
 
-              // Ouch - hack to make utypes for extra form fields
-              // be added in
+              // Add utypes for extra form fields (not included in
+              // standard list returned from initial TAP schema call)
+              // Note: can be generalized to support obsCoreFormConfig in future.
               caomFormConfig.addExtraUtypeFields()
               _searchApp._cleanMetadata(caomFormConfig)
               _searchApp._cleanMetadata(obsCoreFormConfig)
@@ -1142,8 +1143,6 @@
           }
 
           // Set the default columns and units.
-          // activeForm.getForm().find("input:file.target-list").length > 0 is available
-          // here if it's right to add the cutcout columns at this point.
           this._setDefaultColumns(resultsVOTV)
           this._setDefaultUnitTypes(resultsVOTV)
 
@@ -1602,11 +1601,6 @@
         _viewer.getOptions().defaultColumnIDs.length === 0
       ) {
         var $activeForm = this._getActiveForm()
-        //var $activeFormConfiguration = $activeForm.getConfiguration()
-        ////var columnIDs = $activeFormConfiguration.getDefaultColumnIDs()
-        ////if ($activeForm.hasInputFile() === true) {
-        ////  columnIDs = $activeFormConfiguration.addUploadColumns(columnIDs)
-        ////}
 
         // getDefaultColumnIDs() will add forom field columns if required, based on
         // how $activeForm is currently filled out

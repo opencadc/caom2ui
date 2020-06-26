@@ -390,7 +390,7 @@
         order
       )
 
-      order = allColumnIDs.indexOf(utypeConfig.upload_target_ra_id)
+      order = allColumnIDs.indexOf(utypeConfig.upload_target_dec_id)
       this._addFieldsForUType(
         utypeConfig.upload_target_dec_id,
         ucd,
