@@ -302,11 +302,7 @@
         var jobJSON = JSON.parse(jobString)
         var uwsJobParser = new ca.nrc.cadc.search.uws.json.UWSJobParser(jobJSON)
         adqlText = uwsJobParser.getJob().getParameterValue('QUERY')
-
-        var selectListString = this._getActiveForm()
-          .getSelectListString(_includeExtendedColumns, [])
-          //.getConfiguration()
-          //.getSelectListString(_includeExtendedColumns, [])
+        var selectListString = this._getActiveForm().getSelectListString(_includeExtendedColumns)
 
         adqlText =
           'SELECT ' +
@@ -1151,14 +1147,6 @@
           this._setDefaultColumns(resultsVOTV)
           this._setDefaultUnitTypes(resultsVOTV)
 
-          // Check to see if this search has an input file
-          // s 2741 - get values if necessary
-          if (this._getActiveForm().hasInputFile()) {
-            // add targetName & coordinates columns in the results grid
-            // Assuming the search will return these values anyway
-            // (what extra work needs to be done to add these to the ADQL values returned?
-          }
-
           queryOverlay.modal('show')
         }.bind(this)
 
@@ -1614,14 +1602,14 @@
         _viewer.getOptions().defaultColumnIDs.length === 0
       ) {
         var $activeForm = this._getActiveForm()
-        var $activeFormConfiguration = $activeForm.getConfiguration()
-        //var columnIDs = $activeFormConfiguration.getDefaultColumnIDs()
-        //if ($activeForm.hasInputFile() === true) {
-        //  columnIDs = $activeFormConfiguration.addUploadColumns(columnIDs)
-        //}
+        //var $activeFormConfiguration = $activeForm.getConfiguration()
+        ////var columnIDs = $activeFormConfiguration.getDefaultColumnIDs()
+        ////if ($activeForm.hasInputFile() === true) {
+        ////  columnIDs = $activeFormConfiguration.addUploadColumns(columnIDs)
+        ////}
 
-        // function will add upload columns if required, based on
-        // how active form is currently filled out
+        // getDefaultColumnIDs() will add forom field columns if required, based on
+        // how $activeForm is currently filled out
         var columnIDs = $activeForm.getDefaultColumnIDs()
         _viewer.getOptions().defaultColumnIDs = columnIDs
       }

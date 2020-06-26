@@ -530,7 +530,7 @@ public abstract class AbstractPersistenceService implements PersistenceService {
     }
 
     public String getColumnName(String utype) {
-        LOGGER.info("getColumnName: " + utype);
+        LOGGER.debug("getColumnName: " + utype);
         try {
             final String column =
                     ObsModel.getObsCoreName(utype.replaceAll("_", "."));

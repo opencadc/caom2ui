@@ -36,20 +36,71 @@
               'caom2:Upload.target': {
                 tap_column_name: 'Upload.target',
                 label: 'Upload Target',
-                fitMax: true,
+                fitMax: false,
+                width: 210,
                 formField: 'targetList'
               },
               'caom2:Upload.ra': {
                 tap_column_name: 'Upload.ra',
+                datatype: 'double',
                 label: 'Upload Target RA',
-                fitMax: true,
-                formField: 'targetList'
+                formField: 'targetList',
+                fitMax: false,
+                width: 130,
+                converter: 'RAConverter',
+                valueFormatter: function (value, column) {
+                  return formatUnit(value, column, 'hms')
+                },
+                formatter: function (row, cell, value, columnDef) {
+                  return formatOutputHTML(
+                    formatUnit(value, columnDef, 'hms') || Number.NaN,
+                    columnDef.utype,
+                    value
+                  )
+                },
+                header: {
+                  units: [{
+                    label: 'H:M:S',
+                    value: 'hms',
+                    default: true
+                  },
+                    {
+                      label: 'Degrees',
+                      value: 'DEGREES'
+                    }
+                  ]
+                }
               },
               'caom2:Upload.dec': {
                 tap_column_name: 'Upload.dec',
+                dataypte: "double",
                 label: 'Upload Target Dec',
-                fitMax: true,
-                formField: 'targetList'
+                fitMax: false,
+                formField: 'targetList',
+                width: 140,
+                converter: 'DECConverter',
+                valueFormatter: function (value, column) {
+                  return formatUnit(value, column, 'dms')
+                },
+                formatter: function (row, cell, value, columnDef) {
+                  return formatOutputHTML(
+                    formatUnit(value, columnDef, 'dms') || Number.NaN,
+                    columnDef.utype,
+                    value
+                  )
+                },
+                header: {
+                  units: [{
+                    label: 'D:M:S',
+                    value: 'dms',
+                    default: true
+                  },
+                    {
+                      label: 'Degrees',
+                      value: 'DEGREES'
+                    }
+                  ]
+                }
               },
               'caom2:Observation.observationID': {
                 label: 'Obs. ID',

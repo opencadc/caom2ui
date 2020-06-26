@@ -259,8 +259,6 @@ public class ADQLGenerator extends AbstractPersistenceService {
         tableMap.put(Observation.class, "Observation");
         tableMap.put(Plane.class, "Plane");
 
-        // TODO: add TAP_UPLOAD.search_upload in here as a tableMap?
-
         // class -> alias, String -> String
         aliasMap = new TreeMap<>(new ClassComp());
 
@@ -304,9 +302,6 @@ public class ADQLGenerator extends AbstractPersistenceService {
                     query.append(" JOIN TAP_UPLOAD.");
                     query.append(table);
                     query.append(" as " + SEARCH_UPLOAD_TABLE + " on ");
-
-                    // TODO: here is where the search_upload values would be quereied
-                    // to get the target name & ra & dec
 
                     if (StringUtil.hasText(getUploadResolver())
                             && getUploadResolver().equals("OBJECT")) {
@@ -361,9 +356,8 @@ public class ADQLGenerator extends AbstractPersistenceService {
             if (ea.length == 1) // expression
             {
                 final String selectItem = getExpression(ea[0]);
-
                 sb.append(selectItem);
-//                sb.append(", ");
+
             } else if ((ea.length >= 3) && "AS".equalsIgnoreCase(ea[1])) {
                 final String as = " " + ea[1] + " ";
                 final int startAlias = trimItem.indexOf(as) + 4;
@@ -372,7 +366,6 @@ public class ADQLGenerator extends AbstractPersistenceService {
                 sb.append(selectItem);
                 sb.append(" AS ");
                 sb.append(trimItem.substring(startAlias));
-//                sb.append(", ");
             } else {
                 throw new IllegalArgumentException(
                     "failed to parse select list: found " + ea.length
@@ -382,14 +375,12 @@ public class ADQLGenerator extends AbstractPersistenceService {
         }
 
         if (hasUpload()) {
-//            sb.append(prefix + SEARCH_UPLOAD_TABLE + ".target AS \"Upload Target\"");
-//            sb.append(prefix + SEARCH_UPLOAD_TABLE + ".ra AS \"Upload RA\"");
-//            sb.append(prefix + SEARCH_UPLOAD_TABLE + ".dec AS \"Upload DEC\"");
+            // Upload target, ra and dec come in to the service as part of the
+            // list of requested columns. Only radius needs to be added.
             sb.append(prefix + SEARCH_UPLOAD_TABLE + ".radius");
         }
 
         return sb.toString();
-//        return sb.substring(0, sb.length() - 2); // strip last comma-space
     }
 
     private String getExpression(final String e) {
@@ -418,16 +409,16 @@ public class ADQLGenerator extends AbstractPersistenceService {
                 } else {
                     sb.append(getColumnName(item));
                 }
-
                 sb.append(", ");
             }
 
             sb.delete(sb.length() - 2, sb.length());
         } else {
             if (e.contains("Upload") || !e.contains(".")) {
+                // Upload classes aren't mapped and added to the query without
+                // the extra condition here
                 sb.append(e);
             } else {
-                // fall through for obscore search?
                 LOGGER.debug("Looking up " + e);
                 sb.append(getColumnName(e));
             }
