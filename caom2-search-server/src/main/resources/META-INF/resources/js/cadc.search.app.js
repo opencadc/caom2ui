@@ -824,10 +824,15 @@
               preserveColumnState = true
               prevColumns = resultsVOTV.getColumns()
 
-              // Note: known bug here where additional form field columns
-              //  are retained  if the collections set is the same,
-              //  In future, this is the best point in the code to
-              //  remove any formField columns that do not currrently apply
+              // Note: Results table column state is retained if the collection
+              // set selected is the same from one search to the next.
+              //  If an upload target file was used, additional columns will be
+              // added to the results table. If the results table is removed from
+              // the search, and the collections set stays the same, these additional
+              // columns are left in the results column (empty, as the search will return
+              // no data for them.) Expected behaviour is the columns would only be
+              // displayed if a target upload file is in the current search.
+              // Issue opened in github: https://github.com/opencadc/caom2ui/issues/182
               // HJ, June 2020
               prevDisplayedColumns = resultsVOTV.getDisplayedColumns()
               prevColumnSelects = resultsVOTV.getUpdatedColumnSelects()

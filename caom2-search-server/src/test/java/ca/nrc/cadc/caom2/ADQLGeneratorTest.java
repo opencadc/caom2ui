@@ -380,7 +380,6 @@ public class ADQLGeneratorTest extends AbstractUnitTest<ADQLGenerator>
 
         final String fromClause = getTestSubject().getFrom(Plane.class, 2);
 
-        System.out.println("BLAAAAA!!!!!" + fromClause);
         assertEquals("From clause is wrong.",
                      "caom2.Plane AS Plane "
                      + "JOIN TAP_UPLOAD.search_upload as Upload on INTERSECTS(POINT('ICRS', Upload.ra, Upload.dec), Plane.position_bounds) = 1 "

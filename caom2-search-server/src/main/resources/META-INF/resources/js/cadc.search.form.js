@@ -1842,14 +1842,6 @@
      * @private
      */
     this._beforeSerialize = function () {
-      //var inputFile = this.$form.find('input:file.target-list')
-
-      //if (
-      //  inputFile.length > 0 &&
-      //  !inputFile.prop('disabled') &&
-      //  inputFile.val() !== ''
-      //) {
-
       if (this.hasInputFile()) {
 
         // Update the file input name with the value from the target list select.
@@ -1910,7 +1902,6 @@
           this.$form
             .find('input.' + this.configuration.getName() + '_selectlist')
             .val(this.getSelectListString(false, formFieldColumns))
-            //.val(this.configuration.getSelectListString(false, formFieldColumns))
 
         } catch (e) {
           this.cancel()
