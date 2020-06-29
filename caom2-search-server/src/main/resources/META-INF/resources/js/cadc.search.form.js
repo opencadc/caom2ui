@@ -40,7 +40,10 @@
                 footprint_column_id: 'caom2:Plane.position.bounds',
                 ra_column_id: 'caom2:Plane.position.bounds.cval1',
                 dec_column_id: 'caom2:Plane.position.bounds.cval2',
-                fov_column_id: 'caom2:Plane.position.bounds.area'
+                fov_column_id: 'caom2:Plane.position.bounds.area',
+                upload_target_name_id: 'caom2:Upload.target',
+                upload_target_ra_id: 'caom2:Upload.ra',
+                upload_target_dec_id: 'caom2:Upload.dec',
               }
             },
             ObsCore: {
@@ -53,7 +56,10 @@
                 footprint_column_id: 'obscore:Char.SpatialAxis.Coverage.Support.Area',
                 ra_column_id: 'obscore:Char.SpatialAxis.Coverage.Location.Coord.Position2D.Value2.C1',
                 dec_column_id: 'obscore:Char.SpatialAxis.Coverage.Location.Coord.Position2D.Value2.C2',
-                fov_column_id: 'obscore:Char.SpatialAxis.Coverage.Bounds.Extent.diameter'
+                fov_column_id: 'obscore:Char.SpatialAxis.Coverage.Bounds.Extent.diameter',
+                upload_target_name_id: 'obscore:Upload.target',
+                upload_target_ra_id: 'obscore:Upload.ra',
+                upload_target_dec_id: 'obscore:Upload.dec',
               }
             },
             types: {
@@ -65,7 +71,10 @@
                 footprint_column_id: 'caom2:Plane.position.bounds',
                 ra_column_id: 'caom2:Plane.position.bounds.cval1',
                 dec_column_id: 'caom2:Plane.position.bounds.cval2',
-                fov_column_id: 'caom2:Plane.position.bounds.area'
+                fov_column_id: 'caom2:Plane.position.bounds.area',
+                upload_target_name_id: 'caom2:Upload.target',
+                upload_target_ra_id: 'caom2:Upload.ra',
+                upload_target_dec_id: 'caom2:Upload.dec',
               },
               ObsCore: {
                 id: 'ObsCore',
@@ -75,7 +84,10 @@
                 footprint_column_id: 'obscore:Char.SpatialAxis.Coverage.Support.Area',
                 ra_column_id: 'obscore:Char.SpatialAxis.Coverage.Location.Coord.Position2D.Value2.C1',
                 dec_column_id: 'obscore:Char.SpatialAxis.Coverage.Location.Coord.Position2D.Value2.C2',
-                fov_column_id: 'obscore:Char.SpatialAxis.Coverage.Bounds.Extent.diameter'
+                fov_column_id: 'obscore:Char.SpatialAxis.Coverage.Bounds.Extent.diameter',
+                upload_target_name_id: 'obscore:Upload.target',
+                upload_target_ra_id: 'obscore:Upload.ra',
+                upload_target_dec_id: 'obscore:Upload.dec',
               }
             },
             SearchForm: SearchForm,
@@ -160,9 +172,11 @@
      *
      * @return {Metadata|cadc.vot.Metadata}
      */
-    this.getResultsTableMetadata = function () {
-      // Current order of column IDs.
-      var columnIDs = this.config.getAllColumnIDs()
+    this.getResultsTableMetadata = function (columnIDs) {
+      // columnIDs are passed in here because the list may need to be
+      // augmented depending on whether form fields are populated or not,
+      // information which is not currently the domain of the FormConfiguration
+      // object, but of the parent Form.
       var currentMetadata = new cadc.vot.Metadata(
         null,
         null,
@@ -253,7 +267,9 @@
       var order
 
       if (uType in this.getColumnOptions()) {
-        var allColumnIDs = this.config.getAllColumnIDs()
+        // Get full list including any form field columns so
+        // columns don't inadvertently end up with the same order value
+        var allColumnIDs = this.config.getCompleteColumnIDList()
         order = allColumnIDs.indexOf(uType)
 
         this._addFieldsForUType(
@@ -340,6 +356,58 @@
     }
 
     /**
+     * Add fields for utypes not associated with fields currently part
+     * of the standard table metadata (ie not part of the TAP schema returned
+     * at page startup time.)
+     */
+    this.addExtraUtypeFields = function () {
+      var utypeConfig = this.config.getConfig()
+      var ucd = ""
+      var unit = ""
+      var datatype = "char"
+      var arraySize = 0
+      var description = "target upload file data identifier"
+      var xtype = ""
+      var allColumnIDs = this.config.getCompleteColumnIDList()
+
+      var order = allColumnIDs.indexOf(utypeConfig.upload_target_name_id)
+      this._addFieldsForUType(
+        utypeConfig.upload_target_name_id,
+        ucd,
+        unit,
+        datatype,
+        undefined,
+        description,
+        xtype,
+        order
+      )
+
+      order = allColumnIDs.indexOf(utypeConfig.upload_target_ra_id)
+      this._addFieldsForUType(
+        utypeConfig.upload_target_ra_id,
+        ucd,
+        unit,
+        datatype,
+        undefined,
+        description,
+        xtype,
+        order
+      )
+
+      order = allColumnIDs.indexOf(utypeConfig.upload_target_dec_id)
+      this._addFieldsForUType(
+        utypeConfig.upload_target_dec_id,
+        ucd,
+        unit,
+        datatype,
+        undefined,
+        description,
+        xtype,
+        order
+      )
+    }
+
+    /**
      * Iterate through all of the individual columns for the given UType, and
      * add them to the table metadata, if appropriate.
      *
@@ -394,8 +462,11 @@
      * @param {boolean} _includeExtendedColumns   Flag to indicate whether extended (hidden) columns are to be included.
      * @returns {string}    ADQL Select clause, or empty string.  Never null.
      */
-    this.getSelectListString = function (_includeExtendedColumns) {
-      var selectColumnIDs = this.config.getAllColumnIDs()
+    this.getSelectListString = function (_includeExtendedColumns, formFieldColumns, allColumnIDs) {
+      // column ID list passed in here because it may bee augmented if certain form fields
+      // are filled out (ie target upload.) - that information is part of the parent Form object's
+      // state, not FormConfiguration.
+      var selectColumnIDs = allColumnIDs
       var thisColumnOptions = this.getColumnOptions()
       var lowercaseName = this.getName().toLowerCase()
       var selectListString = ''
@@ -405,7 +476,14 @@
         if (columnID.indexOf(lowercaseName) === 0) {
           var field = thisColumnOptions[columnID]
           if (field) {
-            if (!field.extended || _includeExtendedColumns) {
+            // First clause of this next if covers all regular columns
+            // Second clause here will include any extended columns that are part of
+            // the data set but not linked to a particular form field
+            // Third clause will include any columns specific to a named form field
+            if ( (typeof(field.extended) === 'undefined') && (typeof(field.formField) === 'undefined')
+              || ((typeof(field.extended) !== 'undefined') && _includeExtendedColumns)
+              || ((typeof(field.formField) !== 'undefined') && formFieldColumns.includes(field.formField)) )
+            {
               var selector = this._getSelect(columnID, field)
               var selectorSplit = selector.split(/\.(.+)/)
               var selectorValue
@@ -504,6 +582,17 @@
     }
 
     /**
+     * Augment the list provided with additional column IDs associated
+     * with the target upload form field
+     * @param columnIDs
+     * @returns {*|any[]|string}
+     */
+
+    this.addUploadColumns = function(columnIDs) {
+      return this.config.addUploadColumns(columnIDs)
+    }
+
+    /**
      * Obtain a hash of default unit types.
      * @return {{}}
      * @deprecated    Use FormConfiguration.getDefaultUnitTypes().
@@ -552,6 +641,28 @@
     }
 
     /**
+     * Augment the list provided with additional column IDs associated
+     * with the target upload form field
+     * @param columnIDs
+     * @returns {*|any[]|string}
+     */
+    this.addUploadColumns = function(columnIDs) {
+      // upload cols need to be in display order
+      // add this bundle right after the 'Preview' column
+
+      // NOTE: this function could be generalized to add fields for a named
+      // form field. Complications may occur in making the order of the columns
+      // sane if more than one form field with columns associated is used.
+      var uploadColumnIDs = [
+        this.config.upload_target_name_id,
+        this.config.upload_target_ra_id,
+        this.config.upload_target_dec_id
+      ]
+      var firstEl = columnIDs.slice(0,1) // uri has to be first in display
+      return firstEl.concat(uploadColumnIDs.concat(columnIDs.slice(1, columnIDs.length)))
+    }
+
+    /**
      * Obtain the full set of column IDs that will be in the select list, based
      * on some conditions at search time.
      *
@@ -560,6 +671,19 @@
     this.getAllColumnIDs = function () {
       var selectedCollections = this._getSelectedCollections()
       return this.columnBundleManager.getAllColumnIDs(selectedCollections)
+    }
+
+    /**
+     * Get list of all columns for the selected collections, plus any
+     * additional form field-related columns.
+     *
+     * Used for initializing results table metadata.
+     * @returns {*|any[]|string}
+     */
+    this.getCompleteColumnIDList = function () {
+      var selectedCollections = this._getSelectedCollections()
+      var completeIDList = this.columnBundleManager.getAllColumnIDs(selectedCollections)
+      return this.addUploadColumns(completeIDList)
     }
 
     /**
@@ -599,6 +723,30 @@
      */
     this.getDefaultColumnIDs = function () {
       return this.columnBundleManager.getDefaultColumnIDs([this.config.id])
+    }
+
+    /**
+     * Get column ID list for all possible columns, with any additional form field
+     * related columns added
+     * @returns {*[]}
+     */
+    this.getCompleteColumnIDList = function () {
+      // For now, there are no upload columns to add for obscore
+      // The upload function doesn't work (as of June 2020) and needs
+      // to be fixed, so this function will be upgraded at that point
+      return this.getAllColumnIDs()
+    }
+
+    /**
+     * Add/insert columns to the list provided
+     * @param columnIDs
+     * @returns {*}
+     */
+    this.addUploadColumns = function(columnIDs) {
+      // For now, there are no upload columns to add for obscore
+      // The upload function doesn't work (as of June 2020) and needs
+      // to be fixed, so this function will be upgraded at that point
+      return columnIDs
     }
 
     /**
@@ -1343,7 +1491,8 @@
      * @returns {cadc.vot.Metadata|*}
      */
     this.getResultsTableMetadata = function () {
-      return this.configuration.getResultsTableMetadata()
+      var columnIDs = this.getAllColumnIDs()
+      return this.configuration.getResultsTableMetadata(columnIDs)
     }
 
     /**
@@ -1623,17 +1772,77 @@
     }
 
     /**
+     * Check current form to see if upload target file is given
+     * @returns {boolean}
+     */
+    this.hasInputFile = function () {
+      var inputFile = this.$form.find('input:file.target-list')
+
+      return (inputFile.length > 0 &&
+        !inputFile.prop('disabled') &&
+        inputFile.val() !== '')
+    }
+
+    /**
+     * Get list of default column IDs to be displayed as part of results.
+     * Add any columns associated with form fields used in current search.
+     * @returns {*[]}
+     */
+    this.getDefaultColumnIDs = function() {
+      var columnIDs = this.configuration.getDefaultColumnIDs()
+
+      // Note: to generalize thie pattern, a function could be placed
+      // here to check if any columns in the column definitions have 'formField' as
+      // a parameter, and cross that with which of the form fields are currently
+      // populated in the active form.
+      // For now, this supports the Target Upload file field only.
+      if (this.hasInputFile() === true) {
+        // functions that use this are expecting a jquery object
+        columnIDs = $(this.configuration.addUploadColumns(columnIDs.toArray()))
+      }
+      return columnIDs
+    }
+
+    /**
+     * Get list of all column IDs that can be displayed as part of results.
+     * Add any columns associated with form fields used in current search.
+     * @returns {*[]}
+     */
+    this.getAllColumnIDs = function () {
+      var allColumnIDs = this.configuration.getAllColumnIDs()
+      // Note: to generalize thie pattern, a function could be placed
+      // here to check if any columns in the column definitions have 'formField' as
+      // a parameter, and cross that with which of the form fields are currently
+      // populated in the active form.
+      // For now, this supports the Target Upload file field only.
+
+      if (this.hasInputFile() === true) {
+        allColumnIDs = this.configuration.addUploadColumns(allColumnIDs)
+      }
+      return allColumnIDs
+    }
+
+    /**
+     * Get fields needed to generate an ADQL select list, based on how
+     * the current form is filled out.
+     *
+     * @param _includeExtendedCols
+     * @returns {string}
+     */
+    this.getSelectListString = function(_includeExtendedCols) {
+      var formFields= []
+      if (this.hasInputFile()) {
+        formFields.push('targetList')
+      }
+      return this.configuration.getSelectListString(_includeExtendedCols, formFields, this.getAllColumnIDs())
+    }
+
+    /**
      * Action to perform before form serialization begins.
      * @private
      */
     this._beforeSerialize = function () {
-      var inputFile = this.$form.find('input:file.target-list')
-
-      if (
-        inputFile.length > 0 &&
-        !inputFile.prop('disabled') &&
-        inputFile.val() !== ''
-      ) {
+      if (this.hasInputFile()) {
 
         // Update the file input name with the value from the target list select.
         var resolverSelect = this.$form.find('select.resolver-select')
@@ -1641,6 +1850,7 @@
         // Renaming the field is a terrible idea, but cloning it doesn't work in some browsers.
         // jenkinsd 2017.07.10
         //
+        var inputFile = this.$form.find('input:file.target-list')
         inputFile.prop('name', 'targetList:' + resolverSelect.val())
       }
 
@@ -1685,9 +1895,14 @@
         var netStart = new Date().getTime()
 
         try {
+          var formFieldColumns = []
+          if (this.hasInputFile()) {
+            formFieldColumns.push('targetList')
+          }
           this.$form
             .find('input.' + this.configuration.getName() + '_selectlist')
-            .val(this.configuration.getSelectListString(false))
+            .val(this.getSelectListString(false, formFieldColumns))
+
         } catch (e) {
           this.cancel()
           alert('Error: ' + e.message)

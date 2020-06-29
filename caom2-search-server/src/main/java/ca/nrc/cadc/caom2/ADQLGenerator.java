@@ -22,6 +22,7 @@ public class ADQLGenerator extends AbstractPersistenceService {
     private static final String CAOM2_TIME_UTYPE = "Plane.time.bounds.samples";
     private static final String OBSCORE_ENERGY_UTYPE = "Char.SpectralAxis.Coverage.Bounds.Limits";
     private static final String OBSCORE_TIME_UTYPE = "Char.TemporalAxis.Coverage.Bounds.Limits";
+    private static final String SEARCH_UPLOAD_TABLE = "Upload";
 
 
     private static Logger LOGGER = Logger.getLogger(ADQLGenerator.class);
@@ -300,16 +301,17 @@ public class ADQLGenerator extends AbstractPersistenceService {
 
                     query.append(" JOIN TAP_UPLOAD.");
                     query.append(table);
-                    query.append(" as f on ");
+                    query.append(" as " + SEARCH_UPLOAD_TABLE + " on ");
 
                     if (StringUtil.hasText(getUploadResolver())
                             && getUploadResolver().equals("OBJECT")) {
                         query.append(a2);
                         query.append(".");
                         query.append(getTargetNameField());
-                        query.append(" = f.target");
+                        query.append(" = " + SEARCH_UPLOAD_TABLE + ".target");
                     } else {
-                        query.append("INTERSECTS(POINT('ICRS', f.ra, f.dec), ");
+                        query.append("INTERSECTS(POINT('ICRS', " + SEARCH_UPLOAD_TABLE + ".ra, "
+                            + SEARCH_UPLOAD_TABLE + ".dec), ");
                         query.append(a1);
                         query.append(".");
                         query.append(getTargetCoordField());
@@ -346,15 +348,16 @@ public class ADQLGenerator extends AbstractPersistenceService {
         final StringBuilder sb = new StringBuilder();
         final String[] parts = utypeSelectList.split(",");
 
+        String prefix = "";
         for (final String item : parts) {
             final String trimItem = item.trim();
             final String[] ea = trimItem.split(" ");
+            sb.append(prefix);
             if (ea.length == 1) // expression
             {
                 final String selectItem = getExpression(ea[0]);
-
                 sb.append(selectItem);
-                sb.append(", ");
+
             } else if ((ea.length >= 3) && "AS".equalsIgnoreCase(ea[1])) {
                 final String as = " " + ea[1] + " ";
                 final int startAlias = trimItem.indexOf(as) + 4;
@@ -363,15 +366,21 @@ public class ADQLGenerator extends AbstractPersistenceService {
                 sb.append(selectItem);
                 sb.append(" AS ");
                 sb.append(trimItem.substring(startAlias));
-                sb.append(", ");
             } else {
                 throw new IllegalArgumentException(
-                        "failed to parse select list: found " + ea.length
-                                + " tokens in '" + trimItem + "'");
+                    "failed to parse select list: found " + ea.length
+                        + " tokens in '" + trimItem + "'");
             }
+            prefix = ", ";
         }
 
-        return sb.substring(0, sb.length() - 2); // strip last comma-space
+        if (hasUpload()) {
+            // Upload target, ra and dec come in to the service as part of the
+            // list of requested columns. Only radius needs to be added.
+            sb.append(prefix + SEARCH_UPLOAD_TABLE + ".radius");
+        }
+
+        return sb.toString();
     }
 
     private String getExpression(final String e) {
@@ -400,13 +409,14 @@ public class ADQLGenerator extends AbstractPersistenceService {
                 } else {
                     sb.append(getColumnName(item));
                 }
-
                 sb.append(", ");
             }
 
             sb.delete(sb.length() - 2, sb.length());
         } else {
-            if (!e.contains(".")) {
+            if (e.contains("Upload") || !e.contains(".")) {
+                // Upload classes aren't mapped and added to the query without
+                // the extra condition here
                 sb.append(e);
             } else {
                 LOGGER.debug("Looking up " + e);

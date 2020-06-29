@@ -302,10 +302,7 @@
         var jobJSON = JSON.parse(jobString)
         var uwsJobParser = new ca.nrc.cadc.search.uws.json.UWSJobParser(jobJSON)
         adqlText = uwsJobParser.getJob().getParameterValue('QUERY')
-
-        var selectListString = this._getActiveForm()
-          .getConfiguration()
-          .getSelectListString(_includeExtendedColumns)
+        var selectListString = this._getActiveForm().getSelectListString(_includeExtendedColumns)
 
         adqlText =
           'SELECT ' +
@@ -401,6 +398,10 @@
                 }
               }
 
+              // Add utypes for extra form fields (not included in
+              // standard list returned from initial TAP schema call)
+              // Note: can be generalized to support obsCoreFormConfig in future.
+              caomFormConfig.addExtraUtypeFields()
               _searchApp._cleanMetadata(caomFormConfig)
               _searchApp._cleanMetadata(obsCoreFormConfig)
 
@@ -822,6 +823,17 @@
               // Save viewer state from previous search
               preserveColumnState = true
               prevColumns = resultsVOTV.getColumns()
+
+              // Note: Results table column state is retained if the collection
+              // set selected is the same from one search to the next.
+              //  If an upload target file was used, additional columns will be
+              // added to the results table. If the results table is removed from
+              // the search, and the collections set stays the same, these additional
+              // columns are left in the results column (empty, as the search will return
+              // no data for them.) Expected behaviour is the columns would only be
+              // displayed if a target upload file is in the current search.
+              // Issue opened in github: https://github.com/opencadc/caom2ui/issues/182
+              // HJ, June 2020
               prevDisplayedColumns = resultsVOTV.getDisplayedColumns()
               prevColumnSelects = resultsVOTV.getUpdatedColumnSelects()
               prevSortOptions['sortcol'] = resultsVOTV.sortcol
@@ -1593,8 +1605,12 @@
         !_viewer.getOptions().defaultColumnIDs ||
         _viewer.getOptions().defaultColumnIDs.length === 0
       ) {
-        var $activeFormConfiguration = this._getActiveForm().getConfiguration()
-        _viewer.getOptions().defaultColumnIDs = $activeFormConfiguration.getDefaultColumnIDs()
+        var $activeForm = this._getActiveForm()
+
+        // getDefaultColumnIDs() will add forom field columns if required, based on
+        // how $activeForm is currently filled out
+        var columnIDs = $activeForm.getDefaultColumnIDs()
+        _viewer.getOptions().defaultColumnIDs = columnIDs
       }
     }
 
