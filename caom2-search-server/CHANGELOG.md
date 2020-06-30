@@ -1,3 +1,7 @@
+## June 29th, 2020
+### 2.12.3
+* Minor change: Upload target, RA and Dec added to search results if Upload Targets
+file is used.  
 
 ## June 9th, 2020
 ### 2.12.2
