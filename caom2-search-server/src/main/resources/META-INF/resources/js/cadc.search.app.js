@@ -1066,62 +1066,144 @@
           downloadFormSubmit.off().click(function (event) {
             event.preventDefault()
 
+            // Behaviour here depends on whether request contains
+            // a target upload file or not
+            var fromInputForm = this._getActiveForm().hasInputFile();
+            var downloadTuples = [];
+
+            // clear hidden inputs from any prior searches first
             downloadForm.find("input[name='uri']").remove()
 
+            // Collect & prepare data to be submitted
             if (resultsVOTV.getSelectedRows().length <= 0) {
               translated_message = downloadForm.find('span#NO_OBSERVATIONS_SELECTED_MESSAGE').text()
               alert(translated_message)
             } else {
               var selectedRows = resultsVOTV.getSelectedRows()
               for (
-                  var arrIndex = 0, srl = selectedRows.length; arrIndex < srl; arrIndex++
+                var arrIndex = 0, srl = selectedRows.length; arrIndex < srl; arrIndex++
               ) {
                 var $nextRow = resultsVOTV.getRow(selectedRows[arrIndex])
-                var $nextPlaneURI =
-                        $nextRow['caom2:Plane.publisherID.downloadable']
+                // uri is used for both formats
+                var $nextPlaneURI = $nextRow['caom2:Plane.publisherID.downloadable']
 
-                var $input = $('<input>')
-                $input.prop('type', 'hidden')
-                $input.prop('name', 'uri')
-                $input.prop('id', $nextPlaneURI)
-                $input.val($nextPlaneURI)
+                // check for use of target upload file
+                if (fromInputForm) {
+                  // set up tuples
+                  // get these values from upload target columns
+                  // for these variables
+                  var $nextPlaneTargetName = $nextRow['caom2:Upload.target']
+                  var $nextPlaneShape = $nextRow['caom2:Plane.position.bounds']
 
-                downloadForm.append($input)
+                  var tuple = {
+                    "label" : $nextPlaneTargetName,
+                    "shape" : $nextPlaneShape,
+                    "tupleID" : $nextPlaneURI
+                  }
+
+                  downloadTuples.push(tuple)
+
+                } else {
+                  // hidden input used for resolver form only
+                  var $input = $('<input>')
+                  $input.prop('type', 'hidden')
+                  $input.prop('name', 'uri')
+                  $input.prop('id', $nextPlaneURI)
+                  $input.val($nextPlaneURI)
+
+                  downloadForm.append($input)
+                }
               }
 
               // Story 1566, when all 'Product Types'
               // checkboxes are checked, do not send any
+              // both (2739) - although I wonder if the 'all checked' check
+              //being done twice is necessary (after the submit, for example.)
               var allChecked =
-                      downloadForm
-                          .find('input.product_type_option_flag')
-                          .not(':checked').length === 0
+                    downloadForm
+                      .find('input.product_type_option_flag')
+                      .not(':checked').length === 0
               if (allChecked) {
                 // disable all 'Product Types' checkboxes
                 $.each(
-                    downloadForm.find('input.product_type_option_flag:checked'),
-                    function () {
-                      $(this).prop('disabled', true)
-                    }
+                  downloadForm.find('input.product_type_option_flag:checked'),
+                  function () {
+                    $(this).prop('disabled', true)
+                  }
                 )
               }
 
-              window.open('', 'DOWNLOAD', '')
-              downloadForm.submit()
+              // Now get down to submitting the data
+              if (fromInputForm) {
+                // iterate through downloadTuples and make the badgerfish json
+                var badgerfishTuples = "";
+                for (i=0; i<downloadTuples.length; i++) {
+                  var tupleJSON = "{\"tuple\":{\"tupleID\":{\"$\":\"" + downloadTuples[i].tupleID + "\"}," +
+                    "\"shape\":{\"$\":\"" + downloadTuples[i].shape + "\"}," +
+                    "\"label\":{\"$\":\"" + downloadTuples[i].label + "\"}}}";
+                  badgerfishTuples += tupleJSON + ","; // add another badgerfish beast on here..
+                }
+                // trim off last ','
+                badgerfishTuples = badgerfishTuples.substr(0, badgerfishTuples.length-1);
+                // Should be 'stringified' enough at this point to add to the payload/data
+                // attribute of the $.ajax call below
+                var jsonTuples = "{\"tupleList\":{\"$\":[" + badgerfishTuples + "]}}";
 
+                var multiPartData = new FormData()
+                // Q: where does 'runid' live?
+
+                var runID = downloadForm.find("input[name='fragment']")
+                  .val()
+                  .substring(6)
+                multiPartData.append('runId', runID)
+
+                // 'Blob' type is requred to have the 'filename="blob" parameter added
+                // to the multipart section, and have the Content-type header added
+                multiPartData.append('blob', new Blob([jsonTuples], {
+                  type: 'application/json; charset=utf-8'
+                }))
+
+                $.ajax({
+                  url: '/downloadManager/download',
+                  type: 'POST',
+                  processData: false,
+                  contentType: 'multipart/form-data',
+                  enctype: 'multipart/form-data',
+                  contentType: false,
+                  data: multiPartData
+                })
+                .done(function (data) {
+                  var win = window.open()
+                  // Q: does this work for all browsers??
+                  win.document.write(data)
+                })
+                .fail(function (jqXHR, textStatus, errorThrown) {
+                  alert(errorThrown)
+                });
+
+              } else {
+                // do original call
+                window.open('', 'DOWNLOAD', '')
+                downloadForm.submit()
+              }
+
+              // needs to happen for both searches - (2739)
               // Story 1566, re-enable all product types
               // checkbox
               if (allChecked) {
                 // re-enable all 'Product Types'
                 // checkboxes
                 $.each(
-                    downloadForm.find('input.product_type_option_flag:checked'),
-                    function () {
-                      $(this).prop('disabled', false)
-                    }
+                  downloadForm.find('input.product_type_option_flag:checked'),
+                  function () {
+                    $(this).prop('disabled', false)
+                  }
                 )
               }
+
+              //*** original code ends here - TODO: remove this after testing
             }
-          })
+          }.bind(this))
 
           $('#results_bookmark').click(
               function (event) {
@@ -1237,6 +1319,33 @@
     }
 
     // End initForms function.
+
+    this.getFormData = function(FormData, data, name){
+        name = name || '';
+        if (typeof data === 'object'){
+          my = this
+          $.each(data, function(index, value){
+            if (name == ''){
+              my.getFormData(FormData, value, index);
+            } else {
+              my.getFormData(FormData, value, name + '['+index+']');
+            }
+          })
+        } else {
+          FormData.append(name, data);
+        }
+      }
+
+
+      //var formData = new FormData(),
+      //    your_object = {
+      //      name: 'test object',
+      //      another_object: {
+      //        name: 'and other objects',
+      //        value: 'whatever'
+      //      }
+      //    };
+      //appendFormdata(formData, your_object);
 
     this._setBookmarkURL = function (hrefURI) {
       hrefURI.clearQuery()
