@@ -104,8 +104,7 @@ public class StreamingVOTableWriter extends VOTableWriter {
         table.addContent(getField("DEC", "double", namespace));
         table.addContent(getField("radius", "double", namespace));
 
-        // TODO:testing whether 'Circle' as a data type can be used rather
-        // than a string.
+        // FIELD element for position
         table.addContent(getField("position", "double", "circle", 3, namespace));
 
         // FIELD element for any errors encountered parsing the position.

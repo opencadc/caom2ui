@@ -51,8 +51,6 @@ import static org.junit.Assert.*;
 
 public class ADQLGeneratorTest extends AbstractUnitTest<ADQLGenerator>
 {
-    private static final Logger LOG = Logger.getLogger(ADQLGeneratorTest.class);
-
     @Test
     public void getCAOM2SelectList() throws Exception
     {
