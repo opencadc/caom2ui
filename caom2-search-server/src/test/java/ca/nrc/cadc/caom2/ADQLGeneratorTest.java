@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import ca.nrc.cadc.AbstractUnitTest;
 import ca.nrc.cadc.caom2.types.*;
 import ca.nrc.cadc.date.DateUtil;
@@ -50,6 +51,8 @@ import static org.junit.Assert.*;
 
 public class ADQLGeneratorTest extends AbstractUnitTest<ADQLGenerator>
 {
+    private static final Logger LOG = Logger.getLogger(ADQLGeneratorTest.class);
+
     @Test
     public void getCAOM2SelectList() throws Exception
     {
@@ -382,7 +385,7 @@ public class ADQLGeneratorTest extends AbstractUnitTest<ADQLGenerator>
 
         assertEquals("From clause is wrong.",
                      "caom2.Plane AS Plane "
-                     + "JOIN TAP_UPLOAD.search_upload as Upload on INTERSECTS(POINT('ICRS', Upload.ra, Upload.dec), Plane.position_bounds) = 1 "
+                     + "JOIN TAP_UPLOAD.search_upload as Upload on INTERSECTS(Upload.position, Plane.position_bounds) = 1 "
                      + "JOIN caom2.Observation AS Observation ON Plane.obsID = Observation.obsID",
                      fromClause);
     }
@@ -398,7 +401,7 @@ public class ADQLGeneratorTest extends AbstractUnitTest<ADQLGenerator>
 
         assertEquals("From clause is wrong.",
                      "ivoa.obscore.Plane AS Plane "
-                     + "JOIN TAP_UPLOAD.search_upload as Upload on INTERSECTS(POINT('ICRS', Upload.ra, Upload.dec), Plane.s_fov) = 1 "
+                     + "JOIN TAP_UPLOAD.search_upload as Upload on INTERSECTS(Upload.position, Plane.s_fov) = 1 "
                      + "JOIN ivoa.obscore.Observation AS Observation ON Plane.obsID = Observation.obsID",
                      fromClause);
     }

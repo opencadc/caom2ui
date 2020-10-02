@@ -46,6 +46,9 @@ import ca.nrc.cadc.search.parser.resolver.ResolverImpl;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
 
+import ca.nrc.cadc.dali.Circle;
+import ca.nrc.cadc.dali.util.CircleFormat;
+import ca.nrc.cadc.dali.Point;
 import ca.nrc.cadc.search.parser.Resolver;
 import ca.nrc.cadc.search.parser.TargetData;
 import ca.nrc.cadc.search.parser.TargetParser;
@@ -61,6 +64,8 @@ public class StreamingIterator implements Iterator<Element>
 
     // Counts of table rows and processing errors.
     private final UploadResults uploadResults;
+
+    private final CircleFormat cf = new CircleFormat();
 
 
     /**
@@ -113,6 +118,7 @@ public class StreamingIterator implements Iterator<Element>
         Double ra = null;
         Double dec = null;
         Double radius = null;
+        Circle position = null;
         String error = "";
         try
         {
@@ -124,6 +130,7 @@ public class StreamingIterator implements Iterator<Element>
             ra = result.getRA();
             dec = result.getDec();
             radius = result.getRadius();
+            position = new Circle(new Point(ra, dec), radius);
         }
         catch (Throwable t)
         {
@@ -134,6 +141,7 @@ public class StreamingIterator implements Iterator<Element>
         tableRow.addContent(createTableData(ra));
         tableRow.addContent(createTableData(dec));
         tableRow.addContent(createTableData(radius));
+        tableRow.addContent(createTableData(position));
         tableRow.addContent(createTableData(error));
 
         return tableRow;
@@ -165,6 +173,14 @@ public class StreamingIterator implements Iterator<Element>
     {
         final Element element = new Element("TD", namespace);
         element.setText((s == null) ? "" : s);
+
+        return element;
+    }
+
+    private Element createTableData(Circle s)
+    {
+        final Element element = new Element("TD", namespace);
+        element.setText((s == null) ? "" : cf.format(s));
 
         return element;
     }
