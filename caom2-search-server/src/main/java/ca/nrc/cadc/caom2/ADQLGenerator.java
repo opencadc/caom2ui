@@ -377,7 +377,7 @@ public class ADQLGenerator extends AbstractPersistenceService {
 
         if (hasUpload()) {
             // Upload target, ra and dec come in to the service as part of the
-            // list of requested columns. Only radius needs to be added.
+            // list of requested columns. Radius and position need to be added.
             sb.append(prefix);
             sb.append(SEARCH_UPLOAD_TABLE);
             sb.append(".radius");
