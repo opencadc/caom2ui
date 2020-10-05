@@ -310,8 +310,9 @@ public class ADQLGenerator extends AbstractPersistenceService {
                         query.append(getTargetNameField());
                         query.append(" = " + SEARCH_UPLOAD_TABLE + ".target");
                     } else {
-                        query.append("INTERSECTS(POINT('ICRS', " + SEARCH_UPLOAD_TABLE + ".ra, "
-                            + SEARCH_UPLOAD_TABLE + ".dec), ");
+                        // search_upload.position is a Circle ( 3 doubles representing
+                        // RA, Dec, and radius of the circle.)
+                        query.append("INTERSECTS(" + SEARCH_UPLOAD_TABLE + ".position, ");
                         query.append(a1);
                         query.append(".");
                         query.append(getTargetCoordField());
@@ -376,8 +377,13 @@ public class ADQLGenerator extends AbstractPersistenceService {
 
         if (hasUpload()) {
             // Upload target, ra and dec come in to the service as part of the
-            // list of requested columns. Only radius needs to be added.
-            sb.append(prefix + SEARCH_UPLOAD_TABLE + ".radius");
+            // list of requested columns. Radius and position need to be added.
+            sb.append(prefix);
+            sb.append(SEARCH_UPLOAD_TABLE);
+            sb.append(".radius");
+            sb.append(prefix);
+            sb.append(SEARCH_UPLOAD_TABLE);
+            sb.append(".position");
         }
 
         return sb.toString();

@@ -104,6 +104,9 @@ public class StreamingVOTableWriter extends VOTableWriter {
         table.addContent(getField("DEC", "double", namespace));
         table.addContent(getField("radius", "double", namespace));
 
+        // FIELD element for position
+        table.addContent(getField("position", "double", "circle", 3, namespace));
+
         // FIELD element for any errors encountered parsing the position.
         table.addContent(getField("TargetError", "char", namespace));
 
@@ -146,6 +149,17 @@ public class StreamingVOTableWriter extends VOTableWriter {
         if (datatype.equalsIgnoreCase("char")) {
             element.setAttribute("arraysize", "*");
         }
+
+        return element;
+    }
+
+    private Element getField(final String name, final String datatype, final String xtype,
+                             final Integer arraySize, final Namespace namespace) {
+        final Element element = new Element("FIELD", namespace);
+        element.setAttribute("name", name);
+        element.setAttribute("datatype", datatype);
+        element.setAttribute("xtype", xtype );
+        element.setAttribute("arraysize", arraySize.toString());
 
         return element;
     }
