@@ -1,3 +1,7 @@
+## Oct 2, 2020
+### 2.12.4
+* Minor change: Bug fix for upload target file radius being ignored during search.
+
 ## June 29th, 2020
 ### 2.12.3
 * Minor change: Upload target, RA and Dec added to search results if Upload Targets

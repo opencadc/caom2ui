@@ -1068,7 +1068,7 @@
 
             // Behaviour here depends on whether request contains
             // a target upload file or not
-            var fromInputForm = this._getActiveForm().hasInputFile();
+            var fromInputFile = this._getActiveForm().hasInputFile();
             var downloadTuples = [];
 
             // clear hidden inputs from any prior searches first
@@ -1088,16 +1088,27 @@
                 var $nextPlaneURI = $nextRow['caom2:Plane.publisherID.downloadable']
 
                 // check for use of target upload file
-                if (fromInputForm) {
-                  // set up tuples
-                  // get these values from upload target columns
-                  // for these variables
+                if (fromInputFile) {
+                  // set up tuples which will be sent to downloadManager
+                  // single target selection uses 'URI' and 'POS' input fields
+                  // embedded in the download form.
                   var $nextPlaneTargetName = $nextRow['caom2:Upload.target']
-                  var $nextPlaneShape = $nextRow['caom2:Plane.position.bounds']
+
+                  // TODO: the radius on the end of this is temporary, will need to be pulled
+                  // from the upload file or from the data somehow else.
+                  // TODO: decide
+                  //var $nextPlaneCutout = "CIRCLE "+ $nextRow['caom2:Upload.ra'] + " " + $nextRow['caom2:Upload.dec'] + " 0.5"
+                  var $nextPlaneCutout = "CIRCLE "+ $nextRow['caom2:Upload.ra'] + " " + $nextRow['caom2:Upload.dec']
+                    + " " + $nextRow['caom2:Upload.radius']
+
+                  // TODO: remove after testing complete
+                  //  intentionally bad value used to trigger & debug validation errors on chooser.jsp page
+                  //var $nextPlaneCutout = "BADSHAPE "+ $nextRow['caom2:Upload.ra'] + " " + $nextRow['caom2:Upload.dec']
+                  //  + " " + $nextRow['caom2:Upload.radius']
 
                   var tuple = {
                     "label" : $nextPlaneTargetName,
-                    "shape" : $nextPlaneShape,
+                    "shape" : $nextPlaneCutout,
                     "tupleID" : $nextPlaneURI
                   }
 
@@ -1134,7 +1145,7 @@
               }
 
               // Now get down to submitting the data
-              if (fromInputForm) {
+              if (fromInputFile) {
                 // iterate through downloadTuples and make the badgerfish json
                 var badgerfishTuples = "";
                 for (i=0; i<downloadTuples.length; i++) {
@@ -1145,17 +1156,15 @@
                 }
                 // trim off last ','
                 badgerfishTuples = badgerfishTuples.substr(0, badgerfishTuples.length-1);
-                // Should be 'stringified' enough at this point to add to the payload/data
-                // attribute of the $.ajax call below
+                // create payload item
                 var jsonTuples = "{\"tupleList\":{\"$\":[" + badgerfishTuples + "]}}";
 
                 var multiPartData = new FormData()
-                // Q: where does 'runid' live?
+                var runID = downloadForm.find("input[name='runid']").val()
 
-                var runID = downloadForm.find("input[name='fragment']")
-                  .val()
-                  .substring(6)
-                multiPartData.append('runId', runID)
+                if (runID !=  null) {
+                  multiPartData.append('runid', runID)
+                }
 
                 // 'Blob' type is requred to have the 'filename="blob" parameter added
                 // to the multipart section, and have the Content-type header added
@@ -1187,7 +1196,6 @@
                 downloadForm.submit()
               }
 
-              // needs to happen for both searches - (2739)
               // Story 1566, re-enable all product types
               // checkbox
               if (allChecked) {
@@ -1200,8 +1208,6 @@
                   }
                 )
               }
-
-              //*** original code ends here - TODO: remove this after testing
             }
           }.bind(this))
 
@@ -2129,17 +2135,23 @@
           $(document).data('displayUnits', json.display_units)
         }
 
-        downloadForm.find("input[name='fragment']").val('RUNID=' + runID)
+        // Set the runid for this download
+        // value is used every time, unlike uri and pos which may
+        // not be used at all in the case of a target upload file search
+        // This is why it's not removed from downloadForm
+        downloadForm.find("input[name='runid']").val(runID)
 
         // Clean and prepare the download form.
         downloadForm.find("input[name='uri']").remove()
-        downloadForm.find("input[name='cutout']").remove()
+        downloadForm.find("input[name='pos']").remove()
 
         if (json.cutout) {
           var input = $('<input>')
 
           input.prop('type', 'hidden')
-          input.prop('name', 'cutout')
+          // 'pos' is the position cutout parameter that
+          // can be used in cutout requests to download manager
+          input.prop('name', 'pos')
           input.val(json.cutout)
 
           downloadForm.append(input)

@@ -91,7 +91,7 @@
         <div id="results-grid-header" class="grid-header">
             <form id="downloadForm" name="downloadForm" class="form-horizontal"
                 action="<%= downloadLink %>" method="POST" target="DOWNLOAD">
-                <input type="hidden" name="fragment" id="runId" value=""/>
+                <input type="hidden" name="runid" id="runid" value=""/>
                 <span id="NO_OBSERVATIONS_SELECTED_MESSAGE" class="hidden"><fmt:message key="NO_OBSERVATIONS_SELECTED_MESSAGE" bundle="${langBundle}"/></span>
                 <span class="grid-header-icon-span">
                     <img class="margin-bottom-none margin-left-none margin-right-none align-middle grid-header-icon" src="cadcVOTV/images/transparent-20.png"/>

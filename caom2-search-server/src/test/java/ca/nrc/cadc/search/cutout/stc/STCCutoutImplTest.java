@@ -66,8 +66,8 @@ public class STCCutoutImplTest extends AbstractUnitTest<STCCutoutImpl>
                                           new Circle(new Point(0.4d, 0.5d),
                                                      0.5d)), null));
 
-        assertEquals("Should be Circle ICRS 0.4 0.5 0.5",
-                     "Circle ICRS 0.4 0.5 0.5",
+        assertEquals("Should be Circle 0.4 0.5 0.5",
+                     "Circle 0.4 0.5 0.5",
                      getTestSubject().format());
     }
 
@@ -80,9 +80,9 @@ public class STCCutoutImplTest extends AbstractUnitTest<STCCutoutImpl>
                                           new Location(new Point(0.4d, 0.5d))),
                         null));
 
-        assertEquals("Should be Circle ICRS 0.4 0.5 "
+        assertEquals("Should be Circle 0.4 0.5 "
                      + ONE_ARC_MIN_AS_DEG,
-                     "Circle ICRS 0.4 0.5 " + ONE_ARC_MIN_AS_DEG,
+                     "Circle 0.4 0.5 " + ONE_ARC_MIN_AS_DEG,
                      getTestSubject().format());
     }
 
@@ -121,9 +121,9 @@ public class STCCutoutImplTest extends AbstractUnitTest<STCCutoutImpl>
                                           new Location(new Point(0.4d, 0.5d))),
                         null));
 
-        assertEquals("Should be Circle ICRS 0.4 0.5 "
+        assertEquals("Should be Circle 0.4 0.5 "
                      + ONE_ARC_MIN_AS_DEG,
-                     "Circle ICRS 0.4 0.5 " + ONE_ARC_MIN_AS_DEG,
+                     "Circle 0.4 0.5 " + ONE_ARC_MIN_AS_DEG,
                      getTestSubject().format());
     }
 
@@ -137,10 +137,10 @@ public class STCCutoutImplTest extends AbstractUnitTest<STCCutoutImpl>
                         new IntervalSearch("TEST Interval", 88.1d, 88.9d,
                                            "MHz")));
 
-        assertEquals("Should be Circle ICRS 0.4 0.5 "
+        assertEquals("Should be Circle 0.4 0.5 "
                      + ONE_ARC_MIN_AS_DEG
                      + " SpectralInterval 88.1 88.9 MHz",
-                     "Circle ICRS 0.4 0.5 " + ONE_ARC_MIN_AS_DEG
+                     "Circle 0.4 0.5 " + ONE_ARC_MIN_AS_DEG
                      + " SpectralInterval 88.1 88.9 MHz",
                      getTestSubject().format());
     }

@@ -111,7 +111,8 @@ public class STCCutoutImpl implements Cutout
         else
         {
             final Shape position = getSpatialSearch().getPosition();
-            region = new ca.nrc.cadc.stc.Circle(Frame.ICRS, null, null,
+            // When formatted will generate a DALI string: "CIRCLE cval2 cval2 radius"
+            region = new ca.nrc.cadc.stc.Circle(null, null, null,
                                                 position.getCenter().cval1,
                                                 position.getCenter().cval2,
                                                 getRadius(position));

@@ -44,6 +44,7 @@
                 upload_target_name_id: 'caom2:Upload.target',
                 upload_target_ra_id: 'caom2:Upload.ra',
                 upload_target_dec_id: 'caom2:Upload.dec',
+                upload_target_radius_id: 'caom2:Upload.radius',
               }
             },
             ObsCore: {
@@ -60,6 +61,7 @@
                 upload_target_name_id: 'obscore:Upload.target',
                 upload_target_ra_id: 'obscore:Upload.ra',
                 upload_target_dec_id: 'obscore:Upload.dec',
+                upload_target_radius_id: 'obscore:Upload.radius',
               }
             },
             types: {
@@ -75,6 +77,7 @@
                 upload_target_name_id: 'caom2:Upload.target',
                 upload_target_ra_id: 'caom2:Upload.ra',
                 upload_target_dec_id: 'caom2:Upload.dec',
+                upload_target_radius_id: 'caom2:Upload.radius',
               },
               ObsCore: {
                 id: 'ObsCore',
@@ -88,6 +91,7 @@
                 upload_target_name_id: 'obscore:Upload.target',
                 upload_target_ra_id: 'obscore:Upload.ra',
                 upload_target_dec_id: 'obscore:Upload.dec',
+                upload_target_radius_id: 'obscore:Upload.radius',
               }
             },
             SearchForm: SearchForm,
@@ -405,6 +409,18 @@
         xtype,
         order
       )
+
+      order = allColumnIDs.indexOf(utypeConfig.upload_target_radius_id)
+      this._addFieldsForUType(
+        utypeConfig.upload_target_radius_id,
+        ucd,
+        unit,
+        datatype,
+        undefined,
+        description,
+        xtype,
+        order
+      )
     }
 
     /**
@@ -583,12 +599,24 @@
 
     /**
      * Augment the list provided with additional column IDs associated
-     * with the target upload form field
+     * with the target upload form field. These will be displayed in the initial
+     * results.
      * @param columnIDs
      * @returns {*|any[]|string}
      */
+    this.addDefaultUploadColumns = function(columnIDs) {
+      return this.config.addDefaultUploadColumns(columnIDs)
+    }
 
+    /**
+     * Augment the list provided with all additional column IDs associated
+     * with the target upload form field.
+     * @param columnIDs
+     * @returns {*|any[]|string}
+     */
     this.addUploadColumns = function(columnIDs) {
+      // Add default and other columns
+      //return this.config.addOtherUploadColumns(this.config.addDefaultUploadColumns(columnIDs))
       return this.config.addUploadColumns(columnIDs)
     }
 
@@ -646,22 +674,42 @@
      * @param columnIDs
      * @returns {*|any[]|string}
      */
-    this.addUploadColumns = function(columnIDs) {
+    this.addDefaultUploadColumns = function(columnIDs) {
       // upload cols need to be in display order
       // add this bundle right after the 'Preview' column
 
       // NOTE: this function could be generalized to add fields for a named
       // form field. Complications may occur in making the order of the columns
       // sane if more than one form field with columns associated is used.
-      var uploadColumnIDs = [
+      var defaultUploadColumnIDs = [
         this.config.upload_target_name_id,
         this.config.upload_target_ra_id,
         this.config.upload_target_dec_id
       ]
+
       var firstEl = columnIDs.slice(0,1) // uri has to be first in display
-      return firstEl.concat(uploadColumnIDs.concat(columnIDs.slice(1, columnIDs.length)))
+      // Ha - could add radius at the end of the list so it's not in default display.
+      return firstEl.concat(defaultUploadColumnIDs.concat(columnIDs.slice(1, columnIDs.length)))
     }
 
+    /**
+     * Augment the list provided with additional column IDs associated
+     * with the target upload form field
+     * @param columnIDs
+     * @returns {*|any[]|string}
+     */
+    this.addOtherUploadColumns = function(columnIDs) {
+
+      var otherUploadColumnIDs = [
+        this.config.upload_target_radius_id
+      ]
+
+      return columnIDs.concat(otherUploadColumnIDs)
+    }
+
+    this.addUploadColumns = function(columnIDs) {
+      return this.addOtherUploadColumns(this.addDefaultUploadColumns(columnIDs))
+    }
     /**
      * Obtain the full set of column IDs that will be in the select list, based
      * on some conditions at search time.
@@ -742,7 +790,14 @@
      * @param columnIDs
      * @returns {*}
      */
-    this.addUploadColumns = function(columnIDs) {
+    this.addDefaultUploadColumns = function(columnIDs) {
+      // For now, there are no upload columns to add for obscore
+      // The upload function doesn't work (as of June 2020) and needs
+      // to be fixed, so this function will be upgraded at that point
+      return columnIDs
+    }
+
+    this.addOtherUploadColumns = function(columnIDs) {
       // For now, there are no upload columns to add for obscore
       // The upload function doesn't work (as of June 2020) and needs
       // to be fixed, so this function will be upgraded at that point
@@ -1798,7 +1853,7 @@
       // For now, this supports the Target Upload file field only.
       if (this.hasInputFile() === true) {
         // functions that use this are expecting a jquery object
-        columnIDs = $(this.configuration.addUploadColumns(columnIDs.toArray()))
+        columnIDs = $(this.configuration.addDefaultUploadColumns(columnIDs.toArray()))
       }
       return columnIDs
     }
