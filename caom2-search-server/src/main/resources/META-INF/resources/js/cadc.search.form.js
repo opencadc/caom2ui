@@ -681,6 +681,8 @@
       // NOTE: this function could be generalized to add fields for a named
       // form field. Complications may occur in making the order of the columns
       // sane if more than one form field with columns associated is used.
+      // - and: could allow a position argument to be passed in so set of values
+      // could be put in a particular spot in the column list
       var defaultUploadColumnIDs = [
         this.config.upload_target_name_id,
         this.config.upload_target_ra_id,
@@ -688,7 +690,6 @@
       ]
 
       var firstEl = columnIDs.slice(0,1) // uri has to be first in display
-      // Ha - could add radius at the end of the list so it's not in default display.
       return firstEl.concat(defaultUploadColumnIDs.concat(columnIDs.slice(1, columnIDs.length)))
     }
 

@@ -1328,33 +1328,6 @@
 
     // End initForms function.
 
-    this.getFormData = function(FormData, data, name){
-        name = name || '';
-        if (typeof data === 'object'){
-          my = this
-          $.each(data, function(index, value){
-            if (name == ''){
-              my.getFormData(FormData, value, index);
-            } else {
-              my.getFormData(FormData, value, name + '['+index+']');
-            }
-          })
-        } else {
-          FormData.append(name, data);
-        }
-      }
-
-
-      //var formData = new FormData(),
-      //    your_object = {
-      //      name: 'test object',
-      //      another_object: {
-      //        name: 'and other objects',
-      //        value: 'whatever'
-      //      }
-      //    };
-      //appendFormdata(formData, your_object);
-
     this._setBookmarkURL = function (hrefURI) {
       hrefURI.clearQuery()
       var href = hrefURI.toString()
