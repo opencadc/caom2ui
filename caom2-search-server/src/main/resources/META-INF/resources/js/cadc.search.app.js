@@ -1084,38 +1084,35 @@
                 var arrIndex = 0, srl = selectedRows.length; arrIndex < srl; arrIndex++
               ) {
                 var $nextRow = resultsVOTV.getRow(selectedRows[arrIndex])
-                // uri is used for both formats
+
+                // uri is used for download request
                 var $nextPlaneURI = $nextRow['caom2:Plane.publisherID.downloadable']
 
                 // check for use of target upload file
                 if (fromInputFile) {
+
                   // set up tuples which will be sent to downloadManager
-                  // single target selection uses 'URI' and 'POS' input fields
-                  // embedded in the download form.
+                  // downloadManager request will have multipart data, using
+                  // a JSON blob to transmit tuples built below
+
+                  // build cutout DALI string
+                  var $nextPlaneCutout = 'CIRCLE ' + $nextRow['caom2:Upload.ra'] + " " + $nextRow['caom2:Upload.dec']
+                    + ' ' + $nextRow['caom2:Upload.radius']
+
+                  // grab target name for label
                   var $nextPlaneTargetName = $nextRow['caom2:Upload.target']
 
-                  // TODO: the radius on the end of this is temporary, will need to be pulled
-                  // from the upload file or from the data somehow else.
-                  // TODO: decide
-                  //var $nextPlaneCutout = "CIRCLE "+ $nextRow['caom2:Upload.ra'] + " " + $nextRow['caom2:Upload.dec'] + " 0.5"
-                  var $nextPlaneCutout = "CIRCLE "+ $nextRow['caom2:Upload.ra'] + " " + $nextRow['caom2:Upload.dec']
-                    + " " + $nextRow['caom2:Upload.radius']
-
-                  // TODO: remove after testing complete
-                  //  intentionally bad value used to trigger & debug validation errors on chooser.jsp page
-                  //var $nextPlaneCutout = "BADSHAPE "+ $nextRow['caom2:Upload.ra'] + " " + $nextRow['caom2:Upload.dec']
-                  //  + " " + $nextRow['caom2:Upload.radius']
-
                   var tuple = {
-                    "label" : $nextPlaneTargetName,
+                    "tupleID" : $nextPlaneURI,
                     "shape" : $nextPlaneCutout,
-                    "tupleID" : $nextPlaneURI
+                    "label" : $nextPlaneTargetName
                   }
 
                   downloadTuples.push(tuple)
 
                 } else {
-                  // hidden input used for resolver form only
+                  // hidden input used with resolver form
+                  // downloadManager request will have URI=#&URI=# format
                   var $input = $('<input>')
                   $input.prop('type', 'hidden')
                   $input.prop('name', 'uri')
@@ -1156,27 +1153,32 @@
                 }
                 // trim off last ','
                 badgerfishTuples = badgerfishTuples.substr(0, badgerfishTuples.length-1);
+
                 // create payload item
                 var jsonTuples = "{\"tupleList\":{\"$\":[" + badgerfishTuples + "]}}";
 
                 var multiPartData = new FormData()
                 var runID = downloadForm.find("input[name='runid']").val()
-
                 if (runID !=  null) {
                   multiPartData.append('runid', runID)
                 }
 
                 // 'Blob' type is requred to have the 'filename="blob" parameter added
                 // to the multipart section, and have the Content-type header added
+                // so that the web service can correctly parse JSON payload sent
                 multiPartData.append('blob', new Blob([jsonTuples], {
                   type: 'application/json; charset=utf-8'
                 }))
 
+                // content-type: false below is important to retain
+                // so the web service will correctly parse the data as an
+                // upload file. if it's set to 'multipart/form-data' (as one would expect,)
+                // downloadManager's web service can't parse it and it generates a blank page.
+                // CADC-1245: cutout story for target upload file
                 $.ajax({
                   url: '/downloadManager/download',
                   type: 'POST',
                   processData: false,
-                  contentType: 'multipart/form-data',
                   enctype: 'multipart/form-data',
                   contentType: false,
                   data: multiPartData
