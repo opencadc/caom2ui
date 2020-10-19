@@ -1095,7 +1095,7 @@
                   // downloadManager request will have multipart data, using
                   // a JSON blob to transmit tuples built below
 
-                  // build cutout DALI string
+                  // build spatial cutout DALI string
                   var $nextPlaneCutout = 'CIRCLE ' + $nextRow['caom2:Upload.ra'] + " " + $nextRow['caom2:Upload.dec']
                     + ' ' + $nextRow['caom2:Upload.radius']
 
@@ -1144,18 +1144,20 @@
               // Now get down to submitting the data
               if (fromInputFile) {
                 // iterate through downloadTuples and make the badgerfish json
-                var badgerfishTuples = "";
+                var badgerfishTuples = new Array();
                 for (i=0; i<downloadTuples.length; i++) {
-                  var tupleJSON = "{\"tuple\":{\"tupleID\":{\"$\":\"" + downloadTuples[i].tupleID + "\"}," +
-                    "\"shape\":{\"$\":\"" + downloadTuples[i].shape + "\"}," +
-                    "\"label\":{\"$\":\"" + downloadTuples[i].label + "\"}}}";
-                  badgerfishTuples += tupleJSON + ","; // add another badgerfish beast on here..
+                  var tupleJSON = {"tuple":
+                      {
+                        "tupleID":{"$": downloadTuples[i].tupleID },
+                        "shape":{"$": downloadTuples[i].shape },
+                        "label":{"$": downloadTuples[i].label }
+                      }
+                  }
+                  badgerfishTuples.push(tupleJSON);
                 }
-                // trim off last ','
-                badgerfishTuples = badgerfishTuples.substr(0, badgerfishTuples.length-1);
 
                 // create payload item
-                var jsonTuples = "{\"tupleList\":{\"$\":[" + badgerfishTuples + "]}}";
+                var jsonTuples = {"tupleList": {"$": badgerfishTuples }};
 
                 var multiPartData = new FormData()
                 var runID = downloadForm.find("input[name='runid']").val()
@@ -1166,7 +1168,7 @@
                 // 'Blob' type is requred to have the 'filename="blob" parameter added
                 // to the multipart section, and have the Content-type header added
                 // so that the web service can correctly parse JSON payload sent
-                multiPartData.append('blob', new Blob([jsonTuples], {
+                multiPartData.append('blob', new Blob([JSON.stringify(jsonTuples)], {
                   type: 'application/json; charset=utf-8'
                 }))
 
@@ -2044,7 +2046,8 @@
      * @param {String}  json.results_url      URL to obtain search results.
      * @param {String}  json.run_id           The Job ID of the archive search job that spawned the TAP job.
      * @param {{}}      [json.display_units]   Hash map containing uType -> display unit.
-     * @param {String}  [json.cutout]          Requested cutout value as an ICRS cutout shape.
+     * @param {String}  [json.pos]            Requested spatial cutout value as a DALI string.
+     * @param {String}  [json.band]           Requested spectral cutout value as a DALI string
      * @param {String}  [json.upload_url]     URL for upload information to be passed to TAP.
      * @param {Number} startDate              The start time in milliseconds to use as a start time.
      * @param {Function} searchCompleteCallback    Callback on completion.
@@ -2119,15 +2122,24 @@
         // Clean and prepare the download form.
         downloadForm.find("input[name='uri']").remove()
         downloadForm.find("input[name='pos']").remove()
+        downloadForm.find("input[name='band']").remove()
 
-        if (json.cutout) {
+        if (json.pos) {
+          // Spatial cutout requested. Add element to download form as POS.
           var input = $('<input>')
-
           input.prop('type', 'hidden')
-          // 'pos' is the position cutout parameter that
-          // can be used in cutout requests to download manager
           input.prop('name', 'pos')
-          input.val(json.cutout)
+          input.val(json.pos)
+
+          downloadForm.append(input)
+        }
+
+        if (json.band) {
+          // Spectral cutout requested. Add element to download form as BAND.
+          var input = $('<input>')
+          input.prop('type', 'hidden')
+          input.prop('name', 'band')
+          input.val(json.band)
 
           downloadForm.append(input)
         }

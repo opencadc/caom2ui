@@ -41,7 +41,8 @@ import ca.nrc.cadc.caom2.SpatialSearch;
 import ca.nrc.cadc.profiler.Profiler;
 import ca.nrc.cadc.search.*;
 import ca.nrc.cadc.search.cutout.Cutout;
-import ca.nrc.cadc.search.cutout.stc.STCCutoutImpl;
+import ca.nrc.cadc.search.cutout.dali.POSCutoutImpl;
+import ca.nrc.cadc.search.cutout.dali.BANDCutoutImpl;
 import ca.nrc.cadc.search.form.FormErrors;
 import ca.nrc.cadc.search.parser.Resolver;
 import ca.nrc.cadc.search.parser.TargetData;
@@ -202,12 +203,24 @@ public class TAPSearcher implements Searcher {
             writeFormValueUnits(jsonWriter, formData);
 
             if (isCutoutSpecified(job)) {
-                final Cutout cutout = getCutout(job, templates);
-                final String cutoutValue = cutout.format();
+                // Check for BAND and POS cutouts
+                final Cutout bandCutout = getBANDCutout(job, templates);
+                if (bandCutout != null) {
+                    final String cutoutValue = bandCutout.format();
 
-                if (StringUtil.hasText(cutoutValue)) {
-                    jsonWriter.key("cutout").value(cutoutValue);
+                    if (StringUtil.hasText(cutoutValue)) {
+                        jsonWriter.key("band").value(cutoutValue);
+                    }
                 }
+
+                final Cutout posCutout = getPOSCutout(job, templates);
+                if (posCutout != null) {
+                   final String cutoutValue = posCutout.format();
+
+                   if (StringUtil.hasText(cutoutValue)) {
+                       jsonWriter.key("pos").value(cutoutValue);
+                   }
+               }
             }
 
             // Include the parsed resolver information, if any.
@@ -438,18 +451,31 @@ public class TAPSearcher implements Searcher {
     }
 
     /**
-     * Obtain a cutout from the query parameters.
+     * Obtain a POS (spatial) cutout from the query parameters.
      *
+     * @param job associated with current search.
      * @param templates The Search templates to obtain values from.
      * @return Cutout instance.
      */
-    private Cutout getCutout(final Job job, final Templates templates) {
+    private Cutout getPOSCutout(final Job job, final Templates templates) {
         final List<SpatialSearch> spatialSearches = templates.getSearchTemplates(SpatialSearch.class);
+
+        return new POSCutoutImpl((spatialSearches.isEmpty() || !isSpatialCutoutSpecified(job))
+                                         ? null : spatialSearches.get(0));
+    }
+
+    /**
+     * Obtain a BAND (spectral) cutout from the query parameters.
+     *
+     * @param job associated with current search.
+     * @param templates The Search templates to obtain values from.
+     * @return Cutout instance.
+     */
+    private Cutout getBANDCutout(final Job job, final Templates templates) {
         final List<IntervalSearch> spectralSearches = templates.getSearchTemplates(IntervalSearch.class);
 
-        return new STCCutoutImpl((spatialSearches.isEmpty() || !isSpatialCutoutSpecified(job))
-                                         ? null : spatialSearches.get(0),
-                                 (spectralSearches.isEmpty() || !isSpectralCutoutSpecified(job))
-                                         ? null : spectralSearches.get(0));
+        return new BANDCutoutImpl((spectralSearches.isEmpty() || !isSpectralCutoutSpecified(job))
+            ? null : spectralSearches.get(0));
     }
+
 }
