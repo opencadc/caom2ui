@@ -32,6 +32,7 @@ dependencies {
     implementation 'org.opencadc:caom2-compute:[2.2.5, 2.4.0)'
     implementation 'org.apache.httpcomponents:httpclient:[4.5.11,4.6)'
     implementation 'commons-net:commons-net:3.6'
+    
 
     runtime 'org.postgresql:postgresql:42.2.10'
     runtime 'javax.servlet.jsp.jstl:jstl-api:1.2'
@@ -45,4 +46,5 @@ dependencies {
 
 sourceCompatibility = 1.8
 group = 'org.opencadc'
-version = '2.12.4'
+version = '2.12.5'
+

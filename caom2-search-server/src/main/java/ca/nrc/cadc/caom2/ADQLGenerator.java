@@ -255,7 +255,6 @@ public class ADQLGenerator extends AbstractPersistenceService {
 
         // caom
         tableMap.put(SimpleObservation.class, "Observation");
-        tableMap.put(CompositeObservation.class, "Observation");
         tableMap.put(Observation.class, "Observation");
         tableMap.put(Plane.class, "Plane");
 

@@ -1066,47 +1066,139 @@
           downloadFormSubmit.off().click(function (event) {
             event.preventDefault()
 
+            // Behaviour here depends on whether request contains
+            // a target upload file or not
+            var fromInputFile = this._getActiveForm().hasInputFile();
+            var downloadTuples = [];
+
+            // clear hidden inputs from any prior searches first
             downloadForm.find("input[name='uri']").remove()
 
+            // Collect & prepare data to be submitted
             if (resultsVOTV.getSelectedRows().length <= 0) {
               translated_message = downloadForm.find('span#NO_OBSERVATIONS_SELECTED_MESSAGE').text()
               alert(translated_message)
             } else {
               var selectedRows = resultsVOTV.getSelectedRows()
               for (
-                  var arrIndex = 0, srl = selectedRows.length; arrIndex < srl; arrIndex++
+                var arrIndex = 0, srl = selectedRows.length; arrIndex < srl; arrIndex++
               ) {
                 var $nextRow = resultsVOTV.getRow(selectedRows[arrIndex])
-                var $nextPlaneURI =
-                        $nextRow['caom2:Plane.publisherID.downloadable']
 
-                var $input = $('<input>')
-                $input.prop('type', 'hidden')
-                $input.prop('name', 'uri')
-                $input.prop('id', $nextPlaneURI)
-                $input.val($nextPlaneURI)
+                // uri is used for download request
+                var $nextPlaneURI = $nextRow['caom2:Plane.publisherID.downloadable']
 
-                downloadForm.append($input)
+                // check for use of target upload file
+                if (fromInputFile) {
+
+                  // set up tuples which will be sent to downloadManager
+                  // downloadManager request will have multipart data, using
+                  // a JSON blob to transmit tuples built below
+
+                  // build spatial cutout DALI string
+                  var $nextPlaneCutout = 'CIRCLE ' + $nextRow['caom2:Upload.ra'] + " " + $nextRow['caom2:Upload.dec']
+                    + ' ' + $nextRow['caom2:Upload.radius']
+
+                  // grab target name for label
+                  var $nextPlaneTargetName = $nextRow['caom2:Upload.target']
+
+                  var tuple = {
+                    "tupleID" : $nextPlaneURI,
+                    "shape" : $nextPlaneCutout,
+                    "label" : $nextPlaneTargetName
+                  }
+
+                  downloadTuples.push(tuple)
+
+                } else {
+                  // hidden input used with resolver form
+                  // downloadManager request will have URI=#&URI=# format
+                  var $input = $('<input>')
+                  $input.prop('type', 'hidden')
+                  $input.prop('name', 'uri')
+                  $input.prop('id', $nextPlaneURI)
+                  $input.val($nextPlaneURI)
+
+                  downloadForm.append($input)
+                }
               }
 
               // Story 1566, when all 'Product Types'
               // checkboxes are checked, do not send any
+              // both (2739) - although I wonder if the 'all checked' check
+              //being done twice is necessary (after the submit, for example.)
               var allChecked =
-                      downloadForm
-                          .find('input.product_type_option_flag')
-                          .not(':checked').length === 0
+                    downloadForm
+                      .find('input.product_type_option_flag')
+                      .not(':checked').length === 0
               if (allChecked) {
                 // disable all 'Product Types' checkboxes
                 $.each(
-                    downloadForm.find('input.product_type_option_flag:checked'),
-                    function () {
-                      $(this).prop('disabled', true)
-                    }
+                  downloadForm.find('input.product_type_option_flag:checked'),
+                  function () {
+                    $(this).prop('disabled', true)
+                  }
                 )
               }
 
-              window.open('', 'DOWNLOAD', '')
-              downloadForm.submit()
+              // Now get down to submitting the data
+              if (fromInputFile) {
+                // iterate through downloadTuples and make the badgerfish json
+                var badgerfishTuples = new Array();
+                for (i=0; i<downloadTuples.length; i++) {
+                  var tupleJSON = {"tuple":
+                      {
+                        "tupleID":{"$": downloadTuples[i].tupleID },
+                        "shape":{"$": downloadTuples[i].shape },
+                        "label":{"$": downloadTuples[i].label }
+                      }
+                  }
+                  badgerfishTuples.push(tupleJSON);
+                }
+
+                // create payload item
+                var jsonTuples = {"tupleList": {"$": badgerfishTuples }};
+
+                var multiPartData = new FormData()
+                var runID = downloadForm.find("input[name='runid']").val()
+                if (runID !=  null) {
+                  multiPartData.append('runid', runID)
+                }
+
+                // 'Blob' type is requred to have the 'filename="blob" parameter added
+                // to the multipart section, and have the Content-type header added
+                // so that the web service can correctly parse JSON payload sent
+                multiPartData.append('blob', new Blob([JSON.stringify(jsonTuples)], {
+                  type: 'application/json; charset=utf-8'
+                }))
+
+                // content-type: false below is important to retain
+                // so the web service will correctly parse the data as an
+                // upload file. if it's set to 'multipart/form-data' (as one would expect,)
+                // downloadManager's web service can't parse it and it generates a blank page.
+                // CADC-1245: cutout story for target upload file
+                $.ajax({
+                  url: '/downloadManager/download',
+                  type: 'POST',
+                  processData: false,
+                  enctype: 'multipart/form-data',
+                  contentType: false,
+                  data: multiPartData
+                })
+                .done(function (data) {
+                  var win = window.open()
+                  // Q: does this work for all browsers??
+                  win.document.write(data)
+                })
+                .fail(function (jqXHR, textStatus, errorThrown) {
+                  alert(errorThrown)
+                });
+
+              } else {
+                // do original call
+                window.open('', 'DOWNLOAD', '')
+                downloadForm.submit()
+              }
 
               // Story 1566, re-enable all product types
               // checkbox
@@ -1114,14 +1206,14 @@
                 // re-enable all 'Product Types'
                 // checkboxes
                 $.each(
-                    downloadForm.find('input.product_type_option_flag:checked'),
-                    function () {
-                      $(this).prop('disabled', false)
-                    }
+                  downloadForm.find('input.product_type_option_flag:checked'),
+                  function () {
+                    $(this).prop('disabled', false)
+                  }
                 )
               }
             }
-          })
+          }.bind(this))
 
           $('#results_bookmark').click(
               function (event) {
@@ -1954,7 +2046,8 @@
      * @param {String}  json.results_url      URL to obtain search results.
      * @param {String}  json.run_id           The Job ID of the archive search job that spawned the TAP job.
      * @param {{}}      [json.display_units]   Hash map containing uType -> display unit.
-     * @param {String}  [json.cutout]          Requested cutout value as an ICRS cutout shape.
+     * @param {String}  [json.pos]            Requested spatial cutout value as a DALI string.
+     * @param {String}  [json.band]           Requested spectral cutout value as a DALI string
      * @param {String}  [json.upload_url]     URL for upload information to be passed to TAP.
      * @param {Number} startDate              The start time in milliseconds to use as a start time.
      * @param {Function} searchCompleteCallback    Callback on completion.
@@ -2020,18 +2113,33 @@
           $(document).data('displayUnits', json.display_units)
         }
 
-        downloadForm.find("input[name='fragment']").val('RUNID=' + runID)
+        // Set the runid for this download
+        // value is used every time, unlike uri and pos which may
+        // not be used at all in the case of a target upload file search
+        // This is why it's not removed from downloadForm
+        downloadForm.find("input[name='runid']").val(runID)
 
         // Clean and prepare the download form.
         downloadForm.find("input[name='uri']").remove()
-        downloadForm.find("input[name='cutout']").remove()
+        downloadForm.find("input[name='pos']").remove()
+        downloadForm.find("input[name='band']").remove()
 
-        if (json.cutout) {
+        if (json.pos) {
+          // Spatial cutout requested. Add element to download form as POS.
           var input = $('<input>')
-
           input.prop('type', 'hidden')
-          input.prop('name', 'cutout')
-          input.val(json.cutout)
+          input.prop('name', 'pos')
+          input.val(json.pos)
+
+          downloadForm.append(input)
+        }
+
+        if (json.band) {
+          // Spectral cutout requested. Add element to download form as BAND.
+          var input = $('<input>')
+          input.prop('type', 'hidden')
+          input.prop('name', 'band')
+          input.val(json.band)
 
           downloadForm.append(input)
         }
