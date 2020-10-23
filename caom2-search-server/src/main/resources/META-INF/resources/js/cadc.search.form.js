@@ -907,10 +907,10 @@
                 ),
                 true
               )
-              $("input[name$='.DOWNLOADCUTOUT']").prop('checked', false)
+              $("input[name$='.energy.DOWNLOADCUTOUT']").prop('checked', false)
               this.toggleDisabled(
                 $(
-                  '#' + this.id + " input[name$='.DOWNLOADCUTOUT']"
+                  '#' + this.id + " input[name$='.energy.DOWNLOADCUTOUT']"
                 ),
                 true
               )
@@ -924,7 +924,7 @@
               )
               this.toggleDisabled(
                 $(
-                  '#' + this.id + " input[name$='.DOWNLOADCUTOUT']"
+                  '#' + this.id + " input[name$='.energy.DOWNLOADCUTOUT']"
                 ),
                 false
               )
@@ -1837,6 +1837,16 @@
       return (inputFile.length > 0 &&
         !inputFile.prop('disabled') &&
         inputFile.val() !== '')
+    }
+
+    this.doSpatialCutout = function () {
+      var spatialCutout = this.$form.find("input[name$='.position.DOWNLOADCUTOUT']")
+      return spatialCutout.prop('checked')
+    }
+
+    this.doSpectralCutout = function () {
+      var spectralCutout = this.$form.find("input[name$='.energy.DOWNLOADCUTOUT']")
+      return spectralCutout.prop('checked')
     }
 
     /**
