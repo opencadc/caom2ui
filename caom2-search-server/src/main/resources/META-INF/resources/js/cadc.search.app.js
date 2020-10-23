@@ -1069,7 +1069,7 @@
             var fromInputFile = this._getActiveForm().hasInputFile()
             var doSpatialCutout = this._getActiveForm().doSpatialCutout()
             var doSpectralCutout = this._getActiveForm().doSpectralCutout()
-            var downloadTuples = [];
+            var downloadTuples = []
 
             // clear hidden URI inputs from any prior searches first
             downloadForm.find("input[name='uri']").remove()
@@ -1094,7 +1094,7 @@
                   // set up tuples which will be sent to downloadManager
                   // downloadManager request will have multipart data, using
                   // a JSON blob to transmit tuples built below
-                  
+
                   // Need to build a spatial cutout DALI string for each selected row.
                   var $nextPlaneCutout = 'CIRCLE ' + $nextRow['caom2:Upload.ra'] + " " + $nextRow['caom2:Upload.dec']
                     + ' ' + $nextRow['caom2:Upload.radius']
@@ -1163,7 +1163,7 @@
               // Now get down to submitting the data
               if ((fromInputFile === true) && (doSpatialCutout === true)) {
                 // iterate through downloadTuples and make the badgerfish json
-                var badgerfishTuples = new Array();
+                var badgerfishTuples = new Array()
                 for (i=0; i<downloadTuples.length; i++) {
                   var tupleJSON = {"tuple":
                       {
@@ -1172,11 +1172,11 @@
                         "label":{"$": downloadTuples[i].label }
                       }
                   }
-                  badgerfishTuples.push(tupleJSON);
+                  badgerfishTuples.push(tupleJSON)
                 }
 
                 // create payload item
-                var jsonTuples = {"tupleList": {"$": badgerfishTuples }};
+                var jsonTuples = {"tupleList": {"$": badgerfishTuples }}
 
                 var multiPartData = new FormData()
 
@@ -1187,8 +1187,8 @@
                 }
 
                 // Add spectral cutout if defined
-                // Spectral cutouts are included in JSON tuple data
-                if (doSpectralCutout == true) {
+                // Spatial cutouts are included in JSON tuple data
+                if (doSpectralCutout === true) {
                   var specCutout = downloadForm.find("input[name='band']")
                   multiPartData.append('band', specCutout.val())
                 }
@@ -1220,7 +1220,7 @@
                 })
                 .fail(function (jqXHR, textStatus, errorThrown) {
                   alert(errorThrown)
-                });
+                })
 
               } else {
                 // do original call
