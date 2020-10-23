@@ -1102,6 +1102,25 @@
                   // grab target name for label
                   var $nextPlaneTargetName = $nextRow['caom2:Upload.target']
 
+                  // translate the special characters in this string to what will
+                  // be used in the SODA calls in downloadManager. This is being done
+                  // here because lines such as 'M101 30"' will either have to be
+                  // escaped here and decoded in the server (which seems like extra unnecessary
+                  // work,) - or the translation function can be done here.
+                  // Rules from user story CADC-1245, subtask CADC 8244
+                  // '/' added because SODA service (caom2ops) does not accept it.
+                  // 1) ' -> arcmin
+                  // 2) " -> arcsec
+                  // 3) '+' -> 'p'
+                  // 4) ':' and '/' -> '_'
+                  // 5) all whitespaces replaced by underscores.
+
+                  $nextPlaneTargetName = $nextPlaneTargetName.replace('\'', 'arcmin')
+                  $nextPlaneTargetName = $nextPlaneTargetName.replace('"', 'arcsec')
+                  $nextPlaneTargetName = $nextPlaneTargetName.replace('\\+', 'p')
+                  $nextPlaneTargetName = $nextPlaneTargetName.replace('\\:|\\/', '_')
+                  $nextPlaneTargetName = $nextPlaneTargetName.replace(' ' , '_')
+
                   var tuple = {
                     "tupleID" : $nextPlaneURI,
                     "shape" : $nextPlaneCutout,
