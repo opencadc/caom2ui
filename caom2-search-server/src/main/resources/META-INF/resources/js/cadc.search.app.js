@@ -1066,12 +1066,12 @@
           downloadFormSubmit.off().click(function (event) {
             event.preventDefault()
 
-            // Behaviour here depends on whether request contains
-            // a target upload file or not
-            var fromInputFile = this._getActiveForm().hasInputFile();
-            var downloadTuples = [];
+            var fromInputFile = this._getActiveForm().hasInputFile()
+            var doSpatialCutout = this._getActiveForm().doSpatialCutout()
+            var doSpectralCutout = this._getActiveForm().doSpectralCutout()
+            var downloadTuples = []
 
-            // clear hidden inputs from any prior searches first
+            // clear hidden URI inputs from any prior searches first
             downloadForm.find("input[name='uri']").remove()
 
             // Collect & prepare data to be submitted
@@ -1088,14 +1088,14 @@
                 // uri is used for download request
                 var $nextPlaneURI = $nextRow['caom2:Plane.publisherID.downloadable']
 
-                // check for use of target upload file
-                if (fromInputFile) {
+                // check for request combination that will lead to tuple generation
+                if ((fromInputFile === true) && (doSpatialCutout === true)) {
 
                   // set up tuples which will be sent to downloadManager
                   // downloadManager request will have multipart data, using
                   // a JSON blob to transmit tuples built below
 
-                  // build spatial cutout DALI string
+                  // Need to build a spatial cutout DALI string for each selected row.
                   var $nextPlaneCutout = 'CIRCLE ' + $nextRow['caom2:Upload.ra'] + " " + $nextRow['caom2:Upload.dec']
                     + ' ' + $nextRow['caom2:Upload.radius']
 
@@ -1161,9 +1161,9 @@
               }
 
               // Now get down to submitting the data
-              if (fromInputFile) {
+              if ((fromInputFile === true) && (doSpatialCutout === true)) {
                 // iterate through downloadTuples and make the badgerfish json
-                var badgerfishTuples = new Array();
+                var badgerfishTuples = new Array()
                 for (i=0; i<downloadTuples.length; i++) {
                   var tupleJSON = {"tuple":
                       {
@@ -1172,16 +1172,25 @@
                         "label":{"$": downloadTuples[i].label }
                       }
                   }
-                  badgerfishTuples.push(tupleJSON);
+                  badgerfishTuples.push(tupleJSON)
                 }
 
                 // create payload item
-                var jsonTuples = {"tupleList": {"$": badgerfishTuples }};
+                var jsonTuples = {"tupleList": {"$": badgerfishTuples }}
 
                 var multiPartData = new FormData()
+
+                // Add runid if defined
                 var runID = downloadForm.find("input[name='runid']").val()
                 if (runID !=  null) {
                   multiPartData.append('runid', runID)
+                }
+
+                // Add spectral cutout if defined
+                // Spatial cutouts are included in JSON tuple data
+                if (doSpectralCutout === true) {
+                  var specCutout = downloadForm.find("input[name='band']")
+                  multiPartData.append('band', specCutout.val())
                 }
 
                 // 'Blob' type is requred to have the 'filename="blob" parameter added
@@ -1211,7 +1220,7 @@
                 })
                 .fail(function (jqXHR, textStatus, errorThrown) {
                   alert(errorThrown)
-                });
+                })
 
               } else {
                 // do original call
