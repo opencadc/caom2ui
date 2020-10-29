@@ -73,7 +73,7 @@
   },
   "Plane.energy.DOWNLOADCUTOUT": {
     "tipHTML":
-      "<p>Enter a \"Spectral Coverage\" value to enable this option. </p><p>Check the box to return image cutouts rather than full images. Cutouts will be constrained to the range in the \"Spectral Coverage\" box.</p>"
+      "<p>Enter a \"Spectral Coverage\" value to enable this option. </p><p>Check the box to return a restricted spectral range rather than the full file. Cutouts will be constrained to the range in the \"Spectral Coverage\" box.</p>"
   },
   "download_data": {
     "tipHTML":
