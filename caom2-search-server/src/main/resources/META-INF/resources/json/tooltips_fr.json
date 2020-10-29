@@ -37,7 +37,7 @@
   },
   "Plane.position.DOWNLOADCUTOUT": {
     "tipHTML":
-      "Cocher cette option si vous voulez effectuer un d&eacute;coupage spatial des images &agrave; r&eacute;cup&eacute;rer. Les zones de d&eacute;coupages sont centr&eacute;es sur les valeurs des coordonn&eacute;es qui correspondent &agrave; celle du nom d'objet sp&eacute;cifi&eacute;. Le diam&egrave;tre de la zone de d&eacute;coupage est d'une minute d'arc par d&eacute;faut. Il n'est pas encore possible d'utiliser cet option si on soumet une liste d'objets pour la recherche."
+      "<p>Saisissez une valeur &laquo;Target&raquo ou sélectionnez un fichier &laquo;Upload Targets&raquo pour activer cette option.</p><p>Cocher cette option si vous voulez effectuer un d&eacute;coupage spatial des images &agrave; r&eacute;cup&eacute;rer. Les zones de d&eacute;coupages sont centr&eacute;es sur les valeurs des coordonn&eacute;es qui correspondent &agrave; celle du nom d'objet sp&eacute;cifi&eacute;. Le diam&egrave;tre de la zone de d&eacute;coupage est d'une minute d'arc par d&eacute;faut.</p>"
   },
   "Plane.time.bounds.samples": {
     "tipHTML":
@@ -73,7 +73,7 @@
   },
   "Plane.energy.DOWNLOADCUTOUT": {
     "tipHTML":
-      "Utiliser cet option si vous voulez r&eacute;cup&eacute;rer un d&eacute;coupage spectral plut&ocirc;t que les images compl&egrave;tes. Les contraintes pour le d&eacute;coupage sont sp&eacute;cifi&eacute;es via l'option &laquo;Spectral Coverage&raquo;."
+      "<p>Saisissez une valeur &laquo;Spectral Coverage&raquo pour activer cette option.</p><p>Utiliser cet option si vous voulez r&eacute;cup&eacute;rer un d&eacute;coupage spectral plut&ocirc;t que les images compl&egrave;tes. Les contraintes pour le d&eacute;coupage sont sp&eacute;cifi&eacute;es via l'option &laquo;Spectral Coverage&raquo;.</p>"
   },
   "download_data": {
     "tipHTML":

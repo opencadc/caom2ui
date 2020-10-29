@@ -858,6 +858,7 @@
     this.currentTimeoutID = null
 
     this.targetNameFieldID = null
+    this.spectralCoverageFieldID = null
 
     /**
      * The data train at the bottom of the form.
@@ -887,6 +888,9 @@
       this.targetNameFieldID = $currForm
         .find("input[name$='@Shape1.value']")
         .prop('id')
+      this.spectralCoverageFieldID = $currForm
+        .find("input[name$='@Energy.value']")
+        .prop('id')
 
       $currForm.find('.search_criteria_input').on(
         'change input',
@@ -902,32 +906,16 @@
             if ($(event.target).val() !== '') {
               $('.targetList_clear').show()
               this.toggleDisabled(
-                $(
-                  '#' + this.id + " input[id='" + this.targetNameFieldID + "']"
-                ),
+                $('#' + this.id + " input[id='" + this.targetNameFieldID + "']"),
                 true
               )
-              $("input[name$='.energy.DOWNLOADCUTOUT']").prop('checked', false)
-              this.toggleDisabled(
-                $(
-                  '#' + this.id + " input[name$='.energy.DOWNLOADCUTOUT']"
-                ),
-                true
-              )
-
+              this._enableSpatialCutoutCheckbox(true)
             } else {
               this.toggleDisabled(
-                $(
-                  '#' + this.id + " input[id='" + this.targetNameFieldID + "']"
-                ),
+                $('#' + this.id + " input[id='" + this.targetNameFieldID + "']"),
                 false
               )
-              this.toggleDisabled(
-                $(
-                  '#' + this.id + " input[name$='.energy.DOWNLOADCUTOUT']"
-                ),
-                false
-              )
+              this._enableSpatialCutoutCheckbox(false)
             }
           }.bind(this)
         )
@@ -1323,6 +1311,8 @@
         }
 
         this.toggleDisabled($("input[id='" + id + "_targetList']"), hasValue)
+        // Enable the spatial cutout checkbox if there is a value in the target resolver input
+        this._enableSpatialCutoutCheckbox(hasValue)
 
         if (hasValue === true && resolver !== 'NONE') {
           this.clearTimeout()
@@ -1391,6 +1381,14 @@
           this._clearTargetNameResolutionStatus()
         }
       } else if ($node.hasClass('ui_unitconversion_input')) {
+
+          if (id === this.spectralCoverageFieldID) {
+            //toggle the spectral cutout checkbox as appropriate
+            this._indicateInputPresence(hasValue, id, value)
+            // Spectral cutout checkbox is enabled if there is input
+            this._enableSpectralCutoutCheckbox(hasValue)
+          }
+
         // Pass request to server
         $.getJSON(
           autocompleteURL, {
@@ -1827,6 +1825,8 @@
       resolverPopover.popover('hide')
     }
 
+
+
     /**
      * Check current form to see if upload target file is given
      * @returns {boolean}
@@ -1847,6 +1847,24 @@
     this.doSpectralCutout = function () {
       var spectralCutout = this.$form.find("input[name$='.energy.DOWNLOADCUTOUT']")
       return spectralCutout.prop('checked')
+    }
+
+    this._enableSpatialCutoutCheckbox = function (enableBox) {
+      var spatialCutout = this.$form.find("input[name$='.position.DOWNLOADCUTOUT']")
+      if (enableBox === true) {
+        // Clear checkbox so it's not picked up as part of search request
+        spatialCutout.prop('checked', false)
+      }
+      this.toggleDisabled(spatialCutout, !enableBox)
+    }
+
+    this._enableSpectralCutoutCheckbox = function (enableBox) {
+      var spectralCutout = this.$form.find("input[name$='.energy.DOWNLOADCUTOUT']")
+      if (enableBox === true) {
+        // Clear checkbox so it's not picked up as part of search request
+        spectralCutout.prop('checked', false)
+      }
+      this.toggleDisabled(spectralCutout, !enableBox)
     }
 
     /**
@@ -2067,13 +2085,9 @@
         $(this).val('')
       })
 
-      $('#' + this.id + "input[name$='.DOWNLOADCUTOUT']").prop('checked', false)
-      this.toggleDisabled(
-        $(
-          '#' + this.id + " input[name$='.DOWNLOADCUTOUT']"
-        ),
-        false
-      )
+      // Both cutout boxes are disabled by default
+      this._enableSpectralCutoutCheckbox(false)
+      this._enableSpatialCutoutCheckbox(false)
 
       this.$form.find('input.search_criteria_input').each(
         function (key, value) {

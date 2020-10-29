@@ -37,7 +37,7 @@
   },
   "Plane.position.DOWNLOADCUTOUT": {
     "tipHTML":
-      "Check this box to return image cutouts rather than full images. Cutouts will be centred on the location determined from the \"Target\" box. The size of the cutouts will be twice the radius specified in the \"Target\" box. If no radius is specified then a default of 1 arcmin is used. Cutouts for a list of targets from \"Choose File\" are not yet implemented."
+      "<p>Enter a \"Target\" value or select an \"Upload Targets\" file to enable this search option.</p><p>Check the box to return image cutouts rather than full images. Cutouts will be centred on the location determined by the resolver for each target provided. The size of the cutouts will be twice the radius specified. If no radius is specified then a default of 1 arcmin is used.</p>"
   },
   "Plane.time.bounds.samples": {
     "tipHTML":
@@ -73,7 +73,7 @@
   },
   "Plane.energy.DOWNLOADCUTOUT": {
     "tipHTML":
-      "Check this box to return image cutouts rather than full images. Cutouts will be constrained to the range in the \"Spectral Coverage\" box."
+      "<p>Enter a \"Spectral Coverage\" value to enable this option. </p><p>Check the box to return image cutouts rather than full images. Cutouts will be constrained to the range in the \"Spectral Coverage\" box.</p>"
   },
   "download_data": {
     "tipHTML":
