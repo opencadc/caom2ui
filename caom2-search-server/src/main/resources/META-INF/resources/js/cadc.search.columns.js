@@ -102,6 +102,14 @@
                   ]
                 }
               },
+              'caom2:Upload.radius': {
+                tap_column_name: 'Upload.radius',
+                datatype: 'double',
+                label: 'Cutout Radius',
+                formField: 'targetList',
+                fitMax: false,
+                visible: false
+              },
               'caom2:Observation.observationID': {
                 label: 'Obs. ID',
                 fitMax: true,
@@ -264,10 +272,7 @@
                     var observationID = queryItems[0]
                     var productID = queryItems[1]
 
-                    var runID = $('#downloadForm')
-                      .find("input[name='fragment']")
-                      .val()
-                      .substring(6)
+                    var runID = $('#downloadForm').find("input[name='runid']").val()
 
                     // Get the thumbnails and previews from datalink
                     $.ajax({

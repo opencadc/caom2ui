@@ -7,10 +7,18 @@
 <%@ taglib tagdir="/WEB-INF/tags/cadc" prefix="cadc" %>
 
 
-<div class="col-sm-12 label_tooltip_${param.tipSide}">
+<div class="label_tooltip_${param.tipSide}">
+
+    <div data-toggle="popover"
+         data-utype="${param.name}"
+         data-placement="${param.tipSide}"
+         data-title="<fmt:message key="${param.name}_FORM_LABEL" bundle="${langBundle}"/>"
+         class="advancedsearch-tooltip glyphicon glyphicon-question-sign popover-blue popover-right">
+    </div>
+
     <div class="form-group">
         <cadc:checkbox checkboxName="${param.name}" i18nKey="${param.name}_FORM_LABEL" />
         <input type="hidden"
-               name="<%= FormConstraint.FORM_NAME %>" >
+               name="<%= FormConstraint.FORM_NAME %>" disabled="disabled"/>
     </div>
 </div>

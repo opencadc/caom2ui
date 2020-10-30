@@ -44,6 +44,7 @@
                 upload_target_name_id: 'caom2:Upload.target',
                 upload_target_ra_id: 'caom2:Upload.ra',
                 upload_target_dec_id: 'caom2:Upload.dec',
+                upload_target_radius_id: 'caom2:Upload.radius',
               }
             },
             ObsCore: {
@@ -60,6 +61,7 @@
                 upload_target_name_id: 'obscore:Upload.target',
                 upload_target_ra_id: 'obscore:Upload.ra',
                 upload_target_dec_id: 'obscore:Upload.dec',
+                upload_target_radius_id: 'obscore:Upload.radius',
               }
             },
             types: {
@@ -75,6 +77,7 @@
                 upload_target_name_id: 'caom2:Upload.target',
                 upload_target_ra_id: 'caom2:Upload.ra',
                 upload_target_dec_id: 'caom2:Upload.dec',
+                upload_target_radius_id: 'caom2:Upload.radius',
               },
               ObsCore: {
                 id: 'ObsCore',
@@ -88,6 +91,7 @@
                 upload_target_name_id: 'obscore:Upload.target',
                 upload_target_ra_id: 'obscore:Upload.ra',
                 upload_target_dec_id: 'obscore:Upload.dec',
+                upload_target_radius_id: 'obscore:Upload.radius',
               }
             },
             SearchForm: SearchForm,
@@ -405,6 +409,18 @@
         xtype,
         order
       )
+
+      order = allColumnIDs.indexOf(utypeConfig.upload_target_radius_id)
+      this._addFieldsForUType(
+        utypeConfig.upload_target_radius_id,
+        ucd,
+        unit,
+        datatype,
+        undefined,
+        description,
+        xtype,
+        order
+      )
     }
 
     /**
@@ -583,12 +599,24 @@
 
     /**
      * Augment the list provided with additional column IDs associated
-     * with the target upload form field
+     * with the target upload form field. These will be displayed in the initial
+     * results.
      * @param columnIDs
      * @returns {*|any[]|string}
      */
+    this.addDefaultUploadColumns = function(columnIDs) {
+      return this.config.addDefaultUploadColumns(columnIDs)
+    }
 
+    /**
+     * Augment the list provided with all additional column IDs associated
+     * with the target upload form field.
+     * @param columnIDs
+     * @returns {*|any[]|string}
+     */
     this.addUploadColumns = function(columnIDs) {
+      // Add default and other columns
+      //return this.config.addOtherUploadColumns(this.config.addDefaultUploadColumns(columnIDs))
       return this.config.addUploadColumns(columnIDs)
     }
 
@@ -646,22 +674,43 @@
      * @param columnIDs
      * @returns {*|any[]|string}
      */
-    this.addUploadColumns = function(columnIDs) {
+    this.addDefaultUploadColumns = function(columnIDs) {
       // upload cols need to be in display order
       // add this bundle right after the 'Preview' column
 
       // NOTE: this function could be generalized to add fields for a named
       // form field. Complications may occur in making the order of the columns
       // sane if more than one form field with columns associated is used.
-      var uploadColumnIDs = [
+      // - and: could allow a position argument to be passed in so set of values
+      // could be put in a particular spot in the column list
+      var defaultUploadColumnIDs = [
         this.config.upload_target_name_id,
         this.config.upload_target_ra_id,
         this.config.upload_target_dec_id
       ]
+
       var firstEl = columnIDs.slice(0,1) // uri has to be first in display
-      return firstEl.concat(uploadColumnIDs.concat(columnIDs.slice(1, columnIDs.length)))
+      return firstEl.concat(defaultUploadColumnIDs.concat(columnIDs.slice(1, columnIDs.length)))
     }
 
+    /**
+     * Augment the list provided with additional column IDs associated
+     * with the target upload form field
+     * @param columnIDs
+     * @returns {*|any[]|string}
+     */
+    this.addOtherUploadColumns = function(columnIDs) {
+
+      var otherUploadColumnIDs = [
+        this.config.upload_target_radius_id
+      ]
+
+      return columnIDs.concat(otherUploadColumnIDs)
+    }
+
+    this.addUploadColumns = function(columnIDs) {
+      return this.addOtherUploadColumns(this.addDefaultUploadColumns(columnIDs))
+    }
     /**
      * Obtain the full set of column IDs that will be in the select list, based
      * on some conditions at search time.
@@ -742,7 +791,14 @@
      * @param columnIDs
      * @returns {*}
      */
-    this.addUploadColumns = function(columnIDs) {
+    this.addDefaultUploadColumns = function(columnIDs) {
+      // For now, there are no upload columns to add for obscore
+      // The upload function doesn't work (as of June 2020) and needs
+      // to be fixed, so this function will be upgraded at that point
+      return columnIDs
+    }
+
+    this.addOtherUploadColumns = function(columnIDs) {
       // For now, there are no upload columns to add for obscore
       // The upload function doesn't work (as of June 2020) and needs
       // to be fixed, so this function will be upgraded at that point
@@ -802,6 +858,7 @@
     this.currentTimeoutID = null
 
     this.targetNameFieldID = null
+    this.spectralCoverageFieldID = null
 
     /**
      * The data train at the bottom of the form.
@@ -831,6 +888,9 @@
       this.targetNameFieldID = $currForm
         .find("input[name$='@Shape1.value']")
         .prop('id')
+      this.spectralCoverageFieldID = $currForm
+        .find("input[name$='@Energy.value']")
+        .prop('id')
 
       $currForm.find('.search_criteria_input').on(
         'change input',
@@ -846,32 +906,16 @@
             if ($(event.target).val() !== '') {
               $('.targetList_clear').show()
               this.toggleDisabled(
-                $(
-                  '#' + this.id + " input[id='" + this.targetNameFieldID + "']"
-                ),
+                $('#' + this.id + " input[id='" + this.targetNameFieldID + "']"),
                 true
               )
-              $("input[name$='.DOWNLOADCUTOUT']").prop('checked', false)
-              this.toggleDisabled(
-                $(
-                  '#' + this.id + " input[name$='.DOWNLOADCUTOUT']"
-                ),
-                true
-              )
-
+              this._enableSpatialCutoutCheckbox(true)
             } else {
               this.toggleDisabled(
-                $(
-                  '#' + this.id + " input[id='" + this.targetNameFieldID + "']"
-                ),
+                $('#' + this.id + " input[id='" + this.targetNameFieldID + "']"),
                 false
               )
-              this.toggleDisabled(
-                $(
-                  '#' + this.id + " input[name$='.DOWNLOADCUTOUT']"
-                ),
-                false
-              )
+              this._enableSpatialCutoutCheckbox(false)
             }
           }.bind(this)
         )
@@ -1267,6 +1311,8 @@
         }
 
         this.toggleDisabled($("input[id='" + id + "_targetList']"), hasValue)
+        // Enable the spatial cutout checkbox if there is a value in the target resolver input
+        this._enableSpatialCutoutCheckbox(hasValue)
 
         if (hasValue === true && resolver !== 'NONE') {
           this.clearTimeout()
@@ -1335,6 +1381,14 @@
           this._clearTargetNameResolutionStatus()
         }
       } else if ($node.hasClass('ui_unitconversion_input')) {
+
+          if (id === this.spectralCoverageFieldID) {
+            //toggle the spectral cutout checkbox as appropriate
+            this._indicateInputPresence(hasValue, id, value)
+            // Spectral cutout checkbox is enabled if there is input
+            this._enableSpectralCutoutCheckbox(hasValue)
+          }
+
         // Pass request to server
         $.getJSON(
           autocompleteURL, {
@@ -1771,6 +1825,8 @@
       resolverPopover.popover('hide')
     }
 
+
+
     /**
      * Check current form to see if upload target file is given
      * @returns {boolean}
@@ -1781,6 +1837,34 @@
       return (inputFile.length > 0 &&
         !inputFile.prop('disabled') &&
         inputFile.val() !== '')
+    }
+
+    this.doSpatialCutout = function () {
+      var spatialCutout = this.$form.find("input[name$='.position.DOWNLOADCUTOUT']")
+      return spatialCutout.prop('checked')
+    }
+
+    this.doSpectralCutout = function () {
+      var spectralCutout = this.$form.find("input[name$='.energy.DOWNLOADCUTOUT']")
+      return spectralCutout.prop('checked')
+    }
+
+    this._enableSpatialCutoutCheckbox = function (enableBox) {
+      var spatialCutout = this.$form.find("input[name$='.position.DOWNLOADCUTOUT']")
+      if (enableBox === true) {
+        // Clear checkbox so it's not picked up as part of search request
+        spatialCutout.prop('checked', false)
+      }
+      this.toggleDisabled(spatialCutout, !enableBox)
+    }
+
+    this._enableSpectralCutoutCheckbox = function (enableBox) {
+      var spectralCutout = this.$form.find("input[name$='.energy.DOWNLOADCUTOUT']")
+      if (enableBox === true) {
+        // Clear checkbox so it's not picked up as part of search request
+        spectralCutout.prop('checked', false)
+      }
+      this.toggleDisabled(spectralCutout, !enableBox)
     }
 
     /**
@@ -1798,7 +1882,7 @@
       // For now, this supports the Target Upload file field only.
       if (this.hasInputFile() === true) {
         // functions that use this are expecting a jquery object
-        columnIDs = $(this.configuration.addUploadColumns(columnIDs.toArray()))
+        columnIDs = $(this.configuration.addDefaultUploadColumns(columnIDs.toArray()))
       }
       return columnIDs
     }
@@ -2001,13 +2085,9 @@
         $(this).val('')
       })
 
-      $('#' + this.id + "input[name$='.DOWNLOADCUTOUT']").prop('checked', false)
-      this.toggleDisabled(
-        $(
-          '#' + this.id + " input[name$='.DOWNLOADCUTOUT']"
-        ),
-        false
-      )
+      // Both cutout boxes are disabled by default
+      this._enableSpectralCutoutCheckbox(false)
+      this._enableSpatialCutoutCheckbox(false)
 
       this.$form.find('input.search_criteria_input').each(
         function (key, value) {

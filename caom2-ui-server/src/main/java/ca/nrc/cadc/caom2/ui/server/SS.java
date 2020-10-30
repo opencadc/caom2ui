@@ -190,7 +190,7 @@ public class SS {
                 sb.append("states: ");
                 if (comp.states != null) {
                     for (PolarizationState ps : comp.states) {
-                        sb.append(ps.stringValue()).append(" ");
+                        sb.append(ps.getValue()).append(" ");
                     }
                 }
                 sb.append("<br>").append("dimension: ").append(comp.dimension);
