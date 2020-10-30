@@ -19,6 +19,6 @@
     <div class="form-group">
         <cadc:checkbox checkboxName="${param.name}" i18nKey="${param.name}_FORM_LABEL" />
         <input type="hidden"
-               name="<%= FormConstraint.FORM_NAME %>" disabled >
+               name="<%= FormConstraint.FORM_NAME %>" disabled="disabled"/>
     </div>
 </div>
