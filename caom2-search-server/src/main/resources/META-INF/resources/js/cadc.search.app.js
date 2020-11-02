@@ -817,34 +817,31 @@
           var selectedCollections = this._getActiveForm().getCollectionSelectID()
           var currentCollections = $(
               '#' + selectedCollections.replace('.', '\\.')).val()
-          if (resultsVOTV) {
-            if (currentCollections.sort().join('') ===
-                previousCollections.sort().join('')) {
-              // Save viewer state from previous search
-              preserveColumnState = true
-              prevColumns = resultsVOTV.getColumns()
 
-              // Note: Results table column state is retained if the collection
-              // set selected is the same from one search to the next.
-              //  If an upload target file was used, additional columns will be
-              // added to the results table. If the results table is removed from
-              // the search, and the collections set stays the same, these additional
-              // columns are left in the results column (empty, as the search will return
-              // no data for them.) Expected behaviour is the columns would only be
-              // displayed if a target upload file is in the current search.
-              // Issue opened in github: https://github.com/opencadc/caom2ui/issues/182
-              // HJ, June 2020
-              prevDisplayedColumns = resultsVOTV.getDisplayedColumns()
-              prevColumnSelects = resultsVOTV.getUpdatedColumnSelects()
-              prevSortOptions['sortcol'] = resultsVOTV.sortcol
-              prevSortOptions['sortAsc'] = resultsVOTV.sortAsc
+          var cadcForm = args.cadcForm
+
+          if (resultsVOTV) {
+            // the results column set is retained if the collection used
+            // in the search is the same AND the form itself says it
+            // should be prserved
+            if ( (currentCollections.sort().join('') ===
+                previousCollections.sort().join('') )
+              && (cadcForm.preserveColumnSet() === true) ) {
+
+                // Save viewer state from previous search
+                preserveColumnState = true
+                prevColumns = resultsVOTV.getColumns()
+
+                prevDisplayedColumns = resultsVOTV.getDisplayedColumns()
+                prevColumnSelects = resultsVOTV.getUpdatedColumnSelects()
+                prevSortOptions['sortcol'] = resultsVOTV.sortcol
+                prevSortOptions['sortAsc'] = resultsVOTV.sortAsc
+
             }
 
             resultsVOTV.destroy()
           }
           previousCollections = currentCollections
-
-          var cadcForm = args.cadcForm
 
           // Searching on different data.  Switch the columns.
           if (!this.activeFormID || !cadcForm.isActive(this.activeFormID)) {
