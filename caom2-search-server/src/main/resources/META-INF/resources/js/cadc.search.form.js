@@ -1844,7 +1844,7 @@
     }
 
     /**
-     * Determine if the current column set be preserved through the next search.
+     * Determine if the current column set can be preserved through the next search.
      * @returns {boolean}
      */
     this.preserveColumnSet = function () {
