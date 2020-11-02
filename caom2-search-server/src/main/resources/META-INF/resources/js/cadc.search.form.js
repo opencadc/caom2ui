@@ -138,6 +138,10 @@
     this.config = _config
     this.options = _options
 
+    // Used to flag whether the column set has any form field-related
+    // columns added.
+    this.hasAugmentedColumnSet = false
+
     /**
      * @type {Metadata|cadc.vot.Metadata}
      */
@@ -1839,6 +1843,17 @@
         inputFile.val() !== '')
     }
 
+    /**
+     * Check to see if the current column set has been augmented,
+     * as compared to current form fields.
+     * @returns {*}
+     */
+    this.preserveColumnSet = function () {
+      // hasAugmentedColumnSet reflects what happened on the previous form
+      // submit.
+      return this.hasInputFile() === this.hasAugmentedColumnSet
+    }
+
     this.doSpatialCutout = function () {
       var spatialCutout = this.$form.find("input[name$='.position.DOWNLOADCUTOUT']")
       return spatialCutout.prop('checked')
@@ -1883,6 +1898,9 @@
       if (this.hasInputFile() === true) {
         // functions that use this are expecting a jquery object
         columnIDs = $(this.configuration.addDefaultUploadColumns(columnIDs.toArray()))
+        this.hasAugmentedColumnSet = true
+      } else {
+        this.hasAugmentedColumnSet = false
       }
       return columnIDs
     }
@@ -1902,6 +1920,9 @@
 
       if (this.hasInputFile() === true) {
         allColumnIDs = this.configuration.addUploadColumns(allColumnIDs)
+        this.hasAugmentedColumnSet = true
+      } else {
+        this.hasAugmentedColumnSet = false
       }
       return allColumnIDs
     }
