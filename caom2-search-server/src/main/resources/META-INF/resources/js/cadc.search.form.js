@@ -1846,7 +1846,7 @@
     /**
      * Check to see if the current column set has been augmented,
      * as compared to current form fields.
-     * @returns {*}
+     * @returns {boolean}
      */
     this.preserveColumnSet = function () {
       // hasAugmentedColumnSet reflects what happened on the previous form
