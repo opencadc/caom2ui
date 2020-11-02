@@ -1844,13 +1844,16 @@
     }
 
     /**
-     * Check to see if the current column set has been augmented,
-     * as compared to current form fields.
+     * Determine if the current column set be preserved through the next search.
      * @returns {boolean}
      */
     this.preserveColumnSet = function () {
+      // Check to see if the current column set has been augmented,
+      // as compared to current form fields.
       // hasAugmentedColumnSet reflects what happened on the previous form
       // submit.
+
+      // Check target upload file augmented column requirements
       return this.hasInputFile() === this.hasAugmentedColumnSet
     }
 
