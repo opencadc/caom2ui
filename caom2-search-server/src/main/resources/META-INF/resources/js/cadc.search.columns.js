@@ -12,6 +12,7 @@
             OBSCORE_RESOLVER_VALUE_KEY: 'Char.SpatialAxis.Coverage.Support.Area@Shape1Resolver.value',
             CAOM2_TARGET_NAME_VALUE_KEY: 'Plane.position.bounds@Shape1.value',
             COLLECTION_VALUE_KEY: 'Observation.collection',
+            INSTRUMENT_NAME_KEY: 'Observation.instrument.name',
             DETAILS_CSS: 'details_tooltip_link',
             DATALINK_URL_SUFFIX: '/datalink',
             columns: {
@@ -19,6 +20,7 @@
               OBSERVATION_URI_UTYPE: 'caom2:Observation.uri',
               OBSERVATION_ID_UTYPE: 'caom2:Observation.observationID',
               COLLECTION_UTYPE: 'caom2:Observation.collection',
+              INSTRUMENT_NAME_UTYPE: 'caom2:Observation.instrument.name',
               ColumnManager: ColumnManager
             },
             datalink: {
@@ -938,8 +940,22 @@
                 valueFormatter: function (value, column) {
                   return formatUnit(value, column, 'IVOA')
                 },
-                formatter: function (row, cell, value, columnDef) {
+                formatter: function (row, cell, value, columnDef, dataContext) {
                   var searchValue = {}
+                  //caom2:Observation.collection
+                  //caom2:Observation.instrument.name
+                  var instrument =
+                        dataContext[ca.nrc.cadc.search.columns.INSTRUMENT_NAME_UTYPE]
+                  if (instrument) {
+                    searchValue[ca.nrc.cadc.search.INSTRUMENT_NAME_KEY] = instrument
+                  }
+
+                  var collection =
+                        dataContext[ca.nrc.cadc.search.columns.COLLECTION_UTYPE]
+
+                  if (collection) {
+                    searchValue[ca.nrc.cadc.search.COLLECTION_VALUE_KEY] = collection
+                  }
 
                   if (value) {
                     var intValue = parseInt(value)
