@@ -117,6 +117,7 @@ public class SearchResultsPage extends AbstractTestWebPage {
     static final By FIRST_QUICKSEARCH_TARGET_LINK = By.cssSelector("a.quicksearch_link:nth-child(1)");
     static final By QUERY_TAB_LOCATOR = By.cssSelector("#tabList > li:nth-child(1)");
 
+
     // Switches between busy and transparent (idle).
     static final By GRID_HEADER_ICON = By.className("grid-header-icon");
 
@@ -280,6 +281,11 @@ public class SearchResultsPage extends AbstractTestWebPage {
 
     void ensureMarkAllCheckboxVisible() throws Exception {
         waitForElementVisible(MARK_ALL_CHECKBOX_BY);
+    }
+
+    String getStartDateLink() throws Exception {
+        List<WebElement> quickSearches = driver.findElements(FIRST_QUICKSEARCH_TARGET_LINK);
+        return quickSearches.get(1).getAttribute("href");
     }
 
 }
