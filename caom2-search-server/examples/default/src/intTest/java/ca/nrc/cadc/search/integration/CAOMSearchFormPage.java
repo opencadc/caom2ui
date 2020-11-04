@@ -89,6 +89,7 @@ public class CAOMSearchFormPage extends AbstractSearchFormPage
     private static final int DEFAULT_TIMEOUT_IN_SECONDS = 25;
     private static final By H1_HEADER = By.cssSelector("h1");
 
+    static final By COOKIE_BANNER_BUTTON = By.id("cookies_accept");
     static final By DATA_TRAIN_LOCATOR = By.id("caom2_data_train");
     static final By DATA_TRAIN_COLLECTION_MENU = By.id("Observation.collection");
     static final By DATA_TRAIN_INSTRUMENT_MENU = By.id("Observation.instrument.name");
@@ -226,4 +227,10 @@ public class CAOMSearchFormPage extends AbstractSearchFormPage
         selectWindow(curWindowTitle);
     }
 
+    public CAOMSearchFormPage dismissCookieBanner() throws Exception {
+        waitForElementClickable(COOKIE_BANNER_BUTTON);
+        click(COOKIE_BANNER_BUTTON);
+
+        return new CAOMSearchFormPage(driver);
+    }
 }

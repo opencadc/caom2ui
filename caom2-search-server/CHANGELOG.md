@@ -1,3 +1,17 @@
+## Nov 3, 2020
+### 2.12.7
+* Minor change: Further constrain start date quick links to include collection and instrument name.
+
+## Nov 2, 2020
+### 2.12.6
+* Fix for github issue: https://github.com/opencadc/caom2ui/issues/182 
+* Additional results columns displayed for Upload Target file not going away when switching
+to a single target search. (And the columns didn't show up under certain search combinations.)
+
+## Oct 30, 2020
+### 2.12.5
+* Change: support 'Do Spatial Cutout' for Upload Target files
+
 ## Oct 2, 2020
 ### 2.12.4
 * Minor change: Bug fix for upload target file radius being ignored during search.
