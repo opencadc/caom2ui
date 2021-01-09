@@ -1,3 +1,9 @@
+## Jan 8, 2020
+### 2.12.8
+* Minor change: Adding HST column bundle to display project proposal 
+column so HAP products can be identified and set column display 
+order to be unique to HST collection.
+
 ## Nov 3, 2020
 ### 2.12.7
 * Minor change: Further constrain start date quick links to include collection and instrument name.
