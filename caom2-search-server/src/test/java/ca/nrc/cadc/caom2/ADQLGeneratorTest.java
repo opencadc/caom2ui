@@ -162,7 +162,6 @@ public class ADQLGeneratorTest extends AbstractUnitTest<ADQLGenerator>
             new IntervalSearch("Plane.energy.bounds.samples", null, 888.0d, "m");
         final String sql2 = getTestSubject().toSQL(intervalSearch2, null,
             false);
-        System.out.println(sql2);
         assertEquals("SQL doesn't match.",
             "Plane.energy_bounds_upper <= 888.0",
             sql2);
