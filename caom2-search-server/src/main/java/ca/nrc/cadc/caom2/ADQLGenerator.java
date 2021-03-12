@@ -199,7 +199,15 @@ public class ADQLGenerator extends AbstractPersistenceService {
             throw new UnsupportedOperationException(
                     "IntervalSearch to SQL (fuzzy match)");
         } else if (CAOM2_ENERGY_UTYPE.equals(s.getName())) {
-            sql = toIntersectSQL(s, getColumnName(CAOM2_ENERGY_UTYPE));
+            // CADC-9369, CADC-1052: call this version of toIntersectSQL so it's a plain
+            // upper & lower bound comparison rather than INTERSECTS, which is returning
+            // invalid results
+            // parameters below are IntervalSearch, upper bound, lower bound
+            sql = toIntervalSQL(s, getColumnName("Plane.energy.bounds.upper"),
+                getColumnName("Plane.energy.bounds.lower"));
+            // TODO: reinstate this when CADC-9369 changes are reverted, after
+            // CADC-9367 is completed
+            //            sql = toIntersectSQL(s, getColumnName(CAOM2_ENERGY_UTYPE));
         } else if (CAOM2_TIME_UTYPE.equals(s.getName())) {
             sql = toIntersectSQL(s, getColumnName(CAOM2_TIME_UTYPE));
         } else if (OBSCORE_ENERGY_UTYPE.equals(s.getName())) {

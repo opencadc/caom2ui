@@ -2,7 +2,7 @@
  ************************************************************************
  ****  C A N A D I A N   A S T R O N O M Y   D A T A   C E N T R E  *****
  *
- * (c) 2012.                         (c) 2012.
+ * (c) 2021.                            (c) 2021.
  * National Research Council            Conseil national de recherches
  * Ottawa, Canada, K1A 0R6              Ottawa, Canada, K1A 0R6
  * All rights reserved                  Tous droits reserves
@@ -136,17 +136,37 @@ public class ADQLGeneratorTest extends AbstractUnitTest<ADQLGenerator>
                 new IntervalSearch("Plane.energy.bounds.samples", 88.0d, 888.0d, "m");
         final String sql = getTestSubject().toSQL(intervalSearch, null,
                                                   false);
+
+        // CADC-9369: these tests are changed from intersects to interval SQL
+        // temporarily until underlying argus queries
+        // are fixed in CADC-9367 - Mar 11/21, HGJ
+        //        assertEquals("SQL doesn't match.",
+        //                     "INTERSECTS( INTERVAL( 88.0, 888.0 ), Plane.energy_bounds_samples ) = 1",
+        //                     sql);
+        //
+        //
+        //        final IntervalSearch intervalSearch2 =
+        //                new IntervalSearch("Plane.energy.bounds.samples", null, 888.0d, "m");
+        //        final String sql2 = getTestSubject().toSQL(intervalSearch2, null,
+        //                                                   false);
+        //        assertEquals("SQL doesn't match.",
+        //                     "INTERSECTS( INTERVAL( 0.0, 888.0 ), Plane.energy_bounds_samples ) = 1",
+        //                     sql2);
+
+
         assertEquals("SQL doesn't match.",
-                     "INTERSECTS( INTERVAL( 88.0, 888.0 ), Plane.energy_bounds_samples ) = 1",
-                     sql);
+            "Plane.energy_bounds_upper <= 888.0 AND 88.0 <= Plane.energy_bounds_lower",
+            sql);
 
         final IntervalSearch intervalSearch2 =
-                new IntervalSearch("Plane.energy.bounds.samples", null, 888.0d, "m");
+            new IntervalSearch("Plane.energy.bounds.samples", null, 888.0d, "m");
         final String sql2 = getTestSubject().toSQL(intervalSearch2, null,
-                                                   false);
+            false);
         assertEquals("SQL doesn't match.",
-                     "INTERSECTS( INTERVAL( 0.0, 888.0 ), Plane.energy_bounds_samples ) = 1",
-                     sql2);
+            "Plane.energy_bounds_upper <= 888.0",
+            sql2);
+
+
     }
 
     @Test
