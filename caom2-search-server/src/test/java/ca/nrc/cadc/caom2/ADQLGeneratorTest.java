@@ -152,10 +152,9 @@ public class ADQLGeneratorTest extends AbstractUnitTest<ADQLGenerator>
         //        assertEquals("SQL doesn't match.",
         //                     "INTERSECTS( INTERVAL( 0.0, 888.0 ), Plane.energy_bounds_samples ) = 1",
         //                     sql2);
-
-
+        
         assertEquals("SQL doesn't match.",
-            "Plane.energy_bounds_upper <= 888.0 AND 88.0 <= Plane.energy_bounds_lower",
+            "Plane.energy_bounds_lower <= 888.0 AND 88.0 <= Plane.energy_bounds_upper",
             sql);
 
         final IntervalSearch intervalSearch2 =
@@ -163,7 +162,7 @@ public class ADQLGeneratorTest extends AbstractUnitTest<ADQLGenerator>
         final String sql2 = getTestSubject().toSQL(intervalSearch2, null,
             false);
         assertEquals("SQL doesn't match.",
-            "Plane.energy_bounds_upper <= 888.0",
+            "Plane.energy_bounds_lower <= 888.0",
             sql2);
 
 
