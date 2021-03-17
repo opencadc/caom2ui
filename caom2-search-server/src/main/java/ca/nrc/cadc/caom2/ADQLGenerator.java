@@ -203,8 +203,8 @@ public class ADQLGenerator extends AbstractPersistenceService {
             // upper & lower bound comparison rather than INTERSECTS, which is returning
             // invalid results
             // parameters below are IntervalSearch, upper bound, lower bound
-            sql = toIntervalSQL(s, getColumnName("Plane.energy.bounds.upper"),
-                getColumnName("Plane.energy.bounds.lower"));
+            sql = toIntervalSQL(s, getColumnName("Plane.energy.bounds.lower"),
+                getColumnName("Plane.energy.bounds.upper"));
             // TODO: reinstate this when CADC-9369 changes are reverted, after
             // CADC-9367 is completed
             //            sql = toIntersectSQL(s, getColumnName(CAOM2_ENERGY_UTYPE));
