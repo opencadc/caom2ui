@@ -211,6 +211,7 @@ public class ADQLGenerator extends AbstractPersistenceService {
         } else if (CAOM2_TIME_UTYPE.equals(s.getName())) {
             sql = toIntersectSQL(s, getColumnName(CAOM2_TIME_UTYPE));
         } else if (OBSCORE_ENERGY_UTYPE.equals(s.getName())) {
+            // When CADC-9367 is done, change this to match CAOM@_ENERGY_UTYPE search type
             sql = toIntervalSQL(s,
                                 getColumnName(OBSCORE_ENERGY_UTYPE + ".LoLimit"),
                                 getColumnName(OBSCORE_ENERGY_UTYPE + ".HiLimit"));
