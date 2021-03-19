@@ -150,29 +150,29 @@ public class ADQLGenerator extends AbstractPersistenceService {
      * @param col2 The upper bound column to search on.
      * @return String SQL fragment.
      */
-    private String toIntervalSQL(final IntervalSearch s, final String col1,
-                                 final String col2) {
+    private String toIntervalSQL(final IntervalSearch s, final String lowerBoundColName,
+                                 final String upperBoundColName) {
         final StringBuilder sb = new StringBuilder();
 
         if ((s.getLower() != null) && (s.getUpper() != null)) {
             // contains
-            sb.append(col1);
+            sb.append(lowerBoundColName);
             sb.append(" <= ");
-            sb.append(s.getUpper());
-            sb.append(" AND ");
             sb.append(s.getLower());
+            sb.append(" AND ");
+            sb.append(s.getUpper());
             sb.append(" <= ");
-            sb.append(col2);
+            sb.append(upperBoundColName);
         } else if (s.getUpper() != null) {
             // below
-            sb.append(col1);
+            sb.append(upperBoundColName);
             sb.append(" <= ");
             sb.append(s.getUpper());
         } else if (s.getLower() != null) {
             // above
+            sb.append(lowerBoundColName);
+            sb.append(" >= ");
             sb.append(s.getLower());
-            sb.append(" <= ");
-            sb.append(col2);
         }
 
         return sb.toString();
@@ -215,8 +215,8 @@ public class ADQLGenerator extends AbstractPersistenceService {
                                 getColumnName(OBSCORE_ENERGY_UTYPE + ".LoLimit"),
                                 getColumnName(OBSCORE_ENERGY_UTYPE + ".HiLimit"));
         } else if (OBSCORE_TIME_UTYPE.equals(s.getName())) {
-            sql = toIntervalSQL(s, getColumnName(OBSCORE_TIME_UTYPE + ".StopTime"),
-                                getColumnName(OBSCORE_TIME_UTYPE + ".StartTime"));
+            sql = toIntervalSQL(s, getColumnName(OBSCORE_TIME_UTYPE + ".StartTime"),
+                                getColumnName(OBSCORE_TIME_UTYPE + ".StopTime"));
         } else {
             throw new IllegalArgumentException("cannot use IntervalSearch with utype=" + s.getName());
         }
