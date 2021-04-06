@@ -1,13 +1,12 @@
 plugins {
-    id 'maven'
     id 'java'
+    id 'maven'
     id 'maven-publish'
-    id 'com.jfrog.bintray' version '1.8.5'
 }
 
 repositories {
-    mavenLocal()    
     mavenCentral()
+    mavenLocal()
 }
 
 dependencies {
@@ -29,3 +28,6 @@ dependencies {
 sourceCompatibility = 1.8
 group = 'org.opencadc'
 version = '2.5.2'
+
+description = 'OpenCADC CAOM UI library'
+def git_url = 'https://github.com/opencadc/caom2ui'
