@@ -297,187 +297,181 @@
                             'votable'
                           )
 
-                          // Check query status
-                          var queryStatus = evaluator.evaluate(
-                            "/VOTABLE/RESOURCE[@type='results']/INFO[@name='QUERY_STATUS' and @value='OK']"
+                          // Determine field indexes
+                          var accessUrlIndex
+                          var errorMessageIndex
+                          var semanticsIndex
+                          var readableIndex = -1
+                          var contentTypeIndex
+                          var fields = evaluator.evaluate(
+                            "/VOTABLE/RESOURCE[@type='results']/TABLE/FIELD"
                           )
-                          if (queryStatus.length !== 0) {
-                            // Determine field indexes
-                            var accessUrlIndex
-                            var errorMessageIndex
-                            var semanticsIndex
-                            var readableIndex = -1
-                            var contentTypeIndex
-                            var fields = evaluator.evaluate(
-                              "/VOTABLE/RESOURCE[@type='results']/TABLE/FIELD"
-                            )
-                            for (
-                              var fieldIndex = 0, fl = fields.length; fieldIndex < fl; fieldIndex++
-                            ) {
-                              var field = fields[fieldIndex]
-                              var name = field.getAttribute('name')
-                              switch (name) {
-                                case 'access_url':
-                                  {
-                                    accessUrlIndex = fieldIndex
-                                    break
-                                  }
+                          for (
+                            var fieldIndex = 0, fl = fields.length; fieldIndex < fl; fieldIndex++
+                          ) {
+                            var field = fields[fieldIndex]
+                            var name = field.getAttribute('name')
+                            switch (name) {
+                              case 'access_url':
+                                {
+                                  accessUrlIndex = fieldIndex
+                                  break
+                                }
 
-                                case 'error_message':
-                                  {
-                                    errorMessageIndex = fieldIndex
-                                    break
-                                  }
+                              case 'error_message':
+                                {
+                                  errorMessageIndex = fieldIndex
+                                  break
+                                }
 
-                                case 'semantics':
-                                  {
-                                    semanticsIndex = fieldIndex
-                                    break
-                                  }
+                              case 'semantics':
+                                {
+                                  semanticsIndex = fieldIndex
+                                  break
+                                }
 
-                                case 'readable':
-                                  {
-                                    readableIndex = fieldIndex
-                                    break
-                                  }
+                              case 'readable':
+                                {
+                                  readableIndex = fieldIndex
+                                  break
+                                }
 
-                                case 'content_type':
-                                  {
-                                    contentTypeIndex = fieldIndex
-                                    break
-                                  }
-                              }
+                              case 'content_type':
+                                {
+                                  contentTypeIndex = fieldIndex
+                                  break
+                                }
                             }
+                          }
 
-                            // Loop through the table rows
-                            var rowID = dataContext['id']
-                            var thumbnailURLs = []
-                            var previewURLs = []
-                            var packageURLs = []
-                            var otherURLs = []
-                            var tableDataRows = evaluator.evaluate(
-                              '/VOTABLE/RESOURCE[@type="results"]/TABLE/DATA/TABLEDATA/TR'
-                            )
+                          // Loop through the table rows
+                          var rowID = dataContext['id']
+                          var thumbnailURLs = []
+                          var previewURLs = []
+                          var packageURLs = []
+                          var otherURLs = []
+                          var tableDataRows = evaluator.evaluate(
+                            '/VOTABLE/RESOURCE[@type="results"]/TABLE/DATA/TABLEDATA/TR'
+                          )
 
-                            for (
-                              var trIndex = 0, trl = tableDataRows.length; trIndex < trl; trIndex++
-                            ) {
-                              var tableDataCells =
-                                tableDataRows[trIndex].children
-                              var errorMessage =
-                                tableDataCells[errorMessageIndex].textContent
-                              var readable =
-                                readableIndex >= 0 &&
-                                tableDataCells[readableIndex].textContent ===
-                                'true'
+                          for (
+                            var trIndex = 0, trl = tableDataRows.length; trIndex < trl; trIndex++
+                          ) {
+                            var tableDataCells =
+                              tableDataRows[trIndex].children
+                            var errorMessage =
+                              tableDataCells[errorMessageIndex].textContent
+                            var readable =
+                              readableIndex >= 0 &&
+                              tableDataCells[readableIndex].textContent ===
+                              'true'
 
-                              if (errorMessage.length > 0) {
-                                console.error(
-                                  'DataLink preview error: ' + errorMessage
-                                )
-                              } else if (readable === true) {
-                                var contentType =
-                                  tableDataCells[contentTypeIndex].textContent
-                                var semantics =
-                                  tableDataCells[semanticsIndex].textContent
-                                var accessURL =
-                                  tableDataCells.length >= accessUrlIndex ?
-                                  tableDataCells[accessUrlIndex].textContent :
-                                  ''
-                                if (accessURL) {
-                                  if (
-                                    semantics ===
-                                    ca.nrc.cadc.search.datalink.thumbnail_uri
-                                  ) {
-                                    thumbnailURLs.push(accessURL)
-                                  } else if (
-                                    semantics ===
-                                    ca.nrc.cadc.search.datalink.preview_uri &&
-                                    contentType.indexOf('image') >= 0
-                                  ) {
-                                    previewURLs.push(accessURL)
-                                  } else if (
-                                    semantics ===
-                                    ca.nrc.cadc.search.datalink.pkg_uri
-                                  ) {
-                                    packageURLs.push(accessURL)
-                                  } else {
-                                    otherURLs.push(accessURL)
-                                  }
+                            if (errorMessage.length > 0) {
+                              console.error(
+                                'DataLink preview error: ' + errorMessage
+                              )
+                            } else if (readable === true) {
+                              var contentType =
+                                tableDataCells[contentTypeIndex].textContent
+                              var semantics =
+                                tableDataCells[semanticsIndex].textContent
+                              var accessURL =
+                                tableDataCells.length >= accessUrlIndex ?
+                                tableDataCells[accessUrlIndex].textContent :
+                                ''
+                              if (accessURL) {
+                                if (
+                                  semantics ===
+                                  ca.nrc.cadc.search.datalink.thumbnail_uri
+                                ) {
+                                  thumbnailURLs.push(accessURL)
+                                } else if (
+                                  semantics ===
+                                  ca.nrc.cadc.search.datalink.preview_uri &&
+                                  contentType.indexOf('image') >= 0
+                                ) {
+                                  previewURLs.push(accessURL)
+                                } else if (
+                                  semantics ===
+                                  ca.nrc.cadc.search.datalink.pkg_uri
+                                ) {
+                                  packageURLs.push(accessURL)
+                                } else {
+                                  otherURLs.push(accessURL)
                                 }
                               }
                             }
+                          }
 
-                            // CADC Story 2288 - One Click Downloads
-                            // For those DataLink semantics that are not Previews or Thumbnails, keep track of
-                            // them and apply them as:
-                            // 1. If there is a single semantic left, then use it.
-                            // 2. If there are multiple semantics left with no #pkg semantic, disable one-click.
-                            // 3. Use the #pkg semantic URL.
-                            var $oneClickLink = $('a#_one-click_' + rowID)
-                            if (otherURLs.length === 1) {
-                              $oneClickLink.attr('href', otherURLs[0]).show()
-                            } else if (packageURLs.length >= 1) {
-                              $oneClickLink.attr('href', packageURLs[0]).show()
-                            }
+                          // CADC Story 2288 - One Click Downloads
+                          // For those DataLink semantics that are not Previews or Thumbnails, keep track of
+                          // them and apply them as:
+                          // 1. If there is a single semantic left, then use it.
+                          // 2. If there are multiple semantics left with no #pkg semantic, disable one-click.
+                          // 3. Use the #pkg semantic URL.
+                          var $oneClickLink = $('a#_one-click_' + rowID)
+                          if (otherURLs.length === 1) {
+                            $oneClickLink.attr('href', otherURLs[0]).show()
+                          } else if (packageURLs.length >= 1) {
+                            $oneClickLink.attr('href', packageURLs[0]).show()
+                          }
 
-                            // If datalink didn't provide thumbnail and preview URLs, create the urls and
-                            // check if they exist.
-                            if (
-                              thumbnailURLs.length === 0 &&
-                              previewURLs.length === 0
-                            ) {
-                              var thumbnailPreview = new ca.nrc.cadc.search.Preview(
+                          // If datalink didn't provide thumbnail and preview URLs, create the urls and
+                          // check if they exist.
+                          if (
+                            thumbnailURLs.length === 0 &&
+                            previewURLs.length === 0
+                          ) {
+                            var thumbnailPreview = new ca.nrc.cadc.search.Preview(
+                              collection,
+                              observationID,
+                              productID,
+                              256,
+                              runID,
+                              undefined
+                            )
+
+                            var addMainPreview = function (thumbnailURL) {
+                              var preview = new ca.nrc.cadc.search.Preview(
                                 collection,
                                 observationID,
                                 productID,
-                                256,
+                                1024,
                                 runID,
                                 undefined
                               )
 
-                              var addMainPreview = function (thumbnailURL) {
-                                var preview = new ca.nrc.cadc.search.Preview(
-                                  collection,
-                                  observationID,
-                                  productID,
-                                  1024,
-                                  runID,
-                                  undefined
-                                )
+                              preview.getPreview(function (previewURL) {
+                                if (previewURL) {
+                                  var $link = createLink($cell, thumbnailURL)
+                                  $link.attr('href', previewURL)
+                                  $link.attr('target', '_PREVIEW')
 
-                                preview.getPreview(function (previewURL) {
-                                  if (previewURL) {
-                                    var $link = createLink($cell, thumbnailURL)
-                                    $link.attr('href', previewURL)
-                                    $link.attr('target', '_PREVIEW')
-
-                                    var $previewImage = $('<img />')
-                                    $previewImage.prop(
-                                      'id',
-                                      observationID + '_256_preview'
-                                    )
-                                    $previewImage.prop('src', previewURL)
-                                    $previewImage.addClass('image-actual')
-                                  }
-                                })
-                              }
-
-                              thumbnailPreview.getPreview(
-                                addMainPreview,
-                                function (status) {
-                                  if (status === 404) {
-                                    addMainPreview(null)
-                                  }
+                                  var $previewImage = $('<img />')
+                                  $previewImage.prop(
+                                    'id',
+                                    observationID + '_256_preview'
+                                  )
+                                  $previewImage.prop('src', previewURL)
+                                  $previewImage.addClass('image-actual')
                                 }
-                              )
-                            } else {
-                              insertPreviewLink(
-                                previewURLs,
-                                thumbnailURLs,
-                                planePublisherIdValue
-                              )
+                              })
                             }
+
+                            thumbnailPreview.getPreview(
+                              addMainPreview,
+                              function (status) {
+                                if (status === 404) {
+                                  addMainPreview(null)
+                                }
+                              }
+                            )
+                          } else {
+                            insertPreviewLink(
+                              previewURLs,
+                              thumbnailURLs,
+                              planePublisherIdValue
+                            )
                           }
                         }
                       }
