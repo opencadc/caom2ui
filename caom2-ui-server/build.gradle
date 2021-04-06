@@ -17,7 +17,7 @@ dependencies {
 
     compile 'org.opencadc:cadc-access-control:[1.1,2.0)'
     compile 'org.opencadc:cadc-uws:[1.0.3,)'
-    compile 'org.opencadc:cadc-adql:[1.1.10,)'
+//    compile 'org.opencadc:cadc-adql:[1.1.10,)'
     compile 'org.opencadc:cadc-web-util:[1.2.6,)'
     compile 'org.opencadc:cadc-dali:[1.2.0,)'
     compile 'org.opencadc:caom2:[2.4.1, 2.5)'
