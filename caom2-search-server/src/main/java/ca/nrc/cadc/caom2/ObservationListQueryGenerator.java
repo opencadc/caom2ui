@@ -15,7 +15,7 @@ import ca.nrc.cadc.util.StringUtil;
 public class ObservationListQueryGenerator
         implements SearchTemplateQueryGenerator
 {
-    private ADQLGenerator adqlGenerator;
+    private final ADQLGenerator adqlGenerator;
 
 
     public ObservationListQueryGenerator(final String upload,
