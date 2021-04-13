@@ -49,7 +49,7 @@ import ca.nrc.cadc.search.form.SearchableFormConstraint;
  */
 public class Templates {
 
-    private static Logger log = Logger.getLogger(Templates.class);
+    private static final Logger LOGGER = Logger.getLogger(Templates.class);
     private static final int QUERY_LIMIT = 20000;
 
     public final List<FormError> errorList = new ArrayList<>();
@@ -77,9 +77,9 @@ public class Templates {
                     formConstraint.buildSearch(errorList);
             if (template != null) {
                 searchTemplates.add(template);
-                log.debug(template);
+                LOGGER.debug(template);
             } else {
-                log.debug("SearchTemplate is null");
+                LOGGER.debug("SearchTemplate is null");
             }
         }
 

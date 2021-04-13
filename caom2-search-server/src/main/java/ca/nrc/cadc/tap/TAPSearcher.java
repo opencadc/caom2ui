@@ -44,6 +44,7 @@ import ca.nrc.cadc.search.cutout.Cutout;
 import ca.nrc.cadc.search.cutout.dali.POSCutoutImpl;
 import ca.nrc.cadc.search.cutout.dali.BANDCutoutImpl;
 import ca.nrc.cadc.search.form.FormErrors;
+import ca.nrc.cadc.search.form.Shape1;
 import ca.nrc.cadc.search.parser.Resolver;
 import ca.nrc.cadc.search.parser.TargetData;
 import ca.nrc.cadc.search.parser.TargetParser;
@@ -87,7 +88,6 @@ public class TAPSearcher implements Searcher {
 
     private static final String CAOM2_RESOLVER_VALUE_KEY = "Plane.position.bounds@Shape1Resolver.value";
     private static final String CAOM2_TARGET_NAME_VALUE_KEY = "Plane.position.bounds@Shape1.value";
-    private static final String CAOM2_RESOLVER_VALUE_NONE = "NONE";
 
     private final SyncResponseWriter syncResponseWriter;
     private final QueryGenerator queryGenerator;
@@ -115,7 +115,7 @@ public class TAPSearcher implements Searcher {
      * @return True if set, false otherwise.
      */
     private boolean hasSetValidResolver(final String resolverName) {
-        return StringUtil.hasText(resolverName) && !resolverName.equals(CAOM2_RESOLVER_VALUE_NONE);
+        return StringUtil.hasText(resolverName) && !resolverName.equals(Shape1.RESOLVER_TARGET_NAME_MATCH);
     }
 
 
@@ -142,7 +142,7 @@ public class TAPSearcher implements Searcher {
 
             // Errors in the form.
             if (!formData.isValid(formError)) {
-                handleError(job, formError.toString(), jobUpdater, ErrorType.FATAL);
+                handleError(job, formError.toString(), jobUpdater);
                 jsonWriter.key("errorMessage").value(job.getErrorSummary().getSummaryMessage());
             } else {
                 runSearch(serviceURI, jsonWriter, job, jobUpdater, formData);
@@ -178,7 +178,7 @@ public class TAPSearcher implements Searcher {
         final FormErrors formError = new FormErrors();
 
         if (!templates.isValid(formError)) {
-            handleError(job, formError.toString(), jobUpdater, ErrorType.FATAL);
+            handleError(job, formError.toString(), jobUpdater);
         } else {
             // Just a simple OutputStream to hold the results URL.
             final OutputStream outputStream = new ByteArrayOutputStream();
@@ -205,22 +205,18 @@ public class TAPSearcher implements Searcher {
             if (isCutoutSpecified(job)) {
                 // Check for BAND and POS cutouts
                 final Cutout bandCutout = getBANDCutout(job, templates);
-                if (bandCutout != null) {
-                    final String cutoutValue = bandCutout.format();
+                final String bandCutoutValue = bandCutout.format();
 
-                    if (StringUtil.hasText(cutoutValue)) {
-                        jsonWriter.key("band").value(cutoutValue);
-                    }
+                if (StringUtil.hasText(bandCutoutValue)) {
+                    jsonWriter.key("band").value(bandCutoutValue);
                 }
 
                 final Cutout posCutout = getPOSCutout(job, templates);
-                if (posCutout != null) {
-                   final String cutoutValue = posCutout.format();
+                final String posCutoutValue = posCutout.format();
 
-                   if (StringUtil.hasText(cutoutValue)) {
-                       jsonWriter.key("pos").value(cutoutValue);
-                   }
-               }
+                if (StringUtil.hasText(posCutoutValue)) {
+                    jsonWriter.key("pos").value(posCutoutValue);
+                }
             }
 
             // Include the parsed resolver information, if any.
@@ -384,12 +380,9 @@ public class TAPSearcher implements Searcher {
             // Run the TAP Job.
             if (ownerSubject != null) {
                 // To pass on the SSO Cookie credential
-                Subject.doAs(ownerSubject, new PrivilegedAction<Void>() {
-                    @Override
-                    public Void run() {
-                        tapClient.execute(serviceURI, tapJob, outputStream);
-                        return null;
-                    }
+                Subject.doAs(ownerSubject, (PrivilegedAction<Void>) () -> {
+                    tapClient.execute(serviceURI, tapJob, outputStream);
+                    return null;
                 });
             } else {
                 tapClient.execute(serviceURI, tapJob, outputStream);
@@ -403,11 +396,9 @@ public class TAPSearcher implements Searcher {
      * Handle an error message.
      *
      * @param message   The error message to set to the job.
-     * @param errorType The error type to set to the job.
      */
-    private void handleError(final Job job, final String message, final JobUpdater jobUpdater,
-                             final ErrorType errorType) {
-        final ErrorSummary errorSummary = new ErrorSummary(message, errorType);
+    private void handleError(final Job job, final String message, final JobUpdater jobUpdater) {
+        final ErrorSummary errorSummary = new ErrorSummary(message, ErrorType.FATAL);
 
         try {
             job.setErrorSummary(errorSummary);
@@ -415,8 +406,7 @@ public class TAPSearcher implements Searcher {
 
             jobUpdater.setPhase(job.getID(), ExecutionPhase.EXECUTING, ExecutionPhase.ERROR, errorSummary, new Date());
         } catch (Throwable oops) {
-            LOGGER.error("failed to set final error status after " + message,
-                         oops);
+            LOGGER.error("failed to set final error status after " + message, oops);
             syncResponseWriter.setResponseCode(500);
         }
     }
