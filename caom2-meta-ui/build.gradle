@@ -22,10 +22,13 @@ dependencies {
     testCompile 'org.easymock:easymock:[4.0,)'
 }
 
-apply from: '../opencadc.gradle'
 apply from: '../int_test.gradle'
 
 version = '1019'
+sourceCompatibility = 1.8
+group = 'org.opencadc'
+
+def git_url = 'https://github.com/opencadc/caom2ui'
 
 ext {
     // Change this value to test other locations, such as Production or RC.
