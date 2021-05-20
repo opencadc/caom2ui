@@ -1,6 +1,6 @@
 plugins {
     id 'maven'
-    id 'java'
+    id 'java-library'
     id 'maven-publish'
 }
 
@@ -41,9 +41,7 @@ dependencies {
     testImplementation 'org.easymock:easymock:[3.6,4.0)'
 }
 
-sourceCompatibility = 1.8
-group = 'org.opencadc'
-version = '2.13.2'
+apply from: '../opencadc.gradle'
 
+version = '2.13.2'
 description = 'OpenCADC CAOM search server library'
-def git_url = 'https://github.com/opencadc/caom2ui'
