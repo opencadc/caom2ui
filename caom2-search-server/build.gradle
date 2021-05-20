@@ -1,13 +1,12 @@
 plugins {
     id 'maven'
-    id 'java'
+    id 'java-library'
     id 'maven-publish'
 }
 
 repositories {
     mavenCentral()
     mavenLocal()
-    mavenCentral()
 }
 
 dependencies {
@@ -31,7 +30,6 @@ dependencies {
     implementation 'org.opencadc:jsky:[1.0,2.0)'
     implementation 'org.apache.httpcomponents:httpclient:[4.5.11,4.6)'
     implementation 'commons-net:commons-net:3.6'
-    
 
     runtime 'org.postgresql:postgresql:42.2.19'
     runtime 'javax.servlet.jsp.jstl:jstl-api:1.2'
@@ -43,9 +41,7 @@ dependencies {
     testImplementation 'org.easymock:easymock:[3.6,4.0)'
 }
 
-sourceCompatibility = 1.8
-group = 'org.opencadc'
-version = '2.13.1'
+apply from: '../opencadc.gradle'
 
+version = '2.13.2'
 description = 'OpenCADC CAOM search server library'
-def git_url = 'https://github.com/opencadc/caom2ui'

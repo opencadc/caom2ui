@@ -1,4 +1,8 @@
-## Jan 8, 2020
+## May 20, 2021
+### 2.13.2
+* Change to not rely on local registry server
+
+## Jan 8, 2021
 ### 2.12.8
 * Minor change: Adding HST column bundle to display project proposal 
 column so HAP products can be identified and set column display 

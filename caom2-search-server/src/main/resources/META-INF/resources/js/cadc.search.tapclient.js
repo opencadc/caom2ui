@@ -33,6 +33,7 @@
         cadc: {
           search: {
             tapclient: {
+              TAP_SERVICE_STANDARD_ID : 'ivo://ivoa.net/std/TAP',
               TAP_SYNC_ENDPOINT : '/sync',
               SearchTapClient: SearchTapClient,
               events: {
@@ -65,19 +66,9 @@
     this._TAPServiceURL = {}
 
     var _rc = this
-    var _regClient = this.options.baseURL === '' ?
-                        new Registry() :
-                        new Registry({baseURL: this.options.baseURL})
-
-
-    function prepareTAPCall(baseURI) {
-      return _regClient.getServiceURL(
-              baseURI,
-              'ivo://ivoa.net/std/TAP',
-              'vs:ParamHTTP',
-              'cookie'
-          )
-    }
+    var _serviceLocatorEndpoint = this.options.serviceLocatorEndpoint === '' ?
+                                    'service-locator' :
+                                    this.options.serviceLocatorEndpoint
 
     function setTAPServiceURL(url, path) {
         _rc._TAPServiceURL = {
@@ -131,18 +122,24 @@
      * Make call to server to get TAP data
      * @private
      */
-      function postTAPRequest(tapQuery, format, callerId) {
+    function postTAPRequest(tapQuery, format, callerId) {
       // callerId is so the listeners can determine if an event coming
       // from an instance of this object belongs to them or not.
       var baseURI = _rc.options.tapServiceId
 
       if (typeof _rc._TAPServiceURL.href === 'undefined') {
-        Promise.resolve(this.prepareTAPCall(baseURI))
-          .then(function (serviceURL) {
-            _rc.setTAPServiceURL(serviceURL, ca.nrc.cadc.search.tapclient.TAP_SYNC_ENDPOINT)
+          $.get(
+            _serviceLocatorEndpoint,
+            {
+              serviceID: baseURI,
+              standardID: ca.nrc.cadc.search.tapclient.TAP_SERVICE_STANDARD_ID
+            }
+          )
+          .done(function (serviceURLJSON) {
+            _rc.setTAPServiceURL(serviceURLJSON.serviceURL, ca.nrc.cadc.search.tapclient.TAP_SYNC_ENDPOINT)
             postRequest(_rc._TAPServiceURL, format, tapQuery, callerId)
           })
-          .catch(function (err) {
+          .fail(function (err) {
             _rc.trigger(
               ca.nrc.cadc.search.tapclient.events.onTAPClientFail,
               {responseText: err}
@@ -201,7 +198,6 @@
       getLastEndpoint: getLastEndpoint,
       getLastURL: getLastURL,
       postTAPRequest: postTAPRequest,
-      prepareTAPCall: prepareTAPCall,
       setTAPServiceURL: setTAPServiceURL,
       subscribe: subscribe,
       trigger: trigger,
