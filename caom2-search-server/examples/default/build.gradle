@@ -9,6 +9,7 @@ plugins {
 }
 
 repositories {
+    mavenCentral()
     mavenLocal()
     jcenter()
 }
@@ -16,7 +17,7 @@ repositories {
 apply from: file('../../../int_test.gradle')
 
 dependencies {
-    compile 'org.opencadc:caom2-search-server:[2.12.5,)'
+    compile 'org.opencadc:caom2-search-server:[2.13.2,)'
     compile 'org.opencadc:cadc-uws-server:[1.2.1,)'
     compile 'org.opencadc:cadc-registry:[1.5.0,)'
 
@@ -31,13 +32,10 @@ ext {
     intTest_default_web_app_url = 'https://rc.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/search/'
     intTest_user_name = 'CADCtest'
     intTest_user_password = 'sywymUL4'
-
-    // Modify this to your liking!
-    default_docker_image_name = 'opencadc/caom2-search:' + project.version
 }
 
 group = 'org.opencadc'
-version = '2052'
+version = '2053'
 
 war {
     // Trying to fix static file caching on new build.
@@ -47,5 +45,5 @@ war {
         }
     }
 
-    archiveName = "search##" + project.version + ".war"
+    archiveName "search##" + project.version + ".war"
 }
