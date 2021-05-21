@@ -1838,17 +1838,13 @@
         votableURL += '&UPLOAD=' + upload
       }
 
-      for (
-        var dti = 0, dtl = ca.nrc.cadc.search.downloadTypes.length; dti < dtl; dti++
-      ) {
+      for (var dti = 0, dtl = ca.nrc.cadc.search.downloadTypes.length; dti < dtl; dti++) {
         var nextDownloadType = ca.nrc.cadc.search.downloadTypes[dti]
 
-        var nextVOTableURI = new cadc.web.util.URI(
-          votableURL + '&FORMAT=' + nextDownloadType
-        )
+        var nextVOTableURI = new cadc.web.util.URI(votableURL + '&FORMAT=' + nextDownloadType)
         $('a.votable_link_' + nextDownloadType).prop(
           'href',
-          nextVOTableURI.getRelativeURI()
+          nextVOTableURI.getURI()
         )
       }
 
