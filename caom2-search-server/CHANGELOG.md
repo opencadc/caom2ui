@@ -1,6 +1,10 @@
+## May 21, 2021
+### 2.13.3
+* Change to use server-side configured Registry server in Full Results links.
+
 ## May 20, 2021
 ### 2.13.2
-* Change to not rely on local registry server
+* Change to use server-side configured Registry server in populating the Additional Constraints menus.
 
 ## Jan 8, 2021
 ### 2.12.8
