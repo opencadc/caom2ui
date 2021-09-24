@@ -71,7 +71,7 @@ package ca.nrc.cadc.caom2.ui.server.client;
 
 import ca.nrc.cadc.caom2.Observation;
 import ca.nrc.cadc.caom2.ObservationURI;
-import ca.nrc.cadc.net.HttpDownload;
+import ca.nrc.cadc.net.HttpGet;
 import ca.nrc.cadc.net.NetUtil;
 import ca.nrc.cadc.reg.Standards;
 import org.apache.log4j.Logger;
@@ -106,9 +106,10 @@ public class Caom2MetaClient extends BaseClient {
         final URL serviceURL = getServiceURL(resourceID, Standards.CAOM2_OBS_20);
 
         LOGGER.debug(String.format("Using service URL '%s'", serviceURL.toExternalForm()));
+        LOGGER.debug("Executing with " + subject);
 
         final ReadAction ra = getObservationReader();
-        final HttpDownload get = getDownloader(serviceURL, ra);
+        final HttpGet get = getGetter(serviceURL, ra);
 
         Subject.doAs(subject, new GetAction(get, observationURI.getURI().toString()));
 

@@ -55,6 +55,7 @@ import java.util.List;
 import static org.easymock.EasyMock.*;
 
 import ca.nrc.cadc.net.HttpDownload;
+import ca.nrc.cadc.net.HttpGet;
 import org.junit.Test;
 
 
@@ -241,7 +242,7 @@ public class Caom2RepoObservationServletTest {
         final Caom2RepoClient.ReadAction mockObservationReader =
             createMock(Caom2RepoClient.ReadAction.class);
         final URL repoURL = new URL("http://mysite.com/caom2repo");
-        final HttpDownload mockDownloader = createMock(HttpDownload.class);
+        final HttpGet mockDownloader = createMock(HttpGet.class);
 
         final Caom2RepoClient testClient =
             new Caom2RepoClient() {
@@ -264,8 +265,8 @@ public class Caom2RepoObservationServletTest {
                  * @return HttpDownload instance.
                  */
                 @Override
-                public HttpDownload getDownloader(URL url,
-                                                  Caom2MetaClient.ReadAction readAction) {
+                public HttpGet getGetter(URL url,
+                                         ReadAction readAction) {
                     return mockDownloader;
                 }
 

@@ -75,6 +75,7 @@ import ca.nrc.cadc.caom2.Observation;
 import ca.nrc.cadc.caom2.xml.ObservationParsingException;
 import ca.nrc.cadc.caom2.xml.ObservationReader;
 import ca.nrc.cadc.net.HttpDownload;
+import ca.nrc.cadc.net.HttpGet;
 import ca.nrc.cadc.net.InputStreamWrapper;
 import ca.nrc.cadc.reg.client.RegistryClient;
 import org.apache.log4j.Logger;
@@ -114,7 +115,10 @@ public abstract class BaseClient {
      * @return Subject instance.
      */
     public Subject getCurrentSubject() {
-        return AuthenticationUtil.getCurrentSubject();
+        final Subject subject = AuthenticationUtil.getCurrentSubject();
+        LOGGER.debug("Calling with Subject: " + subject);
+
+        return subject;
     }
 
     /**
@@ -158,12 +162,12 @@ public abstract class BaseClient {
      * @param readAction The read action to write to.
      * @return HttpDownload instance.
      */
-    public HttpDownload getDownloader(final URL url, final BaseClient.ReadAction readAction) {
-        return new HttpDownload(url, readAction);
+    public HttpGet getGetter(final URL url, final ReadAction readAction) {
+        return new HttpGet(url, readAction);
     }
 
 
-    public class ReadAction implements InputStreamWrapper {
+    public static class ReadAction implements InputStreamWrapper {
         private Observation obs;
 
 
@@ -184,22 +188,23 @@ public abstract class BaseClient {
     }
 
 
-    protected class GetAction implements PrivilegedAction<Void> {
+    protected static class GetAction implements PrivilegedAction<Void> {
         private final String errorMessageID;
-        private final HttpDownload downloader;
+        private final HttpGet getter;
 
 
-        GetAction(final HttpDownload downloader, final String errorMessageID) {
-            this.downloader = downloader;
+        GetAction(final HttpGet getter, final String errorMessageID) {
+            this.getter = getter;
             this.errorMessageID = errorMessageID;
         }
 
         public Void run() {
-            downloader.run();
+            getter.run();
 
-            final Throwable e = downloader.getThrowable();
+            final Throwable e = getter.getThrowable();
 
             if (e != null) {
+                LOGGER.error("Encountered Exception: " + e + "\n");
                 final String message;
 
                 if ((e instanceof FileNotFoundException) || (e instanceof AccessControlException)) {
@@ -207,14 +212,14 @@ public abstract class BaseClient {
                 } else {
                     message = "Failed to get observation with publisherID '%s' from '%s'. "
                         + "| Impossible d'obtenir l'observation avec publisherID '%s' "
-                        + "de '%s'.";
+                        + "de '%s'.                                                    " + e.getMessage();
                 }
 
                 throw new RuntimeException(
                     String.format(message, errorMessageID,
-                                  downloader.getURL().toExternalForm(),
+                                  getter.getURL().toExternalForm(),
                                   errorMessageID,
-                                  downloader.getURL().toExternalForm()));
+                                  getter.getURL().toExternalForm()));
             }
 
             return null;
