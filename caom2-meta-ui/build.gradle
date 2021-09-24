@@ -35,3 +35,7 @@ ext {
     // Change this value to test other locations, such as Production or RC.
     intTest_default_web_app_url = 'https://rc.cadc-ccda.hia-iha.nrc-cnrc.gc.ca'
 }
+
+war {
+    archiveName 'caom2ui.war'
+}
