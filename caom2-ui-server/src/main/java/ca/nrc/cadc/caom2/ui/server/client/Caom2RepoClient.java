@@ -74,6 +74,7 @@ import ca.nrc.cadc.caom2.ObservationURI;
 import ca.nrc.cadc.config.ApplicationConfiguration;
 import ca.nrc.cadc.date.DateUtil;
 import ca.nrc.cadc.net.HttpDownload;
+import ca.nrc.cadc.net.HttpGet;
 import ca.nrc.cadc.reg.Standards;
 import org.apache.log4j.Logger;
 
@@ -207,9 +208,9 @@ public class Caom2RepoClient extends BaseClient {
         final URL serviceURL = getServiceURL();
 
         final BaseClient.ReadAction ra = getObservationReader();
-        final HttpDownload get = getDownloader(serviceURL, ra);
+        final HttpGet get = getGetter(serviceURL, ra);
 
-        Subject.doAs(subject, new BaseClient.GetAction(get, uri.toString()));
+        Subject.doAs(subject, new GetAction(get, uri.toString()));
 
         return ra.getObs();
     }

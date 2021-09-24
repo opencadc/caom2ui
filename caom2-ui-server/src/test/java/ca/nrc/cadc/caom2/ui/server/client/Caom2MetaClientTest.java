@@ -71,6 +71,7 @@ package ca.nrc.cadc.caom2.ui.server.client;
 
 import ca.nrc.cadc.caom2.ObservationURI;
 import ca.nrc.cadc.net.HttpDownload;
+import ca.nrc.cadc.net.HttpGet;
 import ca.nrc.cadc.net.NetUtil;
 
 import javax.security.auth.Subject;
@@ -86,7 +87,7 @@ import static org.junit.Assert.*;
 public class Caom2MetaClientTest {
     @Test
     public void getObservation() {
-        final HttpDownload mockDownload = createMock(HttpDownload.class);
+        final HttpGet mockDownload = createMock(HttpGet.class);
 
         final Caom2MetaClient testSubject = new Caom2MetaClient() {
             /**
@@ -112,7 +113,7 @@ public class Caom2MetaClientTest {
              * @return HttpDownload instance.
              */
             @Override
-            public HttpDownload getDownloader(URL url, ReadAction readAction) {
+            public HttpGet getGetter(URL url, ReadAction readAction) {
                 return mockDownload;
             }
         };
