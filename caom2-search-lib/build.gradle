@@ -28,5 +28,5 @@ dependencies {
 apply from: '../opencadc.gradle'
 
 def git_url = 'https://github.com/opencadc/caom2ui'
-version = '2.5.3'
+version = '2.5.4'
 description = 'OpenCADC CAOM UI library'
