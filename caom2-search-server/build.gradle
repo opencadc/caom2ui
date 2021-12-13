@@ -45,5 +45,5 @@ apply from: '../opencadc.gradle'
 
 def git_url = 'https://github.com/opencadc/caom2ui'
 
-version = '2.13.3'
+version = '2.13.4'
 description = 'OpenCADC CAOM search server library'
