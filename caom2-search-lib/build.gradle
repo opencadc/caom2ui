@@ -10,8 +10,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.apache.logging.log4j:log4j-core:[2.15.0,3.0)'
-    implementation 'org.apache.logging.log4j:log4j-slf4j-impl:[2.15.0,3.0)'
+    implementation 'log4j:log4j:1.2.17'
     implementation 'org.jdom:jdom2:2.0.6'
     implementation 'commons-io:commons-io:2.6'
 
@@ -28,5 +27,5 @@ dependencies {
 apply from: '../opencadc.gradle'
 
 def git_url = 'https://github.com/opencadc/caom2ui'
-version = '2.5.4'
+version = '2.5.5'
 description = 'OpenCADC CAOM UI library'

@@ -49,8 +49,8 @@ import java.util.Iterator;
 
 import ca.nrc.cadc.dali.tables.votable.VOTableWriter;
 import org.apache.commons.io.LineIterator;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
