@@ -30,6 +30,8 @@ configurations {
 
         if (project.hasProperty('intTest_web_app_url')) {
             systemProperty 'web.app.url', project.intTest_web_app_url
+        } else {
+            System.out.println("Please set the intTest_web_app_url property (-PintTest_web_app_url=https://myhost.com...).")
         }
 
         if (project.hasProperty('intTest_user_name')) {
