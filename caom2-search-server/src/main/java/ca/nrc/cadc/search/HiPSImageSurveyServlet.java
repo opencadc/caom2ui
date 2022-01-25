@@ -70,6 +70,7 @@ package ca.nrc.cadc.search;
 
 import ca.nrc.cadc.net.HttpGet;
 import ca.nrc.cadc.web.ConfigurableServlet;
+import org.apache.log4j.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletResponse;
@@ -80,16 +81,15 @@ import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+
 public class HiPSImageSurveyServlet extends ConfigurableServlet {
+    private static final Logger LOGGER = Logger.getLogger(HiPSImageSurveyServlet.class);
+
     private static final String DEFAULT_HIPS_BASE_URL =
             "https://archive-new.nrao.edu/vlass/HiPS/VLASS_Epoch1/Quicklook";
 
     private final URL hipsBaseURL;
 
-
-    public HiPSImageSurveyServlet(final URL hipsBaseURL) {
-        this.hipsBaseURL = hipsBaseURL;
-    }
 
     public HiPSImageSurveyServlet() {
         super();
@@ -163,9 +163,13 @@ public class HiPSImageSurveyServlet extends ConfigurableServlet {
     @Override
     protected void doGet(final HttpServletRequest req, final HttpServletResponse resp)
             throws ServletException, IOException {
+        LOGGER.debug("doGet()");
         final OutputStream outputStream = resp.getOutputStream();
-        final URL endpoint = new URL(hipsBaseURL, req.getPathInfo());
+        final String baseURLString = hipsBaseURL.toExternalForm() + "%s";
+        final URL endpoint = new URL(String.format(baseURLString, req.getPathInfo()));
+        LOGGER.debug(String.format("Proxying request to %s", endpoint.toExternalForm()));
         write(endpoint, outputStream);
+        LOGGER.debug("doGet() complete");
     }
 
     private void write(final URL endpoint, final OutputStream outputStream) throws IOException {

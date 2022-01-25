@@ -111,12 +111,13 @@
     this.fieldOfViewSetFlag = false
 
     this.addHooks = function() {
-      // WebRT 76120
-      // VLASS output for HiPS VLASS tiles.
-      //
-      // at88mph/jenkinsd 2019.11.01
-      //
-      var hipsDir = 'https://archive-new.nrao.edu/vlass/HiPS/VLASS_Epoch1/Quicklook/'
+      /*
+      * Use a local endpoint (/survey-images) to proxy VLASS HiPS tiles as their endpoint cannot be used while the
+      * CADC pages are being browsed over HTTPS.
+      *
+      * jenkinsd 2022.01.25
+      */
+      const hipsDir = 'survey-images'
 
       var label = 'VLASS Epoch 1'
       var currA = _self.aladin
