@@ -88,10 +88,10 @@ import java.io.IOException;
  */
 public class Caom2MetaObservationServlet extends HttpServlet {
     private static final long serialVersionUID = -917406909288899339L;
-    private static Logger log = Logger.getLogger(Caom2MetaObservationServlet.class);
+    private static final Logger LOGGER = Logger.getLogger(Caom2MetaObservationServlet.class);
 
     private static final String ERROR_MESSAGE_NOT_FOUND_FORBIDDEN =
-        "Observation with Observation URI '%s' not found, or you are "
+            "Observation with Observation URI '%s' not found, or you are "
             + "forbidden from seeing it.  Please login and "
             + "try again. | l'Observation avec le URI '%s' pas "
             + "trouvé, ou vous n'avez pas permission.  S'il "
@@ -121,7 +121,7 @@ public class Caom2MetaObservationServlet extends HttpServlet {
      * @throws IOException      If IO exception.
      */
     protected void doGet(final HttpServletRequest request, final HttpServletResponse response)
-        throws ServletException, IOException {
+            throws ServletException, IOException {
         final long start = System.currentTimeMillis();
         final String errMsg;
 
@@ -130,21 +130,25 @@ public class Caom2MetaObservationServlet extends HttpServlet {
             final ObservationURI targetURI = ObservationUtil.extractObservationURIFromQuery(request);
             if (targetURI == null) {
                 errMsg = "Must specify the target URI (ivo://<authority>?<observation id>) in the query. | "
-                    + "Le chemain manque l'URI (ivo://<authority>?<observation id>)  dans le query.";
-                log.error(errMsg);
+                         + "Le chemain manque l'URI (ivo://<authority>?<observation id>) dans le requête.";
+                LOGGER.error(errMsg);
                 request.setAttribute("errorMsg", errMsg);
                 forward(request, response, "/error.jsp");
             } else {
                 final ObservationUtil.TargetObservation targetObservation =
-                    ObservationUtil.extractTargetObservation(request);
-                final Observation obs = metaClient.getObservation(metaClient.getCurrentSubject(),
-                                                                  targetObservation.getResourceID(),
-                                                                  targetObservation.getObservationURI());
+                        ObservationUtil.extractTargetObservation(request);
+                final Observation obs;
+
+                if (targetObservation == null) {
+                    obs = null;
+                } else {
+                    obs = metaClient.getObservation(metaClient.getCurrentSubject(), targetObservation.getResourceID(),
+                                                    targetObservation.getObservationURI());
+                }
 
                 if (obs == null) {
-                    errMsg = String.format(ERROR_MESSAGE_NOT_FOUND_FORBIDDEN, targetURI.toString(),
-                                           targetURI.toString());
-                    log.error(errMsg);
+                    errMsg = String.format(ERROR_MESSAGE_NOT_FOUND_FORBIDDEN, targetURI, targetURI);
+                    LOGGER.error(errMsg);
                     request.setAttribute("errorMsg", errMsg);
                     forward(request, response, "/error.jsp");
                 } else {
@@ -153,17 +157,16 @@ public class Caom2MetaObservationServlet extends HttpServlet {
                 }
             }
         } catch (RuntimeException oops) {
-            log.error("unexpected exception", oops);
+            LOGGER.error("unexpected exception", oops);
             request.setAttribute("errorMsg", oops.getMessage());
             forward(request, response, "/error.jsp");
         } finally {
-            log.info("doGet[" + (System.currentTimeMillis() - start) + "ms]");
+            LOGGER.info("doGet[" + (System.currentTimeMillis() - start) + "ms]");
         }
     }
 
-    private void forward(final HttpServletRequest request,
-                         final HttpServletResponse response, final String path)
-        throws ServletException, IOException {
+    private void forward(final HttpServletRequest request, final HttpServletResponse response, final String path)
+            throws ServletException, IOException {
         final RequestDispatcher dispatcher = request.getRequestDispatcher(path);
         dispatcher.forward(request, response);
     }

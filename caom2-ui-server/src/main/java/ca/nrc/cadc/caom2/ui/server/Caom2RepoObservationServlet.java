@@ -88,7 +88,7 @@ import java.util.List;
 
 public class Caom2RepoObservationServlet extends HttpServlet {
     private static final long serialVersionUID = 201708242300L;
-    private static Logger log = Logger.getLogger(Caom2RepoObservationServlet.class);
+    private static final Logger LOGGER = Logger.getLogger(Caom2RepoObservationServlet.class);
 
     private static final String ERROR_MESSAGE_NOT_FOUND_FORBIDDEN =
         "Observation with URI '%s' not found, or you are "
@@ -145,18 +145,21 @@ public class Caom2RepoObservationServlet extends HttpServlet {
                 }
                 case OBSERVATION_VIEW: {
                     final ObservationURI uri = ObservationUtil.extractObservationURIFromPath(request);
-                    final Observation obs =
-                        repoClient.getObservation(repoClient.getCurrentSubject(), uri);
+                    final Observation obs;
+                    if (uri == null) {
+                        obs = null;
+                    } else {
+                        obs = repoClient.getObservation(repoClient.getCurrentSubject(), uri);
+                    }
 
                     if (obs == null) {
                         String errMsg = String.format(ERROR_MESSAGE_NOT_FOUND_FORBIDDEN, uri, uri);
-                        log.error(errMsg);
+                        LOGGER.error(errMsg);
                         request.setAttribute("errorMsg", errMsg);
                         forward(request, response, "/error.jsp");
                     } else {
-                        request.setAttribute("collection", (uri == null) ? "Unknown" : uri.getCollection());
-                        request.setAttribute("observationID", (uri == null) ? "Unknown"
-                            : uri.getObservationID());
+                        request.setAttribute("collection", uri.getCollection());
+                        request.setAttribute("observationID", uri.getObservationID());
                         request.setAttribute("obs", obs);
                         forward(request, response, "/display.jsp");
                     }
@@ -172,12 +175,12 @@ public class Caom2RepoObservationServlet extends HttpServlet {
                 }
             }
         } catch (RuntimeException oops) {
-            log.error("unexpected runtime exception", oops);
+            LOGGER.error("unexpected runtime exception", oops);
             request.setAttribute("runtimeException", oops);
             request.setAttribute("errorMsg", oops.getMessage());
             forward(request, response, "/error.jsp");
         } finally {
-            log.info("doGet[" + (System.currentTimeMillis() - start) + "ms]");
+            LOGGER.info("doGet[" + (System.currentTimeMillis() - start) + "ms]");
         }
 
     }
@@ -189,7 +192,7 @@ public class Caom2RepoObservationServlet extends HttpServlet {
         if (sid == null) {
             requestType = COLLECTION_LIST;
         } else {
-            sid = sid.substring(1, sid.length()); // strip leading /
+            sid = sid.substring(1); // strip leading /
             String[] parts = sid.split("/");
 
             if (parts.length == 1) {
@@ -205,7 +208,7 @@ public class Caom2RepoObservationServlet extends HttpServlet {
             }
         }
 
-        log.error("Invalid path : " + sid);
+        LOGGER.error("Invalid path : " + sid);
         return requestType;
     }
 
@@ -213,7 +216,7 @@ public class Caom2RepoObservationServlet extends HttpServlet {
         String sid = request.getPathInfo();
 
         if (sid != null) {
-            sid = sid.substring(1, sid.length()); // strip leading /
+            sid = sid.substring(1); // strip leading /
             final String[] parts = sid.split("/");
 
             if (parts.length == 1) {
@@ -222,13 +225,12 @@ public class Caom2RepoObservationServlet extends HttpServlet {
         }
 
         String errMsg = "Collection name not found: " + sid;
-        log.error(errMsg);
+        LOGGER.error(errMsg);
         throw new RuntimeException(errMsg);
     }
 
 
-    private void forward(final HttpServletRequest request,
-                         final HttpServletResponse response, final String path)
+    private void forward(final HttpServletRequest request, final HttpServletResponse response, final String path)
         throws ServletException, IOException {
         final RequestDispatcher dispatcher = request.getRequestDispatcher(path);
         dispatcher.forward(request, response);

@@ -73,7 +73,6 @@ import ca.nrc.cadc.caom2.Observation;
 import ca.nrc.cadc.caom2.ObservationURI;
 import ca.nrc.cadc.config.ApplicationConfiguration;
 import ca.nrc.cadc.date.DateUtil;
-import ca.nrc.cadc.net.HttpDownload;
 import ca.nrc.cadc.net.HttpGet;
 import ca.nrc.cadc.reg.Standards;
 import org.apache.log4j.Logger;
@@ -119,10 +118,10 @@ public class Caom2RepoClient extends BaseClient {
         // no path for get collections list
         path = "";
         URL url = getServiceURL();
-        HttpDownload get = new HttpDownload(url, bos);
+        HttpGet get = new HttpGet(url, bos);
         get.run();
 
-        int response = get.getResponseCode();
+        final int response = get.getResponseCode();
 
         if (response == 200) {
             String message = bos.toString().trim();
@@ -155,7 +154,7 @@ public class Caom2RepoClient extends BaseClient {
             URL collectionURL = getServiceURL();
 
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            HttpDownload get = new HttpDownload(collectionURL, bos);
+            HttpGet get = new HttpGet(collectionURL, bos);
             get.run();
 
             int response = get.getResponseCode();
