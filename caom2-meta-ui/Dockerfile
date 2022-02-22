@@ -1,6 +1,6 @@
-FROM opencadc/tomcat:alpine
+FROM tomcat:9-jdk11-openjdk-slim
+
+RUN rm -rf webapps/* \
+    && mkdir -p /root/config
 
 COPY build/libs/*.war webapps/
-
-EXPOSE 5555
-

@@ -86,7 +86,7 @@ public class Caom2MetaObservationServletTest {
 
         mockRequest.setAttribute("errorMsg",
                                  "Must specify the target URI (ivo://<authority>?<observation id>) in the query. | "
-                                     + "Le chemain manque l'URI (ivo://<authority>?<observation id>)  dans le query.");
+                                     + "Le chemain manque l'URI (ivo://<authority>?<observation id>) dans le requête.");
         expectLastCall().once();
 
         expect(mockRequest.getRequestDispatcher("/error.jsp")).andReturn(mockErrorDispatcher).once();
