@@ -76,6 +76,7 @@
                 'CFHTWIRWOLF',
                 'HST',
                 'HSTHLA',
+                'JWST',
                 'GEMINI',
                 'JCMT',
                 'JCMTLS',
