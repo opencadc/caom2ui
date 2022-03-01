@@ -24,8 +24,8 @@
               ColumnManager: ColumnManager
             },
             datalink: {
-              thumbnail_uri: 'http://www.opencadc.org/caom2#thumbnail',
-              pkg_uri: 'http://www.opencadc.org/caom2#pkg',
+              thumbnail_uri: '#thumbnail',
+              pkg_uri: '#package',
               preview_uri: '#preview'
             },
             preview: {
