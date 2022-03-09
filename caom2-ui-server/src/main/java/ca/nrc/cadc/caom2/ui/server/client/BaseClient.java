@@ -74,7 +74,6 @@ import ca.nrc.cadc.auth.AuthenticationUtil;
 import ca.nrc.cadc.caom2.Observation;
 import ca.nrc.cadc.caom2.xml.ObservationParsingException;
 import ca.nrc.cadc.caom2.xml.ObservationReader;
-import ca.nrc.cadc.net.HttpDownload;
 import ca.nrc.cadc.net.HttpGet;
 import ca.nrc.cadc.net.InputStreamWrapper;
 import ca.nrc.cadc.reg.client.RegistryClient;
@@ -105,6 +104,11 @@ public abstract class BaseClient {
             + "trouvé, ou vous n'avez pas permission.  S'il "
             + "vous plaît connecter et essayez à nouveau.";
 
+    private static final String ERROR_MESSAGE_MISSING_CONFIGURATION =
+            "No configuration matching Resource ID '%s' for Standard '%s'.  Please create a ticket at "
+            + "support@canfar.net.  |  La configuration de l'ID de ressource '%s' se manque pour la norme '%s'. "
+            + "Veuillez créer un ticket à support@canfar.net.";
+
 
     BaseClient() {
     }
@@ -128,12 +132,19 @@ public abstract class BaseClient {
      * @return URL instance.
      */
     public URL getServiceURL(final URI resourceID, final URI standardsURI) {
+        LOGGER.debug(String.format("getServiceURL for Resource ID (%s) and Standards (%s).", resourceID, standardsURI));
         try {
             // Discover client service URL
             final Subject subject = getCurrentSubject();
             final RegistryClient rc = new RegistryClient();
             final AuthMethod authMethod = AuthenticationUtil.getAuthMethodFromCredentials(subject);
             final URL repoURL = rc.getServiceURL(resourceID, standardsURI, authMethod);
+
+            // No service to handle this request.
+            if (repoURL == null) {
+                throw new RuntimeException(String.format(ERROR_MESSAGE_MISSING_CONFIGURATION, resourceID, standardsURI,
+                                                         resourceID, standardsURI));
+            }
 
             return new URL(repoURL.toExternalForm() + path);
         } catch (MalformedURLException urie) {
