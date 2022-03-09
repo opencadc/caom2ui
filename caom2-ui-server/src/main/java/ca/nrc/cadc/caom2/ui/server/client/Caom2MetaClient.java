@@ -103,10 +103,11 @@ public class Caom2MetaClient extends BaseClient {
     public Observation getObservation(final Subject subject, final URI resourceID,
                                       final ObservationURI observationURI) {
         path = "?ID=" + NetUtil.encode(observationURI.getURI().toString());
+        LOGGER.debug(String.format("Looking for path %s", path));
         final URL serviceURL = getServiceURL(resourceID, Standards.CAOM2_OBS_20);
 
         LOGGER.debug(String.format("Using service URL '%s'", serviceURL.toExternalForm()));
-        LOGGER.debug("Executing with " + subject);
+        LOGGER.debug(String.format("Executing with %s", subject));
 
         final ReadAction ra = getObservationReader();
         final HttpGet get = getGetter(serviceURL, ra);
