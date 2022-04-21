@@ -81,7 +81,8 @@
                 'JCMT',
                 'JCMTLS',
                 'DAO',
-                'DAOPLATES'
+                'DAOPLATES',
+                'RACS'
               ],
               sortCollections: function(val1, val2) {
                 var val1Index = ca.nrc.cadc.search.datatrain.COLLECTION_ORDER.indexOf(
