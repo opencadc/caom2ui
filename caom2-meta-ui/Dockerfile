@@ -1,6 +1,3 @@
-FROM tomcat:9-jdk11-openjdk-slim
+FROM cadc-tomcat:1
 
-RUN rm -rf webapps/* \
-    && mkdir -p /root/config
-
-COPY build/libs/*.war webapps/
+COPY build/libs/caom2ui.war webapps/
