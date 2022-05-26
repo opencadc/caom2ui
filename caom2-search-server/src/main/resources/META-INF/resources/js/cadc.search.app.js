@@ -1451,8 +1451,12 @@
                     qKey,
                     decodeURIComponent(qValue.join())
                   )
-                }
-                else {
+                } else if (qKey === ca.nrc.cadc.search.OBSERVATION_INTENT_FIELD_ID) {
+                  activeSearchForm.setSelectValue(
+                    ca.nrc.cadc.search.OBSERVATION_INTENT_FIELD_ID, 
+                    qKey, 
+                    decodeURIComponent(qValue.join()))
+                } else {
                   activeSearchForm.setInputValue(qKey, decodeURIComponent(qValue.join()))
                 }
 

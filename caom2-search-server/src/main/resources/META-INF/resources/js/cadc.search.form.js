@@ -9,6 +9,7 @@
             CAOM2_TARGET_NAME_FIELD_ID: 'Plane.position.bounds',
             OBSCORE_TARGET_NAME_FIELD_ID: 'Char.SpatialAxis.Coverage.Support.Area',
             TIME_BOUNDS_FIELD_ID: 'Plane.time.bounds.samples',
+            OBSERVATION_INTENT_FIELD_ID: 'Observation.intent',
             FORM_LABEL_INPUT_LENGTH: 12,
             TARGET_FORM_LABEL_INPUT_LENGTH: 24,
             CHECKBOX_CHECKED_REGEX: /^true|on$/g,
@@ -2150,15 +2151,15 @@
      * @param {String} _optionValue    The value of the <option> to set.
      */
     this.setSelectValue = function (_uTypeID, _selectID, _optionValue) {
+      const $select = this.$form.find("select[id='" + _selectID + "']")
+      $select.val(_optionValue).change()
+
       var $detailsItem = this.$form.find(
         "details[id='" + _uTypeID + "_details']"
       )
 
       // Only proceed if a valid input ID was passed in.
       if ($detailsItem.length > 0) {
-        var $select = $detailsItem.find("select[id='" + _selectID + "']")
-        $select.val(_optionValue).change()
-
         if (_optionValue) {
           this.openDetailsItem($detailsItem)
         } else {
