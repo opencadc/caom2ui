@@ -8,9 +8,12 @@ The Meta UI will show a detailed tree-like view of Observations.
 
 The default configuration will use the CAOM-2 Meta service at CADC.
 
+```shell
+$ . VERSION for t in ${TAGS}; do docker build -t caom2-meta-ui:${t} .; done
 ```
-$ docker build -t caom2-meta-ui .
-$ docker run --name meta-ui -p 8080:8080 --rm caom2-meta-ui
+
+```shell
+$ docker run --name meta-ui -p 8080:8080 --rm caom2-meta-ui:<tag>
 ```
 
 ### Running against your own CAOM-2 Meta service
