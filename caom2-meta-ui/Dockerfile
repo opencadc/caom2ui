@@ -1,3 +1,6 @@
 FROM cadc-tomcat:1
 
-COPY build/libs/caom2ui.war webapps/
+# Web resources are in the caom2-search-server JAR file, so enable scanning of it.
+RUN sed -i 's/tomcat.util.scan.StandardJarScanFilter.jarsToScan=\\/tomcat.util.scan.StandardJarScanFilter.jarsToScan=\\\ncaom2-ui-server*\.jar,\\/' /etc/tomcat/catalina.properties
+
+COPY build/libs/caom2ui.war /usr/share/tomcat/webapps/
