@@ -70,41 +70,59 @@
                 4: 'Analysis Product'
               },
               COLLECTION_ORDER: [
-                'CFHT',
-                'CFHTMEGAPIPE',
-                'CFHTTERAPIX',
-                'CFHTWIRWOLF',
-                'HST',
-                'HSTHLA',
+                'CFHT*',
+                'HST*',
                 'JWST',
-                'GEMINI',
-                'JCMT',
-                'JCMTLS',
-                'DAO',
-                'DAOPLATES',
+                'GEMINI*',
+                'JCMT*',
+                'DAO*',
                 'RACS',
-                'WALLABY'
+                'WALLABY',
+                'SUBARU*'
               ],
               sortCollections: function(val1, val2) {
-                var val1Index = ca.nrc.cadc.search.datatrain.COLLECTION_ORDER.indexOf(
-                  val1
-                )
-                var val2Index = ca.nrc.cadc.search.datatrain.COLLECTION_ORDER.indexOf(
-                  val2
-                )
+                /**
+                 * Function to look for those collections that encompass a matching group (i.e. end in "*").
+                 * @param {*} val The collection to check against the set of known Collections.
+                 * @returns int index of matched Collection, or -1 if no match
+                 */
+                const fuzzyMatchIndex = function(val) {
+                  const collectionLength = ca.nrc.cadc.search.datatrain.COLLECTION_ORDER.length
+                  for (let i = 0; i < collectionLength; i++) {
+                    const nextCollection = ca.nrc.cadc.search.datatrain.COLLECTION_ORDER[i]
+                    const fuzzyIndex = nextCollection.indexOf('*')
+                    if (fuzzyIndex > 0) {
+                      const collection = nextCollection.substring(0, fuzzyIndex)
+                      if (val.startsWith(collection)) {
+                        return i
+                      }
+                    }
+                  }
 
-                var placement
+                  // Default unmatched value
+                  return -1
+                }
+
+                // Get exact matches first.
+                let val1Index = ca.nrc.cadc.search.datatrain.COLLECTION_ORDER.indexOf(val1)
+                let val2Index = ca.nrc.cadc.search.datatrain.COLLECTION_ORDER.indexOf(val2)
+
+                if (val1Index < 0) {
+                  val1Index = fuzzyMatchIndex(val1)
+                }
+
+                if (val2Index < 0) {
+                  val2Index = fuzzyMatchIndex(val2)
+                }
 
                 // Put garbage at the bottom
                 if (val2Index < 0) {
-                  placement = -1
+                  return -1
                 } else if (val1Index < 0) {
-                  placement = 1
+                  return 1
                 } else {
-                  placement = val1Index - val2Index
+                  return val1Index - val2Index
                 }
-
-                return placement
               },
               sortNumericDescending: function(val1, val2) {
                 var descVal
