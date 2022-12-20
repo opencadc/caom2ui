@@ -28,10 +28,9 @@ public interface PersistenceService
 
     // query-building support methods
     String literal(Object obj);
-    String getTable(Class c);
+    String getTable(Class<?> c);
     String getColumnName(String utype);
-    String getFrom(Class c, int depth);
-    String getAlias(Class c);
+    String getFrom(Class<?> c, int depth);
     String getWhere(final List<SearchTemplate> constraints);
 
     /**
@@ -42,7 +41,7 @@ public interface PersistenceService
      * @param results       The Collection of results to use.
      * @param <T>           The data type of results to use.
      */
-    <T> void query(final String sql, final ResultSetExtractor rse,
+    <T> void query(final String sql, final ResultSetExtractor<Collection<T>> rse,
                    final Collection<T> results);
 
     /**
@@ -53,7 +52,7 @@ public interface PersistenceService
      * @param results       The Collection of results to write to.
      * @param <T>           The data type of results to use.
      */
-    <T> void query(final String sql, final RowMapper rowMapper,
+    <T> void query(final String sql, final RowMapper<T> rowMapper,
                    final Collection<T> results);
 
     // SQL fragment generation (predicates in where clause)
@@ -61,8 +60,6 @@ public interface PersistenceService
     String toSQL(IntervalSearch s, String col, boolean carefulWithNULL);
     String toSQL(NumericSearch s, String col, boolean carefulWithNULL);
     String toSQL(TextSearch s, String col, boolean carefulWithNULL);
-    String toSQL(RangeSearch s, String col, boolean carefulWithNULL);
-
-    String toSQL(InList s, String col, boolean carefulWithNULL);
+    String toSQL(RangeSearch<?> s, String col, boolean carefulWithNULL);
     String toSQL(IsNull s, String col);
 }

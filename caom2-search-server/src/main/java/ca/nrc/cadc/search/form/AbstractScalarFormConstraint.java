@@ -36,13 +36,12 @@ package ca.nrc.cadc.search.form;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 
-
-import ca.nrc.cadc.caom2.InList;
 import ca.nrc.cadc.caom2.IsNull;
+import ca.nrc.cadc.caom2.Or;
 import ca.nrc.cadc.caom2.SearchTemplate;
 import ca.nrc.cadc.caom2.TextSearch;
 import ca.nrc.cadc.search.util.ParameterUtil;
@@ -53,9 +52,8 @@ import ca.nrc.cadc.uws.Job;
 
 abstract class AbstractScalarFormConstraint extends AbstractFormConstraint implements SearchableFormConstraint {
 
-    private static Logger log = Logger.getLogger(AbstractScalarFormConstraint.class);
+    private static final Logger LOGGER = Logger.getLogger(AbstractScalarFormConstraint.class);
 
-    // TODO: change this attribute to private
     // Array of selected values from the drop down list.
     private String[] selectedValues;
 
@@ -76,13 +74,13 @@ abstract class AbstractScalarFormConstraint extends AbstractFormConstraint imple
         if ((selectedValues == null) && (job != null)) {
             final List<String> list = new ParameterUtil().getValues(utype + this.getName(),
                                                                     job.getParameterList());
-            this.selectedValues = list.toArray(new String[list.size()]);
+            this.selectedValues = list.toArray(new String[0]);
         } else {
             this.selectedValues = selectedValues;
         }
     }
 
-    // Create a TextSearch or InList to SearchTemplates.
+    // Create a TextSearch or "Or" to SearchTemplates.
     private SearchTemplate buildScalarSearch(final List<String> list, final String tableColumn,
                                              final List<FormError> errorList) {
         if (list.size() == 1) {
@@ -96,13 +94,18 @@ abstract class AbstractScalarFormConstraint extends AbstractFormConstraint imple
                 }
             } catch (IllegalArgumentException e) {
                 errorList.add(new FormError(this.getUType(), e.getMessage()));
-                log.debug("Invalid parameters: " + e.getMessage()
-                                  + " " + this.toString());
+                LOGGER.debug("Invalid parameters: " + e.getMessage() + " " + this);
 
                 return null;
             }
         } else {
-            return new InList(tableColumn, list);
+            return new Or(list.stream().map(val -> {
+                if (val == null || val.trim().equalsIgnoreCase("null")) {
+                    return new IsNull(tableColumn);
+                } else {
+                    return new TextSearch(tableColumn, val);
+                }
+            }).collect(Collectors.toList()));
         }
     }
 

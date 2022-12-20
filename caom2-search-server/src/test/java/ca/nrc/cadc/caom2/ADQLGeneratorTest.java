@@ -137,21 +137,6 @@ public class ADQLGeneratorTest extends AbstractUnitTest<ADQLGenerator>
         final String sql = getTestSubject().toSQL(intervalSearch, null,
                                                   false);
 
-        // CADC-9369: these tests are changed from intersects to interval SQL
-        // temporarily until underlying argus queries
-        // are fixed in CADC-9367 - Mar 11/21, HGJ
-        //        assertEquals("SQL doesn't match.",
-        //                     "INTERSECTS( INTERVAL( 88.0, 888.0 ), Plane.energy_bounds_samples ) = 1",
-        //                     sql);
-        //
-        //
-        //        final IntervalSearch intervalSearch2 =
-        //                new IntervalSearch("Plane.energy.bounds.samples", null, 888.0d, "m");
-        //        final String sql2 = getTestSubject().toSQL(intervalSearch2, null,
-        //                                                   false);
-        //        assertEquals("SQL doesn't match.",
-        //                     "INTERSECTS( INTERVAL( 0.0, 888.0 ), Plane.energy_bounds_samples ) = 1",
-        //                     sql2);
 
         System.out.println(sql);
         assertEquals("SQL doesn't match.",

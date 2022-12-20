@@ -20,23 +20,22 @@ import ca.nrc.cadc.search.ObsModel;
  */
 public abstract class AbstractPersistenceService implements PersistenceService {
 
-    private static Logger LOGGER = Logger.getLogger(AbstractPersistenceService.class);
+    private static final Logger LOGGER = Logger.getLogger(AbstractPersistenceService.class);
 
     protected static final String BASE_PKG = "ca.nrc.cadc.caom2";
 
-    private static Telescope NULL_TELESCOPE = new Telescope("");
-    private static Instrument NULL_INSTRUMENT = new Instrument("");
-    private static Proposal NULL_PROPOSAL = new Proposal("");
-    private static Target NULL_TARGET = new Target("");
+    private static final Telescope NULL_TELESCOPE = new Telescope("");
+    private static final Instrument NULL_INSTRUMENT = new Instrument("");
+    private static final Proposal NULL_PROPOSAL = new Proposal("");
+    private static final Target NULL_TARGET = new Target("");
 
     protected static final String AND = " AND ";
     protected static final String OR = " OR ";
 
     protected String catalog;
     protected String schema;
-    protected Map<Class, String[]> columnMap;
-    protected Map<Class, String> aliasMap;
-    protected Map<Class, String> tableMap;
+    protected Map<Class<?>, String> aliasMap;
+    protected Map<Class<?>, String> tableMap;
 
     private boolean enabled;
     private DataSource ds;
@@ -89,13 +88,14 @@ public abstract class AbstractPersistenceService implements PersistenceService {
      * @param <T>     The data type of results to use.
      */
     @Override
-    @SuppressWarnings("unchecked")
-    public <T> void query(final String sql, final ResultSetExtractor rse,
-                          final Collection<T> results) {
+    public <T> void query(final String sql, final ResultSetExtractor<Collection<T>> rse, final Collection<T> results) {
         final JdbcTemplate jdbcTemplate = getJdbcTemplate();
 
         if (jdbcTemplate != null) {
-            results.addAll((Collection<T>) jdbcTemplate.query(sql, rse));
+            final Collection<T> queryResults = jdbcTemplate.query(sql, rse);
+            if (queryResults != null) {
+                results.addAll(queryResults);
+            }
         }
     }
 
@@ -108,9 +108,7 @@ public abstract class AbstractPersistenceService implements PersistenceService {
      * @param <T>       The data type of results to use.
      */
     @Override
-    @SuppressWarnings("unchecked")
-    public <T> void query(final String sql, final RowMapper rowMapper,
-                          final Collection<T> results) {
+    public <T> void query(final String sql, final RowMapper<T> rowMapper, final Collection<T> results) {
         final JdbcTemplate jdbcTemplate = getJdbcTemplate();
 
         if (jdbcTemplate == null) {
@@ -288,14 +286,12 @@ public abstract class AbstractPersistenceService implements PersistenceService {
             queryString = toSQL((SpatialSearch) tmpl, col, carefulWithNULL);
         } else if (tmpl instanceof IntervalSearch) {
             queryString = toSQL((IntervalSearch) tmpl, col, carefulWithNULL);
-        } else if (tmpl instanceof InList) {
-            queryString = toSQL((InList) tmpl, col, carefulWithNULL);
         } else if (tmpl instanceof NumericSearch) {
             queryString = toSQL((NumericSearch) tmpl, col, carefulWithNULL);
         } else if (tmpl instanceof TextSearch) {
             queryString = toSQL((TextSearch) tmpl, col, carefulWithNULL);
         } else if (tmpl instanceof RangeSearch) {
-            queryString = toSQL((RangeSearch) tmpl, col, carefulWithNULL);
+            queryString = toSQL((RangeSearch<?>) tmpl, col, carefulWithNULL);
         } else if (tmpl instanceof TimestampSearch) {
             queryString = toSQL((TimestampSearch) tmpl, col,
                                 carefulWithNULL);
@@ -318,7 +314,7 @@ public abstract class AbstractPersistenceService implements PersistenceService {
         throw new UnsupportedOperationException();
     }
 
-    public String toSQL(RangeSearch s, String col, boolean carefulWithNULL) {
+    public String toSQL(RangeSearch<?> s, String col, boolean carefulWithNULL) {
         throw new UnsupportedOperationException();
     }
 
@@ -483,42 +479,11 @@ public abstract class AbstractPersistenceService implements PersistenceService {
         return ret;
     }
 
-    public String toSQL(InList list, String col, boolean carefulWithNULL) {
-        final String queryString;
-
-        if (!list.hasValues() && (list.getSubquery() == null)) {
-            queryString = null;
-        } else {
-            final StringBuilder sb = new StringBuilder();
-
-            sb.append(col).append(" IN ( ");
-            if (list.hasValues()) {
-                for (final String val : list.getValues()) {
-                    sb.append(literal(val));
-                    sb.append(",");
-                }
-
-                sb.deleteCharAt(sb.lastIndexOf(","));
-            } else if (list.getSubquery() != null) {
-                sb.append(list.getSubquery());
-            }
-            sb.append(" )");
-
-            if (carefulWithNULL) {
-                return col + " IS NOT NULL AND " + sb.toString();
-            }
-
-            queryString = sb.toString();
-        }
-
-        return queryString;
-    }
-
     public String toSQL(IsNull s, String col) {
         return col + " IS NULL";
     }
 
-    protected Class getClassFromUtype(String utype)
+    protected Class<?> getClassFromUtype(String utype)
             throws ClassNotFoundException {
         int i = utype.indexOf('.');
         String simpleName = utype.substring(0, i);
@@ -539,7 +504,7 @@ public abstract class AbstractPersistenceService implements PersistenceService {
             } else {
                 int i = utype.indexOf('.');
                 String simpleName = utype.substring(0, i);
-                Class c = getClassFromUtype(utype);
+                final Class<?> c = getClassFromUtype(utype);
                 String alias = simpleName;
                 if (c != null) {
                     LOGGER.debug("getColumnName: class = " + c.getName());
@@ -557,7 +522,7 @@ public abstract class AbstractPersistenceService implements PersistenceService {
         }
     }
 
-    public String getTable(Class c) {
+    public String getTable(Class<?> c) {
         LOGGER.debug("getTable: " + c.getName());
         String tabName = tableMap.get(c);
         if (tabName.startsWith("(")) {
@@ -576,11 +541,11 @@ public abstract class AbstractPersistenceService implements PersistenceService {
         return sb.toString();
     }
 
-    public String getAlias(Class c) {
+    public String getAlias(Class<?> c) {
         return aliasMap.get(c);
     }
 
-    protected String getFrom(Class c) {
+    protected String getFrom(Class<?> c) {
         LOGGER.debug("getFrom: " + c);
         final String classTable = getTable(c);
         final String fromClause;
@@ -594,7 +559,7 @@ public abstract class AbstractPersistenceService implements PersistenceService {
         return fromClause;
     }
 
-    public String getFrom(Class c, int depth) {
+    public String getFrom(Class<?> c, int depth) {
         LOGGER.debug("getFrom: " + c + ", depth = " + depth);
 
         String a1 = getAlias(c);
@@ -640,7 +605,7 @@ public abstract class AbstractPersistenceService implements PersistenceService {
     }
 
 
-    protected static class ClassComp implements Comparator<Class> {
+    protected static class ClassComp implements Comparator<Class<?>> {
 
         public int compare(Class c1, Class c2) {
             return c1.getSimpleName().compareTo(c2.getSimpleName());
