@@ -34,8 +34,8 @@
 
 package ca.nrc.cadc.search.form;
 
-import ca.nrc.cadc.caom2.InList;
 import ca.nrc.cadc.caom2.IsNull;
+import ca.nrc.cadc.caom2.Or;
 import ca.nrc.cadc.caom2.SearchTemplate;
 import ca.nrc.cadc.caom2.TextSearch;
 import org.apache.log4j.Level;
@@ -213,11 +213,13 @@ public class SelectTest {
         selected.add("value2");
         select.setSelected(selected);
         searchTemplate = select.buildSearch(errorList);
-        assertTrue("Should be an InList instance", searchTemplate instanceof InList);
-        InList inList = (InList) searchTemplate;
-        String[] inListValues = inList.getValues().toArray(new String[0]);
-        assertEquals("SearchTemplate should have one element", 2, inListValues.length);
-        assertEquals("Should be 'value1'", "value1", inListValues[0]);
-        assertEquals("Should be 'value1'", "value2", inListValues[1]);
+        assertTrue("Should be an Or instance", searchTemplate instanceof Or);
+        Or orClause = (Or) searchTemplate;
+        final SearchTemplate[] orTemplates = orClause.getTemplates().toArray(new SearchTemplate[]{});
+        assertEquals("Should have two elements", 2, orTemplates.length);
+        assertEquals("Should be TextSearch", "TextSearch[@Select.utype,value1,value1,false,false]",
+                     orTemplates[0].toString());
+        assertEquals("Should be TextSearch", "TextSearch[@Select.utype,value2,value2,false,false]",
+                     orTemplates[1].toString());
     }
 }
