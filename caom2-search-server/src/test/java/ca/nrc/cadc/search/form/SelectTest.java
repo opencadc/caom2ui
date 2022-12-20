@@ -34,7 +34,6 @@
 
 package ca.nrc.cadc.search.form;
 
-import ca.nrc.cadc.caom2.InList;
 import ca.nrc.cadc.caom2.IsNull;
 import ca.nrc.cadc.caom2.Or;
 import ca.nrc.cadc.caom2.SearchTemplate;

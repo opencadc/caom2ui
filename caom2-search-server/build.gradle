@@ -29,10 +29,10 @@ dependencies {
     implementation 'org.apache.httpcomponents:httpclient:[4.5.11,4.6)'
     implementation 'commons-net:commons-net:3.6'
 
-    runtime 'org.postgresql:postgresql:42.2.19'
-    runtime 'javax.servlet.jsp.jstl:jstl-api:1.2'
-    runtime 'javax.servlet:jstl:1.2'
-    runtime 'org.apache.taglibs:taglibs-standard-impl:1.2.5'
+    runtimeOnly 'org.postgresql:postgresql:42.2.19'
+    runtimeOnly 'javax.servlet.jsp.jstl:jstl-api:1.2'
+    runtimeOnly 'javax.servlet:jstl:1.2'
+    runtimeOnly 'org.apache.taglibs:taglibs-standard-impl:1.2.5'
 
     testImplementation 'junit:junit:[4.12,5.0)'
     testImplementation 'org.skyscreamer:jsonassert:[1.5.0,2.0)'
