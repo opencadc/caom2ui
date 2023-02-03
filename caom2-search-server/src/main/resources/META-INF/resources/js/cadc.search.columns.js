@@ -330,7 +330,7 @@
                                   break
                                 }
 
-                              case 'readable':
+                              case 'link_authorized':
                                 {
                                   readableIndex = fieldIndex
                                   break
