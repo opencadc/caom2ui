@@ -70,6 +70,7 @@ package ca.nrc.cadc.search;
 
 import ca.nrc.cadc.AbstractUnitTest;
 import ca.nrc.cadc.net.HttpGet;
+import org.junit.Assert;
 import org.junit.Test;
 
 import javax.servlet.ServletOutputStream;
@@ -89,14 +90,20 @@ public class HiPSImageSurveyServletTest extends AbstractUnitTest<HiPSImageSurvey
         final HttpServletRequest mockRequest = createMock(HttpServletRequest.class);
         final HttpServletResponse mockResponse = createMock(HttpServletResponse.class);
         final ServletOutputStream mockServletOutputStream = createMock(ServletOutputStream.class);
+        final URL expectedURL =
+                new URL("https://archive-new.nrao.edu/vlass/HiPS/VLASS_Epoch1/Quicklook/mypath/3");
 
         final HttpGet mockHTTPGet = createMock(HttpGet.class);
         mockHTTPGet.run();
         expectLastCall().once();
 
+        final boolean[] callsMade = new boolean[] { false };
+
         this.testSubject = new HiPSImageSurveyServlet() {
             @Override
             HttpGet createHttpGet(URL url, OutputStream outputStream) {
+                Assert.assertEquals("Wrong URL.", expectedURL, url);
+                callsMade[0] = true;
                 return mockHTTPGet;
             }
         };
@@ -105,10 +112,11 @@ public class HiPSImageSurveyServletTest extends AbstractUnitTest<HiPSImageSurvey
         expectLastCall().once();
 
         expect(mockResponse.getOutputStream()).andReturn(mockServletOutputStream).once();
-        expect(mockRequest.getPathInfo()).andReturn("/mypath");
+        expect(mockRequest.getPathInfo()).andReturn("/vlass/mypath/3");
 
         replay(mockHTTPGet, mockRequest, mockResponse, mockServletOutputStream);
         this.testSubject.doGet(mockRequest, mockResponse);
+        Assert.assertTrue("Call was not made.", callsMade[0]);
         verify(mockHTTPGet, mockRequest, mockResponse, mockServletOutputStream);
     }
 }
