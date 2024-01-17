@@ -1,3 +1,7 @@
+## January 16, 2024
+### 2.15.3
+* Add LOTSS HiPS image survey to AladinLite Sky Viewer.
+
 ## February 23, 2022
 ### 2.13.8
 * Add JWST in the Data Train order

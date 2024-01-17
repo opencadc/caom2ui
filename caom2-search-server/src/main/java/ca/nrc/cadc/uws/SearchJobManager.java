@@ -1,7 +1,7 @@
 
 package ca.nrc.cadc.uws;
 
-import ca.nrc.cadc.auth.ACIdentityManager;
+import ca.nrc.cadc.ac.ACIdentityManager;
 import ca.nrc.cadc.auth.IdentityManager;
 import ca.nrc.cadc.uws.server.DatabaseJobPersistence;
 import ca.nrc.cadc.uws.server.JobExecutor;

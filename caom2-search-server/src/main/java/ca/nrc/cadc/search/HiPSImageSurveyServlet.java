@@ -69,6 +69,7 @@
 package ca.nrc.cadc.search;
 
 import ca.nrc.cadc.net.HttpGet;
+import ca.nrc.cadc.util.StringUtil;
 import ca.nrc.cadc.web.ConfigurableServlet;
 import org.apache.log4j.Logger;
 
@@ -78,26 +79,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
 
 
 public class HiPSImageSurveyServlet extends ConfigurableServlet {
     private static final Logger LOGGER = Logger.getLogger(HiPSImageSurveyServlet.class);
 
-    private static final String DEFAULT_HIPS_BASE_URL =
-            "https://archive-new.nrao.edu/vlass/HiPS/VLASS_Epoch1/Quicklook";
-
-    private final URL hipsBaseURL;
-
 
     public HiPSImageSurveyServlet() {
         super();
-        try {
-            this.hipsBaseURL = new URL(DEFAULT_HIPS_BASE_URL);
-        } catch (MalformedURLException malformedURLException) {
-            throw new RuntimeException(malformedURLException.getMessage(), malformedURLException);
-        }
     }
 
     /**
@@ -106,7 +97,7 @@ public class HiPSImageSurveyServlet extends ConfigurableServlet {
      *
      * <p>Overriding this method to support a GET request also
      * automatically supports an HTTP HEAD request. A HEAD
-     * request is a GET request that returns no body in the
+     * request is a GET request that returns an empty body in the
      * response, only the request header fields.
      *
      * <p>When overriding this method, read the request data,
@@ -165,11 +156,21 @@ public class HiPSImageSurveyServlet extends ConfigurableServlet {
             throws ServletException, IOException {
         LOGGER.debug("doGet()");
         final OutputStream outputStream = resp.getOutputStream();
-        final String baseURLString = hipsBaseURL.toExternalForm() + "%s";
-        final URL endpoint = new URL(String.format(baseURLString, req.getPathInfo()));
-        LOGGER.debug(String.format("Proxying request to %s", endpoint.toExternalForm()));
-        write(endpoint, outputStream);
+        final URL hipsURL = getHipsURL(req);
+        LOGGER.debug(String.format("Proxying request to %s", hipsURL.toExternalForm()));
+        write(hipsURL, outputStream);
         LOGGER.debug("doGet() complete");
+    }
+
+    private URL getHipsURL(final HttpServletRequest request) throws IOException {
+        final String pathInfo = request.getPathInfo();
+        final String[] pathElements = Arrays.stream(pathInfo.split("/"))
+                                            .filter(StringUtil::hasText)
+                                            .toArray(String[]::new);
+        final SurveyImageBackend surveyImageBackend = SurveyImageBackend.valueOf(pathElements[0].toUpperCase());
+        final String[] relevantPathItems = Arrays.copyOfRange(pathElements, 1, pathElements.length);
+        final String relevantPath = String.join("/", relevantPathItems);
+        return new URL(surveyImageBackend.tileEndpoint + "/" + relevantPath);
     }
 
     private void write(final URL endpoint, final OutputStream outputStream) throws IOException {
@@ -180,5 +181,16 @@ public class HiPSImageSurveyServlet extends ConfigurableServlet {
 
     HttpGet createHttpGet(final URL url, final OutputStream outputStream) {
         return new HttpGet(url, outputStream);
+    }
+
+    private enum SurveyImageBackend {
+        VLASS("https://archive-new.nrao.edu/vlass/HiPS/VLASS_Epoch1/Quicklook"),
+        LOTSS("https://hips.astron.nl/ASTRON/P/lotss_dr2_high");
+
+        private final String tileEndpoint;
+
+        SurveyImageBackend(String tileEndpoint) {
+            this.tileEndpoint = tileEndpoint;
+        }
     }
 }
