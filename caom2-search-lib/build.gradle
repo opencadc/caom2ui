@@ -31,5 +31,5 @@ java {
 apply from: '../opencadc.gradle'
 
 def git_url = 'https://github.com/opencadc/caom2ui'
-version = '2.5.8'
+version = '2.5.7'
 description = 'OpenCADC CAOM UI library'
