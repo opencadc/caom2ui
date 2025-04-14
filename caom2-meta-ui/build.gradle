@@ -28,7 +28,9 @@ dependencies {
 
 apply from: '../int_test.gradle'
 
-sourceCompatibility = 1.8
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+}
 
 def git_url = 'https://github.com/opencadc/caom2ui'
 

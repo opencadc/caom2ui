@@ -31,7 +31,6 @@ package ca.nrc.cadc.search.nameresolver;
 
 import ca.nrc.cadc.astro.CoordUtil;
 import ca.nrc.cadc.search.nameresolver.exception.ClientException;
-import ca.nrc.cadc.stc.CoordPair;
 
 import java.util.Properties;
 
