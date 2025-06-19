@@ -35,5 +35,5 @@ java {
 def git_url = 'https://github.com/opencadc/caom2ui'
 
 war {
-    archiveName 'caom2ui.war'
+    archiveFileName = 'caom2ui.war'
 }
