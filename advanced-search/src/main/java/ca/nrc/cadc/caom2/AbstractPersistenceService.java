@@ -150,13 +150,7 @@ public abstract class AbstractPersistenceService implements PersistenceService {
     }
 
     protected String literal(final Proposal p) {
-        final Proposal proposal;
-
-        if (p == null) {
-            proposal = NULL_PROPOSAL;
-        } else {
-            proposal = p;
-        }
+        final Proposal proposal = Objects.requireNonNullElse(p, NULL_PROPOSAL);
 
         return literal(proposal.getID()) + "," + literal(proposal.pi) + ","
                 + literal(proposal.title) + ","
@@ -164,13 +158,7 @@ public abstract class AbstractPersistenceService implements PersistenceService {
     }
 
     protected String literal(final Telescope t) {
-        final Telescope telescope;
-
-        if (t == null) {
-            telescope = NULL_TELESCOPE;
-        } else {
-            telescope = t;
-        }
+        final Telescope telescope = Objects.requireNonNullElse(t, NULL_TELESCOPE);
 
         return literal(telescope.getName()) + ","
                 + literal(telescope.geoLocationX) + ","
@@ -180,26 +168,13 @@ public abstract class AbstractPersistenceService implements PersistenceService {
     }
 
     protected String literal(final Instrument i) {
-        final Instrument instrument;
+        final Instrument instrument = Objects.requireNonNullElse(i, NULL_INSTRUMENT);
 
-        if (i == null) {
-            instrument = NULL_INSTRUMENT;
-        } else {
-            instrument = i;
-        }
-
-        return literal(instrument.getName()) + ","
-                + literal(instrument.getKeywords());
+        return literal(instrument.getName()) + "," + literal(instrument.getKeywords());
     }
 
     protected String literal(final Target t) {
-        final Target target;
-
-        if (t == null) {
-            target = NULL_TARGET;
-        } else {
-            target = t;
-        }
+        final Target target = Objects.requireNonNullElse(t, NULL_TARGET);
 
         return literal(target.getName()) + ","
                 + literal(target.type.getValue()) + ","
@@ -226,7 +201,7 @@ public abstract class AbstractPersistenceService implements PersistenceService {
         }
 
         final String ret = sb.toString().trim();
-        if (ret.length() == 0) {
+        if (ret.isEmpty()) {
             return null;
         }
 
@@ -250,8 +225,7 @@ public abstract class AbstractPersistenceService implements PersistenceService {
      * @param carefulWithNULL Flag to check for NULL in the SQL.
      * @return String SQL.
      */
-    public String toSQL(final SearchTemplate tmpl,
-                        final boolean carefulWithNULL) {
+    public String toSQL(final SearchTemplate tmpl, final boolean carefulWithNULL) {
         LOGGER.debug("toSQL: " + tmpl);
 
         final String queryString;
@@ -463,14 +437,14 @@ public abstract class AbstractPersistenceService implements PersistenceService {
             }
 
             if (ns.upper != null && ns.closedUpper) {
-                if (ret.length() > 0) {
+                if (!ret.isEmpty()) {
                     ret += " AND ";
                 }
                 ret += " " + col + " <= " + ns.upper;
             }
 
             if (ns.upper != null && !ns.closedUpper) {
-                if (ret.length() > 0) {
+                if (!ret.isEmpty()) {
                     ret += " AND ";
                 }
                 ret += " " + col + " < " + ns.upper;
@@ -494,11 +468,11 @@ public abstract class AbstractPersistenceService implements PersistenceService {
         return Class.forName(BASE_PKG + "." + simpleName);
     }
 
+    @Override
     public String getColumnName(String utype) {
         LOGGER.debug("getColumnName: " + utype);
         try {
-            final String column =
-                    ObsModel.getObsCoreName(utype.replaceAll("_", "."));
+            final String column = ObsModel.getObsCoreName(utype.replace("_", "."));
             if (column != null) {
                 return column;
             } else {

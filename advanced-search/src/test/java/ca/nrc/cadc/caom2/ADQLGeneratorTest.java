@@ -37,9 +37,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import ca.nrc.cadc.AbstractUnitTest;
-import ca.nrc.cadc.caom2.types.*;
+import ca.nrc.cadc.caom2.types.Location;
+import ca.nrc.cadc.caom2.types.Point;
+import ca.nrc.cadc.caom2.types.Shape;
 import ca.nrc.cadc.date.DateUtil;
 import ca.nrc.cadc.search.parser.Operand;
 import ca.nrc.cadc.search.parser.Range;
@@ -348,8 +349,7 @@ public class ADQLGeneratorTest extends AbstractUnitTest<ADQLGenerator>
         final Range<Double> decRange = new Range<>("-10..25", null, -10d, 25d,
                                                          Operand.RANGE);
 
-        final RangeSearch rangeSearch1 =
-                new RangeSearch<>(null, raRange, decRange);
+        final RangeSearch<Double> rangeSearch1 = new RangeSearch<>(null, raRange, decRange);
         try
         {
             getTestSubject().toSQL(rangeSearch1, null, false);
@@ -359,8 +359,7 @@ public class ADQLGeneratorTest extends AbstractUnitTest<ADQLGenerator>
         {
         }
 
-        final RangeSearch rangeSearch2 =
-                new RangeSearch<>("TESTSS", raRange, decRange);
+        final RangeSearch<Double> rangeSearch2 = new RangeSearch<>("TESTSS", raRange, decRange);
         try
         {
             getTestSubject().toSQL(rangeSearch2, null, false);
@@ -370,8 +369,7 @@ public class ADQLGeneratorTest extends AbstractUnitTest<ADQLGenerator>
         {
         }
 
-        final RangeSearch rangeSearch3 = new RangeSearch<>("Plane.position.bounds",
-                                                                 raRange, decRange);
+        final RangeSearch<Double> rangeSearch3 = new RangeSearch<>("Plane.position.bounds", raRange, decRange);
         final String sql = getTestSubject().toSQL(rangeSearch3, null, false);
         assertEquals("RangeSearch SQL doesn't match.",
                      "INTERSECTS( RANGE_S2D(110.0, 115.0, -10.0, 25.0), "
@@ -388,7 +386,7 @@ public class ADQLGeneratorTest extends AbstractUnitTest<ADQLGenerator>
 
         assertEquals("From clause is wrong.",
                      "caom2.Plane AS Plane "
-                     + "JOIN TAP_UPLOAD.search_upload as Upload on INTERSECTS(Upload.position, Plane.position_bounds) = 1 "
+                     + "JOIN TAP_UPLOAD.search_upload as Upload on INTERSECTS(Upload.target_position, Plane.position_bounds) = 1 "
                      + "JOIN caom2.Observation AS Observation ON Plane.obsID = Observation.obsID",
                      fromClause);
     }
@@ -404,7 +402,7 @@ public class ADQLGeneratorTest extends AbstractUnitTest<ADQLGenerator>
 
         assertEquals("From clause is wrong.",
                      "ivoa.obscore.Plane AS Plane "
-                     + "JOIN TAP_UPLOAD.search_upload as Upload on INTERSECTS(Upload.position, Plane.s_fov) = 1 "
+                     + "JOIN TAP_UPLOAD.search_upload as Upload on INTERSECTS(Upload.target_position, Plane.s_fov) = 1 "
                      + "JOIN ivoa.obscore.Observation AS Observation ON Plane.obsID = Observation.obsID",
                      fromClause);
     }

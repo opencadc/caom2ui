@@ -39,6 +39,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.*;
 
 import ca.nrc.cadc.AbstractUnitTest;
+import ca.nrc.cadc.config.ApplicationConfiguration;
 import ca.nrc.cadc.date.DateUtil;
 import ca.nrc.cadc.net.TransientException;
 import ca.nrc.cadc.rest.SyncOutput;
@@ -46,6 +47,8 @@ import ca.nrc.cadc.search.Searcher;
 import ca.nrc.cadc.uws.server.JobUpdater;
 
 
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.easymock.EasyMock.*;
@@ -58,6 +61,16 @@ public class AdvancedRunnerTest extends AbstractUnitTest<AdvancedRunner> {
     private final SyncOutput mockSyncOutput = createMock(SyncOutput.class);
     private final Searcher mockSearcher = createMock(Searcher.class);
 
+
+    @BeforeClass
+    public static void setup() {
+        System.setProperty("org.opencadc.search.tap-service-id", AdvancedRunner.DEFAULT_TAP_SERVICE_URI.toString());
+    }
+
+    @AfterClass
+    public static void tearDownSystemProperties() {
+        System.clearProperty("org.opencadc.search.tap-service-id");
+    }
 
     @Test
     public void runOK() throws Throwable {
@@ -128,7 +141,7 @@ public class AdvancedRunnerTest extends AbstractUnitTest<AdvancedRunner> {
         cal.set(1977, Calendar.NOVEMBER, 25, 3, 21, 0);
         cal.set(Calendar.MILLISECOND, 0);
 
-        setTestSubject(new AdvancedRunner() {
+        setTestSubject(new AdvancedRunner(new ApplicationConfiguration()) {
             /**
              * Obtain the current date.  Implementors can override.
              *

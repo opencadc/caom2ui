@@ -318,9 +318,9 @@ public class ADQLGenerator extends AbstractPersistenceService {
                         query.append(getTargetNameField());
                         query.append(" = " + SEARCH_UPLOAD_TABLE + ".target");
                     } else {
-                        // search_upload.position is a Circle ( 3 doubles representing
+                        // search_upload.target_position is a Circle ( 3 doubles representing
                         // RA, Dec, and radius of the circle.)
-                        query.append("INTERSECTS(" + SEARCH_UPLOAD_TABLE + ".position, ");
+                        query.append("INTERSECTS(" + SEARCH_UPLOAD_TABLE + ".target_position, ");
                         query.append(a1);
                         query.append(".");
                         query.append(getTargetCoordField());
@@ -391,7 +391,7 @@ public class ADQLGenerator extends AbstractPersistenceService {
             sb.append(".radius");
             sb.append(prefix);
             sb.append(SEARCH_UPLOAD_TABLE);
-            sb.append(".position");
+            sb.append(".target_position");
         }
 
         return sb.toString();

@@ -105,7 +105,7 @@ public class StreamingVOTableWriter extends VOTableWriter {
         table.addContent(getField("radius", "double", namespace));
 
         // FIELD element for position
-        table.addContent(getField("position", "double", "circle", 3, namespace));
+        table.addContent(getField("target_position", "double", "circle", 3, namespace));
 
         // FIELD element for any errors encountered parsing the position.
         table.addContent(getField("TargetError", "char", namespace));

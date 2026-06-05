@@ -111,7 +111,7 @@ public class SearchInlineContentHandlerTest {
     @Test
     public void uploadBytes() throws Exception {
         final String[] expectedFields = new String[] {
-                "LineNumber", "Target", "RA", "DEC", "radius", "position", "TargetError"
+                "LineNumber", "Target", "RA", "DEC", "radius", "target_position", "TargetError"
         };
 
         final SearchInlineContentHandler testSubject = new SearchInlineContentHandler();
